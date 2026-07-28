@@ -1,0 +1,15 @@
+Coloque aqui as imagens reais da apresentação (renders), com estes nomes:
+
+  masterplan.png     -> planta geral (slide "Master Plan")
+  fabrica.jpg        -> Fábrica Bracerum
+  hotel.jpg          -> Hotel e Centro de Convenções
+  casas.jpg          -> Condomínio de Casas
+  convencoes.jpg     -> Centro de Convenções
+  tecnologico.jpg    -> Centro Tecnológico
+  escritorios.jpg    -> Escritórios e Salas Corporativas
+  comercial.jpg      -> Centro Comercial e Serviços
+  clube.jpg          -> Clube Bracerum
+  eventos.jpg        -> Eventos e Gastronomia
+
+Enquanto as imagens não existirem, o site mostra placeholders elegantes
+automaticamente — nada quebra. Basta salvar os arquivos e recarregar.
