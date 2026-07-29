@@ -291,6 +291,25 @@ parkFinder.addEventListener("click", () => {
   map.flyTo([PARK.lat, PARK.lng], 13, { duration: 1.2 });
 });
 
+/* ---------- Mobile: guard de toque ----------
+   Em telas touch, o mapa começa "travado" para não capturar a rolagem
+   da página; um toque libera a navegação com um dedo. */
+const isTouch = window.matchMedia("(pointer: coarse)").matches;
+if (isTouch) {
+  map.dragging.disable();
+  const guard = document.createElement("button");
+  guard.type = "button";
+  guard.className = "map-touch-guard";
+  guard.setAttribute("aria-label", "Ativar navegação no mapa");
+  guard.innerHTML = "<span>🗺️ Toque para explorar o mapa</span>";
+  mapHolder.appendChild(guard);
+  guard.addEventListener("click", () => {
+    map.dragging.enable();
+    map.touchZoom.enable();
+    guard.classList.add("is-hidden");
+  });
+}
+
 /* ---------- Painel lateral: acordeão + listas ---------- */
 function fillList(el, items) {
   items.forEach((p) => {
@@ -452,12 +471,12 @@ function renderTable() {
   rows.forEach((c) => {
     const tr = document.createElement("tr");
     tr.innerHTML = `
-      <td><span class="c-name"><span class="c-flag">${c.flag}</span>${c.name}</span><br>
+      <td data-label="Empresa"><span class="c-name"><span class="c-flag">${c.flag}</span>${c.name}</span><br>
           <span class="badge ${c.where === "villeta" ? "" : "badge--soft"}">${c.badge}</span></td>
-      <td>${c.country}</td>
-      <td>${c.sector}</td>
-      <td><span class="c-val">${c.valueLabel}</span></td>
-      <td class="c-note">${c.note}</td>`;
+      <td data-label="Origem">${c.country}</td>
+      <td data-label="Setor">${c.sector}</td>
+      <td data-label="Investimento"><span class="c-val">${c.valueLabel}</span></td>
+      <td data-label="Destaque" class="c-note">${c.note}</td>`;
     tbody.appendChild(tr);
   });
 }
@@ -499,7 +518,12 @@ const navLinks = document.getElementById("navLinks");
 burger.addEventListener("click", () => {
   const open = navLinks.classList.toggle("is-open");
   burger.setAttribute("aria-expanded", open);
+  document.body.style.overflow = open ? "hidden" : "";
 });
 navLinks.querySelectorAll("a").forEach((a) =>
-  a.addEventListener("click", () => { navLinks.classList.remove("is-open"); burger.setAttribute("aria-expanded", "false"); })
+  a.addEventListener("click", () => {
+    navLinks.classList.remove("is-open");
+    burger.setAttribute("aria-expanded", "false");
+    document.body.style.overflow = "";
+  })
 );
