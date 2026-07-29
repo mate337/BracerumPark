@@ -1,5 +1,5 @@
 /* ==========================================================
-   BRACERUM/PARK — script principal (tema claro)
+   BRACERUM/PARK — script principal · v3
    ========================================================== */
 
 /* ---------- Placeholder (usado se alguma imagem faltar em /assets) ---------- */
@@ -9,6 +9,15 @@ window.buildPlaceholder = function (title, ratio) {
   div.innerHTML = `<span class="ph-title">${title}</span><small>adicione a imagem em /assets</small>`;
   return div;
 };
+
+/* ---------- Nav: transparente sobre o hero, sólida ao rolar ---------- */
+const siteNav = document.getElementById("siteNav");
+function updateNav() {
+  const past = window.scrollY > window.innerHeight * 0.72;
+  siteNav.classList.toggle("nav--transparent", !past);
+}
+updateNav();
+window.addEventListener("scroll", updateNav, { passive: true });
 
 /* ==========================================================
    02 · MASTERPLAN
@@ -61,11 +70,11 @@ document.querySelectorAll(".master__legend .chip").forEach((chip) => {
 });
 
 /* ==========================================================
-   03 · LOCALIZAÇÃO — Mapa claro com portos, rótulos e rotas
+   03 · LOCALIZAÇÃO — Mapa
    ========================================================== */
 const PARK = { lat: -25.771694, lng: -57.732389 }; // 25°46'18.1"S 57°43'56.6"W
 
-/* Portos fluviais (dados da tabela oficial) */
+/* Grupo 1 — Portos fluviais */
 const ports = [
   { name: "Emb. Puerto Alegre",   sub: "Fluvial · atracadouro local", via: "vicinal",          km: "4 km",  tempo: "0h 10m", lat: -25.7930, lng: -57.7565 },
   { name: "Puerto Lobato",        sub: "Fluvial · atracadouro local", via: "vicinal",          km: "6 km",  tempo: "0h 15m", lat: -25.8085, lng: -57.7660 },
@@ -77,11 +86,28 @@ const ports = [
   { name: "Porto de Alberdi",     sub: "Fluvial · local",             via: "PY19",             km: "72 km", tempo: "1h",     lat: -26.1870, lng: -58.1290 },
 ];
 
-/* Referências rodoviárias / energia */
-const roadRefs = [
-  { name: "Bracerum Park", sub: "Villeta Industrial City · 1,82 mi m²", km: "—", tempo: "", lat: PARK.lat, lng: PARK.lng, main: true },
-  { name: "Subestação da ANDE", sub: "Energia · Itaipu / Yacyretá", via: "PY19", km: "7,4 km", tempo: "", lat: -25.7205, lng: -57.6935 },
-  { name: "Assunção", sub: "Capital + aeroporto internacional", via: "Acceso Sur", km: "70 km", tempo: "1h 30m", lat: -25.2867, lng: -57.6470 },
+/* Grupo 2 — Rodovias · destinos Mercosul (tabela de conectividade) */
+const roads = [
+  { name: "Assunção",        sub: "Central · PY",     via: "Acceso Sur",     km: "70 km",    tempo: "1h 30m",  lat: -25.2867, lng: -57.6470 },
+  { name: "Encarnación",     sub: "Itapúa · PY",      via: "Ruta 1",         km: "355 km",   tempo: "4h 40m",  lat: -27.3306, lng: -55.8667 },
+  { name: "Ciudad del Este", sub: "Alto Paraná · PY", via: "Ruta 2",         km: "360 km",   tempo: "5h",      lat: -25.5097, lng: -54.6111 },
+  { name: "Foz do Iguaçu",   sub: "Brasil",           via: "Ruta 2 / PY02",  km: "365 km",   tempo: "5h",      lat: -25.5163, lng: -54.5854 },
+  { name: "Curitiba",        sub: "Brasil",           via: "BR-277",         km: "1.000 km", tempo: "12h 30m", lat: -25.4284, lng: -49.2733 },
+  { name: "Porto Alegre",    sub: "Brasil",           via: "BR-386",         km: "1.055 km", tempo: "14h 30m", lat: -30.0346, lng: -51.2177 },
+  { name: "Córdoba",         sub: "Argentina",        via: "RN 16",          km: "1.100 km", tempo: "13h 00m", lat: -31.4201, lng: -64.1888 },
+  { name: "Buenos Aires",    sub: "Argentina",        via: "RN 12",          km: "1.280 km", tempo: "14h 30m", lat: -34.6037, lng: -58.3816 },
+  { name: "Florianópolis",   sub: "Brasil",           via: "BR-282",         km: "1.307 km", tempo: "15h",     lat: -27.5954, lng: -48.5480 },
+  { name: "Santa Cruz de la Sierra", sub: "Bolívia",  via: "Ruta 9",         km: "1.360 km", tempo: "18h 30m", lat: -17.7833, lng: -63.1821 },
+  { name: "São Paulo",       sub: "Brasil",           via: "BR-116",         km: "1.395 km", tempo: "17h 30m", lat: -23.5505, lng: -46.6333 },
+  { name: "Montevidéu",      sub: "Uruguai",          via: "RN 14",          km: "1.550 km", tempo: "19h",     lat: -34.9011, lng: -56.1645 },
+];
+
+/* Grupo 3 — Pontos de referência padrão */
+const refs = [
+  { name: "Bracerum Park",      sub: "Villeta Industrial City · 1,82 mi m²", km: "—",      tempo: "", lat: PARK.lat, lng: PARK.lng, main: true },
+  { name: "Subestação da ANDE", sub: "Energia · Itaipu / Yacyretá",          via: "PY19",  km: "7,4 km", tempo: "", lat: -25.7205, lng: -57.6935 },
+  { name: "Villeta",            sub: "Município-sede do parque",             via: "PY19",  km: "±20 km", tempo: "", lat: -25.5097, lng: -57.5619 },
+  { name: "Aeroporto Silvio Pettirossi", sub: "Internacional · Assunção",    via: "Acceso Sur", km: "±80 km", tempo: "", lat: -25.2399, lng: -57.5191 },
 ];
 
 const map = L.map("map", { scrollWheelZoom: false }).setView([-25.68, -57.72], 10);
@@ -90,40 +116,35 @@ L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r
   maxZoom: 19,
 }).addTo(map);
 
+/* --- Zoom com scroll apenas quando o mouse está sobre o mapa --- */
+const mapEl = document.getElementById("map");
+mapEl.addEventListener("mouseenter", () => map.scrollWheelZoom.enable());
+mapEl.addEventListener("mouseleave", () => map.scrollWheelZoom.disable());
+
 /* Ícones */
 const parkIcon = L.divIcon({
   className: "",
-  html: `<div style="width:24px;height:24px;transform:rotate(45deg);background:#a8842f;border:3px solid #161209;box-shadow:0 4px 14px rgba(22,18,9,.45)"></div>`,
+  html: `<div style="width:24px;height:24px;transform:rotate(45deg);background:#a07c26;border:3px solid #12100a;box-shadow:0 4px 14px rgba(18,16,10,.5)"></div>`,
   iconSize: [24, 24], iconAnchor: [12, 12],
 });
 const portIcon = L.divIcon({
   className: "",
-  html: `<div style="width:26px;height:26px;border-radius:50%;background:#161209;color:#fff;display:grid;place-items:center;font-size:13px;border:2px solid #a8842f;box-shadow:0 3px 10px rgba(22,18,9,.35)">⚓</div>`,
+  html: `<div style="width:26px;height:26px;border-radius:50%;background:#12100a;color:#fff;display:grid;place-items:center;font-size:13px;border:2px solid #a07c26;box-shadow:0 3px 10px rgba(18,16,10,.4)">⚓</div>`,
   iconSize: [26, 26], iconAnchor: [13, 13],
 });
 const refIcon = L.divIcon({
   className: "",
-  html: `<div style="width:14px;height:14px;transform:rotate(45deg);background:#fff;border:2.5px solid #a8842f;box-shadow:0 2px 8px rgba(22,18,9,.3)"></div>`,
+  html: `<div style="width:14px;height:14px;transform:rotate(45deg);background:#fff;border:2.5px solid #7c5f1a;box-shadow:0 2px 8px rgba(18,16,10,.35)"></div>`,
   iconSize: [14, 14], iconAnchor: [7, 7],
+});
+const cityIcon = L.divIcon({
+  className: "",
+  html: `<div style="width:16px;height:16px;border-radius:50%;background:#12100a;border:2.5px solid #fff;outline:1.5px solid #7c5f1a;box-shadow:0 2px 8px rgba(18,16,10,.4)"></div>`,
+  iconSize: [16, 16], iconAnchor: [8, 8],
 });
 
 const markers = {};
-function addMarker(p, icon, labelDir, labelClass) {
-  const m = L.marker([p.lat, p.lng], { icon }).addTo(map);
-  m.bindTooltip(
-    `${p.name}<small>${p.sub}${p.km && p.km !== "—" ? " · " + p.km : ""}</small>`,
-    { permanent: true, direction: labelDir, offset: labelDir === "right" ? [16, 0] : [-16, 0], className: "map-label " + (labelClass || "") }
-  );
-  m.bindPopup(
-    `<b>${p.name}</b><br>${p.sub}` +
-    (p.via ? `<br>Via: ${p.via}` : "") +
-    (p.km && p.km !== "—" ? `<br>Distância: ${p.km}${p.tempo ? " · " + p.tempo : ""}` : "")
-  );
-  markers[p.name] = m;
-  return m;
-}
-
-/* Direções dos rótulos ajustadas p/ evitar sobreposição no cluster de Villeta */
+/* Rótulos permanentes só no corredor local (evita poluição no zoom-out) */
 const labelDir = {
   "Bracerum Park": "right",
   "Emb. Puerto Alegre": "left",
@@ -135,27 +156,46 @@ const labelDir = {
   "Porto de Assunção": "left",
   "Porto de Alberdi": "left",
   "Subestação da ANDE": "left",
+  "Villeta": "right",
+  "Aeroporto Silvio Pettirossi": "right",
   "Assunção": "right",
 };
 
-ports.forEach((p) => addMarker(p, portIcon, labelDir[p.name] || "right"));
-roadRefs.forEach((p) =>
-  addMarker(p, p.main ? parkIcon : refIcon, labelDir[p.name] || "right", p.main ? "map-label--park" : "")
-);
+function addMarker(p, icon, opts = {}) {
+  const m = L.marker([p.lat, p.lng], { icon }).addTo(map);
+  const dir = labelDir[p.name] || "right";
+  m.bindTooltip(
+    `${p.name}<small>${p.sub}${p.km && p.km !== "—" ? " · " + p.km : ""}</small>`,
+    {
+      permanent: !opts.hoverOnly,
+      direction: dir,
+      offset: dir === "right" ? [16, 0] : [-16, 0],
+      className: "map-label " + (opts.labelClass || ""),
+    }
+  );
+  m.bindPopup(
+    `<b>${p.name}</b><br>${p.sub}` +
+    (p.via ? `<br>Via: ${p.via}` : "") +
+    (p.km && p.km !== "—" ? `<br>Distância: ${p.km}${p.tempo ? " · " + p.tempo : ""}` : "")
+  );
+  markers[p.name] = m;
+}
 
-/* Rótulo da rodovia PY19 no meio do corredor */
+ports.forEach((p) => addMarker(p, portIcon));
+refs.forEach((p) => addMarker(p, p.main ? parkIcon : refIcon, { labelClass: p.main ? "map-label--park" : "" }));
+/* Cidades do Mercosul: marcador pequeno + rótulo apenas no hover (exceto Assunção, do corredor) */
+roads.forEach((p) => addMarker(p, cityIcon, { hoverOnly: p.name !== "Assunção" }));
+
+/* Rótulo da rodovia PY19 */
 L.marker([-25.62, -57.63], { opacity: 0 })
   .addTo(map)
   .bindTooltip("Rodovia PY19<small>Mesmo eixo: Bracerum Park → Terport → Puerto Seguro</small>", {
     permanent: true, direction: "right", className: "map-label map-label--hwy", offset: [0, 0],
   });
 
-/* ---------- Rotas seguindo as rodovias ----------
-   1º: tenta o roteador OSRM (traçado real da via).
-   2º: se indisponível, usa polilinhas manuais aproximadas do eixo PY19. */
+/* ---------- Rotas seguindo as rodovias (OSRM com fallback) ---------- */
 const ROUTES = [
-  { // Corredor norte: Park → ANDE → Terport → Caacupemí → Puerto Seguro → Porto de Assunção (PY19 + Acceso Sur)
-    color: "#a8842f", weight: 4, opacity: 0.85,
+  { color: "#a07c26", weight: 4, opacity: 0.9,
     stops: [
       [PARK.lat, PARK.lng], [-25.7205, -57.6935], [-25.5296, -57.5568],
       [-25.5060, -57.5450], [-25.4728, -57.5539], [-25.2780, -57.6430],
@@ -164,29 +204,17 @@ const ROUTES = [
       [PARK.lat, PARK.lng], [-25.7205, -57.6935], [-25.66, -57.645], [-25.60, -57.60],
       [-25.5296, -57.5568], [-25.5060, -57.5450], [-25.4728, -57.5539],
       [-25.40, -57.575], [-25.33, -57.61], [-25.2780, -57.6430],
-    ],
-  },
-  { // Corredor sul: Park → Villa Oliva → Alberdi (PY19 sul)
-    color: "#161209", weight: 3, opacity: 0.6,
+    ] },
+  { color: "#12100a", weight: 3, opacity: 0.6,
     stops: [[PARK.lat, PARK.lng], [-26.0060, -57.8890], [-26.1870, -58.1290]],
     fallback: [
       [PARK.lat, PARK.lng], [-25.85, -57.77], [-25.93, -57.83],
       [-26.0060, -57.8890], [-26.10, -58.00], [-26.1870, -58.1290],
-    ],
-  },
-  { // Vicinais: Park → Emb. Puerto Alegre → Puerto Lobato
-    color: "#8a6b22", weight: 3, opacity: 0.7, dash: "5 7",
+    ] },
+  { color: "#7c5f1a", weight: 3, opacity: 0.75, dash: "5 7",
     stops: [[PARK.lat, PARK.lng], [-25.7930, -57.7565], [-25.8085, -57.7660]],
-    fallback: [[PARK.lat, PARK.lng], [-25.7930, -57.7565], [-25.8085, -57.7660]],
-  },
+    fallback: [[PARK.lat, PARK.lng], [-25.7930, -57.7565], [-25.8085, -57.7660]] },
 ];
-
-function drawFallback(r) {
-  L.polyline(r.fallback, {
-    color: r.color, weight: r.weight, opacity: r.opacity, dashArray: r.dash || null,
-  }).addTo(map);
-}
-
 async function drawRoute(r) {
   try {
     const coords = r.stops.map(([lat, lng]) => `${lng},${lat}`).join(";");
@@ -196,20 +224,32 @@ async function drawRoute(r) {
     const data = await res.json();
     if (!data.routes || !data.routes.length) throw new Error("no route");
     const line = data.routes[0].geometry.coordinates.map(([lng, lat]) => [lat, lng]);
-    L.polyline(line, {
-      color: r.color, weight: r.weight, opacity: r.opacity, dashArray: r.dash || null,
-    }).addTo(map);
+    L.polyline(line, { color: r.color, weight: r.weight, opacity: r.opacity, dashArray: r.dash || null }).addTo(map);
   } catch (e) {
-    drawFallback(r);
+    L.polyline(r.fallback, { color: r.color, weight: r.weight, opacity: r.opacity, dashArray: r.dash || null }).addTo(map);
   }
 }
 ROUTES.forEach(drawRoute);
 
-/* Enquadra tudo */
-const allPts = [...ports, ...roadRefs].map((p) => [p.lat, p.lng]);
-map.fitBounds(L.latLngBounds(allPts).pad(0.12));
+/* Enquadramento inicial: corredor local */
+const HOME_BOUNDS = L.latLngBounds(
+  [...ports, ...refs].map((p) => [p.lat, p.lng])
+).pad(0.12);
+map.fitBounds(HOME_BOUNDS);
 
-/* Listas laterais clicáveis */
+/* ---------- Botão Recentralizar ---------- */
+const recenterBtn = document.getElementById("recenterBtn");
+function checkRecenter() {
+  const distKm = map.distance(map.getCenter(), L.latLng(PARK.lat, PARK.lng)) / 1000;
+  const far = distKm > 55 || map.getZoom() < 8;
+  recenterBtn.classList.toggle("is-visible", far);
+}
+map.on("moveend zoomend", checkRecenter);
+recenterBtn.addEventListener("click", () => {
+  map.flyToBounds(HOME_BOUNDS, { duration: 1.2 });
+});
+
+/* ---------- Painel lateral: acordeão + listas ---------- */
 function fillList(el, items) {
   items.forEach((p) => {
     const li = document.createElement("li");
@@ -221,15 +261,35 @@ function fillList(el, items) {
   });
 }
 fillList(document.getElementById("portList"), ports);
-fillList(document.getElementById("roadList"), roadRefs);
+fillList(document.getElementById("roadList"), roads);
+fillList(document.getElementById("refList"), refs);
 
-document.querySelector(".map-panel").addEventListener("click", (e) => {
+/* Acordeão: um aberto por vez */
+const accs = document.querySelectorAll(".acc");
+accs.forEach((acc) => {
+  acc.querySelector(".acc__head").addEventListener("click", () => {
+    const isOpen = acc.dataset.open === "true";
+    accs.forEach((a) => {
+      a.dataset.open = "false";
+      a.querySelector(".acc__head").setAttribute("aria-expanded", "false");
+    });
+    if (!isOpen) {
+      acc.dataset.open = "true";
+      acc.querySelector(".acc__head").setAttribute("aria-expanded", "true");
+    }
+  });
+});
+
+/* Clique nos itens → navega no mapa */
+document.getElementById("mapPanel").addEventListener("click", (e) => {
   const btn = e.target.closest("button[data-name]");
   if (!btn) return;
-  document.querySelectorAll(".map-panel button").forEach((b) => b.classList.remove("is-active"));
+  document.querySelectorAll("#mapPanel button[data-name]").forEach((b) => b.classList.remove("is-active"));
   btn.classList.add("is-active");
-  const p = [...ports, ...roadRefs].find((x) => x.name === btn.dataset.name);
-  map.flyTo([p.lat, p.lng], 13, { duration: 1.1 });
+  const all = [...ports, ...roads, ...refs];
+  const p = all.find((x) => x.name === btn.dataset.name);
+  const isFar = roads.includes(p) && p.name !== "Assunção";
+  map.flyTo([p.lat, p.lng], isFar ? 7 : 13, { duration: 1.15 });
   markers[p.name].openPopup();
 });
 
@@ -242,89 +302,91 @@ ports.forEach((p) => {
     <td class="t-num">${p.km}</td><td class="t-num">${p.tempo}</td>`;
   portsBody.appendChild(tr);
 });
-
-const roadRows = [
-  { group: "Paraguai" },
-  { city: "Assunção", sub: "Central", via: "Acceso Sur", km: "70 km", tempo: "1h 30m" },
-  { city: "Encarnación", sub: "Itapúa", via: "Ruta 1", km: "355 km", tempo: "4h 40m" },
-  { city: "Ciudad del Este", sub: "Alto Paraná", via: "Ruta 2", km: "360 km", tempo: "5h" },
-  { group: "Mercosul e vizinhos" },
-  { city: "Foz do Iguaçu", sub: "BR", via: "Ruta 2 / PY02", km: "365 km", tempo: "5h" },
-  { city: "Curitiba", sub: "BR", via: "BR-277", km: "1.000 km", tempo: "12h 30m" },
-  { city: "Porto Alegre", sub: "BR", via: "BR-386", km: "1.055 km", tempo: "14h 30m" },
-  { city: "Córdoba", sub: "AR", via: "RN 16", km: "1.100 km", tempo: "13h 00m" },
-  { city: "Buenos Aires", sub: "AR", via: "RN 12", km: "1.280 km", tempo: "14h 30m" },
-  { city: "Florianópolis", sub: "BR", via: "BR-282", km: "1.307 km", tempo: "15h" },
-  { city: "Santa Cruz de la Sierra", sub: "BO", via: "Ruta 9", km: "1.360 km", tempo: "18h 30m" },
-  { city: "São Paulo", sub: "BR", via: "BR-116", km: "1.395 km", tempo: "17h 30m" },
-  { city: "Montevidéu", sub: "UY", via: "RN 14", km: "1.550 km", tempo: "19h" },
-];
 const roadsBody = document.querySelector("#roadsTable tbody");
-roadRows.forEach((r) => {
-  const tr = document.createElement("tr");
-  if (r.group) {
-    tr.className = "group-row";
-    tr.innerHTML = `<td colspan="4">${r.group}</td>`;
-  } else {
-    tr.innerHTML = `<td><span class="d-name">${r.city}</span><span class="d-sub">${r.sub}</span></td>
+const roadGroups = [
+  { label: "Paraguai", names: ["Assunção", "Encarnación", "Ciudad del Este"] },
+  { label: "Mercosul e vizinhos", names: ["Foz do Iguaçu", "Curitiba", "Porto Alegre", "Córdoba", "Buenos Aires", "Florianópolis", "Santa Cruz de la Sierra", "São Paulo", "Montevidéu"] },
+];
+roadGroups.forEach((g) => {
+  const trg = document.createElement("tr");
+  trg.className = "group-row";
+  trg.innerHTML = `<td colspan="4">${g.label}</td>`;
+  roadsBody.appendChild(trg);
+  g.names.forEach((n) => {
+    const r = roads.find((x) => x.name === n);
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td><span class="d-name">${r.name}</span><span class="d-sub">${r.sub}</span></td>
       <td class="d-via">${r.via}</td>
       <td class="t-num">${r.km}</td><td class="t-num">${r.tempo}</td>`;
-  }
-  roadsBody.appendChild(tr);
+    roadsBody.appendChild(tr);
+  });
 });
 
 /* ==========================================================
-   04 · GALERIA — nomes idênticos aos arquivos do repositório
+   04 · CARROSSEL — quase fullscreen, fundo preto
    ========================================================== */
-const galleryItems = [
-  { src: "assets/Fabrica.jpg",     cap: "Fábrica Bracerum", wide: true },
+const slides = [
+  { src: "assets/Fabrica.jpg",     cap: "Fábrica Bracerum" },
   { src: "assets/Hotel.jpg",       cap: "Hotel e Centro de Convenções" },
   { src: "assets/casas.jpg",       cap: "Condomínio de Casas" },
   { src: "assets/convencoes.jpg",  cap: "Centro de Convenções" },
   { src: "assets/convenco2.jpg",   cap: "Centro de Convenções · Interior" },
   { src: "assets/escritorios.jpg", cap: "Escritórios e Salas Corporativas" },
-  { src: "assets/Clube.jpg",       cap: "Clube Bracerum", wide: true },
+  { src: "assets/Clube.jpg",       cap: "Clube Bracerum" },
   { src: "assets/Eventos.jpg",     cap: "Eventos e Gastronomia" },
 ];
 
-const gallery = document.getElementById("gallery");
-galleryItems.forEach((g) => {
-  const fig = document.createElement("button");
-  fig.className = "gallery__item" + (g.wide ? " wide" : "");
-  fig.setAttribute("aria-label", "Ampliar: " + g.cap);
+const carTrack = document.getElementById("carTrack");
+const carCaption = document.getElementById("carCaption");
+const carCounter = document.getElementById("carCounter");
+const carDots = document.getElementById("carDots");
+let carIndex = 0;
+
+slides.forEach((s, i) => {
+  const slide = document.createElement("div");
+  slide.className = "carousel__slide";
   const img = document.createElement("img");
-  img.src = g.src; img.alt = g.cap; img.loading = "lazy";
-  img.onerror = function () { this.replaceWith(window.buildPlaceholder(g.cap, "4/3")); };
-  fig.appendChild(img);
-  const cap = document.createElement("span");
-  cap.className = "gallery__cap"; cap.textContent = g.cap;
-  fig.appendChild(cap);
-  fig.addEventListener("click", () => openLightbox(g));
-  gallery.appendChild(fig);
+  img.src = s.src; img.alt = s.cap;
+  img.loading = i === 0 ? "eager" : "lazy";
+  img.onerror = function () { this.replaceWith(window.buildPlaceholder(s.cap, "16/9")); };
+  slide.appendChild(img);
+  carTrack.appendChild(slide);
+
+  const dot = document.createElement("button");
+  dot.className = "carousel__dot";
+  dot.setAttribute("aria-label", "Ir para: " + s.cap);
+  dot.addEventListener("click", () => goTo(i));
+  carDots.appendChild(dot);
 });
 
-const lightbox = document.getElementById("lightbox");
-const lbMedia = document.getElementById("lbMedia");
-const lbCaption = document.getElementById("lbCaption");
-function openLightbox(g) {
-  lbMedia.innerHTML = "";
-  const img = document.createElement("img");
-  img.src = g.src; img.alt = g.cap;
-  img.onerror = function () { this.replaceWith(window.buildPlaceholder(g.cap, "16/9")); };
-  lbMedia.appendChild(img);
-  lbCaption.textContent = g.cap;
-  lightbox.classList.add("is-open");
-  lightbox.setAttribute("aria-hidden", "false");
-  document.body.style.overflow = "hidden";
+function goTo(i) {
+  carIndex = (i + slides.length) % slides.length;
+  carTrack.style.transform = `translateX(-${carIndex * 100}%)`;
+  carCaption.textContent = slides[carIndex].cap;
+  carCounter.textContent = `${String(carIndex + 1).padStart(2, "0")} / ${String(slides.length).padStart(2, "0")}`;
+  carDots.querySelectorAll(".carousel__dot").forEach((d, di) => d.classList.toggle("is-active", di === carIndex));
 }
-function closeLightbox() {
-  lightbox.classList.remove("is-open");
-  lightbox.setAttribute("aria-hidden", "true");
-  document.body.style.overflow = "";
-}
-document.getElementById("lbClose").addEventListener("click", closeLightbox);
-lightbox.addEventListener("click", (e) => { if (e.target === lightbox) closeLightbox(); });
-document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeLightbox(); });
+goTo(0);
+
+document.getElementById("carPrev").addEventListener("click", () => goTo(carIndex - 1));
+document.getElementById("carNext").addEventListener("click", () => goTo(carIndex + 1));
+
+/* Teclado (com o carrossel focado) */
+document.getElementById("carousel").addEventListener("keydown", (e) => {
+  if (e.key === "ArrowLeft") goTo(carIndex - 1);
+  if (e.key === "ArrowRight") goTo(carIndex + 1);
+});
+
+/* Swipe no mobile */
+let touchX = null;
+const viewport = document.getElementById("carViewport");
+viewport.addEventListener("touchstart", (e) => { touchX = e.touches[0].clientX; }, { passive: true });
+viewport.addEventListener("touchend", (e) => {
+  if (touchX === null) return;
+  const dx = e.changedTouches[0].clientX - touchX;
+  if (Math.abs(dx) > 46) goTo(carIndex + (dx < 0 ? 1 : -1));
+  touchX = null;
+}, { passive: true });
 
 /* ==========================================================
    06 · TABELA INTERATIVA — empresas
