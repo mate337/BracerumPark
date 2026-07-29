@@ -229,6 +229,8 @@ a{color:var(--gold-deep)}
 .master__media{
   border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;background:#fff;box-shadow:var(--shadow);
 }
+.master__rotate{width:100%}
+.master__rotate img{width:100%;display:block}
 .master__media img{width:100%}
 .master__media figcaption{
   padding:14px 20px;font-size:.84rem;color:var(--ink-soft);border-top:1px solid var(--line);
@@ -352,11 +354,11 @@ a{color:var(--gold-deep)}
   padding:8px 14px;cursor:pointer;
   font-family:var(--sans);font-weight:700;font-size:.76rem;color:var(--ink);
   box-shadow:0 8px 26px rgba(18,16,10,.35);
-  opacity:0;pointer-events:none;transition:opacity .25s;
+  opacity:0;visibility:hidden;pointer-events:none;transition:opacity .25s;
   transform:translate(-50%,-50%);
-  white-space:nowrap;
+  white-space:nowrap;left:-9999px;top:-9999px;
 }
-.park-finder.is-visible{opacity:1;pointer-events:auto}
+.park-finder.is-visible{opacity:1;visibility:visible;pointer-events:auto}
 .park-finder:hover{background:var(--gold-soft)}
 .park-finder__arrow{
   display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;
@@ -685,7 +687,15 @@ a{color:var(--gold-deep)}
   }
   .h-hint::after{content:"→";color:var(--gold-deep)}
 
-  /* --- Masterplan: chips roláveis + áreas como cards horizontais --- */
+  /* --- Masterplan: planta girada para retrato (pontos vermelhos p/ cima) --- */
+  .master__media{overflow:hidden;padding:8px}
+  .master__rotate{
+    position:relative;width:100%;aspect-ratio:9 / 16;overflow:hidden;border-radius:8px;
+  }
+  .master__rotate img{
+    position:absolute;top:50%;left:50%;max-width:none;
+    transform:translate(-50%,-50%) rotate(-90deg);transform-origin:center center;
+  }
   .master__legend{
     flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;
     margin:22px calc(-1 * var(--gap)) 14px;padding:2px var(--gap) 8px;scrollbar-width:none;
@@ -825,11 +835,13 @@ a{color:var(--gold-deep)}
 .logo-card__mark{
   height:64px;display:flex;align-items:center;justify-content:flex-start;margin-bottom:12px;
 }
-.logo-card__mark span{
-  font-family:var(--serif);font-weight:700;font-size:1.9rem;color:#fff;
-  filter:grayscale(1) brightness(1.6);opacity:.92;letter-spacing:-.01em;
+.logo-card__mark img{
+  max-height:44px;max-width:80%;width:auto;object-fit:contain;
+  filter:grayscale(1) brightness(0) invert(1);opacity:.92;
 }
-.logo-card__mark .flag{font-size:1.2rem;margin-left:8px;filter:grayscale(1) opacity(.7)}
+.logo-card__fallback{
+  font-family:var(--serif);font-weight:700;font-size:1.6rem;color:#fff;opacity:.9;
+}
 .logo-card__name{font-family:var(--serif);font-weight:700;font-size:1.15rem;color:#fff}
 .logo-card__meta{font-size:.78rem;color:#b3a888}
 .logo-card__badge{

@@ -69,6 +69,28 @@ document.querySelectorAll(".master__legend .chip").forEach((chip) => {
   });
 });
 
+/* Masterplan girado no mobile: dimensiona a imagem para preencher o container retrato.
+   Depois de rotacionar -90°, a "largura visual" = altura do <img> e vice-versa,
+   então largura do img = altura do container e altura do img = largura do container. */
+const masterRotate = document.querySelector(".master__rotate");
+const masterImg = masterRotate ? masterRotate.querySelector("img") : null;
+function sizeMasterplan() {
+  if (!masterImg) return;
+  const isMobile = window.matchMedia("(max-width: 720px)").matches;
+  if (!isMobile) { masterImg.style.width = ""; masterImg.style.height = ""; return; }
+  const cw = masterRotate.clientWidth;
+  const ch = masterRotate.clientHeight;
+  // img girado 90°: sua largura ocupa a altura do container; sua altura ocupa a largura
+  masterImg.style.width = ch + "px";
+  masterImg.style.height = cw + "px";
+  masterImg.style.objectFit = "cover";
+}
+if (masterImg) {
+  if (masterImg.complete) sizeMasterplan();
+  masterImg.addEventListener("load", sizeMasterplan);
+  window.addEventListener("resize", sizeMasterplan);
+}
+
 /* ==========================================================
    03 · LOCALIZAÇÃO — Mapa
    ========================================================== */
@@ -255,37 +277,38 @@ const parkFinderArrow = document.getElementById("parkFinderArrow");
 const mapHolder = document.querySelector(".map-holder");
 
 function updateParkFinder() {
+  const size = map.getSize();
+  // Se o mapa ainda não tem dimensão real (fora da tela/não medido), esconde.
+  if (!size.x || !size.y) { parkFinder.classList.remove("is-visible"); return; }
+
   const parkLatLng = L.latLng(PARK.lat, PARK.lng);
   const inView = map.getBounds().contains(parkLatLng);
   if (inView) {
     parkFinder.classList.remove("is-visible");
     return;
   }
-  parkFinder.classList.add("is-visible");
 
-  // Posição do Park em pixels relativos ao container do mapa
-  const size = map.getSize();               // largura/altura do mapa em px
   const center = { x: size.x / 2, y: size.y / 2 };
   const pt = map.latLngToContainerPoint(parkLatLng);
   const dx = pt.x - center.x;
   const dy = pt.y - center.y;
 
-  // Ângulo para girar a seta (➤ aponta para a direita por padrão)
   const angle = (Math.atan2(dy, dx) * 180) / Math.PI;
   parkFinderArrow.style.transform = `rotate(${angle}deg)`;
 
-  // Interseção do vetor centro→Park com a borda do mapa (com margem)
   const PAD = 56;
   const halfW = size.x / 2 - PAD;
   const halfH = size.y / 2 - PAD;
   const scale = 1 / Math.max(Math.abs(dx) / halfW, Math.abs(dy) / halfH);
   const x = center.x + dx * scale;
   const y = center.y + dy * scale;
+  // Posiciona ANTES de tornar visível — evita o "quadrado voando".
   parkFinder.style.left = x + "px";
   parkFinder.style.top = y + "px";
+  parkFinder.classList.add("is-visible");
 }
 map.on("move zoom moveend zoomend resize", updateParkFinder);
-updateParkFinder();
+map.whenReady(updateParkFinder);
 
 parkFinder.addEventListener("click", () => {
   map.flyTo([PARK.lat, PARK.lng], 13, { duration: 1.2 });
@@ -425,22 +448,27 @@ viewport.addEventListener("touchend", (e) => {
    ========================================================== */
 const companies = [
   { name: "Be8", flag: "🇧🇷", country: "Brasil", sector: "Biocombustíveis",
+    logo: "assets/be8.svg",
     value: 999999999, valueLabel: "n/d",
     note: "Líder brasileira em biodiesel. Desenvolve em Villeta a biorrefinaria Omega Green, de combustíveis renováveis avançados.",
     where: "villeta", badge: "Em Villeta" },
   { name: "Ball Corporation", flag: "🇺🇸", country: "EUA", sector: "Embalagens de alumínio",
+    logo: "assets/Ball_Corporation_logo_2024.svg",
     value: 80000000, valueLabel: "US$ 80 mi",
     note: "Maior fabricante mundial de latas de alumínio. Planta na região pela proximidade aos portos.",
     where: "villeta", badge: "Em Villeta" },
   { name: "Cremer", flag: "🇩🇪", country: "Alemanha", sector: "Óleos e químicos",
+    logo: "assets/cremer.svg",
     value: 999999999, valueLabel: "n/d",
     note: "Grupo alemão com planta de biodiesel e refino de glicerina em Villeta.",
     where: "villeta", badge: "Em Villeta" },
   { name: "Lupo", flag: "🇧🇷", country: "Brasil", sector: "Têxtil",
+    logo: "assets/Lupo_logo (1).svg",
     value: 6000000, valueLabel: "R$ 30 mi",
     note: "Têxtil centenária brasileira. Fábrica no Paraguai sob regime de Maquila, com custo de produção ~28% menor que no Brasil.",
     where: "paraguai", badge: "No Paraguai" },
   { name: "Kingspan", flag: "🇮🇪", country: "Irlanda", sector: "Construção industrializada",
+    logo: "assets/Kingspan_Group_logo.svg",
     value: 999999999, valueLabel: "n/d",
     note: "Líder global em painéis isotérmicos, com operação no Brasil (Kingspan Isoeste) e expansão na América do Sul.",
     where: "paraguai", badge: "No Paraguai" },
@@ -511,7 +539,10 @@ if (logosStrip) {
       <div class="logos-track">
         ${companies.map((c) => `
           <div class="logo-card">
-            <div class="logo-card__mark"><span>${c.name}</span><span class="flag">${c.flag}</span></div>
+            <div class="logo-card__mark">
+              <img src="${encodeURI(c.logo)}" alt="${c.name}" loading="lazy"
+                   onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'logo-card__fallback',textContent:${JSON.stringify(c.name)}}))" />
+            </div>
             <span class="logo-card__name">${c.country}</span>
             <span class="logo-card__meta">${c.sector} · ${c.valueLabel}</span>
             <span class="logo-card__badge ${c.where === "villeta" ? "" : "logo-card__badge--soft"}">${c.badge}</span>
