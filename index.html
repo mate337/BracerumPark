@@ -135,6 +135,10 @@
       <button id="recenterBtn" class="recenter" aria-label="Recentralizar no Bracerum Park">
         <span class="recenter__ico">◎</span> Recentralizar
       </button>
+      <button id="parkFinder" class="park-finder" aria-label="Ir para o Bracerum Park">
+        <span class="park-finder__arrow" id="parkFinderArrow">➤</span>
+        <span class="park-finder__txt">Bracerum Park</span>
+      </button>
     </div>
 
     <aside class="map-panel" id="mapPanel">
@@ -165,22 +169,6 @@
     </aside>
   </div>
 
-  <div class="tables-duo reveal">
-    <div class="dtable">
-      <h3>⚓ Distância dos portos fluviais</h3>
-      <table id="portsTable">
-        <thead><tr><th>Porto / Atracadouro</th><th>Via</th><th class="t-num">Distância</th><th class="t-num">Tempo</th></tr></thead>
-        <tbody></tbody>
-      </table>
-    </div>
-    <div class="dtable">
-      <h3>◆ Conectividade rodoviária <small>de carro</small></h3>
-      <table id="roadsTable">
-        <thead><tr><th>Destino</th><th>Via principal</th><th class="t-num">Distância</th><th class="t-num">Tempo</th></tr></thead>
-        <tbody></tbody>
-      </table>
-    </div>
-  </div>
 </section>
 
 <!-- ============ 04 · CARROSSEL DO PARQUE ============ -->
@@ -197,7 +185,7 @@
     </div>
     <button class="carousel__nav carousel__nav--next" id="carNext" aria-label="Próxima imagem">›</button>
 
-    <div class="carousel__footer">
+    <div class="carousel__overlay">
       <p class="carousel__caption" id="carCaption"></p>
       <div class="carousel__meta">
         <span class="carousel__counter" id="carCounter"></span>
@@ -317,6 +305,14 @@
     </div>
   </div>
 </footer>
+
+<!-- WhatsApp flutuante -->
+<a class="wa-float" target="_blank" rel="noopener" aria-label="Falar no WhatsApp"
+   href="https://wa.me/5511986516065?text=Ol%C3%A1%20Cleber.%20Estou%20no%20site%20do%20Bracerum%20Park%20e%20gostaria%20de%20saber%20mais%20sobre%20o%20projeto">
+  <svg viewBox="0 0 32 32" width="30" height="30" fill="currentColor" aria-hidden="true">
+    <path d="M16.04 3C9.06 3 3.4 8.66 3.4 15.64c0 2.23.58 4.4 1.69 6.32L3.3 28.7l6.9-1.81a12.6 12.6 0 0 0 5.84 1.49h.01c6.98 0 12.64-5.66 12.64-12.64C28.69 8.66 23.02 3 16.04 3zm0 22.99h-.01a10.5 10.5 0 0 1-5.35-1.47l-.38-.23-3.98 1.05 1.06-3.88-.25-.4a10.47 10.47 0 0 1-1.61-5.61c0-5.8 4.72-10.52 10.53-10.52 2.81 0 5.45 1.1 7.44 3.08a10.46 10.46 0 0 1 3.08 7.45c0 5.8-4.72 10.52-10.53 10.52zm5.77-7.88c-.32-.16-1.87-.92-2.16-1.03-.29-.11-.5-.16-.71.16-.21.32-.82 1.03-1 1.24-.18.21-.37.24-.68.08-.32-.16-1.34-.49-2.55-1.57-.94-.84-1.57-1.87-1.76-2.19-.18-.32-.02-.49.14-.65.14-.14.32-.37.47-.55.16-.19.21-.32.32-.53.11-.21.05-.4-.03-.55-.08-.16-.71-1.71-.97-2.35-.26-.62-.52-.53-.71-.54l-.6-.01c-.21 0-.55.08-.84.4-.29.32-1.1 1.08-1.1 2.63 0 1.55 1.13 3.05 1.29 3.26.16.21 2.23 3.4 5.4 4.77.75.33 1.34.52 1.8.67.76.24 1.45.21 1.99.13.61-.09 1.87-.77 2.13-1.5.26-.74.26-1.37.18-1.5-.08-.13-.29-.21-.6-.37z"/>
+  </svg>
+</a>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <script src="script.js"></script>

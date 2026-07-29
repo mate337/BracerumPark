@@ -237,16 +237,58 @@ const HOME_BOUNDS = L.latLngBounds(
 ).pad(0.12);
 map.fitBounds(HOME_BOUNDS);
 
-/* ---------- Botão Recentralizar ---------- */
+/* ---------- Botão Recentralizar (aparece a partir de 5 km do Park) ---------- */
 const recenterBtn = document.getElementById("recenterBtn");
 function checkRecenter() {
   const distKm = map.distance(map.getCenter(), L.latLng(PARK.lat, PARK.lng)) / 1000;
-  const far = distKm > 55 || map.getZoom() < 8;
-  recenterBtn.classList.toggle("is-visible", far);
+  recenterBtn.classList.toggle("is-visible", distKm > 5);
 }
 map.on("moveend zoomend", checkRecenter);
 recenterBtn.addEventListener("click", () => {
   map.flyToBounds(HOME_BOUNDS, { duration: 1.2 });
+});
+
+/* ---------- "Buscador" direcional do Park (estilo jogos) ----------
+   Quando o Park sai da tela, uma seta na borda do mapa aponta para ele. */
+const parkFinder = document.getElementById("parkFinder");
+const parkFinderArrow = document.getElementById("parkFinderArrow");
+const mapHolder = document.querySelector(".map-holder");
+
+function updateParkFinder() {
+  const parkLatLng = L.latLng(PARK.lat, PARK.lng);
+  const inView = map.getBounds().contains(parkLatLng);
+  if (inView) {
+    parkFinder.classList.remove("is-visible");
+    return;
+  }
+  parkFinder.classList.add("is-visible");
+
+  // Posição do Park em pixels relativos ao container do mapa
+  const size = map.getSize();               // largura/altura do mapa em px
+  const center = { x: size.x / 2, y: size.y / 2 };
+  const pt = map.latLngToContainerPoint(parkLatLng);
+  const dx = pt.x - center.x;
+  const dy = pt.y - center.y;
+
+  // Ângulo para girar a seta (➤ aponta para a direita por padrão)
+  const angle = (Math.atan2(dy, dx) * 180) / Math.PI;
+  parkFinderArrow.style.transform = `rotate(${angle}deg)`;
+
+  // Interseção do vetor centro→Park com a borda do mapa (com margem)
+  const PAD = 56;
+  const halfW = size.x / 2 - PAD;
+  const halfH = size.y / 2 - PAD;
+  const scale = 1 / Math.max(Math.abs(dx) / halfW, Math.abs(dy) / halfH);
+  const x = center.x + dx * scale;
+  const y = center.y + dy * scale;
+  parkFinder.style.left = x + "px";
+  parkFinder.style.top = y + "px";
+}
+map.on("move zoom moveend zoomend resize", updateParkFinder);
+updateParkFinder();
+
+parkFinder.addEventListener("click", () => {
+  map.flyTo([PARK.lat, PARK.lng], 13, { duration: 1.2 });
 });
 
 /* ---------- Painel lateral: acordeão + listas ---------- */
@@ -291,35 +333,6 @@ document.getElementById("mapPanel").addEventListener("click", (e) => {
   const isFar = roads.includes(p) && p.name !== "Assunção";
   map.flyTo([p.lat, p.lng], isFar ? 7 : 13, { duration: 1.15 });
   markers[p.name].openPopup();
-});
-
-/* ---------- Tabelas de distância ---------- */
-const portsBody = document.querySelector("#portsTable tbody");
-ports.forEach((p) => {
-  const tr = document.createElement("tr");
-  tr.innerHTML = `<td><span class="d-name">${p.name}</span><span class="d-sub">${p.sub}</span></td>
-    <td class="d-via">${p.via}</td>
-    <td class="t-num">${p.km}</td><td class="t-num">${p.tempo}</td>`;
-  portsBody.appendChild(tr);
-});
-const roadsBody = document.querySelector("#roadsTable tbody");
-const roadGroups = [
-  { label: "Paraguai", names: ["Assunção", "Encarnación", "Ciudad del Este"] },
-  { label: "Mercosul e vizinhos", names: ["Foz do Iguaçu", "Curitiba", "Porto Alegre", "Córdoba", "Buenos Aires", "Florianópolis", "Santa Cruz de la Sierra", "São Paulo", "Montevidéu"] },
-];
-roadGroups.forEach((g) => {
-  const trg = document.createElement("tr");
-  trg.className = "group-row";
-  trg.innerHTML = `<td colspan="4">${g.label}</td>`;
-  roadsBody.appendChild(trg);
-  g.names.forEach((n) => {
-    const r = roads.find((x) => x.name === n);
-    const tr = document.createElement("tr");
-    tr.innerHTML = `<td><span class="d-name">${r.name}</span><span class="d-sub">${r.sub}</span></td>
-      <td class="d-via">${r.via}</td>
-      <td class="t-num">${r.km}</td><td class="t-num">${r.tempo}</td>`;
-    roadsBody.appendChild(tr);
-  });
 });
 
 /* ==========================================================
