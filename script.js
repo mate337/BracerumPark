@@ -502,6 +502,24 @@ document.getElementById("tableFilters").addEventListener("click", (e) => {
   activeFilter = chip.dataset.filter; renderTable();
 });
 
+/* ---------- Mobile: faixa de logotipos monocromáticos ---------- */
+const logosStrip = document.getElementById("logosStrip");
+if (logosStrip) {
+  logosStrip.innerHTML = `
+    <div class="logos-strip__wrap">
+      <p class="logos-strip__label">Empresas que já estão em Villeta e no Paraguai</p>
+      <div class="logos-track">
+        ${companies.map((c) => `
+          <div class="logo-card">
+            <div class="logo-card__mark"><span>${c.name}</span><span class="flag">${c.flag}</span></div>
+            <span class="logo-card__name">${c.country}</span>
+            <span class="logo-card__meta">${c.sector} · ${c.valueLabel}</span>
+            <span class="logo-card__badge ${c.where === "villeta" ? "" : "logo-card__badge--soft"}">${c.badge}</span>
+          </div>`).join("")}
+      </div>
+    </div>`;
+}
+
 /* ==========================================================
    Geral — reveal + menu mobile
    ========================================================== */

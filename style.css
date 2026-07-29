@@ -18,6 +18,10 @@
   --max:1180px;
   --radius:14px;
   --shadow:0 12px 44px rgba(20,17,9,.12);
+  /* Margem lateral padrão (respeita notch/safe-area no mobile) */
+  --gap:clamp(20px,4vw,56px);
+  --safe-l:0px;
+  --safe-r:0px;
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
@@ -249,6 +253,7 @@ a{color:var(--gold-deep)}
 .master__grid .mi-name{display:block;font-family:var(--serif);font-weight:600;color:var(--ink);font-size:1.02rem;line-height:1.3;margin-bottom:2px}
 .master__grid .mi-val{display:block;color:var(--gold-deep);font-weight:700;font-size:.93rem}
 .master__grid .mi-cat{display:block;color:var(--ink-soft);font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;margin-top:10px;font-weight:600}
+.h-hint{display:none}
 
 /* ---------- Mapa ---------- */
 .hwy-callout{
@@ -567,17 +572,33 @@ a{color:var(--gold-deep)}
 
 /* ==========================================================
    MOBILE (≤ 720px) — layout repensado para uso no celular
+   Sistema de margem: --gap lateral consistente + safe-area (notch)
    ========================================================== */
 @media (max-width: 720px){
+  :root{
+    --gap:20px;
+    --safe-l:env(safe-area-inset-left,0px);
+    --safe-r:env(safe-area-inset-right,0px);
+  }
   html,body{overflow-x:hidden}
   body{font-size:16px}
 
+  /* Margem lateral única para todos os blocos de conteúdo */
+  .nav,
+  .trustbar,
+  .section,
+  .showcase__head,
+  .footer{
+    padding-left:calc(var(--gap) + var(--safe-l));
+    padding-right:calc(var(--gap) + var(--safe-r));
+  }
+
   /* --- Navegação: menu de tela cheia com alvos de toque generosos --- */
-  .nav{padding:14px 18px}
+  .nav{padding-top:14px;padding-bottom:14px}
   .nav__links{
     position:fixed;inset:0;background:rgba(250,248,243,.98);backdrop-filter:blur(14px);
     flex-direction:column;justify-content:center;align-items:center;
-    padding:80px 24px 40px;gap:6px;border:none;
+    padding:80px calc(var(--gap) + 4px) 40px;gap:6px;border:none;
     transform:translateY(-102%);transition:transform .4s cubic-bezier(.22,.8,.24,1);
     z-index:-1;
   }
@@ -598,17 +619,21 @@ a{color:var(--gold-deep)}
   .nav__burger[aria-expanded="true"] span:nth-child(2){opacity:0}
   .nav__burger[aria-expanded="true"] span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
 
-  /* --- Hero cinematográfico --- */
-  .cine{min-height:100svh}
-  .cine__kicker{font-size:.66rem;letter-spacing:.22em;margin-bottom:20px;padding:0 8px}
-  .cine__logo{font-size:clamp(2.4rem,13vw,3.4rem)}
-  .cine__rule{margin:22px auto}
-  .cine__tagline{font-size:1.05rem;padding:0 14px}
+  /* --- Hero cinematográfico: conteúdo ancorado no centro-baixo --- */
+  .cine{min-height:100svh;align-items:flex-end;justify-content:flex-start}
+  .cine__content{
+    text-align:left;padding:0 var(--gap) 20svh;max-width:100%;width:100%;
+  }
+  .cine__kicker{font-size:.6rem;letter-spacing:.18em;margin-bottom:14px}
+  .cine__logo{font-size:clamp(2rem,10vw,2.9rem);line-height:1.02}
+  .cine__rule{margin:16px 0;width:64px}
+  .cine__tagline{font-size:.98rem;padding:0}
   .cine__scroll{bottom:22px}
-  .cine__scroll-line{height:44px}
+  .cine__scroll-line{height:40px}
 
   /* --- 01 · Visão geral --- */
-  .hero{padding:64px 20px 24px}
+  .hero{padding:56px var(--gap) 24px}
+  .hero__inner{gap:32px}
   .hero__title{font-size:clamp(1.75rem,7.4vw,2.2rem)}
   .hero__sub{font-size:1rem}
   .hero__actions{margin-bottom:32px}
@@ -616,7 +641,7 @@ a{color:var(--gold-deep)}
   .hero__proof{flex-wrap:wrap;gap:16px 22px;padding-top:22px}
   .hero__proof strong{font-size:1.4rem}
   /* Pills flutuantes viram etiquetas estáticas sob a imagem */
-  .hero__media{display:flex;flex-direction:column;gap:0}
+  .hero__media{display:flex;flex-direction:column;gap:0;max-width:100%}
   .float-pill{
     position:static;display:inline-flex;width:fit-content;margin-top:10px;
     box-shadow:none;border:1.5px solid var(--line);background:var(--bg-2);
@@ -625,30 +650,63 @@ a{color:var(--gold-deep)}
   .float-pill--1{margin-top:14px}
   .hero__media img{aspect-ratio:4/3}
 
-  /* --- Trustbar: lista compacta centrada --- */
-  .trustbar{gap:8px 14px;font-size:.68rem;padding:16px 18px;letter-spacing:.05em}
+  /* --- Trustbar: faixa rolável horizontal (sem quebra) --- */
+  .trustbar{
+    display:flex;flex-wrap:nowrap;overflow-x:auto;justify-content:flex-start;
+    gap:10px;padding-top:14px;padding-bottom:14px;scrollbar-width:none;
+  }
+  .trustbar::-webkit-scrollbar{display:none}
   .trustbar i{display:none}
   .trustbar span{
-    background:var(--bg-2);border:1px solid var(--line);border-radius:999px;padding:6px 12px;
+    flex-shrink:0;background:var(--bg-2);border:1px solid var(--line);
+    border-radius:999px;padding:7px 14px;font-size:.68rem;
   }
 
-  /* --- Seções: respiro menor, títulos proporcionais --- */
-  .section{padding:60px 18px}
-  .section__head{margin-bottom:28px}
+  /* --- Seções: respiro vertical e títulos proporcionais --- */
+  .section{padding-top:56px;padding-bottom:56px}
+  .section__head{margin-bottom:26px}
   .section__head h2{font-size:clamp(1.6rem,7vw,2.1rem)}
   .lead{font-size:.98rem}
+  .eyebrow{font-size:.7rem}
 
-  /* --- Masterplan: chips roláveis + grade em 1 coluna --- */
+  /* Utilitário: carrossel horizontal com snap (usado em 3 seções) */
+  .h-scroll{
+    display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;
+    -webkit-overflow-scrolling:touch;scrollbar-width:none;
+    margin:0 calc(-1 * var(--gap));
+    padding:4px var(--gap) 14px;
+  }
+  .h-scroll::-webkit-scrollbar{display:none}
+  .h-scroll > *{scroll-snap-align:start;flex:0 0 auto}
+  .h-hint{
+    display:flex;align-items:center;gap:6px;
+    font-size:.68rem;letter-spacing:.06em;color:var(--ink-soft);font-weight:600;
+    margin-top:2px;
+  }
+  .h-hint::after{content:"→";color:var(--gold-deep)}
+
+  /* --- Masterplan: chips roláveis + áreas como cards horizontais --- */
   .master__legend{
     flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;
-    margin:22px -18px 16px;padding:2px 18px 8px;scrollbar-width:none;
+    margin:22px calc(-1 * var(--gap)) 14px;padding:2px var(--gap) 8px;scrollbar-width:none;
   }
   .master__legend::-webkit-scrollbar{display:none}
   .chip{flex-shrink:0;padding:11px 20px;font-size:.82rem}
-  .master__grid{grid-template-columns:1fr;gap:10px}
-  .master__grid li{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;padding:14px 16px}
-  .master__grid .mi-name{flex:1 1 100%;margin:0}
-  .master__grid .mi-cat{margin-top:2px;margin-left:auto}
+  .master__grid{
+    display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;
+    -webkit-overflow-scrolling:touch;scrollbar-width:none;
+    margin:0 calc(-1 * var(--gap));padding:4px var(--gap) 14px;
+  }
+  .master__grid::-webkit-scrollbar{display:none}
+  .master__grid li{
+    scroll-snap-align:start;flex:0 0 62%;min-width:0;
+    display:flex;flex-direction:column;justify-content:space-between;
+    min-height:130px;padding:18px;
+  }
+  .master__grid li.dim{display:none}
+  .master__grid .mi-name{font-size:1.05rem;margin-bottom:6px}
+  .master__grid .mi-cat{margin-top:auto}
+  .h-hint{display:flex}
 
   /* --- Mapa: altura de tela de celular, rótulos enxutos --- */
   .hwy-callout{flex-direction:column;align-items:flex-start;gap:10px;padding:16px 18px}
@@ -666,71 +724,58 @@ a{color:var(--gold-deep)}
   .dist-list button{padding:13px 6px;font-size:.9rem}
   .map-note{font-size:.7rem}
 
-  /* --- Carrossel: imagem larga, controles próximos do polegar --- */
+  /* --- Carrossel do parque: imagem larga, controles no polegar --- */
   .showcase{padding:44px 0 36px}
-  .showcase__head{margin-bottom:16px;padding:0 18px}
-  .carousel__slide{padding:0 12px}
-  .carousel__slide img{max-height:50svh;width:100%;object-fit:cover;border-radius:10px}
+  .showcase__head{margin-bottom:16px}
+  .carousel__slide{padding:0 var(--gap)}
+  .carousel__slide img{max-height:50svh;width:100%;object-fit:cover;border-radius:12px}
   .carousel__slide .placeholder{width:100%;max-height:50svh}
   .carousel__nav{
     top:auto;bottom:-4px;transform:none;
     width:46px;height:46px;font-size:1.5rem;
     background:rgba(11,10,7,.85);
   }
-  .carousel__nav--prev{left:14px}
-  .carousel__nav--next{right:14px}
+  .carousel__nav--prev{left:var(--gap)}
+  .carousel__nav--next{right:var(--gap)}
   .carousel{padding-bottom:58px}
   .carousel__overlay{
-    position:static;transform:none;margin:12px auto 0;max-width:calc(100% - 24px);
+    position:static;transform:none;margin:12px var(--gap) 0;max-width:none;
     background:none;border:none;backdrop-filter:none;padding:0;
   }
   .carousel__caption{font-size:1.05rem;text-shadow:none}
   .carousel__meta{margin-top:8px}
   .carousel__dot{width:8px;height:8px}
 
-  /* --- Vantagens --- */
-  .regime{padding:26px 20px 22px}
-  .regime h3{font-size:1.45rem}
-  .regime__big{font-size:2.3rem}
-  .extras{grid-template-columns:1fr}
-  .extra strong{font-size:1.15rem}
+  /* --- 05 · Vantagens: regimes em carrossel horizontal --- */
+  .regimes{
+    display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;
+    -webkit-overflow-scrolling:touch;scrollbar-width:none;
+    margin:0 calc(-1 * var(--gap));padding:8px var(--gap) 16px;
+  }
+  .regimes::-webkit-scrollbar{display:none}
+  .regime{
+    scroll-snap-align:center;flex:0 0 84%;padding:26px 22px 24px;
+  }
+  .regime h3{font-size:1.5rem}
+  .regime__big{font-size:2.4rem}
+  .extras{
+    display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;
+    -webkit-overflow-scrolling:touch;scrollbar-width:none;
+    grid-template-columns:none;
+    margin:0 calc(-1 * var(--gap));padding:4px var(--gap) 6px;
+  }
+  .extras::-webkit-scrollbar{display:none}
+  .extra{scroll-snap-align:start;flex:0 0 76%}
+  .extra strong{font-size:1.2rem}
 
-  /* --- Empresas: tabela vira cartões empilhados --- */
-  .table-tools{flex-direction:column;align-items:stretch;gap:12px}
-  #tableSearch{width:100%;padding:15px 22px}
-  .table-filters{overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px;scrollbar-width:none}
-  .table-filters::-webkit-scrollbar{display:none}
-  .table-wrap{border:none;box-shadow:none;background:none;overflow:visible;border-radius:0}
-  .companies{min-width:0;display:block}
-  .companies thead{display:none}
-  .companies tbody{display:grid;gap:12px}
-  .companies tbody tr{
-    display:block;background:#fff;border:1px solid var(--line);border-radius:14px;
-    padding:18px 18px 14px;box-shadow:var(--shadow);
-  }
-  .companies tbody tr:hover{background:#fff}
-  .companies tbody td{
-    display:flex;justify-content:space-between;align-items:baseline;gap:14px;
-    border:none;padding:7px 0;font-size:.92rem;
-  }
-  .companies tbody td::before{
-    content:attr(data-label);
-    font-size:.64rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
-    color:var(--ink-soft);flex-shrink:0;
-  }
-  .companies td[data-label="Empresa"]{
-    display:block;border-bottom:1px solid var(--bg-2);padding:0 0 12px;margin-bottom:8px;
-  }
-  .companies td[data-label="Empresa"]::before{display:none}
-  .companies td[data-label="Empresa"] br{display:none}
-  .companies td[data-label="Empresa"] .badge{margin-left:10px;vertical-align:2px}
-  .companies td[data-label="Destaque"]{display:block;padding-top:10px}
-  .companies td[data-label="Destaque"]::before{display:block;margin-bottom:4px}
-  .table-empty td{display:block;text-align:center}
-  .table-note{font-size:.72rem}
+  /* --- 06 · Empresas: faixa rolável de logotipos monocromáticos --- */
+  .table-tools,
+  .table-wrap,
+  .table-note{display:none}
+  .logos-strip{display:block}
 
   /* --- Footer --- */
-  .footer{padding:64px 18px 32px}
+  .footer{padding-top:60px;padding-bottom:32px}
   .footer__sub{margin-bottom:32px}
   .footer__cta{margin-bottom:34px}
   .footer__contacts{flex-direction:column;margin-bottom:44px}
@@ -738,17 +783,60 @@ a{color:var(--gold-deep)}
   .footer__meta{font-size:.74rem}
 
   /* --- Flutuantes --- */
-  .wa-float{width:56px;height:56px;right:14px;bottom:14px}
+  .wa-float{
+    width:56px;height:56px;
+    right:calc(14px + var(--safe-r));bottom:calc(14px + env(safe-area-inset-bottom,0px));
+  }
 }
 
 /* Telas muito estreitas */
 @media (max-width: 380px){
-  .cine__logo{font-size:2.15rem}
+  .cine__logo{font-size:1.85rem}
   .hero__actions{flex-direction:column}
   .hero__actions .btn{width:100%}
   .hero__proof{gap:14px}
   .hero__proof > div{flex:1 1 40%}
+  .regime{flex-basis:88%}
+  .master__grid li{flex-basis:72%}
 }
+
+/* ==========================================================
+   06 · Faixa de logotipos (só renderiza no mobile)
+   ========================================================== */
+.logos-strip{display:none}
+.logos-strip__wrap{
+  background:#0b0a07;color:#fff;
+  margin:0 calc(-1 * var(--gap));padding:36px 0 40px;border-radius:0;
+}
+.logos-strip__label{
+  text-align:center;font-size:.66rem;letter-spacing:.2em;text-transform:uppercase;
+  color:#e6c87e;font-weight:700;margin-bottom:22px;padding:0 var(--gap);
+}
+.logos-track{
+  display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;
+  -webkit-overflow-scrolling:touch;scrollbar-width:none;padding:0 var(--gap) 6px;
+}
+.logos-track::-webkit-scrollbar{display:none}
+.logo-card{
+  scroll-snap-align:center;flex:0 0 66%;
+  background:#12100a;border:1px solid #2a2416;border-radius:16px;
+  padding:26px 22px;display:flex;flex-direction:column;gap:4px;
+}
+.logo-card__mark{
+  height:64px;display:flex;align-items:center;justify-content:flex-start;margin-bottom:12px;
+}
+.logo-card__mark span{
+  font-family:var(--serif);font-weight:700;font-size:1.9rem;color:#fff;
+  filter:grayscale(1) brightness(1.6);opacity:.92;letter-spacing:-.01em;
+}
+.logo-card__mark .flag{font-size:1.2rem;margin-left:8px;filter:grayscale(1) opacity(.7)}
+.logo-card__name{font-family:var(--serif);font-weight:700;font-size:1.15rem;color:#fff}
+.logo-card__meta{font-size:.78rem;color:#b3a888}
+.logo-card__badge{
+  align-self:flex-start;margin-top:10px;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;
+  font-weight:700;border:1px solid #e6c87e;color:#e6c87e;border-radius:999px;padding:3px 11px;
+}
+.logo-card__badge--soft{border-color:#4a4433;color:#8f8570}
 
 /* Guard de toque do mapa (criado via JS apenas em telas touch) */
 .map-touch-guard{
@@ -764,3 +852,4 @@ a{color:var(--gold-deep)}
   box-shadow:0 10px 30px rgba(18,16,10,.35);
 }
 .map-touch-guard.is-hidden{display:none}
+
