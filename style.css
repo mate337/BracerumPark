@@ -598,8 +598,11 @@ a{color:var(--gold-deep)}
   /* --- Navegação: menu de tela cheia com alvos de toque generosos --- */
   .nav{padding-top:14px;padding-bottom:14px}
   .nav__links{
-    position:fixed;inset:0;background:var(--bg);
-    flex-direction:column;justify-content:center;align-items:stretch;
+    position:fixed!important;inset:0!important;
+    width:100vw;height:100vh;height:100dvh;
+    background:var(--bg)!important;
+    display:flex!important;flex-direction:column!important;
+    justify-content:center;align-items:stretch;
     padding:88px calc(var(--gap) + 4px) 40px;gap:4px;border:none;
     transform:translateY(-102%);
     transition:transform .4s cubic-bezier(.22,.8,.24,1), visibility 0s linear .4s;
