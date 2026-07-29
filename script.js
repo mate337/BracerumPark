@@ -567,12 +567,14 @@ const navLinks = document.getElementById("navLinks");
 burger.addEventListener("click", () => {
   const open = navLinks.classList.toggle("is-open");
   burger.setAttribute("aria-expanded", open);
+  document.body.classList.toggle("menu-open", open);
   document.body.style.overflow = open ? "hidden" : "";
 });
 navLinks.querySelectorAll("a").forEach((a) =>
   a.addEventListener("click", () => {
     navLinks.classList.remove("is-open");
     burger.setAttribute("aria-expanded", "false");
+    document.body.classList.remove("menu-open");
     document.body.style.overflow = "";
   })
 );

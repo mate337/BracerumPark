@@ -598,23 +598,29 @@ a{color:var(--gold-deep)}
   /* --- Navegação: menu de tela cheia com alvos de toque generosos --- */
   .nav{padding-top:14px;padding-bottom:14px}
   .nav__links{
-    position:fixed;inset:0;background:rgba(250,248,243,.98);backdrop-filter:blur(14px);
-    flex-direction:column;justify-content:center;align-items:center;
-    padding:80px calc(var(--gap) + 4px) 40px;gap:6px;border:none;
+    position:fixed;inset:0;background:var(--bg);
+    flex-direction:column;justify-content:center;align-items:stretch;
+    padding:88px calc(var(--gap) + 4px) 40px;gap:4px;border:none;
     transform:translateY(-102%);
     transition:transform .4s cubic-bezier(.22,.8,.24,1), visibility 0s linear .4s;
-    z-index:55;visibility:hidden;
+    z-index:65;visibility:hidden;overflow-y:auto;
   }
   .nav__links.is-open{transform:none;visibility:visible;transition:transform .4s cubic-bezier(.22,.8,.24,1)}
   .nav__burger{position:relative;z-index:70}
   .nav__links a{
-    color:var(--ink)!important;font-size:1.25rem;font-weight:600;
-    padding:14px 20px;width:100%;text-align:center;border-radius:12px;
+    color:var(--ink)!important;font-size:1.35rem;font-weight:600;
+    padding:16px 20px;width:100%;text-align:center;border-radius:12px;
+    border-bottom:1px solid var(--line);
   }
+  /* Anula o estado "transparente" (feito p/ o menu horizontal do hero) dentro do painel */
+  .nav--transparent .nav__links a{color:var(--ink)!important}
+  .nav__links a:last-of-type{border-bottom:none}
   .nav__links a:active{background:var(--bg-2)}
-  .nav__cta{
-    margin-top:18px;width:auto!important;background:var(--ink)!important;
-    color:#fff!important;padding:16px 40px!important;
+  .nav__cta,
+  .nav--transparent .nav__cta{
+    margin-top:22px;width:100%!important;background:var(--ink)!important;
+    color:#fff!important;padding:18px 40px!important;border-bottom:none!important;
+    font-size:1.15rem!important;border-radius:999px!important;
   }
   .nav__burger{display:flex;padding:10px;margin:-10px}
   .nav__burger span{transition:transform .3s, opacity .3s, background .35s}
