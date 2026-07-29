@@ -1,360 +1,278 @@
-/* ==========================================================
-   BRACERUM/PARK — script principal
-   ========================================================== */
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Bracerum Park — Villeta Industrial City · Paraguay</title>
+<meta name="description" content="Uma Cidade Industrial Completa no coração do Mercosul. Parque industrial e cidade multiuso em Villeta, Paraguai. Regime de Maquila, Ley de Inversiones e Certificado de Origem Mercosul." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,500;0,8..60,600;0,8..60,700;1,8..60,500;1,8..60,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
 
-/* ---------- Placeholder helper (usado quando a imagem real ainda não existe) ---------- */
-window.buildPlaceholder = function (title, ratio) {
-  const div = document.createElement("div");
-  div.className = "placeholder " + (ratio === "4/3" ? "placeholder--43" : "placeholder--169");
-  div.innerHTML = `<span class="ph-title">${title}</span><small>adicione a imagem em /assets</small>`;
-  return div;
-};
+<!-- ============ NAV ============ -->
+<header class="nav" id="topo">
+  <a class="nav__brand" href="#topo">
+    <span class="brand__main">BRACERUM</span><span class="brand__slash">/</span><span class="brand__park">PARK</span>
+  </a>
+  <nav class="nav__links" id="navLinks">
+    <a href="#masterplan">Masterplan</a>
+    <a href="#localizacao">Localização</a>
+    <a href="#parque">O Parque</a>
+    <a href="#vantagens">Vantagens</a>
+    <a href="#empresas">Empresas</a>
+    <a href="#contato" class="nav__cta">Fale conosco</a>
+  </nav>
+  <button class="nav__burger" id="burger" aria-label="Abrir menu" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
+</header>
 
-/* ==========================================================
-   02 · MASTERPLAN — índices/áreas do projeto
-   ========================================================== */
-const masterAreas = [
-  { name: "Área geral do lote",        val: "1.819.856 m²", cat: "infra" },
-  { name: "Galpões industriais",       val: "488.730 m²",   cat: "industrial" },
-  { name: "Data Center",               val: "277.588 m²",   cat: "industrial" },
-  { name: "Fábrica Bracerum",          val: "180.245 m²",   cat: "industrial" },
-  { name: "Pátio industrial",          val: "115.920 m²",   cat: "industrial" },
-  { name: "Casas (78 lotes)",          val: "79.200 m²",    cat: "cidade" },
-  { name: "Galpões logísticos",        val: "67.500 m²",    cat: "industrial" },
-  { name: "Hotel (384 studios)",       val: "30.000 m²",    cat: "cidade" },
-  { name: "Manobra de ônibus",         val: "20.421 m²",    cat: "infra" },
-  { name: "Isolamento data center",    val: "15.450 m²",    cat: "infra" },
-  { name: "Lagos",                     val: "15.000 m²",    cat: "infra" },
-  { name: "Docas (80 docas)",          val: "14.400 m²",    cat: "industrial" },
-  { name: "Centro de convenções",      val: "13.500 m²",    cat: "cidade" },
-  { name: "Escritórios / coworking",   val: "13.500 m²/piso", cat: "cidade" },
-  { name: "Apoio motorista + posto",   val: "11.670 m²",    cat: "infra" },
-  { name: "Praça centro tecnológico",  val: "10.940 m²",    cat: "cidade" },
-  { name: "Pista de pouso + heliponto",val: "1.325 m de pista", cat: "infra" },
-  { name: "Hangar",                    val: "8.246 m²",     cat: "infra" },
-  { name: "Academia, lojas e lanchonetes", val: "5.489 m²", cat: "cidade" },
-  { name: "Quadras e campos",          val: "5.000 m²",     cat: "cidade" },
-  { name: "Refeitório (por piso)",     val: "4.458 m²",     cat: "cidade" },
-  { name: "Salão de eventos",          val: "3.200 m²",     cat: "cidade" },
-  { name: "Anfiteatro",                val: "1.200 lugares",cat: "cidade" },
-  { name: "Estacionamentos",           val: "2.150 vagas",  cat: "infra" },
-];
+<!-- ============ 01 · HERO ============ -->
+<section class="hero">
+  <div class="hero__inner">
+    <div class="hero__copy reveal">
+      <p class="hero__kicker">— Paraguay · Villeta Industrial City · 2026</p>
+      <h1>Uma cidade industrial <em>completa</em> no coração do <em>Mercosul</em>.</h1>
+      <p class="hero__sub">Parque industrial e cidade multiuso em Villeta: galpões built-to-suit, hotel, centro de convenções, data center, aeroporto corporativo e clube — um único masterplan de <strong>US$ 800 milhões</strong>, construído por fábricas próprias.</p>
+      <div class="hero__actions">
+        <a class="btn btn--primary" href="#contato">Falar com o time <span class="btn__arrow">↗</span></a>
+        <a class="btn btn--outline" href="#vantagens">Por que o Paraguai?</a>
+      </div>
+      <div class="hero__proof">
+        <div><strong>1%</strong><span>Tributo único · Maquila</span></div>
+        <div><strong>1,82 mi m²</strong><span>Na rodovia dos portos</span></div>
+        <div><strong>US$ 800 mi</strong><span>Investimento total</span></div>
+      </div>
+    </div>
+    <div class="hero__media reveal">
+      <figure>
+        <img src="assets/Fabrica.jpg" alt="Fábrica Bracerum — render noturno" fetchpriority="high"
+             onerror="this.replaceWith(window.buildPlaceholder('Fábrica Bracerum','4/3'))" />
+      </figure>
+      <span class="float-pill float-pill--1">◆ 70 km de Assunção</span>
+      <span class="float-pill float-pill--2">◆ PY19 · Rodovia dos portos</span>
+      <span class="float-pill float-pill--3">◆ 3 fábricas próprias na execução</span>
+    </div>
+  </div>
+</section>
 
-const catLabel = { industrial: "Industrial", cidade: "Cidade & Serviços", infra: "Infraestrutura" };
-const masterGrid = document.getElementById("masterGrid");
+<!-- Barra de credibilidade -->
+<div class="trustbar reveal">
+  <span>Regime de Maquila</span><i>·</i>
+  <span>Ley de Inversiones</span><i>·</i>
+  <span>Certificado de Origem Mercosul</i></span><i>·</i>
+  <span>Leis federais 7.547 e 7.548 / 2025</span><i>·</i>
+  <span>+270 mi de consumidores no bloco</span>
+</div>
 
-masterAreas.forEach((a) => {
-  const li = document.createElement("li");
-  li.dataset.cat = a.cat;
-  li.innerHTML = `<span class="mi-name">${a.name}</span>
-                  <span class="mi-val">${a.val}</span>
-                  <span class="mi-cat">${catLabel[a.cat]}</span>`;
-  masterGrid.appendChild(li);
-});
+<!-- ============ 02 · MASTERPLAN ============ -->
+<section class="section" id="masterplan">
+  <div class="section__head reveal">
+    <p class="eyebrow">02 — Masterplan</p>
+    <h2>A cidade industrial que <em>fabrica a si mesma</em></h2>
+    <p class="lead">Lote único de 1.819.856 m² sobre o eixo rodoviário dos portos de Villeta. Explore as áreas do plano geral abaixo.</p>
+  </div>
 
-document.querySelectorAll(".master__legend .chip").forEach((chip) => {
-  chip.addEventListener("click", () => {
-    document.querySelectorAll(".master__legend .chip").forEach((c) => c.classList.remove("is-active"));
-    chip.classList.add("is-active");
-    const area = chip.dataset.area;
-    masterGrid.querySelectorAll("li").forEach((li) => {
-      li.classList.toggle("dim", area !== "all" && li.dataset.cat !== area);
-    });
-  });
-});
+  <div class="master reveal">
+    <figure class="master__media">
+      <img src="assets/masterplan.jpg" alt="Planta geral do Bracerum Park — Masterplan" loading="lazy"
+           onerror="this.replaceWith(window.buildPlaceholder('Masterplan · Planta Geral','16/9'))" />
+      <figcaption>Planta geral · Villeta – PY · Área total de 1.819.856 m²</figcaption>
+    </figure>
 
-/* ==========================================================
-   03 · LOCALIZAÇÃO — Mapa interativo (Leaflet)
-   ========================================================== */
-const PARK = { lat: -25.771694, lng: -57.732389 }; // 25°46'18.1"S 57°43'56.6"W
+    <div class="master__legend">
+      <button class="chip is-active" data-area="all">Todos</button>
+      <button class="chip" data-area="industrial">Industrial</button>
+      <button class="chip" data-area="cidade">Cidade &amp; Serviços</button>
+      <button class="chip" data-area="infra">Infraestrutura</button>
+    </div>
 
-const places = [
-  {
-    name: "Bracerum Park", tag: "Villeta Industrial City", km: "—",
-    lat: PARK.lat, lng: PARK.lng, main: true,
-    desc: "1.819.856 m² na rodovia dos portos.",
-  },
-  {
-    name: "Subestação da ANDE", tag: "Energia · Itaipu / Yacyretá", km: "7,4 km",
-    lat: -25.7205, lng: -57.6935,
-    desc: "Média e alta tensão margeando a rodovia de acesso.",
-  },
-  {
-    name: "Terport Villeta", tag: "Terminal portuário", km: "20 km",
-    lat: -25.5296, lng: -57.5568,
-    desc: "Porto sobre o Rio Paraguai — Hidrovia Paraná-Paraguai.",
-  },
-  {
-    name: "Puerto Seguro", tag: "Terminal portuário", km: "30 km",
-    lat: -25.4728, lng: -57.5539,
-    desc: "Rodas ao Atlântico e ao Pacífico pela hidrovia.",
-  },
-  {
-    name: "Assunção", tag: "Capital + aeroporto internacional", km: "65 km",
-    lat: -25.2867, lng: -57.647,
-    desc: "Vários voos diários. Acesso pela Acceso Sur.",
-  },
-];
+    <ul class="master__grid" id="masterGrid"><!-- via script.js --></ul>
+  </div>
+</section>
 
-const map = L.map("map", { scrollWheelZoom: false }).setView([-25.55, -57.62], 10);
-L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
-  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>',
-  maxZoom: 19,
-}).addTo(map);
+<!-- ============ 03 · LOCALIZAÇÃO ============ -->
+<section class="section section--tint" id="localizacao">
+  <div class="section__head reveal">
+    <p class="eyebrow">03 — Localização</p>
+    <h2>A escolha certa tem <em>endereço</em>. Villeta – PY</h2>
+    <p class="lead">Acesso direto à Hidrovia Paraná–Paraguai e ao corredor rodoviário do Mercosul. <a class="link" href="https://maps.app.goo.gl/oV7XiWquCpgAhZYX7" target="_blank" rel="noopener">Abrir no Google Maps ↗</a></p>
+  </div>
 
-const goldIcon = (main) =>
-  L.divIcon({
-    className: "",
-    html: `<div style="
-      width:${main ? 22 : 14}px;height:${main ? 22 : 14}px;transform:rotate(45deg);
-      background:${main ? "#d9b36c" : "#0a0908"};
-      border:2px solid #d9b36c;box-shadow:0 0 ${main ? 18 : 8}px rgba(217,179,108,.65);
-    "></div>`,
-    iconSize: [main ? 22 : 14, main ? 22 : 14],
-    iconAnchor: [main ? 11 : 7, main ? 11 : 7],
-  });
+  <div class="hwy-callout reveal">
+    <span class="hwy-callout__badge">PY19</span>
+    <p>O Bracerum Park está localizado <strong>sobre a mesma rodovia que serve o Terport e o Puerto Seguro</strong>: a carga sai do galpão direto para o cais, sem travessias urbanas.</p>
+  </div>
 
-const markers = {};
-places.forEach((p) => {
-  const m = L.marker([p.lat, p.lng], { icon: goldIcon(p.main) }).addTo(map);
-  m.bindPopup(`<b>${p.name}</b><br>${p.tag}${p.km !== "—" ? " · " + p.km : ""}<br><span style="opacity:.8">${p.desc}</span>`);
-  markers[p.name] = m;
-});
+  <div class="map-wrap reveal">
+    <div id="map" role="application" aria-label="Mapa interativo da localização do Bracerum Park, portos fluviais e conexões rodoviárias"></div>
+    <aside class="map-panel">
+      <h3>Pontos de referência</h3>
+      <div class="map-panel__group">
+        <h4>⚓ Portos fluviais</h4>
+        <ul id="portList" class="dist-list"></ul>
+      </div>
+      <div class="map-panel__group">
+        <h4>◆ Rodoviário &amp; energia</h4>
+        <ul id="roadList" class="dist-list"></ul>
+      </div>
+      <p class="map-note">25°46'18.1"S 57°43'56.6"W · Clique em um ponto para navegar no mapa. Traçados seguem as rodovias reais (PY19, Acceso Sur e vicinais).</p>
+    </aside>
+  </div>
 
-// Rota (corredor rodoviário aproximado Park → portos → Assunção)
-L.polyline(
-  [
-    [PARK.lat, PARK.lng],
-    [-25.7205, -57.6935],
-    [-25.62, -57.62],
-    [-25.5296, -57.5568],
-    [-25.4728, -57.5539],
-    [-25.38, -57.58],
-    [-25.2867, -57.647],
-  ],
-  { color: "#d9b36c", weight: 2, opacity: 0.7, dashArray: "6 8" }
-).addTo(map);
+  <div class="tables-duo reveal">
+    <div class="dtable">
+      <h3>⚓ Distância dos portos fluviais</h3>
+      <table id="portsTable">
+        <thead><tr><th>Porto / Atracadouro</th><th>Via</th><th class="t-num">Distância</th><th class="t-num">Tempo</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div class="dtable">
+      <h3>◆ Conectividade rodoviária <small>de carro</small></h3>
+      <table id="roadsTable">
+        <thead><tr><th>Destino</th><th>Via principal</th><th class="t-num">Distância</th><th class="t-num">Tempo</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+</section>
 
-// Lista lateral de distâncias
-const distList = document.getElementById("distList");
-places.forEach((p) => {
-  const li = document.createElement("li");
-  li.innerHTML = `<button data-name="${p.name}">
-      <span>${p.name}<span class="d-tag">${p.tag}</span></span>
-      <span class="d-km">${p.km}</span>
-    </button>`;
-  distList.appendChild(li);
-});
-distList.addEventListener("click", (e) => {
-  const btn = e.target.closest("button");
-  if (!btn) return;
-  distList.querySelectorAll("button").forEach((b) => b.classList.remove("is-active"));
-  btn.classList.add("is-active");
-  const p = places.find((x) => x.name === btn.dataset.name);
-  map.flyTo([p.lat, p.lng], 13, { duration: 1.1 });
-  markers[p.name].openPopup();
-});
+<!-- ============ 04 · FOTOS ============ -->
+<section class="section" id="parque">
+  <div class="section__head reveal">
+    <p class="eyebrow">04 — O Parque</p>
+    <h2>Uma cidade completa <em>para a sua indústria</em></h2>
+    <p class="lead">Hospedagem executiva, residências, convenções, escritórios, comércio e lazer dentro do mesmo masterplan.</p>
+  </div>
+  <div class="gallery reveal" id="gallery"></div>
+</section>
 
-/* Conectividade rodoviária (do deck) */
-const connections = [
-  { city: "Assunção · PY", via: "Acceso Sur", km: "65 km" },
-  { city: "Encarnación · PY", via: "Ruta 1", km: "355 km" },
-  { city: "Ciudad del Este · PY", via: "Ruta 2", km: "360 km" },
-  { city: "Foz do Iguaçu · BR", via: "Ruta 2 / PY02", km: "365 km" },
-  { city: "Curitiba · BR", via: "BR-277", km: "1.000 km" },
-  { city: "Porto Alegre · BR", via: "BR-386", km: "1.055 km" },
-  { city: "Córdoba · AR", via: "RN 16", km: "1.100 km" },
-  { city: "Buenos Aires · AR", via: "RN 12", km: "1.280 km" },
-  { city: "Florianópolis · BR", via: "BR-282", km: "1.307 km" },
-  { city: "Santa Cruz de la Sierra · BO", via: "Ruta 9", km: "1.360 km" },
-  { city: "São Paulo · BR", via: "BR-116", km: "1.395 km" },
-  { city: "Montevidéu · UY", via: "RN 14", km: "1.550 km" },
-];
-const connGrid = document.getElementById("connGrid");
-connections.forEach((c) => {
-  const d = document.createElement("div");
-  d.className = "conn__item";
-  d.innerHTML = `<strong>${c.city}</strong><span>${c.km}</span><small>${c.via}</small>`;
-  connGrid.appendChild(d);
-});
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox" aria-hidden="true">
+  <button class="lightbox__close" id="lbClose" aria-label="Fechar">&times;</button>
+  <figure>
+    <div class="lightbox__media" id="lbMedia"></div>
+    <figcaption id="lbCaption"></figcaption>
+  </figure>
+</div>
 
-/* ==========================================================
-   04 · GALERIA — troque os arquivos em /assets pelas imagens reais
-   ========================================================== */
-const galleryItems = [
-  { src: "assets/fabrica.jpg",      cap: "Fábrica Bracerum",             wide: true },
-  { src: "assets/hotel.jpg",        cap: "Hotel e Centro de Convenções" },
-  { src: "assets/casas.jpg",        cap: "Condomínio de Casas" },
-  { src: "assets/convencoes.jpg",   cap: "Centro de Convenções" },
-  { src: "assets/tecnologico.jpg",  cap: "Centro Tecnológico" },
-  { src: "assets/escritorios.jpg",  cap: "Escritórios e Salas Corporativas" },
-  { src: "assets/comercial.jpg",    cap: "Centro Comercial e Serviços" },
-  { src: "assets/clube.jpg",        cap: "Clube Bracerum",               wide: true },
-  { src: "assets/eventos.jpg",      cap: "Eventos e Gastronomia" },
-];
+<!-- ============ 05 · VANTAGENS ============ -->
+<section class="section section--tint" id="vantagens">
+  <div class="section__head reveal">
+    <p class="eyebrow">05 — A Tese Fiscal</p>
+    <h2>A tributação que <em>muda o jogo</em></h2>
+    <p class="lead">Um regime para investir, um para produzir e um para vender. A mesma operação captura os três.</p>
+  </div>
 
-const gallery = document.getElementById("gallery");
-galleryItems.forEach((g) => {
-  const fig = document.createElement("button");
-  fig.className = "gallery__item" + (g.wide ? " wide" : "");
-  fig.setAttribute("aria-label", "Ampliar: " + g.cap);
-  const img = document.createElement("img");
-  img.src = g.src;
-  img.alt = g.cap;
-  img.loading = "lazy";
-  img.onerror = function () {
-    this.replaceWith(window.buildPlaceholder(g.cap, "4/3"));
-  };
-  fig.appendChild(img);
-  const cap = document.createElement("span");
-  cap.className = "gallery__cap";
-  cap.textContent = g.cap;
-  fig.appendChild(cap);
-  fig.addEventListener("click", () => openLightbox(g));
-  gallery.appendChild(fig);
-});
+  <div class="regimes reveal">
+    <article class="regime">
+      <span class="regime__num">01</span>
+      <h3>Regime de Maquila</h3>
+      <p class="regime__big">1% <small>tributo único</small></p>
+      <p>Produza e exporte pagando 1% sobre o maior valor entre o agregado nacional e a fatura de exportação — frente a alíquotas de 25% a 35% nos países vizinhos. Benefícios por até 20 anos, renováveis (Lei 7.547/2025).</p>
+      <ul>
+        <li>Importação com tributos suspensos</li>
+        <li>Venda parcial permitida no mercado interno</li>
+        <li>100% de capital estrangeiro permitido</li>
+      </ul>
+    </article>
+    <article class="regime">
+      <span class="regime__num">02</span>
+      <h3>Ley de Inversiones</h3>
+      <p class="regime__big">0% <small>impostos na entrada</small></p>
+      <p>Novo regime que substitui a Lei 60/90: projetos aprovados recebem isenções sobre tudo o que entra no país para construir e equipar a operação (a partir de US$ 13 mi — Lei 7.548/2025).</p>
+      <ul>
+        <li>0% de tributos aduaneiros e 0% de IVA em bens de capital</li>
+        <li>Isenção sobre remessas de lucros e dividendos por 10 anos</li>
+        <li>Isenção sobre financiamento externo</li>
+      </ul>
+    </article>
+    <article class="regime">
+      <span class="regime__num">03</span>
+      <h3>Certificado Mercosul</h3>
+      <p class="regime__big">0% <small>tarifa no bloco</small></p>
+      <p>O Paraguai é membro pleno do Mercosul. Produtos fabricados no Bracerum Park que cumprem as regras de origem circulam com tarifa zero em todo o bloco.</p>
+      <ul>
+        <li>+270 milhões de consumidores</li>
+        <li>Acesso preferencial a Brasil, Argentina e Uruguai</li>
+        <li>Até 35% de tarifa externa (TEC) evitada</li>
+      </ul>
+    </article>
+  </div>
 
-/* Lightbox */
-const lightbox = document.getElementById("lightbox");
-const lbMedia = document.getElementById("lbMedia");
-const lbCaption = document.getElementById("lbCaption");
-function openLightbox(g) {
-  lbMedia.innerHTML = "";
-  const img = document.createElement("img");
-  img.src = g.src;
-  img.alt = g.cap;
-  img.onerror = function () {
-    this.replaceWith(window.buildPlaceholder(g.cap, "16/9"));
-  };
-  lbMedia.appendChild(img);
-  lbCaption.textContent = g.cap;
-  lightbox.classList.add("is-open");
-  lightbox.setAttribute("aria-hidden", "false");
-  document.body.style.overflow = "hidden";
-}
-function closeLightbox() {
-  lightbox.classList.remove("is-open");
-  lightbox.setAttribute("aria-hidden", "true");
-  document.body.style.overflow = "";
-}
-document.getElementById("lbClose").addEventListener("click", closeLightbox);
-lightbox.addEventListener("click", (e) => { if (e.target === lightbox) closeLightbox(); });
-document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeLightbox(); });
+  <div class="extras reveal">
+    <div class="extra"><strong>10 · 10 · 10</strong><span>Regime fiscal do Paraguai</span></div>
+    <div class="extra"><strong>Investor Pass</strong><span>Residência permanente direta · dividendos a 8% para residentes (Res. MIC 283/2026)</span></div>
+    <div class="extra"><strong>Itaipu + Yacyretá</strong><span>Redundância energética em média e alta tensão · subestação a 7,4 km</span></div>
+    <div class="extra"><strong>3 fábricas próprias</strong><span>Steel Frame, Concreto e Pavers — obra sem terceiros, com prazo e custo comprados</span></div>
+  </div>
+</section>
 
-/* ==========================================================
-   06 · TABELA INTERATIVA — empresas no Paraguai / Villeta
-   ========================================================== */
-const companies = [
-  {
-    name: "Be8", flag: "🇧🇷", country: "Brasil", sector: "Biocombustíveis",
-    value: 999999999, valueLabel: "n/d",
-    note: "Líder brasileira em biodiesel. Desenvolve em Villeta a biorrefinaria Omega Green, de combustíveis renováveis avançados.",
-    where: "villeta", badge: "Em Villeta",
-  },
-  {
-    name: "Ball Corporation", flag: "🇺🇸", country: "EUA", sector: "Embalagens de alumínio",
-    value: 80000000, valueLabel: "US$ 80 mi",
-    note: "Maior fabricante mundial de latas de alumínio. Planta na região pela proximidade aos portos.",
-    where: "villeta", badge: "Em Villeta",
-  },
-  {
-    name: "Cremer", flag: "🇩🇪", country: "Alemanha", sector: "Óleos e químicos",
-    value: 999999999, valueLabel: "n/d",
-    note: "Grupo alemão com planta de biodiesel e refino de glicerina em Villeta.",
-    where: "villeta", badge: "Em Villeta",
-  },
-  {
-    name: "Lupo", flag: "🇧🇷", country: "Brasil", sector: "Têxtil",
-    value: 6000000, valueLabel: "R$ 30 mi",
-    note: "Têxtil centenária brasileira. Fábrica no Paraguai sob regime de Maquila, com custo de produção ~28% menor que no Brasil.",
-    where: "paraguai", badge: "No Paraguai",
-  },
-  {
-    name: "Kingspan", flag: "🇮🇪", country: "Irlanda", sector: "Construção industrializada",
-    value: 999999999, valueLabel: "n/d",
-    note: "Líder global em painéis isotérmicos, com operação no Brasil (Kingspan Isoeste) e expansão na América do Sul.",
-    where: "paraguai", badge: "No Paraguai",
-  },
-];
+<!-- ============ 06 · EMPRESAS ============ -->
+<section class="section" id="empresas">
+  <div class="section__head reveal">
+    <p class="eyebrow">06 — Validação de Mercado</p>
+    <h2>Empresas que já estão <em>moldando o futuro</em> de Villeta</h2>
+    <p class="lead">Villeta já atrai as indústrias globais: <strong>+US$ 3 bi</strong> em cadeias produtivas na região, aluguéis de galpões subindo <strong>+20% a.a.</strong> e valorização projetada de <strong>+205%</strong> até 2030.</p>
+  </div>
 
-const tbody = document.querySelector("#companiesTable tbody");
-let sortKey = null, sortDir = 1, activeFilter = "all", searchTerm = "";
+  <div class="table-tools reveal">
+    <input type="search" id="tableSearch" placeholder="Buscar empresa, país ou setor…" aria-label="Buscar na tabela" />
+    <div class="table-filters" id="tableFilters">
+      <button class="chip is-active" data-filter="all">Todas</button>
+      <button class="chip" data-filter="villeta">Em Villeta</button>
+      <button class="chip" data-filter="paraguai">No Paraguai</button>
+    </div>
+  </div>
 
-function renderTable() {
-  let rows = companies.filter((c) => {
-    const matchFilter = activeFilter === "all" || c.where === activeFilter;
-    const q = searchTerm.toLowerCase();
-    const matchSearch = !q || [c.name, c.country, c.sector, c.note].join(" ").toLowerCase().includes(q);
-    return matchFilter && matchSearch;
-  });
+  <div class="table-wrap reveal">
+    <table class="companies" id="companiesTable">
+      <thead>
+        <tr>
+          <th data-sort="name" class="sortable">Empresa <span class="arrow"></span></th>
+          <th data-sort="country" class="sortable">Origem <span class="arrow"></span></th>
+          <th data-sort="sector" class="sortable">Setor <span class="arrow"></span></th>
+          <th data-sort="value" class="sortable">Investimento <span class="arrow"></span></th>
+          <th>Destaque</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+  <p class="table-note reveal">Valores conforme divulgação pública / material do projeto. "n/d" = não divulgado.</p>
+</section>
 
-  if (sortKey) {
-    rows = [...rows].sort((a, b) => {
-      const va = sortKey === "value" ? a.value : String(a[sortKey]).toLowerCase();
-      const vb = sortKey === "value" ? b.value : String(b[sortKey]).toLowerCase();
-      return (va > vb ? 1 : va < vb ? -1 : 0) * sortDir;
-    });
-  }
+<!-- ============ 07 · FOOTER ============ -->
+<footer class="footer" id="contato">
+  <div class="footer__inner reveal">
+    <p class="footer__brand"><span class="brand__main">BRACERUM</span><span class="brand__slash">/</span><span class="brand__park">PARK</span></p>
+    <p class="footer__sub">Paraguay · Villeta Industrial City · 2026</p>
+    <h2 class="footer__cta">Vamos construir a porta de entrada industrial do <em>Mercosul</em>?</h2>
+    <div class="footer__contacts">
+      <a href="https://wa.me/5511986516065" target="_blank" rel="noopener" class="contact-card">
+        <span class="contact-card__name">Cleber Pavao</span>
+        <span class="contact-card__phone">+55 11 98651-6065</span>
+        <span class="contact-card__action">WhatsApp ↗</span>
+      </a>
+      <a href="https://wa.me/554788030200" target="_blank" rel="noopener" class="contact-card">
+        <span class="contact-card__name">Sidney Savi</span>
+        <span class="contact-card__phone">+55 47 8803-0200</span>
+        <span class="contact-card__action">WhatsApp ↗</span>
+      </a>
+    </div>
+    <div class="footer__meta">
+      <a href="https://maps.app.goo.gl/oV7XiWquCpgAhZYX7" target="_blank" rel="noopener">25°46'18.1"S 57°43'56.6"W · Villeta, Paraguai</a>
+      <span>© 2026 Bracerum Park. Todos os direitos reservados.</span>
+    </div>
+  </div>
+</footer>
 
-  tbody.innerHTML = "";
-  if (!rows.length) {
-    tbody.innerHTML = `<tr class="table-empty"><td colspan="5">Nenhuma empresa encontrada para “${searchTerm}”.</td></tr>`;
-    return;
-  }
-  rows.forEach((c) => {
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td><span class="c-name"><span class="c-flag">${c.flag}</span>${c.name}</span><br>
-          <span class="badge ${c.where === "villeta" ? "" : "badge--soft"}">${c.badge}</span></td>
-      <td>${c.country}</td>
-      <td>${c.sector}</td>
-      <td><span class="c-val">${c.valueLabel}</span></td>
-      <td class="c-note">${c.note}</td>`;
-    tbody.appendChild(tr);
-  });
-}
-renderTable();
-
-document.querySelectorAll("#companiesTable th.sortable").forEach((th) => {
-  th.addEventListener("click", () => {
-    const key = th.dataset.sort;
-    if (sortKey === key) sortDir *= -1;
-    else { sortKey = key; sortDir = 1; }
-    document.querySelectorAll("#companiesTable th").forEach((t) => t.classList.remove("asc", "desc"));
-    th.classList.add(sortDir === 1 ? "asc" : "desc");
-    renderTable();
-  });
-});
-
-document.getElementById("tableSearch").addEventListener("input", (e) => {
-  searchTerm = e.target.value.trim();
-  renderTable();
-});
-
-document.getElementById("tableFilters").addEventListener("click", (e) => {
-  const chip = e.target.closest(".chip");
-  if (!chip) return;
-  document.querySelectorAll("#tableFilters .chip").forEach((c) => c.classList.remove("is-active"));
-  chip.classList.add("is-active");
-  activeFilter = chip.dataset.filter;
-  renderTable();
-});
-
-/* ==========================================================
-   Geral — reveal on scroll + menu mobile
-   ========================================================== */
-const observer = new IntersectionObserver(
-  (entries) => entries.forEach((en) => { if (en.isIntersecting) { en.target.classList.add("is-visible"); observer.unobserve(en.target); } }),
-  { threshold: 0.12 }
-);
-document.querySelectorAll(".reveal").forEach((el) => observer.observe(el));
-
-const burger = document.getElementById("burger");
-const navLinks = document.getElementById("navLinks");
-burger.addEventListener("click", () => {
-  const open = navLinks.classList.toggle("is-open");
-  burger.setAttribute("aria-expanded", open);
-});
-navLinks.querySelectorAll("a").forEach((a) =>
-  a.addEventListener("click", () => { navLinks.classList.remove("is-open"); burger.setAttribute("aria-expanded", "false"); })
-);
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="script.js"></script>
+</body>
+</html>
