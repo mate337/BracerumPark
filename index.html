@@ -95,27 +95,46 @@
   <div class="section__head reveal">
     <p class="eyebrow">02 — Masterplan</p>
     <h2>A cidade industrial que <em>fabrica a si mesma</em></h2>
-    <p class="lead">Lote único de 1.819.856 m² sobre o eixo rodoviário dos portos de Villeta. Explore as áreas do plano geral abaixo.</p>
+    <p class="lead">Lote único de 1.819.856 m² sobre o eixo rodoviário dos portos de Villeta. Explore a maquete virtual: clique em qualquer lote para ver a metragem.</p>
   </div>
 
-  <div class="master reveal">
-    <figure class="master__media">
-      <div class="master__rotate">
-        <img src="assets/masterplan.jpg" alt="Planta geral do Bracerum Park — Masterplan" loading="lazy"
-             onerror="this.replaceWith(window.buildPlaceholder('Masterplan · Planta Geral','16/9'))" />
+  <div class="mp reveal">
+    <div class="mp__toolbar">
+      <div class="mp__chips" id="mpChips">
+        <button class="chip is-active" data-cat="all">Todos</button>
+        <button class="chip" data-cat="industrial">Industrial</button>
+        <button class="chip" data-cat="logistico">Logístico</button>
+        <button class="chip" data-cat="comercial">Comercial</button>
+        <button class="chip" data-cat="institucional">Institucional</button>
+        <button class="chip" data-cat="residencial">Residencial</button>
+        <button class="chip" data-cat="infra">Infraestrutura</button>
       </div>
-      <figcaption>Planta geral · Villeta – PY · Área total de 1.819.856 m²</figcaption>
-    </figure>
-
-    <div class="master__legend">
-      <button class="chip is-active" data-area="all">Todos</button>
-      <button class="chip" data-area="industrial">Industrial</button>
-      <button class="chip" data-area="cidade">Cidade &amp; Serviços</button>
-      <button class="chip" data-area="infra">Infraestrutura</button>
+      <div class="mp__statuskey">
+        <span><i class="mp-dot mp-dot--free"></i>Disponível</span>
+        <span><i class="mp-dot mp-dot--sold"></i>Vendido</span>
+      </div>
     </div>
 
-    <ul class="master__grid" id="masterGrid"></ul>
-    <p class="h-hint">Arraste para ver todas as áreas</p>
+    <p class="h-hint">Arraste para explorar · toque em um lote para ver a metragem</p>
+
+    <div class="mp__stagewrap" id="mpStageWrap">
+      <div class="mp__stage" id="mpStage">
+        <div class="mp__world" id="mpWorld"><!-- zonas e lotes injetados via script.js --></div>
+      </div>
+      <div class="mp__tip" id="mpTip" hidden></div>
+    </div>
+
+    <div class="mp__card" id="mpCard" hidden tabindex="-1">
+      <button class="mp__card-close" id="mpCardClose" aria-label="Fechar detalhes do lote">×</button>
+      <span class="mp__card-cat" id="mpCardCat"></span>
+      <h3 id="mpCardName"></h3>
+      <p class="mp__card-area" id="mpCardArea"></p>
+      <p class="mp__card-extra" id="mpCardExtra"></p>
+      <p class="mp__card-status" id="mpCardStatus"></p>
+      <a class="btn btn--primary mp__card-cta" id="mpCardCta" href="#" target="_blank" rel="noopener">Consultar disponibilidade <span class="btn__arrow">↗</span></a>
+    </div>
+
+    <p class="mp__disclaimer">Metragens conforme planta oficial do masterplan (revisão 2026). Layout esquemático e ilustrativo da distribuição de lotes; sujeito a alterações de projeto.</p>
   </div>
 </section>
 

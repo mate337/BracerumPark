@@ -20,76 +20,170 @@ updateNav();
 window.addEventListener("scroll", updateNav, { passive: true });
 
 /* ==========================================================
-   02 · MASTERPLAN
+   02 · MASTERPLAN — Maquete virtual 3D interativa
    ========================================================== */
-const masterAreas = [
-  { name: "Área geral do lote",        val: "1.819.856 m²", cat: "infra" },
-  { name: "Galpões industriais",       val: "488.730 m²",   cat: "industrial" },
-  { name: "Data Center",               val: "277.588 m²",   cat: "industrial" },
-  { name: "Fábrica Bracerum",          val: "180.245 m²",   cat: "industrial" },
-  { name: "Pátio industrial",          val: "115.920 m²",   cat: "industrial" },
-  { name: "Casas (78 lotes)",          val: "79.200 m²",    cat: "cidade" },
-  { name: "Galpões logísticos",        val: "67.500 m²",    cat: "industrial" },
-  { name: "Hotel (384 studios)",       val: "30.000 m²",    cat: "cidade" },
-  { name: "Manobra de ônibus",         val: "20.421 m²",    cat: "infra" },
-  { name: "Isolamento data center",    val: "15.450 m²",    cat: "infra" },
-  { name: "Lagos",                     val: "15.000 m²",    cat: "infra" },
-  { name: "Docas (80 docas)",          val: "14.400 m²",    cat: "industrial" },
-  { name: "Centro de convenções",      val: "13.500 m²",    cat: "cidade" },
-  { name: "Escritórios / coworking",   val: "13.500 m²/piso", cat: "cidade" },
-  { name: "Apoio motorista + posto",   val: "11.670 m²",    cat: "infra" },
-  { name: "Praça centro tecnológico",  val: "10.940 m²",    cat: "cidade" },
-  { name: "Pista de pouso + heliponto",val: "1.325 m de pista", cat: "infra" },
-  { name: "Hangar",                    val: "8.246 m²",     cat: "infra" },
-  { name: "Academia, lojas e lanchonetes", val: "5.489 m²", cat: "cidade" },
-  { name: "Quadras e campos",          val: "5.000 m²",     cat: "cidade" },
-  { name: "Refeitório (por piso)",     val: "4.458 m²",     cat: "cidade" },
-  { name: "Salão de eventos",          val: "3.200 m²",     cat: "cidade" },
-  { name: "Anfiteatro",                val: "1.200 lugares",cat: "cidade" },
-  { name: "Estacionamentos",           val: "2.150 vagas",  cat: "infra" },
-];
-const catLabel = { industrial: "Industrial", cidade: "Cidade & Serviços", infra: "Infraestrutura" };
-const masterGrid = document.getElementById("masterGrid");
-masterAreas.forEach((a) => {
-  const li = document.createElement("li");
-  li.dataset.cat = a.cat;
-  li.innerHTML = `<span class="mi-name">${a.name}</span>
-                  <span class="mi-val">${a.val}</span>
-                  <span class="mi-cat">${catLabel[a.cat]}</span>`;
-  masterGrid.appendChild(li);
-});
-document.querySelectorAll(".master__legend .chip").forEach((chip) => {
-  chip.addEventListener("click", () => {
-    document.querySelectorAll(".master__legend .chip").forEach((c) => c.classList.remove("is-active"));
-    chip.classList.add("is-active");
-    const area = chip.dataset.area;
-    masterGrid.querySelectorAll("li").forEach((li) => {
-      li.classList.toggle("dim", area !== "all" && li.dataset.cat !== area);
+(function () {
+  const fmtArea = (n) => n.toLocaleString("pt-BR") + " m²";
+  const catLabel = {
+    industrial: "Galpão Industrial", logistico: "Galpão Logístico / Doca",
+    comercial: "Módulo Comercial", institucional: "Institucional",
+    residencial: "Residencial", infra: "Infraestrutura",
+  };
+
+  const seq = (prefix, count, area, cat, zone, h, soldIdx = []) =>
+    Array.from({ length: count }, (_, i) => ({
+      id: `${zone}-${i + 1}`,
+      name: `${prefix} ${String(i + 1).padStart(2, "0")}`,
+      area, cat, zone, h,
+      status: soldIdx.includes(i + 1) ? "vendido" : "disponivel",
+    }));
+
+  const mpLots = [
+    // Setor Industrial A — galpões de 18.000 m²
+    ...seq("Galpão A", 8, 18000, "industrial", "industA", 11, [3, 4]),
+    // Setor Industrial B — galpões de 9.900 m²
+    ...seq("Galpão B", 16, 9900, "industrial", "industB", 10, [1, 2, 3, 4, 5, 6, 7]),
+    // Setor Industrial C — galpões médios
+    { id: "industC-1", name: "Galpão C 01", area: 14400, cat: "industrial", zone: "industC", h: 11, status: "disponivel" },
+    { id: "industC-2", name: "Galpão C 02", area: 14400, cat: "industrial", zone: "industC", h: 11, status: "disponivel" },
+    { id: "industC-3", name: "Galpão C 03", area: 14400, cat: "industrial", zone: "industC", h: 11, status: "disponivel" },
+    { id: "industC-4", name: "Galpão C 04", area: 10800, cat: "industrial", zone: "industC", h: 10, status: "disponivel" },
+    { id: "industC-5", name: "Galpão C 05", area: 10800, cat: "industrial", zone: "industC", h: 10, status: "disponivel" },
+    { id: "industC-6", name: "Galpão C 06", area: 13500, cat: "industrial", zone: "industC", h: 10, status: "disponivel" },
+    { id: "industC-7", name: "Galpão C 07", area: 5400,  cat: "industrial", zone: "industC", h: 8,  status: "disponivel" },
+    ...seq("Galpão C", 5, 4950, "industrial", "industC", 8).map((l, i) => ({ ...l, id: `industC-${8 + i}`, name: `Galpão C ${String(8 + i).padStart(2, "0")}` })),
+    // Setor Logístico — docas
+    { id: "log-1", name: "Doca 01", area: 13050, cat: "logistico", zone: "logI", h: 9, status: "disponivel" },
+    { id: "log-2", name: "Doca 02", area: 13050, cat: "logistico", zone: "logI", h: 9, status: "disponivel" },
+    { id: "log-3", name: "Doca 03", area: 13050, cat: "logistico", zone: "logI", h: 9, status: "disponivel" },
+    { id: "log-4", name: "Doca 04", area: 13050, cat: "logistico", zone: "logI", h: 9, status: "disponivel" },
+    { id: "log-5", name: "Doca 05", area: 14298, cat: "logistico", zone: "logI", h: 9, status: "disponivel" },
+    { id: "log-6", name: "Doca 06", area: 16288, cat: "logistico", zone: "logI", h: 9, status: "disponivel" },
+    { id: "log-7", name: "Doca 07", area: 18258, cat: "logistico", zone: "logI", h: 9, status: "disponivel" },
+    { id: "log-8", name: "Doca 08", area: 14298, cat: "logistico", zone: "logI", h: 9, status: "disponivel" },
+    // Módulos comerciais / apoio
+    ...seq("Módulo Comercial", 6, 3150, "comercial", "comI", 7),
+    // Institucional / cidade
+    { id: "inst-hotel", name: "Hotel", area: 30000, extra: "384 studios", cat: "institucional", zone: "inst1", h: 30 },
+    { id: "inst-conv", name: "Centro de Convenções", area: 13500, cat: "institucional", zone: "inst1", h: 15 },
+    { id: "inst-anf", name: "Anfiteatro", area: null, extra: "1.200 lugares", cat: "institucional", zone: "inst1", h: 6 },
+    { id: "inst-adm", name: "Administração / Portaria Business", area: 3800, cat: "institucional", zone: "inst1", h: 12 },
+    { id: "inst-tec", name: "Praça · Centro Tecnológico", area: 10940, cat: "institucional", zone: "inst1", h: 9 },
+    { id: "inst-eventos", name: "Salão de Eventos", area: 3200, cat: "institucional", zone: "inst1", h: 10 },
+    { id: "inst-lojas", name: "Academia / Lojas / Lanchonetes", area: 5489, cat: "institucional", zone: "inst1", h: 7 },
+    { id: "inst-refeitorio", name: "Refeitório (por piso)", area: 4458, cat: "institucional", zone: "inst1", h: 9 },
+    { id: "inst-escritorios", name: "Escritórios / Coworking (por piso)", area: 13500, cat: "institucional", zone: "inst1", h: 14 },
+    { id: "inst-hangar", name: "Hangar", area: 8246, cat: "institucional", zone: "inst1", h: 16 },
+    { id: "inst-quadras", name: "Quadras / Campos", area: 5000, cat: "institucional", zone: "inst1", h: 2 },
+    // Residencial
+    { id: "resid-1", name: "Bairro Residencial · 78 lotes", area: 79200, extra: "≈ 1.015 m² por lote, em média", cat: "residencial", zone: "resid", h: 8 },
+    // Infraestrutura
+    { id: "infra-lago1", name: "Lago Norte", area: null, extra: "Espelho d'água paisagístico", cat: "infra", zone: "infra", h: 1, water: true },
+    { id: "infra-lago2", name: "Lago Sul", area: null, extra: "Espelho d'água paisagístico", cat: "infra", zone: "infra", h: 1, water: true },
+    { id: "infra-ete1", name: "E.T.E. / E.T.A. 01", area: 6160, cat: "infra", zone: "infra", h: 10 },
+    { id: "infra-ete2", name: "E.T.E. / E.T.A. 02", area: 31015, cat: "infra", zone: "infra", h: 10 },
+    { id: "infra-amb", name: "Ambulatório / Resgate / Brigadistas", area: 1140, cat: "infra", zone: "infra", h: 7 },
+    { id: "infra-estac", name: "Estacionamentos", area: null, extra: "1.800 vagas (cidade/hotel) + 406 vagas (park)", cat: "infra", zone: "infra", h: 1 },
+    // Entrada
+    { id: "entry-1", name: "Portaria Principal", area: 3800, cat: "institucional", zone: "entry", h: 10 },
+    // Pista
+    { id: "runway-1", name: "Pista de Pouso e Decolagem + Heliponto", area: 142988, extra: "1.325 m de extensão · área de escape e manobra", cat: "infra", zone: "runway", h: 1 },
+  ];
+
+  const mpWorld = document.getElementById("mpWorld");
+  const zoneOrder = ["entry", "industA", "industB", "industC", "logI", "comI", "inst1", "resid", "infra", "runway"];
+  const zones = {};
+  zoneOrder.forEach((z) => {
+    const div = document.createElement("div");
+    div.className = "mp__zone";
+    div.dataset.zone = z;
+    zones[z] = div;
+    mpWorld.appendChild(div);
+  });
+
+  mpLots.forEach((lot) => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = `lot lot--${lot.cat}` + (lot.water ? " is-water" : "") + (lot.status === "vendido" ? " is-sold" : "");
+    btn.style.setProperty("--h", (lot.h || 8) + "px");
+    btn.dataset.id = lot.id;
+    btn.dataset.cat = lot.cat;
+    btn.setAttribute("aria-label", `${lot.name}${lot.area ? " · " + fmtArea(lot.area) : ""}`);
+    btn.innerHTML = `<span class="lot__top"></span><span class="lot__wall-s"></span><span class="lot__wall-e"></span>`;
+    zones[lot.zone].appendChild(btn);
+    lot.el = btn;
+  });
+
+  const tip = document.getElementById("mpTip");
+  const stageWrap = document.getElementById("mpStageWrap");
+  const card = document.getElementById("mpCard");
+  const cardCat = document.getElementById("mpCardCat");
+  const cardName = document.getElementById("mpCardName");
+  const cardArea = document.getElementById("mpCardArea");
+  const cardExtra = document.getElementById("mpCardExtra");
+  const cardStatus = document.getElementById("mpCardStatus");
+  const cardCta = document.getElementById("mpCardCta");
+  const cardClose = document.getElementById("mpCardClose");
+
+  function showTip(lot) {
+    const r = lot.el.getBoundingClientRect();
+    const wrapR = stageWrap.getBoundingClientRect();
+    tip.style.left = (r.left - wrapR.left + stageWrap.scrollLeft + r.width / 2) + "px";
+    tip.style.top = (r.top - wrapR.top + stageWrap.scrollTop - 10) + "px";
+    tip.innerHTML = `${lot.name}${lot.area ? `<small>${fmtArea(lot.area)}</small>` : lot.extra ? `<small>${lot.extra}</small>` : ""}`;
+    tip.hidden = false;
+    requestAnimationFrame(() => tip.classList.add("is-visible"));
+  }
+  function hideTip() {
+    tip.classList.remove("is-visible");
+    tip.hidden = true;
+  }
+
+  let selectedLot = null;
+  function selectLot(lot) {
+    if (selectedLot) selectedLot.el.classList.remove("is-selected");
+    selectedLot = lot;
+    lot.el.classList.add("is-selected");
+
+    cardCat.textContent = catLabel[lot.cat] || "";
+    cardName.textContent = lot.name;
+    cardArea.textContent = lot.area ? fmtArea(lot.area) : "";
+    cardExtra.textContent = lot.extra || "";
+    const sold = lot.status === "vendido";
+    cardStatus.textContent = sold ? "● Vendido" : "● Disponível";
+    cardStatus.className = "mp__card-status " + (sold ? "is-sold" : "is-free");
+    const msg = encodeURIComponent(
+      `Olá! Estou no site do Bracerum Park e gostaria de saber mais sobre o lote "${lot.name}"${lot.area ? ` (${fmtArea(lot.area)})` : ""}.`
+    );
+    cardCta.href = `https://wa.me/5511986516065?text=${msg}`;
+    card.hidden = false;
+    card.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+  function closeCard() {
+    if (selectedLot) selectedLot.el.classList.remove("is-selected");
+    selectedLot = null;
+    card.hidden = true;
+  }
+  cardClose.addEventListener("click", closeCard);
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeCard(); });
+
+  mpLots.forEach((lot) => {
+    lot.el.addEventListener("mouseenter", () => showTip(lot));
+    lot.el.addEventListener("mouseleave", hideTip);
+    lot.el.addEventListener("click", () => selectLot(lot));
+  });
+
+  document.querySelectorAll(".mp__chips .chip").forEach((chip) => {
+    chip.addEventListener("click", () => {
+      document.querySelectorAll(".mp__chips .chip").forEach((c) => c.classList.remove("is-active"));
+      chip.classList.add("is-active");
+      const cat = chip.dataset.cat;
+      mpLots.forEach((lot) => {
+        lot.el.classList.toggle("is-dim", cat !== "all" && lot.cat !== cat);
+      });
     });
   });
-});
-
-/* Masterplan girado no mobile: dimensiona a imagem para preencher o container retrato.
-   Depois de rotacionar -90°, a "largura visual" = altura do <img> e vice-versa,
-   então largura do img = altura do container e altura do img = largura do container. */
-const masterRotate = document.querySelector(".master__rotate");
-const masterImg = masterRotate ? masterRotate.querySelector("img") : null;
-function sizeMasterplan() {
-  if (!masterImg) return;
-  const isMobile = window.matchMedia("(max-width: 720px)").matches;
-  if (!isMobile) { masterImg.style.width = ""; masterImg.style.height = ""; return; }
-  const cw = masterRotate.clientWidth;
-  const ch = masterRotate.clientHeight;
-  // img girado 90°: sua largura ocupa a altura do container; sua altura ocupa a largura
-  masterImg.style.width = ch + "px";
-  masterImg.style.height = cw + "px";
-  masterImg.style.objectFit = "cover";
-}
-if (masterImg) {
-  if (masterImg.complete) sizeMasterplan();
-  masterImg.addEventListener("load", sizeMasterplan);
-  window.addEventListener("resize", sizeMasterplan);
-}
+})();
 
 /* ==========================================================
    03 · LOCALIZAÇÃO — Mapa
