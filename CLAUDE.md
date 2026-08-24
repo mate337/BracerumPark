@@ -4,9 +4,14 @@ Site institucional do **Bracerum Park**, cidade industrial multiuso em Villeta, 
 
 ## Estado do projeto (retomada — 2026-08-24)
 
-O site anterior (`index.html` / `style.css` / `script.js` na raiz, tema claro dourado/creme institucional) está sendo **descartado visualmente**. Vamos construir um novo protótipo do zero: mais intuitivo, com produção visual de alto nível, seguindo boas práticas de UX/UI e um design system consistente, com animações via **GSAP**.
+O protótipo v1 do novo site **já foi construído** (`index.html`, `tributacao.html`, `style.css`, `script.js` na raiz) seguindo a estrutura combinada com o usuário: loader com curtain-wipe, hero cinematográfico com grid de pontos reativo, teaser de tributação → página dedicada `tributacao.html`, masterplan com hotspots interativos, localização com mapa Leaflet escuro full-bleed, jornada em etapas, galeria em sanfona, empresas em grid de logos, assessoria fiscal, tarja azul de história da Bracerum, footer. GSAP + ScrollTrigger via CDN. Testado em desktop/mobile via Playwright (ver `docs/design-references.md` para o roteiro completo).
 
-O **conteúdo e os dados de negócio** do site anterior são reais e devem ser preservados/reaproveitados no novo site (ver `docs/design-references.md` → "Conteúdo e dados a preservar"). Não é para reinventar números, áreas, regimes fiscais ou contatos — só a camada visual/UX muda.
+O **conteúdo e os dados de negócio** (masterplan, regimes fiscais, empresas, contatos) vêm do site anterior + do catálogo V15 anexado pelo usuário, e devem continuar sendo a fonte de verdade — não inventar números.
+
+**Pendências conhecidas** (não inventar, aguardar o usuário):
+- Tarja azul "história da Bracerum como importadora de aço" está com copy genérico, sem número de anos — usuário precisa confirmar o dado antes de publicar.
+- Hotspots do masterplan usam coordenadas aproximadas sobre `assets/renders/masterplan-implantacao.jpg` (extraído do catálogo) — recalibrar quando o usuário enviar os renders em alta resolução da "Entrada 01" (planta humanizada do resort) e do masterplan grid industrial completo, que ele indicou que enviaria via GitHub.
+- Site é multi-página estático (sem framework) — qualquer nova página deve seguir o mesmo padrão de nav/menu-panel/footer de `tributacao.html`.
 
 Todo material de referência de design (guias em PDF, vídeos de interação, sites de benchmark) está registrado em **`docs/design-references.md`**. Leia esse arquivo antes de propor UI nova.
 
@@ -25,4 +30,4 @@ Faltam (mencionados no `LEIA-ME.txt` original, ainda não enviados): `tecnologic
 
 ## Próximo passo
 
-Aguardando o usuário enviar a estrutura do novo site (sitemap/wireframe) para iniciarmos a reconstrução página a página.
+Aguardando o usuário: (1) confirmar/enviar o dado de anos de história da Bracerum para a tarja azul; (2) enviar os renders em alta resolução da planta humanizada (Entrada 01) e do masterplan grid completo para recalibrar os hotspots; (3) revisar o protótipo v1 e apontar ajustes de conteúdo/visual.

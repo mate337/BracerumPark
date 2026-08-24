@@ -113,6 +113,36 @@ Itens que o usuário mencionou existirem em outra conversa e que **ainda não es
 
 ---
 
-## 8. Stack de ferramentas do usuário (para indicação, não uso direto nesta sessão)
+## 8.1 Segunda leva de material (mesma sessão) — catálogo, logos reais, vídeos
+
+Depois do registro inicial acima, o usuário confirmou que o link do freehand.ai é mesmo a referência do land-book.com (curadoria de estilo, não o produto em si), e anexou o material que fechou o escopo do v1:
+
+- **`Bracerum_Park_Catalogo_V15_2026.08.19.pdf`** (40 páginas) — deck de investidor completo: sumário executivo, os 3 regimes fiscais em detalhe, timeline de erosão do ICMS 2026→2033, comparativos Brasil x Paraguai, macroeconomia (Baa3 Moody's), passo a passo de instalação (pág. 13, usado na seção Jornada), prova social (232 empresas brasileiras), mitos e fatos, quadro de áreas do masterplan, renders de cada espaço (fábrica, hotel, condomínio, pavilhão de convenções, centro empresarial, escritórios, comercial, clube, eventos) e modelo de negócio. Imagens extraídas via `pdfimages` e organizadas em `assets/renders/`.
+- **16 variantes de logo real** (`assets/SVG/Ativo 17-32.svg`, copiadas com nomes descritivos em `assets/logo/`): marca origami (3 triângulos dobrados) + wordmark "BRACERUM PARK", em 4 layouts (horizontal, stacked-wide, compact, tagline com "Construimos el futuro Industrial") × 4 cores (black, brown `#473315`, white, cream `#fff8ef`). Essas cores viraram a base do novo design system (ver `style.css`), substituindo o dourado do protótipo anterior.
+- **2 imagens inline da planta** (sem upload de arquivo, só visualizadas no chat): zoom da área do clube/resort com "Entrada 01" (portaria) e o masterplan grid industrial completo — confirmam a leitura de `assets/renders/masterplan-implantacao.jpg` (mesma planta, extraída do catálogo): portaria/estacionamento de caminhões no canto superior esquerdo, loteamentos industriais + ETE ao centro, aeroporto (pista ~1.280–1.480 m) embaixo, condomínio + hotel/centro de convenções no canto superior direito.
+- **`osmologorevealloader1440x900.mp4`** — quarto vídeo de referência Osmo: tela de loading em fundo escuro com wordmark "Osmo ✳" em fade-in, barra de progresso fina, depois uma cortina (`curtain`) desliza revelando a página em fundo claro. Base direta do `#loader` implementado em `index.html`/`script.js`.
+- Os outros 2 vídeos (`osmointeractivedotsgridbackground`, `osmoproducthotspotmodal`) vieram reenviados com hashes novos — mesmo conteúdo já registrado na seção 4.
+
+## 8.2 Estrutura do site v1 (definida pelo usuário nesta sessão)
+
+Ordem confirmada e implementada em `index.html` + `tributacao.html`:
+
+1. Loader (curtain-wipe, logo P&B)
+2. Hero cinematográfico — fundo Hotel + Centro de Convenções, logo SVG central, dots grid leve sobre a imagem
+3. Teaser "1% tributação" → link para página dedicada de tributação
+4. Masterplan interativo com hotspots (estilo hotspot-modal) sobre a planta
+5. Localização — mapa full-width em tons escuros
+6. Jornada — sequência de etapas (estilo catálogo pág. 13)
+7. Galeria em sanfona dos espaços do parque
+8. Empresas — só logos, estilo mobile do site anterior
+9. Assessoria — Bracerum ajuda no enquadramento tributário ideal
+10. Tarja azul — anos de história da Bracerum como importadora de aço no Brasil (conteúdo pendente de confirmação, ver `CLAUDE.md`)
+11. Footer + contatos
+
+## 8.3 Ambiente de teste: CDNs via proxy
+
+Nesta sessão o Chromium (Playwright) só conseguiu acessar CDNs externas (GSAP, Leaflet, Google Fonts) configurando explicitamente `proxy={"server": "http://127.0.0.1:43433"}` no `launch()` — sem isso, dá `ERR_CONNECTION_RESET` mesmo com `HTTPS_PROXY` no ambiente (o Chromium não herda a env var automaticamente). Isso é só uma limitação do sandbox de teste; em produção (hospedagem real) os CDNs funcionam normalmente para os visitantes.
+
+## 9. Stack de ferramentas do usuário (para indicação, não uso direto nesta sessão)
 
 Do PDF 1, mapeado ao perfil "Website orientado a conversão": Figma/FigJam (não disponível aqui — compensado por especificar tokens/componentes direto em código), pesquisa (Maze/Lyssna), Clarity/Hotjar/GA4 (analytics pós-lançamento), Lighthouse (auditoria). Ferramenta de motion adicionada pelo usuário para este projeto: **GSAP**.
