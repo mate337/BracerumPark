@@ -2,18 +2,26 @@
 
 Site institucional do **Bracerum Park**, cidade industrial multiuso em Villeta, Paraguai (Mercosul). Público-alvo: investidores e indústrias avaliando instalar operação no parque.
 
-## Estado do projeto (retomada — 2026-08-24)
+## Estado do projeto (v2 — 2026-08-24)
 
-O protótipo v1 do novo site **já foi construído** (`index.html`, `tributacao.html`, `style.css`, `script.js` na raiz) seguindo a estrutura combinada com o usuário: loader com curtain-wipe, hero cinematográfico com grid de pontos reativo, teaser de tributação → página dedicada `tributacao.html`, masterplan com hotspots interativos, localização com mapa Leaflet escuro full-bleed, jornada em etapas, galeria em sanfona, empresas em grid de logos, assessoria fiscal, tarja azul de história da Bracerum, footer. GSAP + ScrollTrigger via CDN. Testado em desktop/mobile via Playwright (ver `docs/design-references.md` para o roteiro completo).
+O site está na **versão 2**, reconstruída do zero após feedback do usuário sobre a v1. Regras de design **obrigatórias** definidas por ele:
 
-O **conteúdo e os dados de negócio** (masterplan, regimes fiscais, empresas, contatos) vêm do site anterior + do catálogo V15 anexado pelo usuário, e devem continuar sendo a fonte de verdade — não inventar números.
+- **Paleta: SOMENTE preto, branco e bege/marrom** (`--ink #0e0d0b`, `--paper #f7f3ea`, `--sand #cbb88f`, `--brown #473315`). **Zero vermelho e zero azul na UI** (o vermelho/azul que aparece no hero é a iluminação cênica do render, escolhida pelo cliente — ok).
+- **Tipografia: Helvetica** (UI/corpo, stack de sistema) **+ Noto Serif** (display/títulos, com itálico como ênfase no lugar de cor).
+- **Cantos quadrados** — nada de border-radius chamativo (o usuário odiou a sanfona arredondada da v1).
+- **Nav oculta enquanto o hero está em tela cheia**; entra deslizando após rolar. **Não existe menu lateral/painel** (foi removido a pedido) — mobile mostra só logo + CTA.
+- Referências de motion aprovadas: zoom por área do masterplan estilo **oftheoak.co.uk/oak-species**, infográfico com destaque no scroll estilo **freehand.ai**, qualidade geral estilo **oryzo.ai** (blur/focus, serif editorial, copy sobre imagem).
 
-**Pendências conhecidas** (não inventar, aguardar o usuário):
-- Tarja azul "história da Bracerum como importadora de aço" está com copy genérico, sem número de anos — usuário precisa confirmar o dado antes de publicar.
-- Hotspots do masterplan usam coordenadas aproximadas sobre `assets/renders/masterplan-implantacao.jpg` (extraído do catálogo) — recalibrar quando o usuário enviar os renders em alta resolução da "Entrada 01" (planta humanizada do resort) e do masterplan grid industrial completo, que ele indicou que enviaria via GitHub.
-- Site é multi-página estático (sem framework) — qualquer nova página deve seguir o mesmo padrão de nav/menu-panel/footer de `tributacao.html`.
+Estrutura do `index.html`: loader → hero (imagem hi-res `assets/web/hero-hotel-noturno.jpg`, logo SVG inline grande, dots sutis) → teaser "A tributação mais competitiva da América do Sul" → masterplan interativo com zoom (vista aérea `assets/web/vista-aerea-park.jpg`, pinos em `AREAS` no script.js) → mapa Leaflet dark full-bleed com labels de distância permanentes → "Como funciona" pinado (ScrollTrigger) → sanfona escura → empresas → assessoria (marrom) → faixa história (escura) → footer.
 
-Todo material de referência de design (guias em PDF, vídeos de interação, sites de benchmark) está registrado em **`docs/design-references.md`**. Leia esse arquivo antes de propor UI nova.
+O **conteúdo e os dados de negócio** (masterplan, regimes fiscais, empresas, contatos) vêm do catálogo V15 e do site anterior — fonte de verdade, não inventar números.
+
+**Pendências conhecidas** (aguardar o usuário):
+- Faixa de história: copy genérico sem número de anos da Bracerum como importadora de aço — confirmar antes de publicar. (Era para ser "tarja azul", mas azul saiu da paleta na v2; hoje está em fundo escuro `--ink-2`. Confirmar com o usuário se quer o azul de volta nessa faixa específica.)
+- Pinos do masterplan (`AREAS` em script.js) usam coordenadas aproximadas sobre a vista aérea; o usuário descreveu: sup. esquerda = portaria/estacionamento de caminhões, centro = loteamentos/ETE, embaixo = aeroporto (pista 1.480 m), sup. direita = condomínio e hotel+convenções. Refinar se ele apontar ajustes.
+- Hero: a imagem foi recuperada da capa do catálogo (exposição +2.2x sobre overlay escuro). Se o usuário subir o render original em alta no GitHub, substituir `assets/web/hero-hotel-noturno.jpg`.
+
+Todo material de referência de design está registrado em **`docs/design-references.md`**. Leia antes de propor UI nova.
 
 ## Stack de design/dev combinada
 
