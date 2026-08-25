@@ -35,7 +35,6 @@ O **conteúdo e os dados de negócio** vêm do catálogo V15 e de bracerum.com �
 - **Fotos dos pontos de interesse do mapa** (Terport, Puerto Seguro, aeroporto etc.): o cartão já tem o espaço reservado, mostrando "Foto do local" enquanto não chegam. Basta preencher o campo `img` do POI em `script.js`.
 - Faixa de história / página Bracerum: falta o número de anos da Bracerum como importadora de aço. O site institucional só traz "2018–2026" no copyright, então usei 2018 como início da operação como trader — **confirmar com o cliente**.
 - Pinos do masterplan já seguem as marcações do cliente; refinar se ele apontar ajustes.
-- **Logo da Bracerum** (faixa azul `#1c4d9d` do index): o arquivo oficial não chegou; `assets/logo/bracerum-{white,blue,black}.svg` são derivados dos SVGs do Park (marca + "BRACERUM", sem "PARK"). Substituir quando o oficial for enviado.
 - Hero: imagem recuperada da capa do catálogo (+2.2x de exposição). Se o render original em alta for enviado, substituir `assets/web/hero-hotel-noturno.jpg`.
 
 ## Stack de design/dev combinada
@@ -47,10 +46,10 @@ O **conteúdo e os dados de negócio** vêm do catálogo V15 e de bracerum.com �
 
 ## Assets já disponíveis em `/assets`
 
-Imagens reais do projeto (renders): `masterplan.jpg`, `Hotel.jpg`, `Fabrica.jpg`, `casas.jpg`, `convencoes.jpg`, `convenco2.jpg`, `escritorios.jpg`, `Clube.jpg`, `Eventos.jpg`. Logos de empresas parceiras/validação de mercado: `Ball_Corporation_logo_2024.svg`, `Kingspan_Group_logo.svg`, `Lupo_logo (1).svg`, `cremer.svg`, `be8.svg`.
+Imagens reais do projeto (renders): `masterplan.jpg`, `Hotel.jpg`, `Fabrica.jpg`, `casas.jpg`, `convencoes.jpg`, `convenco2.jpg`, `escritorios.jpg`, `Clube.jpg`, `Eventos.jpg`. Logo oficial da Bracerum (grupo): `Bracerum Vertical - Branca.svg`, normalizado em `assets/logo/bracerum-{white,blue,black}.svg` — é um lockup próprio, diferente do logo do Park. Logos de empresas parceiras/validação de mercado: `Ball_Corporation_logo_2024.svg`, `Kingspan_Group_logo.svg`, `Lupo_logo (1).svg`, `cremer.svg`, `be8.svg`.
 
 Faltam (mencionados no `LEIA-ME.txt` original, ainda não enviados): `tecnologico.jpg`, `comercial.jpg`.
 
 ## Próximo passo
 
-Aguardando o usuário: (1) o logo oficial da Bracerum para a faixa azul; (2) as fotos dos pontos de interesse do mapa; (3) o dado de anos de história da Bracerum como importadora de aço.
+Aguardando o usuário: (1) as fotos dos pontos de interesse do mapa; (2) o dado de anos de história da Bracerum como importadora de aço.
