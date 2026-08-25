@@ -2,26 +2,34 @@
 
 Site institucional do **Bracerum Park**, cidade industrial multiuso em Villeta, Paraguai (Mercosul). Público-alvo: investidores e indústrias avaliando instalar operação no parque.
 
-## Estado do projeto (v2 — 2026-08-24)
+## Estado do projeto (v3 — 2026-08-25)
 
-O site está na **versão 2**, reconstruída do zero após feedback do usuário sobre a v1. Regras de design **obrigatórias** definidas por ele:
+O site tem **3 páginas**: `index.html`, `tributacao.html` e `bracerum.html`, mais `i18n.js`, `style.css` e `script.js`.
 
-- **Paleta: SOMENTE preto, branco e bege/marrom** (`--ink #0e0d0b`, `--paper #f7f3ea`, `--sand #cbb88f`, `--brown #473315`). **Zero vermelho e zero azul na UI** (o vermelho/azul que aparece no hero é a iluminação cênica do render, escolhida pelo cliente — ok).
-- **Tipografia: Helvetica** (UI/corpo, stack de sistema) **+ Noto Serif** (display/títulos, com itálico como ênfase no lugar de cor).
-- **Cantos quadrados** — nada de border-radius chamativo (o usuário odiou a sanfona arredondada da v1).
-- **Nav oculta enquanto o hero está em tela cheia**; entra deslizando após rolar. **Não existe menu lateral/painel** (foi removido a pedido) — mobile mostra só logo + CTA.
-- Referências de motion aprovadas: zoom por área do masterplan estilo **oftheoak.co.uk/oak-species**, infográfico com destaque no scroll estilo **freehand.ai**, qualidade geral estilo **oryzo.ai** (blur/focus, serif editorial, copy sobre imagem).
+### Regras de design **obrigatórias** (definidas pelo cliente)
+- **Paleta: SOMENTE preto, branco e bege/marrom** (`--ink #0e0d0b`, `--paper #f7f3ea`, `--sand #cbb88f`, `--brown #473315`). **Zero vermelho e zero azul na UI.** (O vermelho/azul do hero é a iluminação cênica do render — ok. O azul-claro do rio no mapa é semântico, para indicar água — aprovado pelo pedido do cliente.)
+- **Tipografia: Helvetica** (UI/corpo, stack de sistema) **+ Noto Serif** (display/títulos, itálico como ênfase no lugar de cor).
+- **Cantos quadrados** — sem border-radius chamativo.
+- **Nav oculta enquanto o hero está em tela cheia**; entra deslizando após rolar. **Não existe menu lateral/painel** (removido a pedido).
+- Referências de motion aprovadas: zoom por área do masterplan estilo **oftheoak.co.uk/oak-species**, infográfico com destaque no scroll estilo **freehand.ai**, qualidade geral estilo **oryzo.ai**.
 
-Estrutura do `index.html`: loader → hero (imagem hi-res `assets/web/hero-hotel-noturno.jpg`, logo SVG inline grande, dots sutis) → teaser "A tributação mais competitiva da América do Sul" → masterplan interativo com zoom (vista aérea `assets/web/vista-aerea-park.jpg`, pinos em `AREAS` no script.js) → mapa Leaflet dark full-bleed com labels de distância permanentes → "Como funciona" pinado (ScrollTrigger) → sanfona escura → empresas → assessoria (marrom) → faixa história (escura) → footer.
+### Idiomas (i18n.js)
+O HTML carrega **português**; `i18n.js` traz dicionários **EN** e **ES** que sobrescrevem via `data-i18n="chave"`. Chave ausente cai no PT original — a página nunca quebra. Conteúdo dinâmico (pinos, POIs, listas do mapa) usa objetos `{pt,en,es}` lidos pelo helper `tr()` e re-renderiza no evento `langchange`.
+**Atenção:** o helper chama-se `tr()` e **não** `L()`, porque `L` é o global do Leaflet. Ao adicionar texto novo, incluir a chave nos dois dicionários (há um script de conferência no histórico da sessão).
 
-O **conteúdo e os dados de negócio** (masterplan, regimes fiscais, empresas, contatos) vêm do catálogo V15 e do site anterior — fonte de verdade, não inventar números.
+### Estrutura do index
+loader → hero (Ken Burns + dots) → teaser de tributação → masterplan com zoom por área (`AREAS` no script.js, coordenadas em % sobre `assets/web/vista-aerea-park.jpg`) → mapa Leaflet dark full-bleed → "Como funciona" (coluna sticky + IntersectionObserver — **não usar pin do ScrollTrigger, causou sobreposição e espaço em branco**) → sanfona escura → empresas → assessoria → faixa história → footer.
+
+### Mapa
+Rio Paraguai em azul-claro; grupos de POI (portos, rodovias, aeroportos, distâncias aéreas de capitais brasileiras, referências); clique no ponto abre cartão com descrição para empresários; clique na lista traça rota indicativa (arco) a partir do Park; indicador flutuante aponta o Park quando ele sai do enquadramento; rótulos de pontos a menos de 12 km só aparecem a partir do zoom 11.
+
+O **conteúdo e os dados de negócio** vêm do catálogo V15 e de bracerum.com — fonte de verdade, não inventar números.
 
 **Pendências conhecidas** (aguardar o usuário):
-- Faixa de história: copy genérico sem número de anos da Bracerum como importadora de aço — confirmar antes de publicar. (Era para ser "tarja azul", mas azul saiu da paleta na v2; hoje está em fundo escuro `--ink-2`. Confirmar com o usuário se quer o azul de volta nessa faixa específica.)
-- Pinos do masterplan (`AREAS` em script.js) usam coordenadas aproximadas sobre a vista aérea; o usuário descreveu: sup. esquerda = portaria/estacionamento de caminhões, centro = loteamentos/ETE, embaixo = aeroporto (pista 1.480 m), sup. direita = condomínio e hotel+convenções. Refinar se ele apontar ajustes.
-- Hero: a imagem foi recuperada da capa do catálogo (exposição +2.2x sobre overlay escuro). Se o usuário subir o render original em alta no GitHub, substituir `assets/web/hero-hotel-noturno.jpg`.
-
-Todo material de referência de design está registrado em **`docs/design-references.md`**. Leia antes de propor UI nova.
+- **Fotos dos pontos de interesse do mapa** (Terport, Puerto Seguro, aeroporto etc.): o cartão já tem o espaço reservado, mostrando "Foto do local" enquanto não chegam. Basta preencher o campo `img` do POI em `script.js`.
+- Faixa de história / página Bracerum: falta o número de anos da Bracerum como importadora de aço. O site institucional só traz "2018–2026" no copyright, então usei 2018 como início da operação como trader — **confirmar com o cliente**.
+- Pinos do masterplan já seguem as marcações do cliente; refinar se ele apontar ajustes.
+- Hero: imagem recuperada da capa do catálogo (+2.2x de exposição). Se o render original em alta for enviado, substituir `assets/web/hero-hotel-noturno.jpg`.
 
 ## Stack de design/dev combinada
 
