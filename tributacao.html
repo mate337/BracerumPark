@@ -8,38 +8,45 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="style.css?v=10" />
+<link rel="stylesheet" href="style.css?v=11" />
 <noscript><style>.reveal{opacity:1!important;transform:none!important}.mask__in{transform:none!important}</style></noscript>
 </head>
 <body>
 
-<!-- ============ NAV (sempre visível nesta página) ============ -->
+<!-- ============ NAV ============ -->
 <header class="nav" id="siteNav" data-always="true">
-  <a class="nav__brand" href="index.html" aria-label="Bracerum Park — início">
+  <a class="nav__brand" href="index.html" aria-label="Bracerum Park">
     <img src="assets/logo/logo-horizontal-cream.svg" alt="Bracerum Park" />
   </a>
   <nav class="nav__links">
-    <a href="index.html#masterplan">Masterplan</a>
-    <a href="index.html#localizacao">Localização</a>
-    <a href="index.html#jornada">Como funciona</a>
-    <a href="index.html#galeria">O Parque</a>
-    <a href="index.html#empresas">Empresas</a>
-    <a href="tributacao.html" style="color:var(--t-dark)">Tributação</a>
-    <a href="index.html#contato" class="nav__cta">Fale conosco</a>
+    <a href="index.html#masterplan" data-i18n="nav.masterplan">Masterplan</a>
+    <a href="index.html#localizacao" data-i18n="nav.location">Localização</a>
+    <a href="index.html#jornada" data-i18n="nav.how">Como funciona</a>
+    <a href="index.html#galeria" data-i18n="nav.park">O Parque</a>
+    <a href="tributacao.html" style="color:var(--t-dark)" data-i18n="nav.tax">Tributação</a>
+    <a href="bracerum.html" data-i18n="nav.bracerum">Bracerum</a>
   </nav>
+  <div class="nav__right">
+    <div class="lang" role="group" aria-label="Idioma / Language / Idioma">
+      <button class="lang__btn" data-lang="en" title="English (US)">EN</button>
+      <button class="lang__btn" data-lang="pt" title="Português (BR)">PT</button>
+      <button class="lang__btn" data-lang="es" title="Español (PY)">ES</button>
+    </div>
+    <a href="index.html#contato" class="nav__cta" data-i18n="nav.cta">Fale conosco</a>
+  </div>
 </header>
 
 <!-- ============ HERO ============ -->
 <section class="tax-hero bleed">
   <div class="section" style="padding-top:0;padding-bottom:0">
-    <p class="eyebrow eyebrow--dark reveal">Tese fiscal</p>
-    <h1 class="reveal">A tributação mais <em>competitiva</em> da América do Sul</h1>
-    <p class="lead reveal">Três instrumentos legais que, combinados, formam um dos regimes fiscais mais competitivos do hemisfério — do investimento à venda final. Todos renovados e modernizados em 2025.</p>
+    <p class="eyebrow eyebrow--dark reveal" data-i18n="tp.eyebrow">Tese fiscal</p>
+    <h1 class="reveal" data-i18n="tp.title">A tributação mais <em>competitiva</em> da América do Sul</h1>
+    <p class="lead reveal" data-i18n="tp.lead">Três instrumentos legais que, combinados, formam um dos regimes fiscais mais competitivos do hemisfério — do investimento à venda final. Todos renovados e modernizados em 2025.</p>
     <div class="tax-hero__stats reveal">
-      <div><strong>10·10·10</strong><span>Regime fiscal do Paraguai</span></div>
-      <div><strong>1%</strong><span>Tributo único · Maquila</span></div>
-      <div><strong>0%</strong><span>Tarifa intra-Mercosul</span></div>
-      <div><strong>Baa3</strong><span>Grau de investimento Moody's</span></div>
+      <div><strong>10·10·10</strong><span data-i18n="tp.s1">Regime fiscal do Paraguai</span></div>
+      <div><strong>1%</strong><span data-i18n="tp.s2">Tributo único · Maquila</span></div>
+      <div><strong>0%</strong><span data-i18n="tp.s3">Tarifa intra-Mercosul</span></div>
+      <div><strong>Baa3</strong><span data-i18n="tp.s4">Grau de investimento Moody's</span></div>
     </div>
   </div>
 </section>
@@ -47,146 +54,164 @@
 <!-- ============ 3 REGIMES ============ -->
 <section class="section" id="regimes">
   <div class="section__head reveal">
-    <p class="eyebrow">Os três instrumentos</p>
-    <h2>Um regime para produzir, um para investir <em>e um para vender</em></h2>
-    <p class="lead">A mesma operação captura os três benefícios simultaneamente.</p>
+    <p class="eyebrow" data-i18n="tp.reg.eyebrow">Os três instrumentos</p>
+    <h2><span class="mask"><span class="mask__in" data-i18n="tp.reg.title">Um regime para produzir, um para investir <em>e um para vender</em></span></span></h2>
+    <p class="lead" data-i18n="tp.reg.lead">A mesma operação captura os três benefícios simultaneamente.</p>
   </div>
   <div class="regime-grid reveal">
     <article class="regime-card">
       <span class="regime-card__num">01</span>
-      <p class="regime-card__big">1%<small>tributo único</small></p>
-      <h3>Regime de Maquila · Lei 7.547/2025</h3>
-      <p>Produza e exporte pagando 1% sobre o maior valor entre o agregado nacional e a fatura de exportação — frente a alíquotas de 25% a 35% nos países vizinhos.</p>
+      <p class="regime-card__big">1%<small data-i18n="tp.r1.small">Tributo único</small></p>
+      <h3 data-i18n="tp.r1.title">Regime de Maquila · Lei 7.547/2025</h3>
+      <p class="regime-card__text" data-i18n="tp.r1.desc">Produza e exporte pagando 1% sobre o maior valor entre o agregado nacional e a fatura de exportação — frente a alíquotas de 25% a 35% nos países vizinhos.</p>
       <ul>
-        <li>Importação com tributos suspensos</li>
-        <li>Venda parcial permitida no mercado interno</li>
-        <li>100% de capital estrangeiro permitido</li>
-        <li>Benefícios por até 20 anos, renováveis</li>
+        <li data-i18n="tp.r1.l1">Importação com tributos suspensos</li>
+        <li data-i18n="tp.r1.l2">Venda parcial permitida no mercado interno</li>
+        <li data-i18n="tp.r1.l3">100% de capital estrangeiro permitido</li>
+        <li data-i18n="tp.r1.l4">Benefícios por até 20 anos, renováveis</li>
       </ul>
     </article>
     <article class="regime-card">
       <span class="regime-card__num">02</span>
-      <p class="regime-card__big">0%<small>impostos na entrada</small></p>
-      <h3>Ley de Inversiones · Lei 7.548/2025</h3>
-      <p>Substitui a Lei 60/90: projetos aprovados (a partir de US$ 13 mi) recebem isenções sobre tudo o que entra no país para construir e equipar a operação.</p>
+      <p class="regime-card__big">0%<small data-i18n="tp.r2.small">Impostos na entrada</small></p>
+      <h3 data-i18n="tp.r2.title">Ley de Inversiones · Lei 7.548/2025</h3>
+      <p class="regime-card__text" data-i18n="tp.r2.desc">Substitui a Lei 60/90: projetos aprovados (a partir de US$ 13 mi) recebem isenções sobre tudo o que entra no país para construir e equipar a operação.</p>
       <ul>
-        <li>0% de tributos aduaneiros e 0% de IVA em bens de capital</li>
-        <li>Isenção sobre remessas de lucros e dividendos por 10 anos</li>
-        <li>Isenção sobre financiamento externo</li>
+        <li data-i18n="tp.r2.l1">0% de tributos aduaneiros e 0% de IVA em bens de capital</li>
+        <li data-i18n="tp.r2.l2">Isenção sobre remessas de lucros e dividendos por 10 anos</li>
+        <li data-i18n="tp.r2.l3">Isenção sobre financiamento externo</li>
       </ul>
     </article>
     <article class="regime-card">
       <span class="regime-card__num">03</span>
-      <p class="regime-card__big">0%<small>tarifa no bloco</small></p>
-      <h3>Certificado de Origem Mercosul</h3>
-      <p>O Paraguai é membro pleno do Mercosul. Produtos fabricados no Bracerum Park que cumprem as regras de origem circulam com tarifa zero em todo o bloco.</p>
+      <p class="regime-card__big">0%<small data-i18n="tp.r3.small">Tarifa no bloco</small></p>
+      <h3 data-i18n="tp.r3.title">Certificado de Origem Mercosul</h3>
+      <p class="regime-card__text" data-i18n="tp.r3.desc">O Paraguai é membro pleno do Mercosul. Produtos fabricados no Bracerum Park que cumprem as regras de origem circulam com tarifa zero em todo o bloco.</p>
       <ul>
-        <li>+270 milhões de consumidores no bloco</li>
-        <li>Acesso preferencial a Brasil, Argentina e Uruguai</li>
-        <li>Até 35% de tarifa externa (TEC) evitada</li>
+        <li data-i18n="tp.r3.l1">+270 milhões de consumidores no bloco</li>
+        <li data-i18n="tp.r3.l2">Acesso preferencial a Brasil, Argentina e Uruguai</li>
+        <li data-i18n="tp.r3.l3">Até 35% de tarifa externa (TEC) evitada</li>
       </ul>
     </article>
   </div>
 </section>
 
+<!-- ============ BANDA: produção ============ -->
+<div class="img-band">
+  <img src="assets/web/internas-07.jpg" alt="Galpões industriais do Bracerum Park" loading="lazy" />
+  <div class="img-band__copy"><div class="inner">
+    <h3 data-i18n="tp.band1.title">Produza a custo Paraguai. <em>Exporte pagando 1%.</em></h3>
+    <p data-i18n="tp.band1.desc">O galpão no Bracerum Park é a porta de entrada da sua operação de Maquila — matérias-primas, insumos e bens de capital entram no país sem pagar impostos enquanto vinculados à exportação.</p>
+  </div></div>
+</div>
+
 <!-- ============ TIMELINE ICMS ============ -->
 <section class="section section--dark bleed" style="padding-left:0;padding-right:0">
   <div class="section" style="padding-top:0;padding-bottom:0">
     <div class="section__head section__head--dark reveal">
-      <p class="eyebrow eyebrow--dark">Recorte Brasil · Reforma tributária</p>
-      <h2>O benefício de ICMS tem <em>data de validade</em></h2>
-      <p class="lead">A EC 132/2023 substitui o ICMS por um IBS de alíquota única e destino. Entre 2029 e 2032, todo benefício estadual é reduzido 10% ao ano. Em 2033, deixa de existir.</p>
+      <p class="eyebrow eyebrow--dark" data-i18n="tp.icms.eyebrow">Recorte Brasil · Reforma tributária</p>
+      <h2><span class="mask"><span class="mask__in" data-i18n="tp.icms.title">O benefício de ICMS tem <em>data de validade</em></span></span></h2>
+      <p class="lead" data-i18n="tp.icms.lead">A EC 132/2023 substitui o ICMS por um IBS de alíquota única e destino. Entre 2029 e 2032, todo benefício estadual é reduzido 10% ao ano. Em 2033, deixa de existir.</p>
     </div>
     <div class="icms-timeline reveal">
       <div class="icms-step">
         <div class="icms-step__dot"></div>
         <p class="icms-step__year">2026</p>
-        <p class="icms-step__label">Ano-teste</p>
-        <p class="icms-step__desc">CBS a 0,9% e IBS a 0,1%. Benefícios estaduais 100% intactos.</p>
+        <p class="icms-step__label" data-i18n="tp.y1.l">Ano-teste</p>
+        <p class="icms-step__desc" data-i18n="tp.y1.d">CBS a 0,9% e IBS a 0,1%. Benefícios estaduais 100% intactos.</p>
       </div>
       <div class="icms-step">
         <div class="icms-step__dot"></div>
         <p class="icms-step__year">2027</p>
-        <p class="icms-step__label">CBS cheia</p>
-        <p class="icms-step__desc">PIS/Cofins extintos e IPI zerado. ICMS ainda segue intacto.</p>
+        <p class="icms-step__label" data-i18n="tp.y2.l">CBS cheia</p>
+        <p class="icms-step__desc" data-i18n="tp.y2.d">PIS/Cofins extintos e IPI zerado. ICMS ainda segue intacto.</p>
       </div>
       <div class="icms-step is-key">
         <div class="icms-step__dot"></div>
         <p class="icms-step__year">2029</p>
-        <p class="icms-step__label">Início da erosão</p>
-        <p class="icms-step__desc">ICMS cobrado a 90% e benefício reduzido a 90%.</p>
+        <p class="icms-step__label" data-i18n="tp.y3.l">Início da erosão</p>
+        <p class="icms-step__desc" data-i18n="tp.y3.d">ICMS cobrado a 90% e benefício reduzido a 90%.</p>
       </div>
       <div class="icms-step is-key">
         <div class="icms-step__dot"></div>
         <p class="icms-step__year">2032</p>
-        <p class="icms-step__label">Último ano</p>
-        <p class="icms-step__desc">Benefício a 60%. Fundo de Compensação encerra em 31/12.</p>
+        <p class="icms-step__label" data-i18n="tp.y4.l">Último ano</p>
+        <p class="icms-step__desc" data-i18n="tp.y4.d">Benefício a 60%. Fundo de Compensação encerra em 31/12.</p>
       </div>
       <div class="icms-step">
         <div class="icms-step__dot"></div>
         <p class="icms-step__year">2033</p>
-        <p class="icms-step__label">ICMS extinto</p>
-        <p class="icms-step__desc">IBS e CBS somam ~27% — a mesma carga em qualquer estado.</p>
+        <p class="icms-step__label" data-i18n="tp.y5.l">ICMS extinto</p>
+        <p class="icms-step__desc" data-i18n="tp.y5.d">IBS e CBS somam ~27% — a mesma carga em qualquer estado.</p>
       </div>
     </div>
-    <p class="reveal" style="margin-top:36px;font-family:var(--serif);font-style:italic;color:var(--sand)">O regime que depende de um governo estadual expira. O que depende de um tratado internacional, não.</p>
+    <p class="reveal" style="margin-top:40px;font-family:var(--serif);font-style:italic;font-size:clamp(1.1rem,1.9vw,1.45rem);color:var(--sand);max-width:44ch" data-i18n="tp.icms.quote">O regime que depende de um governo estadual expira. O que depende de um tratado internacional, não.</p>
   </div>
 </section>
 
 <!-- ============ COMPARATIVO ============ -->
 <section class="section" id="comparativo">
   <div class="section__head reveal">
-    <p class="eyebrow">Recorte Brasil · Custo de operar</p>
-    <h2>A mesma fábrica, com <em>outra conta</em> no fim do mês</h2>
-    <p class="lead">Três linhas de custo que todo industrial conhece de cor — comparadas lado a lado (Brasil = 100).</p>
+    <p class="eyebrow" data-i18n="tp.cost.eyebrow">Recorte Brasil · Custo de operar</p>
+    <h2><span class="mask"><span class="mask__in" data-i18n="tp.cost.title">A mesma fábrica, com <em>outra conta</em> no fim do mês</span></span></h2>
+    <p class="lead" data-i18n="tp.cost.lead">Três linhas de custo que todo industrial conhece de cor — comparadas lado a lado (Brasil = 100).</p>
   </div>
   <div class="compare-wrap">
     <div class="compare-bars reveal">
       <div>
-        <div class="compare-row__label">Energia industrial (índice)</div>
+        <div class="compare-row__label" data-i18n="tp.b1">Energia industrial (índice)</div>
         <div class="compare-row__track"><div class="compare-bar compare-bar--br" style="width:100%"></div><div class="compare-bar compare-bar--py" style="width:40%"></div></div>
       </div>
       <div>
-        <div class="compare-row__label">Carga tributária (% do PIB)</div>
+        <div class="compare-row__label" data-i18n="tp.b2">Carga tributária (% do PIB)</div>
         <div class="compare-row__track"><div class="compare-bar compare-bar--br" style="width:33%"></div><div class="compare-bar compare-bar--py" style="width:10%"></div></div>
       </div>
       <div>
-        <div class="compare-row__label">Encargos sobre a folha (%)</div>
+        <div class="compare-row__label" data-i18n="tp.b3">Encargos sobre a folha (%)</div>
         <div class="compare-row__track"><div class="compare-bar compare-bar--br" style="width:75%"></div><div class="compare-bar compare-bar--py" style="width:33%"></div></div>
       </div>
       <div class="compare-legend"><span><i style="background:var(--ink)"></i>Brasil</span><span><i style="background:var(--sand)"></i>Paraguai</span></div>
     </div>
     <div class="compare-info reveal">
-      <h4>Folha 2× mais leve</h4>
-      <p>Salário mínimo de ~R$ 2.150 com encargos de ~33% (IPS 16,5% + provisões), contra 70–80% de encargos no Brasil.</p>
-      <h4>Energia de Itaipu, na fonte</h4>
-      <p>Matriz 100% hidrelétrica com tarifas industriais ~60% menores — o Park recebe linhas de duas usinas, subestação a 7 km.</p>
-      <h4>Tributo que cabe numa linha</h4>
-      <p>1% sobre o valor agregado substitui a sopa de siglas brasileira. A contabilidade fiscal da maquila é radicalmente mais simples.</p>
+      <h4 data-i18n="tp.c1.t">Folha 2× mais leve</h4>
+      <p data-i18n="tp.c1.d">Salário mínimo de ~R$ 2.150 com encargos de ~33% (IPS 16,5% + provisões), contra 70–80% de encargos no Brasil.</p>
+      <h4 data-i18n="tp.c2.t">Energia de Itaipu, na fonte</h4>
+      <p data-i18n="tp.c2.d">Matriz 100% hidrelétrica com tarifas industriais ~60% menores — o Park recebe linhas de duas usinas, subestação a 7 km.</p>
+      <h4 data-i18n="tp.c3.t">Tributo que cabe numa linha</h4>
+      <p data-i18n="tp.c3.d">1% sobre o valor agregado substitui a sopa de siglas brasileira. A contabilidade fiscal da maquila é radicalmente mais simples.</p>
     </div>
   </div>
 </section>
+
+<!-- ============ BANDA: logística ============ -->
+<div class="img-band">
+  <img src="assets/web/vista-aerea-park.jpg" alt="Vista aérea do Bracerum Park e do Rio Paraguai" loading="lazy" />
+  <div class="img-band__copy"><div class="inner">
+    <h3 data-i18n="tp.band2.title">Tarifa zero no bloco, <em>porto a minutos do portão</em>.</h3>
+    <p data-i18n="tp.band2.desc">Enquanto o concorrente de fora do bloco paga a Tarifa Externa Comum de até 35%, quem produz no Park circula com tarifa zero em Brasil, Argentina e Uruguai.</p>
+  </div></div>
+</div>
 
 <!-- ============ SEGURANÇA JURÍDICA ============ -->
 <section class="section section--dark bleed" style="padding-left:0;padding-right:0">
   <div class="section" style="padding-top:0;padding-bottom:0">
     <div class="section__head section__head--dark reveal">
-      <p class="eyebrow eyebrow--dark">Segurança jurídica</p>
-      <h2>O investimento estrangeiro é <em>protegido por lei</em></h2>
-      <p class="lead">O Paraguai construiu um dos marcos legais mais abertos ao capital estrangeiro do continente — e o Brasil tem acordo bilateral em vigor.</p>
+      <p class="eyebrow eyebrow--dark" data-i18n="tp.law.eyebrow">Segurança jurídica</p>
+      <h2><span class="mask"><span class="mask__in" data-i18n="tp.law.title">O investimento estrangeiro é <em>protegido por lei</em></span></span></h2>
+      <p class="lead" data-i18n="tp.law.lead">O Paraguai construiu um dos marcos legais mais abertos ao capital estrangeiro do continente — e o Brasil tem acordo bilateral em vigor.</p>
     </div>
     <div class="regime-grid regime-grid--dark reveal">
       <div class="regime-card">
-        <h3>Acordo Brasil–Paraguai (ACFI)</h3>
-        <p>Decreto 9.855/2019 — proteção institucional e prevenção de controvérsias entre os dois países.</p>
+        <h3 data-i18n="tp.j1.t">Acordo Brasil–Paraguai (ACFI)</h3>
+        <p class="regime-card__text" data-i18n="tp.j1.d">Decreto 9.855/2019 — proteção institucional e prevenção de controvérsias entre os dois países.</p>
       </div>
       <div class="regime-card">
-        <h3>Propriedade plena e escriturada</h3>
-        <p>O estrangeiro pode ser dono da terra e do galpão em nome próprio — matrícula registrada, sem arrendamento forçado.</p>
+        <h3 data-i18n="tp.j2.t">Propriedade plena e escriturada</h3>
+        <p class="regime-card__text" data-i18n="tp.j2.d">O estrangeiro pode ser dono da terra e do galpão em nome próprio — matrícula registrada, sem arrendamento forçado.</p>
       </div>
       <div class="regime-card">
-        <h3>Investor Pass</h3>
-        <p>Resolução MIC 283/2026: residência permanente direta, com alíquota de 8% sobre dividendos para residentes.</p>
+        <h3 data-i18n="tp.j3.t">Investor Pass</h3>
+        <p class="regime-card__text" data-i18n="tp.j3.d">Resolução MIC 283/2026: residência permanente direta, com alíquota de 8% sobre dividendos para residentes.</p>
       </div>
     </div>
   </div>
@@ -195,33 +220,33 @@
 <!-- ============ FAQ ============ -->
 <section class="section" id="faq">
   <div class="section__head reveal">
-    <p class="eyebrow">Perguntas frequentes</p>
-    <h2>As seis perguntas de <em>toda primeira reunião</em></h2>
+    <p class="eyebrow" data-i18n="tp.faq.eyebrow">Perguntas frequentes</p>
+    <h2><span class="mask"><span class="mask__in" data-i18n="tp.faq.title">As seis perguntas de <em>toda primeira reunião</em></span></span></h2>
   </div>
   <div class="faq reveal">
     <details>
-      <summary>Preciso fechar minha empresa no Brasil?</summary>
-      <p>Não. A operação típica mantém a empresa brasileira como importadora e distribuidora — a planta paraguaia vira a origem da mercadoria, com Imposto de Importação zero, no lugar do fornecedor asiático.</p>
+      <summary data-i18n="tp.q1">Preciso fechar minha empresa no Brasil?</summary>
+      <p data-i18n="tp.a1">Não. A operação típica mantém a empresa brasileira como importadora e distribuidora — a planta paraguaia vira a origem da mercadoria, com Imposto de Importação zero, no lugar do fornecedor asiático.</p>
     </details>
     <details>
-      <summary>Em quanto tempo estou produzindo?</summary>
-      <p>As etapas correm em paralelo: constituição da empresa, aprovação do programa de maquila e galpão Built-to-Suit erguido com o Steel Frame do grupo — cronograma definido caso a caso.</p>
+      <summary data-i18n="tp.q2">Em quanto tempo estou produzindo?</summary>
+      <p data-i18n="tp.a2">As etapas correm em paralelo: constituição da empresa, aprovação do programa de maquila e galpão Built-to-Suit erguido com o Steel Frame do grupo — cronograma definido caso a caso.</p>
     </details>
     <details>
-      <summary>E se meu produto não cumprir a regra de origem?</summary>
-      <p>A Regra Específica de Origem da NCM define o quanto de transformação é preciso. O projeto industrial é desenhado desde o início para cumpri-la — é engenharia de processo, não sorte.</p>
+      <summary data-i18n="tp.q3">E se meu produto não cumprir a regra de origem?</summary>
+      <p data-i18n="tp.a3">A Regra Específica de Origem da NCM define o quanto de transformação é preciso. O projeto industrial é desenhado desde o início para cumpri-la — é engenharia de processo, não sorte.</p>
     </details>
     <details>
-      <summary>Como levo minhas máquinas?</summary>
-      <p>Bens de capital entram sem tributos aduaneiros nem IVA, pela maquila e pela Ley de Inversiones. O maquinário da fábrica brasileira pode ser transferido para o Paraguai.</p>
+      <summary data-i18n="tp.q4">Como levo minhas máquinas?</summary>
+      <p data-i18n="tp.a4">Bens de capital entram sem tributos aduaneiros nem IVA, pela maquila e pela Ley de Inversiones. O maquinário da fábrica brasileira pode ser transferido para o Paraguai.</p>
     </details>
     <details>
-      <summary>Posso vender no mercado paraguaio?</summary>
-      <p>Sim. A lei permite destinar parte da produção ao mercado interno, pagando tributos locais apenas sobre essa parcela — o restante segue exportado a 1%.</p>
+      <summary data-i18n="tp.q5">Posso vender no mercado paraguaio?</summary>
+      <p data-i18n="tp.a5">Sim. A lei permite destinar parte da produção ao mercado interno, pagando tributos locais apenas sobre essa parcela — o restante segue exportado a 1%.</p>
     </details>
     <details>
-      <summary>O que acontece com meus lucros?</summary>
-      <p>Câmbio livre e remessa de dividendos sem restrição — com isenção sobre remessas por 10 anos para projetos enquadrados na Ley de Inversiones, e 8% para o investidor residente.</p>
+      <summary data-i18n="tp.q6">O que acontece com meus lucros?</summary>
+      <p data-i18n="tp.a6">Câmbio livre e remessa de dividendos sem restrição — com isenção sobre remessas por 10 anos para projetos enquadrados na Ley de Inversiones, e 8% para o investidor residente.</p>
     </details>
   </div>
 </section>
@@ -230,25 +255,25 @@
 <section class="section section--dark bleed" style="padding-left:0;padding-right:0">
   <div class="section" style="padding-top:0;padding-bottom:0">
     <div class="section__head section__head--dark reveal">
-      <p class="eyebrow eyebrow--dark">Mitos e fatos</p>
-      <h2>O que se fala — <em>e o que os dados mostram</em></h2>
+      <p class="eyebrow eyebrow--dark" data-i18n="tp.myth.eyebrow">Mitos e fatos</p>
+      <h2><span class="mask"><span class="mask__in" data-i18n="tp.myth.title">O que se fala — <em>e o que os dados mostram</em></span></span></h2>
     </div>
     <div class="myth-grid reveal">
       <div class="myth-row">
-        <p class="myth-row__q">"É um país instável."</p>
-        <p class="myth-row__a">Grau de investimento Moody's (Baa3) com perspectiva estável, inflação na meta, moeda sem corte de zeros desde 1943 e a menor dívida pública da vizinhança.</p>
+        <p class="myth-row__q" data-i18n="tp.m1.q">"É um país instável."</p>
+        <p class="myth-row__a" data-i18n="tp.m1.a">Grau de investimento Moody's (Baa3) com perspectiva estável, inflação na meta, moeda sem corte de zeros desde 1943 e a menor dívida pública da vizinhança.</p>
       </div>
       <div class="myth-row">
-        <p class="myth-row__q">"O regime pode acabar de uma hora para outra."</p>
-        <p class="myth-row__a">A maquila é lei federal desde 1997, renovada e ampliada em 2025 (Lei 7.547) — com benefícios garantidos por até 20 anos, renováveis.</p>
+        <p class="myth-row__q" data-i18n="tp.m2.q">"O regime pode acabar de uma hora para outra."</p>
+        <p class="myth-row__a" data-i18n="tp.m2.a">A maquila é lei federal desde 1997, renovada e ampliada em 2025 (Lei 7.547) — com benefícios garantidos por até 20 anos, renováveis.</p>
       </div>
       <div class="myth-row">
-        <p class="myth-row__q">"Não tem mão de obra qualificada."</p>
-        <p class="myth-row__a">Idade média de 37 anos, 35 mil empregos formais já operando em maquiladoras e treinamento técnico apoiado pelo sistema nacional (SNPP).</p>
+        <p class="myth-row__q" data-i18n="tp.m3.q">"Não tem mão de obra qualificada."</p>
+        <p class="myth-row__a" data-i18n="tp.m3.a">Idade média de 37 anos, 35 mil empregos formais já operando em maquiladoras e treinamento técnico apoiado pelo sistema nacional (SNPP).</p>
       </div>
       <div class="myth-row">
-        <p class="myth-row__q">"É longe e difícil de acompanhar."</p>
-        <p class="myth-row__a">Voos diários de ~2h saindo de São Paulo, fuso praticamente igual, fronteira terrestre com o Brasil e 65 km entre o aeroporto de Assunção e o Park.</p>
+        <p class="myth-row__q" data-i18n="tp.m4.q">"É longe e difícil de acompanhar."</p>
+        <p class="myth-row__a" data-i18n="tp.m4.a">Voos diários de ~2h saindo de São Paulo, fuso praticamente igual, fronteira terrestre com o Brasil e 65 km entre o aeroporto de Assunção e o Park.</p>
       </div>
     </div>
   </div>
@@ -258,10 +283,10 @@
 <section class="section">
   <div class="advisory reveal">
     <div>
-      <h2>Quer simular sua economia com o seu NCM?</h2>
-      <p>A sétima pergunta — "quanto eu economizo?" — é a que respondemos com a sua planilha, no seu NCM, na primeira conversa.</p>
+      <h2 data-i18n="tp.cta.title">Quer simular sua economia com o seu NCM?</h2>
+      <p data-i18n="tp.cta.desc">A sétima pergunta — "quanto eu economizo?" — é a que respondemos com a sua planilha, no seu NCM, na primeira conversa.</p>
     </div>
-    <a class="btn btn--dark" href="index.html#contato">Falar com o time <span class="btn__arrow">→</span></a>
+    <a class="btn btn--dark" href="index.html#contato"><span data-i18n="adv.cta">Falar com o time</span> <span class="btn__arrow">→</span></a>
   </div>
 </section>
 
@@ -270,35 +295,32 @@
   <div class="footer__inner reveal">
     <div class="footer__top">
       <img class="footer__brand" src="assets/logo/logo-horizontal-cream.svg" alt="Bracerum Park" />
-      <h2 class="footer__cta">Vamos construir a porta de entrada industrial do <em>Mercosul</em>?</h2>
+      <h2 class="footer__cta" data-i18n="ft.cta">Vamos construir a porta de entrada industrial do <em>Mercosul</em>?</h2>
     </div>
     <div class="footer__contacts">
       <div class="contact-card">
-        <span class="contact-card__name">Cleber Pavao</span>
-        <span class="contact-card__phone">+55 11 98651-6065</span>
-        <div class="contact-card__links">
-          <a href="https://wa.me/5511986516065" target="_blank" rel="noopener" class="contact-btn">WhatsApp</a>
-          <a href="https://instagram.com/pavaocleber" target="_blank" rel="noopener" class="contact-btn">@pavaocleber</a>
-        </div>
+        <span class="contact-card__name">Cleber Pavão</span>
+        <span class="contact-card__line"><b data-i18n="ft.py">Paraguai</b><a href="tel:+595985516065">+595 985 516 065</a></span>
+        <span class="contact-card__line"><b data-i18n="ft.br">Brasil</b><a href="tel:+5511986516065">+55 11 98651-6065</a></span>
+        <span class="contact-card__line"><a href="mailto:cleber@bracerum.com">cleber@bracerum.com</a></span>
       </div>
       <div class="contact-card">
         <span class="contact-card__name">Sydney Savi</span>
-        <span class="contact-card__phone">+55 47 98803-0200</span>
-        <div class="contact-card__links">
-          <a href="https://wa.me/5547988030200" target="_blank" rel="noopener" class="contact-btn">WhatsApp</a>
-          <a href="https://instagram.com/sydneysavi" target="_blank" rel="noopener" class="contact-btn">@sydneysavi</a>
-        </div>
+        <span class="contact-card__line"><b data-i18n="ft.py">Paraguai</b><a href="tel:+595983030200">+595 983 030 200</a></span>
+        <span class="contact-card__line"><b data-i18n="ft.br">Brasil</b><a href="tel:+5547988030200">+55 47 98803-0200</a></span>
+        <span class="contact-card__line"><a href="mailto:sydney@bracerum.com">sydney@bracerum.com</a></span>
       </div>
     </div>
     <div class="footer__meta">
       <a href="https://maps.app.goo.gl/oV7XiWquCpgAhZYX7" target="_blank" rel="noopener">25°46'18.1"S 57°43'56.6"W · Villeta, Paraguai</a>
-      <span>© 2026 Bracerum Park. Todos os direitos reservados.</span>
+      <span data-i18n="ft.rights">© 2026 Bracerum Park. Todos os direitos reservados.</span>
     </div>
   </div>
 </footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-<script src="script.js?v=10"></script>
+<script src="i18n.js?v=11"></script>
+<script src="script.js?v=11"></script>
 </body>
 </html>
