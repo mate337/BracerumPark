@@ -448,17 +448,44 @@ function applyLang(lang){
   document.dispatchEvent(new CustomEvent("langchange", { detail: { lang } }));
 }
 
+/* Tela de entrada: na primeira visita o usuário escolhe o idioma antes de
+   o site carregar. Quem já escolheu entra direto (a troca segue disponível
+   no seletor da nav). O evento bp:langready libera o loader. */
 (function initLang(){
   let saved = null;
   try { saved = localStorage.getItem("bp-lang"); } catch (e) {}
-  if (!saved){
+  const guess = (() => {
     const nav = (navigator.language || "pt").toLowerCase();
-    saved = nav.startsWith("en") ? "en" : nav.startsWith("es") ? "es" : "pt";
-  }
+    return nav.startsWith("en") ? "en" : nav.startsWith("es") ? "es" : "pt";
+  })();
+
   document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll(".lang__btn").forEach(btn => {
       btn.addEventListener("click", () => applyLang(btn.dataset.lang));
     });
-    applyLang(saved);
+
+    const gate = document.getElementById("langGate");
+    const start = lang => {
+      applyLang(lang);
+      document.dispatchEvent(new CustomEvent("bp:langready", { detail: { gate: !!gate && !saved } }));
+    };
+
+    if (!gate || saved){
+      if (gate) gate.remove();
+      start(saved || guess);
+      return;
+    }
+
+    applyLang(guess);            // a própria entrada já aparece no idioma provável
+    gate.hidden = false;
+    document.body.style.overflow = "hidden";
+    gate.querySelectorAll(".gate__opt").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const lang = btn.dataset.lang;
+        gate.dataset.chosen = "true";
+        document.body.style.overflow = "";
+        start(lang);
+      });
+    });
   });
 })();

@@ -13,6 +13,7 @@
   --paper-2:#ece5d4;
   --sand:   #cbb88f;   /* acento sobre escuro */
   --brown:  #473315;   /* marrom do logo — acento sobre claro */
+  --brc-blue: #1c4d9d; /* azul institucional da Bracerum (faixa do grupo) */
   --brown-2:#5f4a26;
   --white:  #ffffff;
 
@@ -338,6 +339,11 @@ html.no-motion .pin__dot::after{animation:none;display:none}
 }
 #locMap{position:absolute;inset:0;z-index:0;background:var(--ink-2)}
 #locMap .leaflet-container{background:var(--ink-2)}
+/* Basemap claro invertido: terreno escuro e a água (rios/lagos) desenhada
+   pelo próprio mapa em azul — nada é sobreposto por cima. */
+.leaflet-pane--base{
+  filter:invert(1) hue-rotate(180deg) saturate(1.45) brightness(.86) contrast(1.06);
+}
 
 /* labels permanentes dos pontos */
 .map-label{
@@ -403,9 +409,18 @@ html.no-motion .pin__dot::after{animation:none;display:none}
    COMO FUNCIONA — infográfico pinado (estilo freehand)
    ========================================================== */
 .steps{background:var(--paper)}
-.steps__pin{max-width:var(--max);margin:0 auto;padding:clamp(80px,10vw,140px) var(--gap)}
-.steps__grid{display:grid;grid-template-columns:1fr 1.15fr;gap:clamp(32px,6vw,96px);align-items:start}
-.steps__intro{position:sticky;top:96px;align-self:start}
+/* O bloco ocupa exatamente uma tela: o ScrollTrigger centraliza a seção
+   primeiro e só então avança as etapas uma a uma. */
+.steps__pin{
+  max-width:none;margin:0 auto;height:100svh;
+  display:flex;align-items:center;
+  padding:0 var(--gap);overflow:hidden;
+}
+.steps__grid{
+  width:100%;max-width:var(--max);margin:0 auto;
+  display:grid;grid-template-columns:1fr 1.15fr;gap:clamp(32px,6vw,96px);align-items:center;
+}
+.steps__intro{align-self:center}
 .steps__intro h2{font-size:clamp(1.9rem,3.4vw,2.9rem);margin:.45em 0 .5em}
 .steps__intro .lead{margin-bottom:26px;font-size:1rem}
 .steps__visual{
@@ -426,8 +441,8 @@ html.no-motion .pin__dot::after{animation:none;display:none}
 .steps__list{display:flex;flex-direction:column}
 .step{
   display:grid;grid-template-columns:auto 1fr;gap:clamp(16px,2.2vw,28px);
-  padding:clamp(26px,4.4vh,54px) 0;border-top:1px solid var(--line-light);
-  opacity:.22;filter:blur(1.2px);transform:translateX(12px);
+  padding:clamp(12px,1.7vh,20px) 0;border-top:1px solid var(--line-light);
+  opacity:.2;filter:blur(1.4px);transform:translateX(14px);
   transition:opacity .5s var(--ease),filter .5s var(--ease),transform .5s var(--ease);
 }
 .step:last-child{border-bottom:1px solid var(--line-light)}
@@ -444,10 +459,10 @@ html.no-motion .step{opacity:1;filter:none;transform:none}
 }
 .step__desc{font-size:.85rem;color:var(--t-light-soft);max-width:46ch;line-height:1.55}
 @media (max-width: 900px){
+  .steps__pin{height:auto;padding:clamp(80px,11vw,140px) var(--gap)}
   .steps__grid{grid-template-columns:1fr}
-  .steps__intro{position:static}
-  .steps__visual{aspect-ratio:16/10}
-  .step{opacity:1;filter:none;transform:none}
+  .steps__visual{aspect-ratio:16/10;max-height:none}
+  .step{opacity:1;filter:none;transform:none;padding:22px 0}
 }
 
 /* ==========================================================
@@ -527,23 +542,24 @@ html.no-motion .step{opacity:1;filter:none;transform:none}
    HISTÓRIA — faixa institucional escura
    ========================================================== */
 .history{
-  background:var(--ink-2);color:var(--t-dark);
+  background:var(--brc-blue);color:#fff;
   padding:clamp(70px,9vw,120px) var(--gap);
 }
 .history__inner{
   max-width:var(--max);margin:0 auto;
-  display:grid;grid-template-columns:auto 1fr;gap:clamp(28px,6vw,90px);align-items:center;
+  display:grid;grid-template-columns:auto 1fr;gap:clamp(32px,6vw,90px);align-items:center;
 }
-.history__num{
-  font-family:var(--serif);font-style:italic;font-weight:500;
-  font-size:clamp(3.4rem,7vw,5.6rem);line-height:.9;color:var(--sand);
+.history__logo{display:flex;flex-direction:column;gap:16px;align-items:flex-start}
+.history__logo img{width:clamp(190px,20vw,280px);height:auto}
+.history__logo small{
+  font:700 .6rem/1.4 var(--sans);letter-spacing:.26em;text-transform:uppercase;
+  color:rgba(255,255,255,.6);
 }
-.history__num small{
-  display:block;font:700 .16em/1.4 var(--sans);letter-spacing:.26em;text-transform:uppercase;
-  font-style:normal;color:var(--t-dark-mute);margin-top:1em;
-}
-.history__text h3{font-size:clamp(1.3rem,2.4vw,1.9rem);margin-bottom:.5em}
-.history__text p{color:var(--t-dark-soft);max-width:64ch}
+.history__text h3{font-size:clamp(1.3rem,2.4vw,1.9rem);margin-bottom:.5em;color:#fff}
+.history__text p{color:rgba(255,255,255,.78);max-width:64ch}
+.history .btn--dark{color:#fff;border-color:rgba(255,255,255,.35)}
+.history .btn--dark:hover{color:var(--brc-blue)}
+.history .btn--dark:hover::before{background:#fff}
 @media (max-width: 760px){ .history__inner{grid-template-columns:1fr} }
 
 /* ==========================================================
@@ -672,6 +688,35 @@ html.no-motion .step{opacity:1;filter:none;transform:none}
 .myth-row__q{font-family:var(--serif);font-style:italic;font-weight:500;color:var(--t-dark)}
 .myth-row__a{font-size:.86rem;color:var(--t-dark-soft)}
 @media (max-width: 760px){ .myth-row{grid-template-columns:1fr} }
+
+/* ==========================================================
+   ENTRADA — escolha de idioma antes do site
+   ========================================================== */
+#langGate{
+  position:fixed;inset:0;z-index:300;background:var(--ink);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:clamp(38px,6vh,66px);padding:32px;
+}
+#langGate .gate__mark{width:min(400px,72vw);opacity:0}
+#langGate .gate__label{
+  font:700 .64rem/1 var(--sans);letter-spacing:.32em;text-transform:uppercase;
+  color:var(--t-dark-mute);opacity:0;text-align:center;
+}
+#langGate .gate__opts{display:flex;gap:1px;background:var(--line-dark);border:1px solid var(--line-dark);opacity:0}
+#langGate .gate__opt{
+  background:var(--ink);padding:clamp(18px,2.6vh,26px) clamp(24px,4vw,52px);
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+  transition:background var(--dur-s) var(--ease), color var(--dur-s);
+  color:var(--t-dark);
+}
+#langGate .gate__opt:hover,#langGate .gate__opt:focus-visible{background:var(--paper);color:var(--ink);outline:none}
+#langGate .gate__code{font-family:var(--serif);font-style:italic;font-size:clamp(1.6rem,3vw,2.2rem);font-weight:500;line-height:1}
+#langGate .gate__name{font:600 .6rem/1 var(--sans);letter-spacing:.18em;text-transform:uppercase;opacity:.62}
+#langGate .gate__opt:hover .gate__name{opacity:.85}
+@media (max-width: 560px){
+  #langGate .gate__opts{flex-direction:column}
+}
+html:not(.js) #langGate{display:none}
 
 /* ==========================================================
    SELETOR DE IDIOMA

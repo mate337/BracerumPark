@@ -36,27 +36,70 @@ if (hasGsap) gsap.registerPlugin(ScrollTrigger);
       { autoAlpha: 1, y: 0, duration: 1.1, ease: "power3.out", delay: .2 });
   }
 
-  if (!el){ focusHero(); return; }
-  if (reduceMotion){ el.remove(); return; }
+  const gate = document.getElementById("langGate");
 
-  const mark = el.querySelector(".loader__mark");
-  const bar = el.querySelector(".loader__bar");
-  const label = el.querySelector(".loader__label");
-  const curtain = el.querySelector(".loader__curtain");
+  /* Entrada de idioma: aparece antes de tudo na primeira visita. */
+  function animateGateIn(){
+    if (!gate) return;
+    if (reduceMotion){
+      gate.querySelectorAll(".gate__mark, .gate__label, .gate__opts")
+        .forEach(n => { n.style.opacity = 1; });
+      return;
+    }
+    gsap.timeline({ defaults: { ease: "power3.out" } })
+      .fromTo(gate.querySelector(".gate__mark"), { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: .8 })
+      .fromTo(gate.querySelector(".gate__label"), { opacity: 0 }, { opacity: 1, duration: .5 }, "-=.4")
+      .fromTo(gate.querySelector(".gate__opts"), { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: .6 }, "-=.35");
+  }
+  function animateGateOut(done){
+    if (!gate) { done(); return; }
+    if (reduceMotion){ gate.remove(); done(); return; }
+    gsap.timeline({ onComplete(){ gate.remove(); done(); } })
+      .to(gate.querySelectorAll(".gate__mark, .gate__label, .gate__opts"),
+          { opacity: 0, y: -14, duration: .4, stagger: .05, ease: "power2.in" })
+      .to(gate, { autoAlpha: 0, duration: .35 }, "-=.1");
+  }
 
-  const tl = gsap.timeline({ defaults: { ease: "power2.out" }, onComplete(){ el.remove(); } });
-  tl.to(mark, { opacity: 1, duration: .65 })
-    .to(label, { opacity: 1, duration: .4 }, "-=.3")
-    .to({}, {
-      duration: 1.05, ease: "power2.inOut",
-      onUpdate(){
-        const p = this.progress() * 100;
-        bar.style.background = `linear-gradient(90deg, #f7f3ea ${p}%, rgba(247,243,234,.14) ${p}%)`;
-      }
-    }, "-=.1")
-    .add(focusHero, "+=.1")
-    .to(curtain, { yPercent: -100, duration: .85, ease: "expo.inOut" }, "<")
-    .to(el, { autoAlpha: 0, duration: .25 }, "-=.2");
+  function runLoader(){
+    if (!el){ focusHero(); return; }
+    if (reduceMotion){ el.remove(); focusHero(); return; }
+
+    const mark = el.querySelector(".loader__mark");
+    const bar = el.querySelector(".loader__bar");
+    const label = el.querySelector(".loader__label");
+    const curtain = el.querySelector(".loader__curtain");
+
+    const tl = gsap.timeline({ defaults: { ease: "power2.out" }, onComplete(){ el.remove(); } });
+    tl.to(mark, { opacity: 1, duration: .65 })
+      .to(label, { opacity: 1, duration: .4 }, "-=.3")
+      .to({}, {
+        duration: 1.05, ease: "power2.inOut",
+        onUpdate(){
+          const p = this.progress() * 100;
+          bar.style.background = `linear-gradient(90deg, #f7f3ea ${p}%, rgba(247,243,234,.14) ${p}%)`;
+        }
+      }, "-=.1")
+      .add(focusHero, "+=.1")
+      .to(curtain, { yPercent: -100, duration: .85, ease: "expo.inOut" }, "<")
+      .to(el, { autoAlpha: 0, duration: .25 }, "-=.2");
+  }
+
+  let started = false;
+  function begin(showedGate){
+    if (started) return;
+    started = true;
+    if (showedGate) animateGateOut(runLoader);
+    else { gate?.remove(); runLoader(); }
+  }
+
+  document.addEventListener("bp:langready", e => begin(e.detail && e.detail.gate));
+  // Se a entrada aparecer, anima os elementos dela assim que o DOM estiver pronto
+  document.addEventListener("DOMContentLoaded", () => {
+    if (gate && !gate.hidden) animateGateIn();
+  });
+  // Rede de segurança: se o i18n não carregar, o site entra mesmo assim.
+  // Nunca dispara enquanto a tela de entrada estiver à espera da escolha.
+  setTimeout(() => { if (!gate || gate.hidden) begin(false); }, 4000);
 })();
 
 /* ==========================================================
@@ -350,13 +393,6 @@ const AREAS = [
    ========================================================== */
 const PARK = { lat: -25.771694, lng: -57.732389 };
 
-/* Curso aproximado do Rio Paraguai no trecho Assunção → Alberdi */
-const RIO_PARAGUAI = [
-  [-25.18,-57.58],[-25.28,-57.66],[-25.36,-57.63],[-25.44,-57.59],[-25.52,-57.57],
-  [-25.60,-57.61],[-25.68,-57.67],[-25.75,-57.73],[-25.80,-57.77],[-25.88,-57.81],
-  [-25.96,-57.86],[-26.04,-57.93],[-26.12,-58.02],[-26.19,-58.13],[-26.30,-58.19],[-26.40,-58.22]
-];
-
 const T = {
   port:   { pt: "Porto fluvial", en: "River port", es: "Puerto fluvial" },
   road:   { pt: "Destino rodoviário", en: "Road destination", es: "Destino vial" },
@@ -495,14 +531,26 @@ const refs = [
 
   const map = L.map(el, { zoomControl: false, scrollWheelZoom: true }).setView([PARK.lat, PARK.lng], 10);
   L.control.zoom({ position: "bottomright" }).addTo(map);
-  L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
-    attribution: "&copy; OpenStreetMap &copy; CARTO", maxZoom: 19
+
+  /* --- Basemap ---
+     O terreno vem de um mapa claro (Voyager) invertido por filtro CSS: o
+     resultado é um mapa escuro em que rios e lagos são desenhados em azul
+     pelo próprio basemap, com o traçado real — nada é sobreposto por cima.
+     Os rótulos vêm numa camada separada, sem filtro. */
+  map.createPane("basePane");
+  const basePane = map.getPane("basePane");
+  basePane.style.zIndex = 200;
+  basePane.classList.add("leaflet-pane--base");
+  L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png", {
+    attribution: "&copy; OpenStreetMap &copy; CARTO", maxZoom: 19, pane: "basePane"
   }).addTo(map);
 
-  /* --- Rio Paraguai em azul-claro --- */
-  L.polyline(RIO_PARAGUAI, { color: "#3f7fa8", weight: 16, opacity: .28, lineJoin: "round" }).addTo(map);
-  L.polyline(RIO_PARAGUAI, { color: "#7cc3e8", weight: 5, opacity: .75, lineJoin: "round" }).addTo(map)
-    .bindTooltip("Rio Paraguai · Hidrovia Paraná–Paraguai", { sticky: true, className: "map-label" });
+  map.createPane("labelPane");
+  map.getPane("labelPane").style.zIndex = 210;
+  map.getPane("labelPane").style.pointerEvents = "none";
+  L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png", {
+    maxZoom: 19, pane: "labelPane", opacity: .8
+  }).addTo(map);
 
   /* --- Park --- */
   const parkIcon = L.divIcon({
@@ -550,7 +598,13 @@ const refs = [
   card.querySelector(".poi-card__close").addEventListener("click", closeCard);
   cEl.route.addEventListener("click", () => { if (currentPoi) drawRoute(currentPoi); });
 
-  /* --- Rota indicativa a partir do Park --- */
+  /* --- Rotas ---
+     Para destinos rodoviários usamos o traçado real por vias, pré-calculado
+     com o OSRM e guardado em assets/routes.json (sem chamada em tempo real).
+     Para as capitais brasileiras, que são trechos aéreos, desenhamos um arco. */
+  let ROUTES = {};
+  fetch("assets/routes.json").then(r => r.ok ? r.json() : {}).then(j => { ROUTES = j; }).catch(() => {});
+
   let routeLayer = null;
   function arcPoints(a, b, bend = .18, n = 64){
     const pts = [];
@@ -566,14 +620,27 @@ const refs = [
     }
     return pts;
   }
+
   function drawRoute(p){
     if (routeLayer) map.removeLayer(routeLayer);
-    const pts = arcPoints([PARK.lat, PARK.lng], [p.lat, p.lng]);
+    const real = ROUTES[p.name];
+    const isAir = p._kind === "capital";
+    const pts = (!isAir && real && real.pts.length > 1)
+      ? real.pts
+      : arcPoints([PARK.lat, PARK.lng], [p.lat, p.lng]);
+
+    const style = (!isAir && real)
+      ? { halo: { color: "#cbb88f", weight: 11, opacity: .16 },
+          line: { color: "#cbb88f", weight: 3.2, opacity: .95, lineJoin: "round", lineCap: "round" } }
+      : { halo: { color: "#cbb88f", weight: 10, opacity: .12 },
+          line: { color: "#cbb88f", weight: 2.2, opacity: .9, dashArray: "5 8" } };
+
     routeLayer = L.layerGroup([
-      L.polyline(pts, { color: "#cbb88f", weight: 2.5, opacity: .9, dashArray: "6 7" }),
-      L.polyline(pts, { color: "#cbb88f", weight: 10, opacity: .12 })
+      L.polyline(pts, style.halo),
+      L.polyline(pts, style.line)
     ]).addTo(map);
-    map.fitBounds(L.latLngBounds([[PARK.lat, PARK.lng], [p.lat, p.lng]]), {
+
+    map.fitBounds(L.latLngBounds(pts), {
       padding: [90, 90], maxZoom: 12, animate: !reduceMotion, duration: .9
     });
   }
@@ -583,9 +650,18 @@ const refs = [
     { list: ports, kind: "port", ulId: "portList" },
     { list: roads, kind: "road", ulId: "roadList" },
     { list: airports, kind: "air", ulId: "airportList" },
-    { list: capitals, kind: "air", ulId: "capitalList" },
+    { list: capitals, kind: "capital", ulId: "capitalList" },
     { list: refs, kind: "ref", ulId: "refList" }
   ];
+
+  /* Selecionar um ponto faz sempre a mesma coisa, venha o clique
+     do marcador no mapa ou do item na lista lateral. */
+  function selectPoi(p){
+    document.querySelectorAll(".dist-item").forEach(d =>
+      d.classList.toggle("is-active", d.dataset.poi === p.name));
+    openCard(p);
+    drawRoute(p);
+  }
 
   function haversine(a, b){
     const R = 6371, toRad = d => d * Math.PI / 180;
@@ -597,12 +673,14 @@ const refs = [
   groups.forEach(g => {
     g.list.forEach((p, i) => {
       const dir = i % 2 === 0 ? "right" : "left";
-      const m = L.marker([p.lat, p.lng], { icon: mkIcon(g.kind) }).addTo(map);
+      const kind = g.kind === "capital" ? "air" : g.kind;
+      const m = L.marker([p.lat, p.lng], { icon: mkIcon(kind) }).addTo(map);
       m.bindTooltip(`${p.name} · <b>${p.km}</b> · ${p.tempo}`, {
         permanent: true, direction: dir, offset: [dir === "right" ? 9 : -9, 0], className: "map-label"
       });
-      m.on("click", () => openCard(p));
+      m.on("click", () => selectPoi(p));
       p._marker = m;
+      p._kind = g.kind;
       // pontos muito próximos do Park só ganham rótulo quando há zoom suficiente
       p._minZoom = haversine(PARK, p) < 12 ? 11 : 0;
     });
@@ -626,13 +704,9 @@ const refs = [
       g.list.forEach(p => {
         const li = document.createElement("li");
         li.className = "dist-item";
+        li.dataset.poi = p.name;
         li.innerHTML = `<span>${p.name}</span><b>${p.km}</b><span class="t">${p.tempo}</span>`;
-        li.addEventListener("click", () => {
-          document.querySelectorAll(".dist-item").forEach(d => d.classList.remove("is-active"));
-          li.classList.add("is-active");
-          drawRoute(p);
-          openCard(p);
-        });
+        li.addEventListener("click", () => selectPoi(p));
         ul.appendChild(li);
       });
       g.list.forEach(p => p._marker.setTooltipContent(`${p.name} · <b>${p.km}</b> · ${p.tempo}`));
@@ -705,8 +779,9 @@ const refs = [
    06 · COMO FUNCIONA — sticky + IntersectionObserver
    ========================================================== */
 (function steps(){
+  const pin = document.getElementById("stepsPin");
   const list = document.getElementById("stepsList");
-  if (!list) return;
+  if (!pin || !list) return;
   const items = [...list.querySelectorAll(".step")];
   const shots = [...document.querySelectorAll(".steps__visual img")];
   const fill = document.getElementById("stepsFill");
@@ -715,6 +790,7 @@ const refs = [
   let active = -1;
 
   function setActive(i){
+    i = Math.max(0, Math.min(n - 1, i));
     if (i === active) return;
     active = i;
     items.forEach((s, idx) => s.classList.toggle("is-active", idx === i));
@@ -732,10 +808,20 @@ const refs = [
   }
 
   setActive(0);
-  const io = new IntersectionObserver(entries => {
-    entries.forEach(e => { if (e.isIntersecting) setActive(items.indexOf(e.target)); });
-  }, { rootMargin: "-46% 0px -46% 0px", threshold: 0 });
-  items.forEach(s => io.observe(s));
+  /* A seção tem exatamente uma tela de altura: ela encaixa centralizada
+     no viewport e só depois disso o scroll avança etapa por etapa. */
+  ScrollTrigger.create({
+    trigger: pin,
+    start: "top top",
+    end: "+=" + (n * 420),
+    pin: true,
+    pinSpacing: true,
+    anticipatePin: 1,
+    invalidateOnRefresh: true,
+    onUpdate(self){
+      setActive(Math.floor(self.progress * n * 0.999));
+    }
+  });
 })();
 
 /* ==========================================================

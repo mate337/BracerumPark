@@ -9,10 +9,21 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-<link rel="stylesheet" href="style.css?v=11" />
+<link rel="stylesheet" href="style.css?v=12" />
 <noscript><style>.reveal{opacity:1!important;transform:none!important}.mask__in{transform:none!important}.step{opacity:1!important;filter:none!important;transform:none!important}#loader{display:none!important}</style></noscript>
 </head>
 <body>
+
+<!-- ============ ENTRADA — escolha de idioma ============ -->
+<div id="langGate" hidden>
+  <img class="gate__mark" src="assets/logo/logo-stacked-wide-cream.svg" alt="Bracerum Park" />
+  <p class="gate__label">Select your language · Escolha seu idioma · Elija su idioma</p>
+  <div class="gate__opts">
+    <button class="gate__opt" data-lang="en"><span class="gate__code">EN</span><span class="gate__name">English (US)</span></button>
+    <button class="gate__opt" data-lang="pt"><span class="gate__code">PT</span><span class="gate__name">Português (BR)</span></button>
+    <button class="gate__opt" data-lang="es"><span class="gate__code">ES</span><span class="gate__name">Español (PY)</span></button>
+  </div>
+</div>
 
 <!-- ============ LOADER ============ -->
 <div id="loader" aria-hidden="true">
@@ -363,7 +374,10 @@
 <!-- ============ HISTÓRIA / BRACERUM ============ -->
 <section class="history">
   <div class="history__inner">
-    <p class="history__num reveal">Aço<small data-i18n="hist.small">Origem do grupo</small></p>
+    <div class="history__logo reveal">
+      <img src="assets/logo/bracerum-white.svg" alt="Bracerum" />
+      <small data-i18n="hist.small">Origem do grupo</small>
+    </div>
     <div class="history__text reveal">
       <h3 data-i18n="hist.title">Décadas de aço, agora uma cidade industrial.</h3>
       <p data-i18n="hist.desc">A Bracerum nasceu como importadora de aço plano revestido e trader global. A mesma disciplina de operação, logística e execução está por trás do masterplan e das três fábricas próprias que constroem o Bracerum Park.</p>
@@ -418,7 +432,7 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-<script src="i18n.js?v=11"></script>
-<script src="script.js?v=11"></script>
+<script src="i18n.js?v=12"></script>
+<script src="script.js?v=12"></script>
 </body>
 </html>
