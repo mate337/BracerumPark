@@ -1,580 +1,856 @@
 /* ==========================================================
-   BRACERUM/PARK — script principal · v3
+   BRACERUM/PARK — script principal · v6
+   Loader, nav, hero (Ken Burns + dots), masterplan com zoom,
+   mapa avançado (rio, POIs, rotas, indicador), steps sticky.
    ========================================================== */
+document.documentElement.classList.add("js");
 
-/* ---------- Placeholder (usado se alguma imagem faltar em /assets) ---------- */
-window.buildPlaceholder = function (title, ratio) {
-  const div = document.createElement("div");
-  div.className = "placeholder " + (ratio === "4/3" ? "placeholder--43" : "placeholder--169");
-  div.innerHTML = `<span class="ph-title">${title}</span><small>adicione a imagem em /assets</small>`;
-  return div;
+const hasGsap = typeof gsap !== "undefined" && typeof ScrollTrigger !== "undefined";
+const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches || !hasGsap;
+if (reduceMotion) document.documentElement.classList.add("no-motion");
+if (hasGsap) gsap.registerPlugin(ScrollTrigger);
+
+/* ==========================================================
+   00 · LOADER + entrada do hero
+   ========================================================== */
+(function loader(){
+  const el = document.getElementById("loader");
+  const heroImg = document.querySelector(".hero__bg img");
+  const heroMark = document.getElementById("heroMark");
+
+  function kenBurns(){
+    if (reduceMotion || !heroImg) return;
+    gsap.to(heroImg, {
+      scale: 1.16, xPercent: -1.6, yPercent: 1.2,
+      duration: 26, ease: "sine.inOut", repeat: -1, yoyo: true
+    });
+  }
+
+  function focusHero(){
+    if (reduceMotion || !heroImg) return;
+    gsap.fromTo(heroImg,
+      { filter: "blur(16px)" },
+      { filter: "blur(0px)", duration: 1.5, ease: "power2.out", clearProps: "filter", onComplete: kenBurns });
+    if (heroMark) gsap.fromTo(heroMark,
+      { autoAlpha: 0, y: 26 },
+      { autoAlpha: 1, y: 0, duration: 1.1, ease: "power3.out", delay: .2 });
+  }
+
+  const gate = document.getElementById("langGate");
+
+  /* Entrada de idioma: aparece antes de tudo na primeira visita. */
+  function animateGateIn(){
+    if (!gate) return;
+    if (reduceMotion){
+      gate.querySelectorAll(".gate__mark, .gate__label, .gate__opts")
+        .forEach(n => { n.style.opacity = 1; });
+      return;
+    }
+    gsap.timeline({ defaults: { ease: "power3.out" } })
+      .fromTo(gate.querySelector(".gate__mark"), { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: .8 })
+      .fromTo(gate.querySelector(".gate__label"), { opacity: 0 }, { opacity: 1, duration: .5 }, "-=.4")
+      .fromTo(gate.querySelector(".gate__opts"), { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: .6 }, "-=.35");
+  }
+  function animateGateOut(done){
+    if (!gate) { done(); return; }
+    if (reduceMotion){ gate.remove(); done(); return; }
+    gsap.timeline({ onComplete(){ gate.remove(); done(); } })
+      .to(gate.querySelectorAll(".gate__mark, .gate__label, .gate__opts"),
+          { opacity: 0, y: -14, duration: .4, stagger: .05, ease: "power2.in" })
+      .to(gate, { autoAlpha: 0, duration: .35 }, "-=.1");
+  }
+
+  function runLoader(){
+    if (!el){ focusHero(); return; }
+    if (reduceMotion){ el.remove(); focusHero(); return; }
+
+    const mark = el.querySelector(".loader__mark");
+    const bar = el.querySelector(".loader__bar");
+    const label = el.querySelector(".loader__label");
+    const curtain = el.querySelector(".loader__curtain");
+
+    const tl = gsap.timeline({ defaults: { ease: "power2.out" }, onComplete(){ el.remove(); } });
+    tl.to(mark, { opacity: 1, duration: .65 })
+      .to(label, { opacity: 1, duration: .4 }, "-=.3")
+      .to({}, {
+        duration: 1.05, ease: "power2.inOut",
+        onUpdate(){
+          const p = this.progress() * 100;
+          bar.style.background = `linear-gradient(90deg, #f7f3ea ${p}%, rgba(247,243,234,.14) ${p}%)`;
+        }
+      }, "-=.1")
+      .add(focusHero, "+=.1")
+      .to(curtain, { yPercent: -100, duration: .85, ease: "expo.inOut" }, "<")
+      .to(el, { autoAlpha: 0, duration: .25 }, "-=.2");
+  }
+
+  let started = false;
+  function begin(showedGate){
+    if (started) return;
+    started = true;
+    if (showedGate) animateGateOut(runLoader);
+    else { gate?.remove(); runLoader(); }
+  }
+
+  document.addEventListener("bp:langready", e => begin(e.detail && e.detail.gate));
+  // Se a entrada aparecer, anima os elementos dela assim que o DOM estiver pronto
+  document.addEventListener("DOMContentLoaded", () => {
+    if (gate && !gate.hidden) animateGateIn();
+  });
+  // Rede de segurança: se o i18n não carregar, o site entra mesmo assim.
+  // Nunca dispara enquanto a tela de entrada estiver à espera da escolha.
+  setTimeout(() => { if (!gate || gate.hidden) begin(false); }, 4000);
+})();
+
+/* ==========================================================
+   01 · NAV — só aparece depois do hero
+   ========================================================== */
+(function nav(){
+  const nav = document.getElementById("siteNav");
+  if (!nav) return;
+  const hero = document.querySelector(".hero");
+  if (!hero || nav.dataset.always === "true"){ nav.classList.add("is-visible"); return; }
+  function update(){ nav.classList.toggle("is-visible", window.scrollY > hero.offsetHeight - 90); }
+  update();
+  window.addEventListener("scroll", update, { passive: true });
+})();
+
+/* ==========================================================
+   02 · REVEALS + máscaras de título
+   ========================================================== */
+(function reveals(){
+  const items = document.querySelectorAll(".reveal");
+  if (reduceMotion){ items.forEach(i => i.classList.add("is-in")); }
+  else if (items.length){
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting){ e.target.classList.add("is-in"); io.unobserve(e.target); } });
+    }, { threshold: .15, rootMargin: "0px 0px -8% 0px" });
+    items.forEach(i => io.observe(i));
+  }
+  if (!reduceMotion){
+    document.querySelectorAll(".mask__in").forEach(elm => {
+      gsap.to(elm, { y: 0, duration: 1.1, ease: "power3.out",
+        scrollTrigger: { trigger: elm.closest(".mask"), start: "top 88%" } });
+    });
+  }
+})();
+
+/* ==========================================================
+   03 · HERO — grid de pontos sutil
+   ========================================================== */
+(function heroDots(){
+  const canvas = document.getElementById("heroDots");
+  if (!canvas) return;
+  const hero = canvas.closest(".hero");
+  const ctx = canvas.getContext("2d");
+  let w, h, cols, rows, gap = 34, dpr = Math.min(window.devicePixelRatio || 1, 2);
+  let mouse = { x: -9999, y: -9999 };
+  let running = false, raf;
+
+  function resize(){
+    w = canvas.clientWidth; h = canvas.clientHeight;
+    canvas.width = w * dpr; canvas.height = h * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    cols = Math.ceil(w / gap) + 1; rows = Math.ceil(h / gap) + 1;
+  }
+  function draw(){
+    ctx.clearRect(0, 0, w, h);
+    for (let i = 0; i < cols; i++){
+      for (let j = 0; j < rows; j++){
+        const x = i * gap, y = j * gap;
+        const dx = x - mouse.x, dy = y - mouse.y;
+        const inf = Math.max(0, 1 - Math.sqrt(dx * dx + dy * dy) / 240);
+        ctx.beginPath();
+        ctx.fillStyle = `rgba(247,243,234,${0.07 + inf * 0.4})`;
+        ctx.arc(x, y, 1 + inf * 1.8, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+    if (running) raf = requestAnimationFrame(draw);
+  }
+  function start(){ if (!running){ running = true; draw(); } }
+  function stop(){ running = false; cancelAnimationFrame(raf); }
+
+  resize();
+  if (reduceMotion){ draw(); return; }
+  hero.addEventListener("pointermove", e => {
+    const r = canvas.getBoundingClientRect();
+    mouse.x = e.clientX - r.left; mouse.y = e.clientY - r.top;
+  });
+  hero.addEventListener("pointerleave", () => { mouse.x = -9999; mouse.y = -9999; });
+  new IntersectionObserver(es => es.forEach(e => e.isIntersecting ? start() : stop())).observe(hero);
+  window.addEventListener("resize", resize);
+})();
+
+/* ==========================================================
+   04 · MASTERPLAN — zoom por área
+   Coordenadas em % sobre assets/web/vista-aerea-park.jpg
+   ========================================================== */
+const AREAS = [
+  { x: 25, y: 26, side: "right",
+    tag: { pt: "Clube do Caminhoneiro", en: "Truck Drivers' Club", es: "Club del Camionero" },
+    eyebrow: { pt: "Serviços rodoviários", en: "Road services", es: "Servicios viales" },
+    title: { pt: "Clube do Caminhoneiro", en: "Truck Drivers' Club", es: "Club del Camionero" },
+    val: { pt: "40.065 m² · pátio, posto, restaurante e salão de jogos",
+           en: "40,065 m² · yard, fuel station, restaurant and game room",
+           es: "40.065 m² · patio, estación de servicio, restaurante y salón de juegos" },
+    desc: { pt: "O motorista descansa dentro do Park, não na rodovia — apoio completo à logística.",
+            en: "Drivers rest inside the Park, not on the highway — full logistics support.",
+            es: "El conductor descansa dentro del Park, no en la ruta — apoyo logístico completo." },
+    img: "assets/web/internas-02.jpg" },
+
+  { x: 22, y: 33, side: "right",
+    tag: { pt: "Portaria", en: "Main gate", es: "Portería" },
+    eyebrow: { pt: "Acesso e operação", en: "Access and operations", es: "Acceso y operación" },
+    title: { pt: "Portaria & Estacionamento de caminhões", en: "Main gate & Truck parking", es: "Portería y estacionamiento de camiones" },
+    val: { pt: "Administração · acessos indústria · 3.510 m²",
+           en: "Administration · industrial access · 3,510 m²",
+           es: "Administración · accesos industria · 3.510 m²" },
+    desc: { pt: "Entrada operacional do Park, com controle de acesso dedicado para caminhões e visitantes.",
+            en: "The Park's operational entrance, with dedicated access control for trucks and visitors.",
+            es: "Entrada operativa del Park, con control de acceso dedicado para camiones y visitantes." },
+    img: "assets/web/internas-01.jpg" },
+
+  { x: 57, y: 35, side: "right",
+    tag: { pt: "Fábricas Bracerum", en: "Bracerum factories", es: "Fábricas Bracerum" },
+    eyebrow: { pt: "Execução própria", en: "In-house execution", es: "Ejecución propia" },
+    title: { pt: "Fábricas Bracerum", en: "Bracerum factories", es: "Fábricas Bracerum" },
+    val: { pt: "Steel Frame · Concreto · Pavers", en: "Steel Frame · Concrete · Pavers", es: "Steel Frame · Hormigón · Pavers" },
+    desc: { pt: "Três unidades fabris do grupo constroem o parque sem depender de terceiros — prazo, custo e risco de obra comprados.",
+            en: "Three of the group's factories build the park without third parties — schedule, cost and construction risk secured.",
+            es: "Tres unidades fabriles del grupo construyen el parque sin depender de terceros — plazo, costo y riesgo de obra asegurados." },
+    img: "assets/renders/fabrica-bracerum-noturna.jpg" },
+
+  { x: 46, y: 46, side: "right",
+    tag: { pt: "Lotes industriais", en: "Industrial lots", es: "Lotes industriales" },
+    eyebrow: { pt: "Área industrial", en: "Industrial area", es: "Área industrial" },
+    title: { pt: "Lotes industriais & Built-to-Suit", en: "Industrial lots & Built-to-Suit", es: "Lotes industriales y Built-to-Suit" },
+    val: { pt: "989.642 m² de lotes · módulos de 40.000 m²",
+           en: "989,642 m² of lots · 40,000 m² modules",
+           es: "989.642 m² de lotes · módulos de 40.000 m²" },
+    desc: { pt: "Galpões sob medida, venda ou locação, erguidos com o Steel Frame do próprio grupo.",
+            en: "Made-to-measure warehouses, for sale or lease, built with the group's own Steel Frame.",
+            es: "Galpones a medida, venta o alquiler, levantados con el Steel Frame del propio grupo." },
+    img: "assets/web/internas-07.jpg" },
+
+  { x: 8, y: 61, side: "right",
+    tag: { pt: "ETE / ETA", en: "Water plants", es: "PTAR / PTAP" },
+    eyebrow: { pt: "Infraestrutura", en: "Infrastructure", es: "Infraestructura" },
+    title: { pt: "E.T.E. / E.T.A. & Subestação", en: "Water & effluent plants and Substation", es: "PTAR / PTAP y Subestación" },
+    val: { pt: "Tratamento próprio · 10.650 m² · subestação 11.375 m²",
+           en: "On-site treatment · 10,650 m² · substation 11,375 m²",
+           es: "Tratamiento propio · 10.650 m² · subestación 11.375 m²" },
+    desc: { pt: "Energia de duas usinas (Itaipu e Yacyretá) e tratamento próprio de água e efluentes — operação industrial contínua.",
+            en: "Power from two plants (Itaipu and Yacyretá) plus on-site water and effluent treatment — continuous industrial operation.",
+            es: "Energía de dos usinas (Itaipú y Yacyretá) y tratamiento propio de agua y efluentes — operación industrial continua." },
+    img: "assets/web/internas-06.jpg" },
+
+  { x: 9, y: 73, side: "right",
+    tag: { pt: "Hangares", en: "Hangars", es: "Hangares" },
+    eyebrow: { pt: "Aviação executiva", en: "Business aviation", es: "Aviación ejecutiva" },
+    title: { pt: "Hangares, lounge e abastecimento", en: "Hangars, lounge and refuelling", es: "Hangares, lounge y abastecimiento" },
+    val: { pt: "7.686 m² · apoio à aviação executiva", en: "7,686 m² · business aviation support", es: "7.686 m² · apoyo a la aviación ejecutiva" },
+    desc: { pt: "Estrutura de hangaragem e abastecimento junto à pista, para a aeronave do investidor ficar no próprio parque.",
+            en: "Hangar and refuelling facilities next to the runway, so the investor's aircraft stays inside the park.",
+            es: "Estructura de hangaraje y abastecimiento junto a la pista, para que la aeronave del inversor quede en el propio parque." },
+    img: "assets/web/vista-aerea-park.jpg" },
+
+  { x: 47, y: 84, side: "right",
+    tag: { pt: "Pista de pouso", en: "Runway", es: "Pista de aterrizaje" },
+    eyebrow: { pt: "Aeroporto corporativo", en: "Corporate airport", es: "Aeropuerto corporativo" },
+    title: { pt: "Pista de pouso & Heliponto", en: "Runway & Helipad", es: "Pista de aterrizaje y Helipuerto" },
+    val: { pt: "1.480 m de pista · heliponto próprio", en: "1,480 m runway · own helipad", es: "1.480 m de pista · helipuerto propio" },
+    desc: { pt: "Acesso executivo direto ao Park, sem depender de Assunção.",
+            en: "Direct executive access to the Park, without depending on Asunción.",
+            es: "Acceso ejecutivo directo al Park, sin depender de Asunción." },
+    img: "assets/web/vista-aerea-park.jpg" },
+
+  { x: 87, y: 17, side: "left",
+    tag: { pt: "Centro de convenções", en: "Convention centre", es: "Centro de convenciones" },
+    eyebrow: { pt: "Eventos & negócios", en: "Events & business", es: "Eventos y negocios" },
+    title: { pt: "Centro de Convenções", en: "Convention Centre", es: "Centro de Convenciones" },
+    val: { pt: "13.500 m² · anfiteatro para 1.200 lugares", en: "13,500 m² · 1,200-seat amphitheatre", es: "13.500 m² · anfiteatro para 1.200 lugares" },
+    desc: { pt: "Feiras, lançamentos setoriais e showrooms de marca sob a cobertura envidraçada.",
+            en: "Trade fairs, sector launches and brand showrooms under the glazed roof.",
+            es: "Ferias, lanzamientos sectoriales y showrooms de marca bajo la cubierta vidriada." },
+    img: "assets/renders/pavilhao-eventos-1.jpg" },
+
+  { x: 82, y: 22, side: "left",
+    tag: { pt: "Hotel", en: "Hotel", es: "Hotel" },
+    eyebrow: { pt: "Hospitalidade", en: "Hospitality", es: "Hospitalidad" },
+    title: { pt: "Hotel & Apart-hotel", en: "Hotel & Apart-hotel", es: "Hotel y Apart-hotel" },
+    val: { pt: "384 studios de 35 m² · 1.700 vagas", en: "384 studios of 35 m² · 1,700 parking spaces", es: "384 studios de 35 m² · 1.700 plazas" },
+    desc: { pt: "Hospedagem executiva dentro do masterplan — a equipe da matriz dorme a minutos da fábrica.",
+            en: "Executive accommodation inside the masterplan — head-office teams sleep minutes from the plant.",
+            es: "Hospedaje ejecutivo dentro del masterplan — el equipo de la casa matriz duerme a minutos de la fábrica." },
+    img: "assets/web/hero-hotel-noturno.jpg" },
+
+  { x: 79, y: 30, side: "left",
+    tag: { pt: "Bracerum Resort", en: "Bracerum Resort", es: "Bracerum Resort" },
+    eyebrow: { pt: "Condomínio & clube", en: "Residential & club", es: "Condominio y club" },
+    title: { pt: "Condomínio Bracerum Resort", en: "Bracerum Resort Residential", es: "Condominio Bracerum Resort" },
+    val: { pt: "141 lotes · 142.067 m² · lago, quadras e campo society",
+           en: "141 lots · 142,067 m² · lake, courts and football pitch",
+           es: "141 lotes · 142.067 m² · lago, canchas y campo de fútbol" },
+    desc: { pt: "Residências e lazer para a comunidade corporativa do parque.",
+            en: "Homes and leisure for the park's corporate community.",
+            es: "Residencias y ocio para la comunidad corporativa del parque." },
+    img: "assets/renders/condominio-casa-fachada.jpg" }
+];
+
+(function masterplan(){
+  const section = document.querySelector(".masterplan");
+  const viewport = document.getElementById("mpViewport");
+  const stage = document.getElementById("mpStage");
+  const pinsWrap = document.getElementById("mpPins");
+  const card = document.getElementById("areaCard");
+  const back = document.getElementById("mpBack");
+  if (!viewport || !stage) return;
+
+  const cardImg = card.querySelector(".area-card__media img");
+  const cardEyebrow = card.querySelector(".area-card__eyebrow");
+  const cardTitle = card.querySelector(".area-card__title");
+  const cardVal = card.querySelector(".area-card__val");
+  const cardDesc = card.querySelector(".area-card__desc");
+  let active = -1;
+
+  AREAS.forEach((a, i) => {
+    const pin = document.createElement("button");
+    pin.className = "pin";
+    pin.style.left = a.x + "%";
+    pin.style.top = a.y + "%";
+    pin.dataset.idx = i;
+    if (a.side === "left") pin.classList.add("pin--left");
+    pin.innerHTML = a.side === "left"
+      ? `<span class="pin__tag"></span><span class="pin__dot"></span>`
+      : `<span class="pin__dot"></span><span class="pin__tag"></span>`;
+    pin.addEventListener("click", () => zoomTo(i));
+    pinsWrap.appendChild(pin);
+  });
+
+  function renderPins(){
+    pinsWrap.querySelectorAll(".pin").forEach(p => {
+      const a = AREAS[+p.dataset.idx];
+      p.querySelector(".pin__tag").textContent = tr(a.tag);
+      p.setAttribute("aria-label", tr(a.title));
+    });
+  }
+  renderPins();
+
+  function fillCard(a){
+    cardImg.src = a.img; cardImg.alt = tr(a.title);
+    cardEyebrow.textContent = tr(a.eyebrow);
+    cardTitle.textContent = tr(a.title);
+    cardVal.textContent = tr(a.val);
+    cardDesc.textContent = tr(a.desc);
+    if (a.x < 45){ card.style.left = "auto"; card.style.right = "var(--gap)"; }
+    else { card.style.right = "auto"; card.style.left = "var(--gap)"; }
+  }
+
+  function setStage(s, x, y, cb){
+    if (hasGsap){
+      gsap.to(stage, { scale: s, x, y, duration: reduceMotion ? 0 : 1.15, ease: "power3.inOut", onComplete: cb });
+    } else {
+      stage.style.transition = "transform .9s cubic-bezier(.19,.8,.22,1)";
+      stage.style.transform = `translate(${x}px, ${y}px) scale(${s})`;
+      if (cb) setTimeout(cb, 900);
+    }
+  }
+
+  function zoomTo(i){
+    active = (i + AREAS.length) % AREAS.length;
+    const a = AREAS[active];
+    const w = viewport.offsetWidth, h = viewport.offsetHeight;
+    const s = window.innerWidth < 720 ? 2.7 : 2.2;
+    const maxX = (s - 1) / 2 * w, maxY = (s - 1) / 2 * h;
+    const tx = Math.max(-maxX, Math.min(maxX, (0.5 - a.x / 100) * w * s));
+    const ty = Math.max(-maxY, Math.min(maxY, (0.5 - a.y / 100) * h * s));
+    section.classList.add("is-zoomed");
+    card.classList.remove("is-open");
+    setStage(s, tx, ty, () => { fillCard(a); card.classList.add("is-open"); });
+  }
+
+  function resetZoom(){
+    active = -1;
+    section.classList.remove("is-zoomed");
+    card.classList.remove("is-open");
+    setStage(1, 0, 0);
+  }
+
+  back.addEventListener("click", resetZoom);
+  card.querySelector("[data-area-prev]").addEventListener("click", () => zoomTo(active - 1));
+  card.querySelector("[data-area-next]").addEventListener("click", () => zoomTo(active + 1));
+  document.addEventListener("keydown", e => { if (e.key === "Escape" && active >= 0) resetZoom(); });
+  window.addEventListener("resize", () => { if (active >= 0) zoomTo(active); });
+  document.addEventListener("langchange", () => {
+    renderPins();
+    if (active >= 0) fillCard(AREAS[active]);
+  });
+})();
+
+/* ==========================================================
+   05 · LOCALIZAÇÃO — mapa
+   ========================================================== */
+const PARK = { lat: -25.771694, lng: -57.732389 };
+
+const T = {
+  port:   { pt: "Porto fluvial", en: "River port", es: "Puerto fluvial" },
+  road:   { pt: "Destino rodoviário", en: "Road destination", es: "Destino vial" },
+  air:    { pt: "Aeroporto", en: "Airport", es: "Aeropuerto" },
+  ref:    { pt: "Infraestrutura", en: "Infrastructure", es: "Infraestructura" },
+  cap:    { pt: "Capital · distância aérea", en: "Capital · air distance", es: "Capital · distancia aérea" }
 };
 
-/* ---------- Nav: transparente sobre o hero, sólida ao rolar ---------- */
-const siteNav = document.getElementById("siteNav");
-function updateNav() {
-  const past = window.scrollY > window.innerHeight * 0.72;
-  siteNav.classList.toggle("nav--transparent", !past);
-}
-updateNav();
-window.addEventListener("scroll", updateNav, { passive: true });
-
-/* ==========================================================
-   02 · MASTERPLAN
-   ========================================================== */
-const masterAreas = [
-  { name: "Área geral do lote",        val: "1.819.856 m²", cat: "infra" },
-  { name: "Galpões industriais",       val: "488.730 m²",   cat: "industrial" },
-  { name: "Data Center",               val: "277.588 m²",   cat: "industrial" },
-  { name: "Fábrica Bracerum",          val: "180.245 m²",   cat: "industrial" },
-  { name: "Pátio industrial",          val: "115.920 m²",   cat: "industrial" },
-  { name: "Casas (78 lotes)",          val: "79.200 m²",    cat: "cidade" },
-  { name: "Galpões logísticos",        val: "67.500 m²",    cat: "industrial" },
-  { name: "Hotel (384 studios)",       val: "30.000 m²",    cat: "cidade" },
-  { name: "Manobra de ônibus",         val: "20.421 m²",    cat: "infra" },
-  { name: "Isolamento data center",    val: "15.450 m²",    cat: "infra" },
-  { name: "Lagos",                     val: "15.000 m²",    cat: "infra" },
-  { name: "Docas (80 docas)",          val: "14.400 m²",    cat: "industrial" },
-  { name: "Centro de convenções",      val: "13.500 m²",    cat: "cidade" },
-  { name: "Escritórios / coworking",   val: "13.500 m²/piso", cat: "cidade" },
-  { name: "Apoio motorista + posto",   val: "11.670 m²",    cat: "infra" },
-  { name: "Praça centro tecnológico",  val: "10.940 m²",    cat: "cidade" },
-  { name: "Pista de pouso + heliponto",val: "1.325 m de pista", cat: "infra" },
-  { name: "Hangar",                    val: "8.246 m²",     cat: "infra" },
-  { name: "Academia, lojas e lanchonetes", val: "5.489 m²", cat: "cidade" },
-  { name: "Quadras e campos",          val: "5.000 m²",     cat: "cidade" },
-  { name: "Refeitório (por piso)",     val: "4.458 m²",     cat: "cidade" },
-  { name: "Salão de eventos",          val: "3.200 m²",     cat: "cidade" },
-  { name: "Anfiteatro",                val: "1.200 lugares",cat: "cidade" },
-  { name: "Estacionamentos",           val: "2.150 vagas",  cat: "infra" },
-];
-const catLabel = { industrial: "Industrial", cidade: "Cidade & Serviços", infra: "Infraestrutura" };
-const masterGrid = document.getElementById("masterGrid");
-masterAreas.forEach((a) => {
-  const li = document.createElement("li");
-  li.dataset.cat = a.cat;
-  li.innerHTML = `<span class="mi-name">${a.name}</span>
-                  <span class="mi-val">${a.val}</span>
-                  <span class="mi-cat">${catLabel[a.cat]}</span>`;
-  masterGrid.appendChild(li);
-});
-document.querySelectorAll(".master__legend .chip").forEach((chip) => {
-  chip.addEventListener("click", () => {
-    document.querySelectorAll(".master__legend .chip").forEach((c) => c.classList.remove("is-active"));
-    chip.classList.add("is-active");
-    const area = chip.dataset.area;
-    masterGrid.querySelectorAll("li").forEach((li) => {
-      li.classList.toggle("dim", area !== "all" && li.dataset.cat !== area);
-    });
-  });
-});
-
-/* Masterplan girado no mobile: dimensiona a imagem para preencher o container retrato.
-   Depois de rotacionar -90°, a "largura visual" = altura do <img> e vice-versa,
-   então largura do img = altura do container e altura do img = largura do container. */
-const masterRotate = document.querySelector(".master__rotate");
-const masterImg = masterRotate ? masterRotate.querySelector("img") : null;
-function sizeMasterplan() {
-  if (!masterImg) return;
-  const isMobile = window.matchMedia("(max-width: 720px)").matches;
-  if (!isMobile) { masterImg.style.width = ""; masterImg.style.height = ""; return; }
-  const cw = masterRotate.clientWidth;
-  const ch = masterRotate.clientHeight;
-  // img girado 90°: sua largura ocupa a altura do container; sua altura ocupa a largura
-  masterImg.style.width = ch + "px";
-  masterImg.style.height = cw + "px";
-  masterImg.style.objectFit = "cover";
-}
-if (masterImg) {
-  if (masterImg.complete) sizeMasterplan();
-  masterImg.addEventListener("load", sizeMasterplan);
-  window.addEventListener("resize", sizeMasterplan);
-}
-
-/* ==========================================================
-   03 · LOCALIZAÇÃO — Mapa
-   ========================================================== */
-const PARK = { lat: -25.771694, lng: -57.732389 }; // 25°46'18.1"S 57°43'56.6"W
-
-/* Grupo 1 — Portos fluviais */
 const ports = [
-  { name: "Emb. Puerto Alegre",   sub: "Fluvial · atracadouro local", via: "vicinal",          km: "4 km",  tempo: "0h 10m", lat: -25.7930, lng: -57.7565 },
-  { name: "Puerto Lobato",        sub: "Fluvial · atracadouro local", via: "vicinal",          km: "6 km",  tempo: "0h 15m", lat: -25.8085, lng: -57.7660 },
-  { name: "Terport Villeta",      sub: "Fluvial · contêineres",       via: "PY19",             km: "23 km", tempo: "20m",    lat: -25.5296, lng: -57.5568 },
-  { name: "Puerto Seguro Fluvial",sub: "Fluvial · carga geral (Villeta)", via: "PY19",         km: "33 km", tempo: "30m",    lat: -25.4728, lng: -57.5539 },
-  { name: "Terminal Villa Oliva", sub: "Fluvial · barcaças",          via: "PY19",             km: "38 km", tempo: "0h 50m", lat: -26.0060, lng: -57.8890 },
-  { name: "Caacupemí Villeta",    sub: "Fluvial · contêineres",       via: "PY19",             km: "42 km", tempo: "1h 00m", lat: -25.5060, lng: -57.5450 },
-  { name: "Porto de Assunção",    sub: "Fluvial · carga geral",       via: "PY19 + Acc. Sur",  km: "71 km", tempo: "1h 20m", lat: -25.2780, lng: -57.6430 },
-  { name: "Porto de Alberdi",     sub: "Fluvial · local",             via: "PY19",             km: "72 km", tempo: "1h",     lat: -26.1870, lng: -58.1290 },
+  { name: "Terport Villeta", type: T.port, km: "23 km", tempo: "20 min", lat: -25.5296, lng: -57.5568,
+    desc: { pt: "Terminal privado de contêineres em Villeta, aberto 24h durante todo o ano. O calado do Rio Paraguai neste trecho permite navegação mesmo no período de seca — sem os gargalos e as filas dos portos de Assunção.",
+            en: "Private container terminal in Villeta, open 24/7 all year round. The Paraguay River's draft along this stretch allows navigation even in the dry season — without the bottlenecks and queues of Asunción's ports.",
+            es: "Terminal privada de contenedores en Villeta, abierta 24 h todo el año. El calado del Río Paraguay en este tramo permite navegación incluso en época de seca — sin los cuellos de botella ni las filas de los puertos de Asunción." } },
+  { name: "Puerto Seguro Fluvial", type: T.port, km: "33 km", tempo: "30 min", lat: -25.4728, lng: -57.5539,
+    desc: { pt: "Terminal de carga geral e projeto, com pátio alfandegado. Rota natural para equipamentos industriais e cargas de grande volume que chegam ao parque.",
+            en: "General and project cargo terminal with a bonded yard. The natural route for industrial equipment and oversized cargo arriving at the park.",
+            es: "Terminal de carga general y de proyecto, con patio aduanero. Ruta natural para equipos industriales y cargas de gran volumen que llegan al parque." } },
+  { name: "Caacupemí Villeta", type: T.port, km: "42 km", tempo: "1 h", lat: -25.5060, lng: -57.5450,
+    desc: { pt: "Terminal de contêineres com serviço regular de barcaças para Montevidéu e Buenos Aires, conectando a produção do parque ao Atlântico.",
+            en: "Container terminal with regular barge service to Montevideo and Buenos Aires, connecting the park's output to the Atlantic.",
+            es: "Terminal de contenedores con servicio regular de barcazas a Montevideo y Buenos Aires, conectando la producción del parque al Atlántico." } },
+  { name: "Emb. Puerto Alegre", type: T.port, km: "4 km", tempo: "10 min", lat: -25.7930, lng: -57.7565,
+    desc: { pt: "Atracadouro local a poucos minutos do portão do parque, usado para cargas de apoio e movimentação regional.",
+            en: "Local wharf minutes from the park gate, used for support cargo and regional movements.",
+            es: "Atracadero local a pocos minutos del portón del parque, usado para cargas de apoyo y movimiento regional." } },
+  { name: "Puerto Lobato", type: T.port, km: "6 km", tempo: "15 min", lat: -25.8085, lng: -57.7660,
+    desc: { pt: "Atracadouro fluvial vizinho ao parque, alternativa de curta distância para operações pontuais.",
+            en: "River wharf next to the park, a short-distance alternative for occasional operations.",
+            es: "Atracadero fluvial vecino al parque, alternativa de corta distancia para operaciones puntuales." } },
+  { name: "Terminal Villa Oliva", type: T.port, km: "38 km", tempo: "50 min", lat: -26.0060, lng: -57.8890,
+    desc: { pt: "Terminal de barcaças e granéis ao sul de Villeta, com acesso direto à hidrovia.",
+            en: "Barge and bulk terminal south of Villeta, with direct waterway access.",
+            es: "Terminal de barcazas y graneles al sur de Villeta, con acceso directo a la hidrovía." } },
+  { name: "Porto de Assunção", type: T.port, km: "71 km", tempo: "1 h 20", lat: -25.2780, lng: -57.6430,
+    desc: { pt: "Porto histórico da capital, hoje voltado a carga geral. Villeta absorveu o fluxo de contêineres por ser mais próxima e menos congestionada.",
+            en: "The capital's historic port, today focused on general cargo. Villeta absorbed container flows by being closer and less congested.",
+            es: "Puerto histórico de la capital, hoy orientado a carga general. Villeta absorbió el flujo de contenedores por estar más cerca y menos congestionado." } },
+  { name: "Porto de Alberdi", type: T.port, km: "72 km", tempo: "1 h", lat: -26.1870, lng: -58.1290,
+    desc: { pt: "Terminal fluvial ao sul, próximo à fronteira com a Argentina.",
+            en: "Southern river terminal, close to the Argentine border.",
+            es: "Terminal fluvial al sur, cerca de la frontera con Argentina." } }
 ];
 
-/* Grupo 2 — Rodovias · destinos Mercosul (tabela de conectividade) */
 const roads = [
-  { name: "Assunção",        sub: "Central · PY",     via: "Acceso Sur",     km: "70 km",    tempo: "1h 30m",  lat: -25.2867, lng: -57.6470 },
-  { name: "Encarnación",     sub: "Itapúa · PY",      via: "Ruta 1",         km: "355 km",   tempo: "4h 40m",  lat: -27.3306, lng: -55.8667 },
-  { name: "Ciudad del Este", sub: "Alto Paraná · PY", via: "Ruta 2",         km: "360 km",   tempo: "5h",      lat: -25.5097, lng: -54.6111 },
-  { name: "Foz do Iguaçu",   sub: "Brasil",           via: "Ruta 2 / PY02",  km: "365 km",   tempo: "5h",      lat: -25.5163, lng: -54.5854 },
-  { name: "Curitiba",        sub: "Brasil",           via: "BR-277",         km: "1.000 km", tempo: "12h 30m", lat: -25.4284, lng: -49.2733 },
-  { name: "Porto Alegre",    sub: "Brasil",           via: "BR-386",         km: "1.055 km", tempo: "14h 30m", lat: -30.0346, lng: -51.2177 },
-  { name: "Córdoba",         sub: "Argentina",        via: "RN 16",          km: "1.100 km", tempo: "13h 00m", lat: -31.4201, lng: -64.1888 },
-  { name: "Buenos Aires",    sub: "Argentina",        via: "RN 12",          km: "1.280 km", tempo: "14h 30m", lat: -34.6037, lng: -58.3816 },
-  { name: "Florianópolis",   sub: "Brasil",           via: "BR-282",         km: "1.307 km", tempo: "15h",     lat: -27.5954, lng: -48.5480 },
-  { name: "Santa Cruz de la Sierra", sub: "Bolívia",  via: "Ruta 9",         km: "1.360 km", tempo: "18h 30m", lat: -17.7833, lng: -63.1821 },
-  { name: "São Paulo",       sub: "Brasil",           via: "BR-116",         km: "1.395 km", tempo: "17h 30m", lat: -23.5505, lng: -46.6333 },
-  { name: "Montevidéu",      sub: "Uruguai",          via: "RN 14",          km: "1.550 km", tempo: "19h",     lat: -34.9011, lng: -56.1645 },
+  { name: "Assunção", type: T.road, km: "65 km", tempo: "1 h 10", lat: -25.2867, lng: -57.6470,
+    desc: { pt: "Capital do Paraguai e sede dos órgãos federais (CNIME, aduana) — ida e volta no mesmo expediente pelo Acceso Sur.",
+            en: "Paraguay's capital and seat of the federal bodies (CNIME, customs) — a round trip within the same working day via the Acceso Sur.",
+            es: "Capital del Paraguay y sede de los órganos federales (CNIME, aduana) — ida y vuelta en la misma jornada por el Acceso Sur." } },
+  { name: "Ciudad del Este", type: T.road, km: "360 km", tempo: "5 h", lat: -25.5097, lng: -54.6111,
+    desc: { pt: "Segundo maior polo comercial do país, na tríplice fronteira com Brasil e Argentina.",
+            en: "The country's second-largest commercial hub, on the triple border with Brazil and Argentina.",
+            es: "Segundo mayor polo comercial del país, en la triple frontera con Brasil y Argentina." } },
+  { name: "Foz do Iguaçu", type: T.road, km: "365 km", tempo: "5 h", lat: -25.5163, lng: -54.5854,
+    desc: { pt: "Porta de entrada terrestre no Brasil: a carga sai do galpão e cruza a fronteira sem transbordo marítimo.",
+            en: "Land gateway into Brazil: cargo leaves the warehouse and crosses the border with no sea transhipment.",
+            es: "Puerta de entrada terrestre a Brasil: la carga sale del galpón y cruza la frontera sin transbordo marítimo." } },
+  { name: "Curitiba", type: T.road, km: "1.000 km", tempo: "12 h 30", lat: -25.4284, lng: -49.2733,
+    desc: { pt: "Um dia de caminhão até o centro industrial do Paraná — menos estoque em trânsito que a rota asiática.",
+            en: "One truck day to Paraná's industrial centre — less inventory in transit than the Asian route.",
+            es: "Un día de camión hasta el centro industrial de Paraná — menos stock en tránsito que la ruta asiática." } },
+  { name: "Porto Alegre", type: T.road, km: "1.055 km", tempo: "14 h 30", lat: -30.0346, lng: -51.2177,
+    desc: { pt: "Acesso rodoviário direto ao Rio Grande do Sul pela BR-386.",
+            en: "Direct road access to Rio Grande do Sul via the BR-386.",
+            es: "Acceso vial directo a Rio Grande do Sul por la BR-386." } },
+  { name: "Encarnación", type: T.road, km: "355 km", tempo: "4 h 40", lat: -27.3306, lng: -55.8667,
+    desc: { pt: "Fronteira com Posadas (Argentina) pela Ruta 1.",
+            en: "Border with Posadas (Argentina) via Ruta 1.",
+            es: "Frontera con Posadas (Argentina) por la Ruta 1." } },
+  { name: "Buenos Aires", type: T.road, km: "1.280 km", tempo: "14 h 30", lat: -34.6037, lng: -58.3816,
+    desc: { pt: "Maior mercado consumidor da Argentina, com tarifa zero pelo Certificado de Origem Mercosul.",
+            en: "Argentina's largest consumer market, at zero tariff under the Mercosur Certificate of Origin.",
+            es: "Mayor mercado consumidor de Argentina, con arancel cero por el Certificado de Origen Mercosur." } },
+  { name: "Córdoba", type: T.road, km: "1.100 km", tempo: "13 h", lat: -31.4201, lng: -64.1888,
+    desc: { pt: "Polo automotivo e agroindustrial argentino, acessível pela RN 16.",
+            en: "Argentina's automotive and agro-industrial hub, reached via RN 16.",
+            es: "Polo automotriz y agroindustrial argentino, accesible por la RN 16." } }
 ];
 
-/* Grupo 3 — Pontos de referência padrão */
+const airports = [
+  { name: "Aeroporto Silvio Pettirossi (ASU)", type: T.air, km: "70 km", tempo: "1 h 15", lat: -25.2400, lng: -57.5200,
+    desc: { pt: "Aeroporto internacional de Assunção, com voos diários diretos para São Paulo (~2 h). Do portão de embarque ao portão do parque em cerca de uma hora.",
+            en: "Asunción's international airport, with daily direct flights to São Paulo (~2 h). From boarding gate to park gate in about an hour.",
+            es: "Aeropuerto internacional de Asunción, con vuelos diarios directos a São Paulo (~2 h). De la puerta de embarque al portón del parque en cerca de una hora." } },
+  { name: "Pista do Bracerum Park", type: T.air, km: "0 km", tempo: "—", lat: -25.7790, lng: -57.7290,
+    desc: { pt: "Pista de 1.480 m e heliponto dentro do masterplan, com hangar, lounge e abastecimento — acesso executivo sem depender de Assunção.",
+            en: "A 1,480 m runway and helipad inside the masterplan, with hangar, lounge and refuelling — executive access without depending on Asunción.",
+            es: "Pista de 1.480 m y helipuerto dentro del masterplan, con hangar, lounge y abastecimiento — acceso ejecutivo sin depender de Asunción." } },
+  { name: "Aeroporto Guaraní (AGT)", type: T.air, km: "350 km", tempo: "4 h 50", lat: -25.4547, lng: -54.8428,
+    desc: { pt: "Segundo aeroporto internacional do país, em Ciudad del Este, junto à fronteira brasileira.",
+            en: "The country's second international airport, in Ciudad del Este, next to the Brazilian border.",
+            es: "Segundo aeropuerto internacional del país, en Ciudad del Este, junto a la frontera brasileña." } }
+];
+
+/* Distâncias aéreas a partir de Assunção (ASU) — aproximadas */
+const capitals = [
+  { name: "São Paulo (GRU)", type: T.cap, km: "1.130 km", tempo: "~2 h", lat: -23.4356, lng: -46.4731,
+    desc: { pt: "Voos diários diretos. Ida e volta no mesmo dia é rotina para quem opera no parque.",
+            en: "Daily direct flights. A same-day round trip is routine for those operating at the park.",
+            es: "Vuelos diarios directos. Ida y vuelta en el mismo día es rutina para quien opera en el parque." } },
+  { name: "Curitiba (CWB)", type: T.cap, km: "840 km", tempo: "~1 h 40", lat: -25.5285, lng: -49.1758,
+    desc: { pt: "A capital brasileira mais próxima de Villeta em linha reta.",
+            en: "The closest Brazilian capital to Villeta as the crow flies.",
+            es: "La capital brasileña más cercana a Villeta en línea recta." } },
+  { name: "Porto Alegre (POA)", type: T.cap, km: "820 km", tempo: "~1 h 40", lat: -29.9939, lng: -51.1711,
+    desc: { pt: "Distância aérea menor que São Paulo–Recife.",
+            en: "A shorter air distance than São Paulo–Recife.",
+            es: "Distancia aérea menor que São Paulo–Recife." } },
+  { name: "Florianópolis (FLN)", type: T.cap, km: "930 km", tempo: "~1 h 50", lat: -27.6705, lng: -48.5477,
+    desc: { pt: "Capital catarinense, região de origem de boa parte do capital industrial que migra para a maquila.",
+            en: "Capital of Santa Catarina, home region of much of the industrial capital moving into the maquila regime.",
+            es: "Capital de Santa Catarina, región de origen de buena parte del capital industrial que migra a la maquila." } },
+  { name: "Brasília (BSB)", type: T.cap, km: "1.450 km", tempo: "~2 h 20", lat: -15.8711, lng: -47.9186,
+    desc: { pt: "Capital federal brasileira, com conexões diárias via São Paulo.",
+            en: "Brazil's federal capital, with daily connections via São Paulo.",
+            es: "Capital federal brasileña, con conexiones diarias vía São Paulo." } },
+  { name: "Rio de Janeiro (GIG)", type: T.cap, km: "1.470 km", tempo: "~2 h 30", lat: -22.8100, lng: -43.2506,
+    desc: { pt: "Mesma faixa de tempo de voo que um trecho doméstico brasileiro de média distância.",
+            en: "The same flight-time range as a medium-haul domestic Brazilian leg.",
+            es: "El mismo rango de tiempo de vuelo que un tramo doméstico brasileño de media distancia." } },
+  { name: "Belo Horizonte (CNF)", type: T.cap, km: "1.520 km", tempo: "~2 h 30", lat: -19.6244, lng: -43.9719,
+    desc: { pt: "Polo siderúrgico e automotivo de Minas Gerais.",
+            en: "Minas Gerais' steel and automotive hub.",
+            es: "Polo siderúrgico y automotriz de Minas Gerais." } }
+];
+
 const refs = [
-  { name: "Bracerum Park",      sub: "Villeta Industrial City · 1,82 mi m²", km: "—",      tempo: "", lat: PARK.lat, lng: PARK.lng, main: true },
-  { name: "Subestação da ANDE", sub: "Energia · Itaipu / Yacyretá",          via: "PY19",  km: "7,4 km", tempo: "", lat: -25.7205, lng: -57.6935 },
-  { name: "Villeta",            sub: "Município-sede do parque",             via: "PY19",  km: "±20 km", tempo: "", lat: -25.5097, lng: -57.5619 },
-  { name: "Aeroporto Silvio Pettirossi", sub: "Internacional · Assunção",    via: "Acceso Sur", km: "±80 km", tempo: "", lat: -25.2399, lng: -57.5191 },
+  { name: "Subestação da ANDE", type: T.ref, km: "7,4 km", tempo: "10 min", lat: -25.7550, lng: -57.7600, img: "assets/renders/rodovia-acesso.jpg",
+    desc: { pt: "Subestação de média e alta tensão a 7 km do terreno, alimentada por Itaipu e Yacyretá — redundância energética para operação industrial contínua, com tarifa cerca de 60% menor que a média brasileira.",
+            en: "Medium and high-voltage substation 7 km from the site, fed by Itaipu and Yacyretá — power redundancy for continuous industrial operation, at a tariff roughly 60% below the Brazilian average.",
+            es: "Subestación de media y alta tensión a 7 km del terreno, alimentada por Itaipú y Yacyretá — redundancia energética para operación industrial continua, con tarifa cerca de 60% menor que la media brasileña." } }
 ];
 
-const map = L.map("map", { scrollWheelZoom: false }).setView([-25.68, -57.72], 10);
-L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
-  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>',
-  maxZoom: 19,
-}).addTo(map);
+(function locationMap(){
+  const el = document.getElementById("locMap");
+  if (!el || typeof L === "undefined" || !L.map) return;
 
-/* --- Zoom com scroll apenas quando o mouse está sobre o mapa --- */
-const mapEl = document.getElementById("map");
-mapEl.addEventListener("mouseenter", () => map.scrollWheelZoom.enable());
-mapEl.addEventListener("mouseleave", () => map.scrollWheelZoom.disable());
+  const map = L.map(el, { zoomControl: false, scrollWheelZoom: true }).setView([PARK.lat, PARK.lng], 10);
+  L.control.zoom({ position: "bottomright" }).addTo(map);
 
-/* Ícones */
-const parkIcon = L.divIcon({
-  className: "",
-  html: `<div style="width:24px;height:24px;transform:rotate(45deg);background:#a07c26;border:3px solid #12100a;box-shadow:0 4px 14px rgba(18,16,10,.5)"></div>`,
-  iconSize: [24, 24], iconAnchor: [12, 12],
-});
-const portIcon = L.divIcon({
-  className: "",
-  html: `<div style="width:26px;height:26px;border-radius:50%;background:#12100a;color:#fff;display:grid;place-items:center;font-size:13px;border:2px solid #a07c26;box-shadow:0 3px 10px rgba(18,16,10,.4)">⚓</div>`,
-  iconSize: [26, 26], iconAnchor: [13, 13],
-});
-const refIcon = L.divIcon({
-  className: "",
-  html: `<div style="width:14px;height:14px;transform:rotate(45deg);background:#fff;border:2.5px solid #7c5f1a;box-shadow:0 2px 8px rgba(18,16,10,.35)"></div>`,
-  iconSize: [14, 14], iconAnchor: [7, 7],
-});
-const cityIcon = L.divIcon({
-  className: "",
-  html: `<div style="width:16px;height:16px;border-radius:50%;background:#12100a;border:2.5px solid #fff;outline:1.5px solid #7c5f1a;box-shadow:0 2px 8px rgba(18,16,10,.4)"></div>`,
-  iconSize: [16, 16], iconAnchor: [8, 8],
-});
+  /* --- Basemap ---
+     O terreno vem de um mapa claro (Voyager) invertido por filtro CSS: o
+     resultado é um mapa escuro em que rios e lagos são desenhados em azul
+     pelo próprio basemap, com o traçado real — nada é sobreposto por cima.
+     Os rótulos vêm numa camada separada, sem filtro. */
+  map.createPane("basePane");
+  const basePane = map.getPane("basePane");
+  basePane.style.zIndex = 200;
+  basePane.classList.add("leaflet-pane--base");
+  L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png", {
+    attribution: "&copy; OpenStreetMap &copy; CARTO", maxZoom: 19, pane: "basePane"
+  }).addTo(map);
 
-const markers = {};
-/* Rótulos permanentes só no corredor local (evita poluição no zoom-out) */
-const labelDir = {
-  "Bracerum Park": "right",
-  "Emb. Puerto Alegre": "left",
-  "Puerto Lobato": "left",
-  "Terport Villeta": "right",
-  "Puerto Seguro Fluvial": "right",
-  "Terminal Villa Oliva": "left",
-  "Caacupemí Villeta": "left",
-  "Porto de Assunção": "left",
-  "Porto de Alberdi": "left",
-  "Subestação da ANDE": "left",
-  "Villeta": "right",
-  "Aeroporto Silvio Pettirossi": "right",
-  "Assunção": "right",
-};
+  map.createPane("labelPane");
+  map.getPane("labelPane").style.zIndex = 210;
+  map.getPane("labelPane").style.pointerEvents = "none";
+  L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png", {
+    maxZoom: 19, pane: "labelPane", opacity: .8
+  }).addTo(map);
 
-function addMarker(p, icon, opts = {}) {
-  const m = L.marker([p.lat, p.lng], { icon }).addTo(map);
-  const dir = labelDir[p.name] || "right";
-  m.bindTooltip(
-    `${p.name}<small>${p.sub}${p.km && p.km !== "—" ? " · " + p.km : ""}</small>`,
-    {
-      permanent: !opts.hoverOnly,
-      direction: dir,
-      offset: dir === "right" ? [16, 0] : [-16, 0],
-      className: "map-label " + (opts.labelClass || ""),
+  /* --- Park --- */
+  const parkIcon = L.divIcon({
+    className: "",
+    html: '<div style="width:15px;height:15px;background:#f7f3ea;border:2.5px solid #0e0d0b;transform:rotate(45deg);box-shadow:0 0 0 6px rgba(247,243,234,.18)"></div>',
+    iconSize: [15, 15], iconAnchor: [8, 8]
+  });
+  L.marker([PARK.lat, PARK.lng], { icon: parkIcon, zIndexOffset: 1000 }).addTo(map)
+    .bindTooltip("Bracerum Park", { permanent: true, direction: "top", offset: [0, -12], className: "map-label map-label--park" });
+
+  const icons = {
+    port: '<div style="width:9px;height:9px;background:#7cc3e8;border:1.5px solid #0e0d0b"></div>',
+    road: '<div style="width:9px;height:9px;background:#cbb88f;border:1.5px solid #0e0d0b"></div>',
+    air:  '<div style="width:11px;height:11px;background:#f7f3ea;border:1.5px solid #0e0d0b;transform:rotate(45deg)"></div>',
+    ref:  '<div style="width:9px;height:9px;background:#9c9484;border:1.5px solid #0e0d0b"></div>'
+  };
+  const mkIcon = kind => L.divIcon({ className: "", html: icons[kind], iconSize: [10, 10], iconAnchor: [5, 5] });
+
+  /* --- Card de POI --- */
+  const card = document.getElementById("poiCard");
+  const cEl = {
+    media: card.querySelector(".poi-card__media"),
+    type: card.querySelector(".poi-card__type"),
+    title: card.querySelector(".poi-card__title"),
+    km: card.querySelector("[data-poi-km]"),
+    time: card.querySelector("[data-poi-time]"),
+    desc: card.querySelector(".poi-card__desc"),
+    route: card.querySelector(".poi-card__route")
+  };
+  let currentPoi = null;
+
+  function openCard(p){
+    currentPoi = p;
+    cEl.type.textContent = tr(p.type);
+    cEl.title.textContent = p.name;
+    cEl.km.textContent = p.km;
+    cEl.time.textContent = p.tempo;
+    cEl.desc.textContent = tr(p.desc);
+    cEl.media.innerHTML = p.img
+      ? `<img src="${p.img}" alt="${p.name}" />`
+      : `<span class="poi-card__ph" data-i18n="loc.photoSlot">Foto do local</span>`;
+    card.classList.add("is-open");
+  }
+  function closeCard(){ card.classList.remove("is-open"); currentPoi = null; }
+  card.querySelector(".poi-card__close").addEventListener("click", closeCard);
+  cEl.route.addEventListener("click", () => { if (currentPoi) drawRoute(currentPoi); });
+
+  /* --- Rotas ---
+     Para destinos rodoviários usamos o traçado real por vias, pré-calculado
+     com o OSRM e guardado em assets/routes.json (sem chamada em tempo real).
+     Para as capitais brasileiras, que são trechos aéreos, desenhamos um arco. */
+  let ROUTES = {};
+  fetch("assets/routes.json").then(r => r.ok ? r.json() : {}).then(j => { ROUTES = j; }).catch(() => {});
+
+  let routeLayer = null;
+  function arcPoints(a, b, bend = .18, n = 64){
+    const pts = [];
+    const midLat = (a[0] + b[0]) / 2, midLng = (a[1] + b[1]) / 2;
+    const dLat = b[0] - a[0], dLng = b[1] - a[1];
+    const cLat = midLat - dLng * bend, cLng = midLng + dLat * bend;
+    for (let i = 0; i <= n; i++){
+      const t = i / n, mt = 1 - t;
+      pts.push([
+        mt * mt * a[0] + 2 * mt * t * cLat + t * t * b[0],
+        mt * mt * a[1] + 2 * mt * t * cLng + t * t * b[1]
+      ]);
     }
-  );
-  m.bindPopup(
-    `<b>${p.name}</b><br>${p.sub}` +
-    (p.via ? `<br>Via: ${p.via}` : "") +
-    (p.km && p.km !== "—" ? `<br>Distância: ${p.km}${p.tempo ? " · " + p.tempo : ""}` : "")
-  );
-  markers[p.name] = m;
-}
+    return pts;
+  }
 
-ports.forEach((p) => addMarker(p, portIcon));
-refs.forEach((p) => addMarker(p, p.main ? parkIcon : refIcon, { labelClass: p.main ? "map-label--park" : "" }));
-/* Cidades do Mercosul: marcador pequeno + rótulo apenas no hover (exceto Assunção, do corredor) */
-roads.forEach((p) => addMarker(p, cityIcon, { hoverOnly: p.name !== "Assunção" }));
+  function drawRoute(p){
+    if (routeLayer) map.removeLayer(routeLayer);
+    const real = ROUTES[p.name];
+    const isAir = p._kind === "capital";
+    const pts = (!isAir && real && real.pts.length > 1)
+      ? real.pts
+      : arcPoints([PARK.lat, PARK.lng], [p.lat, p.lng]);
 
-/* Rótulo da rodovia PY19 */
-L.marker([-25.62, -57.63], { opacity: 0 })
-  .addTo(map)
-  .bindTooltip("Rodovia PY19<small>Mesmo eixo: Bracerum Park → Terport → Puerto Seguro</small>", {
-    permanent: true, direction: "right", className: "map-label map-label--hwy", offset: [0, 0],
+    const style = (!isAir && real)
+      ? { halo: { color: "#cbb88f", weight: 11, opacity: .16 },
+          line: { color: "#cbb88f", weight: 3.2, opacity: .95, lineJoin: "round", lineCap: "round" } }
+      : { halo: { color: "#cbb88f", weight: 10, opacity: .12 },
+          line: { color: "#cbb88f", weight: 2.2, opacity: .9, dashArray: "5 8" } };
+
+    routeLayer = L.layerGroup([
+      L.polyline(pts, style.halo),
+      L.polyline(pts, style.line)
+    ]).addTo(map);
+
+    map.fitBounds(L.latLngBounds(pts), {
+      padding: [90, 90], maxZoom: 12, animate: !reduceMotion, duration: .9
+    });
+  }
+
+  /* --- Marcadores --- */
+  const groups = [
+    { list: ports, kind: "port", ulId: "portList" },
+    { list: roads, kind: "road", ulId: "roadList" },
+    { list: airports, kind: "air", ulId: "airportList" },
+    { list: capitals, kind: "capital", ulId: "capitalList" },
+    { list: refs, kind: "ref", ulId: "refList" }
+  ];
+
+  /* Selecionar um ponto faz sempre a mesma coisa, venha o clique
+     do marcador no mapa ou do item na lista lateral. */
+  function selectPoi(p){
+    document.querySelectorAll(".dist-item").forEach(d =>
+      d.classList.toggle("is-active", d.dataset.poi === p.name));
+    openCard(p);
+    drawRoute(p);
+  }
+
+  function haversine(a, b){
+    const R = 6371, toRad = d => d * Math.PI / 180;
+    const dLat = toRad(b.lat - a.lat), dLng = toRad(b.lng - a.lng);
+    const s = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(a.lat)) * Math.cos(toRad(b.lat)) * Math.sin(dLng / 2) ** 2;
+    return 2 * R * Math.asin(Math.sqrt(s));
+  }
+
+  groups.forEach(g => {
+    g.list.forEach((p, i) => {
+      const dir = i % 2 === 0 ? "right" : "left";
+      const kind = g.kind === "capital" ? "air" : g.kind;
+      const m = L.marker([p.lat, p.lng], { icon: mkIcon(kind) }).addTo(map);
+      m.bindTooltip(`${p.name} · <b>${p.km}</b> · ${p.tempo}`, {
+        permanent: true, direction: dir, offset: [dir === "right" ? 9 : -9, 0], className: "map-label"
+      });
+      m.on("click", () => selectPoi(p));
+      p._marker = m;
+      p._kind = g.kind;
+      // pontos muito próximos do Park só ganham rótulo quando há zoom suficiente
+      p._minZoom = haversine(PARK, p) < 12 ? 11 : 0;
+    });
   });
 
-/* ---------- Rotas seguindo as rodovias (OSRM com fallback) ---------- */
-const ROUTES = [
-  { color: "#a07c26", weight: 4, opacity: 0.9,
-    stops: [
-      [PARK.lat, PARK.lng], [-25.7205, -57.6935], [-25.5296, -57.5568],
-      [-25.5060, -57.5450], [-25.4728, -57.5539], [-25.2780, -57.6430],
-    ],
-    fallback: [
-      [PARK.lat, PARK.lng], [-25.7205, -57.6935], [-25.66, -57.645], [-25.60, -57.60],
-      [-25.5296, -57.5568], [-25.5060, -57.5450], [-25.4728, -57.5539],
-      [-25.40, -57.575], [-25.33, -57.61], [-25.2780, -57.6430],
-    ] },
-  { color: "#12100a", weight: 3, opacity: 0.6,
-    stops: [[PARK.lat, PARK.lng], [-26.0060, -57.8890], [-26.1870, -58.1290]],
-    fallback: [
-      [PARK.lat, PARK.lng], [-25.85, -57.77], [-25.93, -57.83],
-      [-26.0060, -57.8890], [-26.10, -58.00], [-26.1870, -58.1290],
-    ] },
-  { color: "#7c5f1a", weight: 3, opacity: 0.75, dash: "5 7",
-    stops: [[PARK.lat, PARK.lng], [-25.7930, -57.7565], [-25.8085, -57.7660]],
-    fallback: [[PARK.lat, PARK.lng], [-25.7930, -57.7565], [-25.8085, -57.7660]] },
-];
-async function drawRoute(r) {
-  try {
-    const coords = r.stops.map(([lat, lng]) => `${lng},${lat}`).join(";");
-    const url = `https://router.project-osrm.org/route/v1/driving/${coords}?overview=full&geometries=geojson`;
-    const res = await fetch(url);
-    if (!res.ok) throw new Error("osrm off");
-    const data = await res.json();
-    if (!data.routes || !data.routes.length) throw new Error("no route");
-    const line = data.routes[0].geometry.coordinates.map(([lng, lat]) => [lat, lng]);
-    L.polyline(line, { color: r.color, weight: r.weight, opacity: r.opacity, dashArray: r.dash || null }).addTo(map);
-  } catch (e) {
-    L.polyline(r.fallback, { color: r.color, weight: r.weight, opacity: r.opacity, dashArray: r.dash || null }).addTo(map);
+  function declutter(){
+    const z = map.getZoom();
+    groups.forEach(g => g.list.forEach(p => {
+      const tip = p._marker.getTooltip();
+      if (tip) tip.setOpacity(z >= p._minZoom ? 1 : 0);
+    }));
   }
-}
-ROUTES.forEach(drawRoute);
+  map.on("zoomend", declutter);
+  declutter();
 
-/* Enquadramento inicial: corredor local */
-const HOME_BOUNDS = L.latLngBounds(
-  [...ports, ...refs].map((p) => [p.lat, p.lng])
-).pad(0.12);
-map.fitBounds(HOME_BOUNDS);
+  function renderLists(){
+    groups.forEach(g => {
+      const ul = document.getElementById(g.ulId);
+      if (!ul) return;
+      ul.innerHTML = "";
+      g.list.forEach(p => {
+        const li = document.createElement("li");
+        li.className = "dist-item";
+        li.dataset.poi = p.name;
+        li.innerHTML = `<span>${p.name}</span><b>${p.km}</b><span class="t">${p.tempo}</span>`;
+        li.addEventListener("click", () => selectPoi(p));
+        ul.appendChild(li);
+      });
+      g.list.forEach(p => p._marker.setTooltipContent(`${p.name} · <b>${p.km}</b> · ${p.tempo}`));
+    });
+  }
+  renderLists();
 
-/* ---------- Botão Recentralizar (aparece a partir de 5 km do Park) ---------- */
-const recenterBtn = document.getElementById("recenterBtn");
-function checkRecenter() {
-  const distKm = map.distance(map.getCenter(), L.latLng(PARK.lat, PARK.lng)) / 1000;
-  recenterBtn.classList.toggle("is-visible", distKm > 5);
-}
-map.on("moveend zoomend", checkRecenter);
-recenterBtn.addEventListener("click", () => {
-  map.flyToBounds(HOME_BOUNDS, { duration: 1.2 });
-});
+  /* --- Sanfonas do painel --- */
+  document.querySelectorAll(".loc-acc__head").forEach(head => {
+    head.addEventListener("click", () => {
+      const acc = head.closest(".loc-acc");
+      const isOpen = acc.getAttribute("data-open") === "true";
+      document.querySelectorAll(".loc-acc").forEach(a => {
+        a.setAttribute("data-open", "false");
+        a.querySelector(".loc-acc__head").setAttribute("aria-expanded", "false");
+      });
+      acc.setAttribute("data-open", String(!isOpen));
+      head.setAttribute("aria-expanded", String(!isOpen));
+    });
+  });
 
-/* ---------- "Buscador" direcional do Park (estilo jogos) ----------
-   Quando o Park sai da tela, uma seta na borda do mapa aponta para ele. */
-const parkFinder = document.getElementById("parkFinder");
-const parkFinderArrow = document.getElementById("parkFinderArrow");
-const mapHolder = document.querySelector(".map-holder");
+  document.getElementById("recenterBtn")?.addEventListener("click", () => {
+    if (routeLayer){ map.removeLayer(routeLayer); routeLayer = null; }
+    document.querySelectorAll(".dist-item").forEach(d => d.classList.remove("is-active"));
+    closeCard();
+    map.flyTo([PARK.lat, PARK.lng], 10, { duration: reduceMotion ? 0 : .8 });
+  });
 
-function updateParkFinder() {
-  const size = map.getSize();
-  // Se o mapa ainda não tem dimensão real (fora da tela/não medido), esconde.
-  if (!size.x || !size.y) { parkFinder.classList.remove("is-visible"); return; }
+  /* --- Indicador: onde está o Park quando ele sai da tela --- */
+  const indicator = document.getElementById("parkIndicator");
+  const indArrow = indicator?.querySelector(".park-indicator__arrow");
+  const indDist = indicator?.querySelector("[data-park-dist]");
 
-  const parkLatLng = L.latLng(PARK.lat, PARK.lng);
-  const inView = map.getBounds().contains(parkLatLng);
-  if (inView) {
-    parkFinder.classList.remove("is-visible");
+  function updateIndicator(){
+    if (!indicator) return;
+    const parkLL = L.latLng(PARK.lat, PARK.lng);
+    if (map.getBounds().contains(parkLL)){ indicator.classList.remove("is-on"); return; }
+
+    const size = map.getSize();
+    const pt = map.latLngToContainerPoint(parkLL);
+    const cx = size.x / 2, cy = size.y / 2;
+    const dx = pt.x - cx, dy = pt.y - cy;
+    const angle = Math.atan2(dy, dx);
+
+    const pad = 74;
+    const halfW = Math.max(20, cx - pad), halfH = Math.max(20, cy - pad);
+    const scale = Math.min(halfW / Math.abs(dx || 1e-6), halfH / Math.abs(dy || 1e-6));
+    const x = cx + dx * scale, y = cy + dy * scale;
+
+    indicator.style.left = x + "px";
+    indicator.style.top = y + "px";
+    indicator.style.transform = "translate(-50%,-50%)";
+    indArrow.style.transform = `rotate(${angle + Math.PI / 2}rad)`;
+
+    const center = map.getCenter();
+    const km = haversine({ lat: center.lat, lng: center.lng }, PARK);
+    indDist.textContent = (km < 10 ? km.toFixed(1) : Math.round(km).toLocaleString("pt-BR")) + " km";
+    indicator.classList.add("is-on");
+  }
+  map.on("move zoom resize", updateIndicator);
+  setTimeout(updateIndicator, 400);
+
+  document.addEventListener("langchange", () => {
+    renderLists();
+    if (currentPoi) openCard(currentPoi);
+  });
+})();
+
+/* ==========================================================
+   06 · COMO FUNCIONA — sticky + IntersectionObserver
+   ========================================================== */
+(function steps(){
+  const pin = document.getElementById("stepsPin");
+  const list = document.getElementById("stepsList");
+  if (!pin || !list) return;
+  const items = [...list.querySelectorAll(".step")];
+  const shots = [...document.querySelectorAll(".steps__visual img")];
+  const fill = document.getElementById("stepsFill");
+  const counter = document.getElementById("stepsCounter");
+  const n = items.length;
+  let active = -1;
+
+  function setActive(i){
+    i = Math.max(0, Math.min(n - 1, i));
+    if (i === active) return;
+    active = i;
+    items.forEach((s, idx) => s.classList.toggle("is-active", idx === i));
+    shots.forEach((im, idx) => im.classList.toggle("is-active", idx === i));
+    if (counter) counter.textContent = String(i + 1).padStart(2, "0") + " / " + String(n).padStart(2, "0");
+    if (fill) fill.style.transform = `scaleX(${(i + 1) / n})`;
+  }
+
+  if (reduceMotion || window.innerWidth < 900){
+    items.forEach(s => s.classList.add("is-active"));
+    shots[0]?.classList.add("is-active");
+    if (fill) fill.style.transform = "scaleX(1)";
+    if (counter) counter.textContent = "01 / " + String(n).padStart(2, "0");
     return;
   }
 
-  const center = { x: size.x / 2, y: size.y / 2 };
-  const pt = map.latLngToContainerPoint(parkLatLng);
-  const dx = pt.x - center.x;
-  const dy = pt.y - center.y;
-
-  const angle = (Math.atan2(dy, dx) * 180) / Math.PI;
-  parkFinderArrow.style.transform = `rotate(${angle}deg)`;
-
-  const PAD = 56;
-  const halfW = size.x / 2 - PAD;
-  const halfH = size.y / 2 - PAD;
-  const scale = 1 / Math.max(Math.abs(dx) / halfW, Math.abs(dy) / halfH);
-  const x = center.x + dx * scale;
-  const y = center.y + dy * scale;
-  // Posiciona ANTES de tornar visível — evita o "quadrado voando".
-  parkFinder.style.left = x + "px";
-  parkFinder.style.top = y + "px";
-  parkFinder.classList.add("is-visible");
-}
-map.on("move zoom moveend zoomend resize", updateParkFinder);
-map.whenReady(updateParkFinder);
-
-parkFinder.addEventListener("click", () => {
-  map.flyTo([PARK.lat, PARK.lng], 13, { duration: 1.2 });
-});
-
-/* ---------- Mobile: guard de toque ----------
-   Em telas touch, o mapa começa "travado" para não capturar a rolagem
-   da página; um toque libera a navegação com um dedo. */
-const isTouch = window.matchMedia("(pointer: coarse)").matches;
-if (isTouch) {
-  map.dragging.disable();
-  const guard = document.createElement("button");
-  guard.type = "button";
-  guard.className = "map-touch-guard";
-  guard.setAttribute("aria-label", "Ativar navegação no mapa");
-  guard.innerHTML = "<span>🗺️ Toque para explorar o mapa</span>";
-  mapHolder.appendChild(guard);
-  guard.addEventListener("click", () => {
-    map.dragging.enable();
-    map.touchZoom.enable();
-    guard.classList.add("is-hidden");
-  });
-}
-
-/* ---------- Painel lateral: acordeão + listas ---------- */
-function fillList(el, items) {
-  items.forEach((p) => {
-    const li = document.createElement("li");
-    li.innerHTML = `<button data-name="${p.name}">
-        <span>${p.name}<span class="d-tag">${p.sub}</span></span>
-        <span class="d-km">${p.km}${p.tempo ? `<span class="d-tag" style="text-align:right">${p.tempo}</span>` : ""}</span>
-      </button>`;
-    el.appendChild(li);
-  });
-}
-fillList(document.getElementById("portList"), ports);
-fillList(document.getElementById("roadList"), roads);
-fillList(document.getElementById("refList"), refs);
-
-/* Acordeão: um aberto por vez */
-const accs = document.querySelectorAll(".acc");
-accs.forEach((acc) => {
-  acc.querySelector(".acc__head").addEventListener("click", () => {
-    const isOpen = acc.dataset.open === "true";
-    accs.forEach((a) => {
-      a.dataset.open = "false";
-      a.querySelector(".acc__head").setAttribute("aria-expanded", "false");
-    });
-    if (!isOpen) {
-      acc.dataset.open = "true";
-      acc.querySelector(".acc__head").setAttribute("aria-expanded", "true");
+  setActive(0);
+  /* A seção tem exatamente uma tela de altura: ela encaixa centralizada
+     no viewport e só depois disso o scroll avança etapa por etapa. */
+  ScrollTrigger.create({
+    trigger: pin,
+    start: "top top",
+    end: "+=" + (n * 420),
+    pin: true,
+    pinSpacing: true,
+    anticipatePin: 1,
+    invalidateOnRefresh: true,
+    onUpdate(self){
+      setActive(Math.floor(self.progress * n * 0.999));
     }
   });
-});
-
-/* Clique nos itens → navega no mapa */
-document.getElementById("mapPanel").addEventListener("click", (e) => {
-  const btn = e.target.closest("button[data-name]");
-  if (!btn) return;
-  document.querySelectorAll("#mapPanel button[data-name]").forEach((b) => b.classList.remove("is-active"));
-  btn.classList.add("is-active");
-  const all = [...ports, ...roads, ...refs];
-  const p = all.find((x) => x.name === btn.dataset.name);
-  const isFar = roads.includes(p) && p.name !== "Assunção";
-  map.flyTo([p.lat, p.lng], isFar ? 7 : 13, { duration: 1.15 });
-  markers[p.name].openPopup();
-});
+})();
 
 /* ==========================================================
-   04 · CARROSSEL — quase fullscreen, fundo preto
+   07 · GALERIA — sanfona
    ========================================================== */
-const slides = [
-  { src: "assets/Fabrica.jpg",     cap: "Fábrica Bracerum" },
-  { src: "assets/Hotel.jpg",       cap: "Hotel e Centro de Convenções" },
-  { src: "assets/casas.jpg",       cap: "Condomínio de Casas" },
-  { src: "assets/convencoes.jpg",  cap: "Centro de Convenções" },
-  { src: "assets/convenco2.jpg",   cap: "Centro de Convenções · Interior" },
-  { src: "assets/escritorios.jpg", cap: "Escritórios e Salas Corporativas" },
-  { src: "assets/Clube.jpg",       cap: "Clube Bracerum" },
-  { src: "assets/Eventos.jpg",     cap: "Eventos e Gastronomia" },
-];
-
-const carTrack = document.getElementById("carTrack");
-const carCaption = document.getElementById("carCaption");
-const carCounter = document.getElementById("carCounter");
-const carDots = document.getElementById("carDots");
-let carIndex = 0;
-
-slides.forEach((s, i) => {
-  const slide = document.createElement("div");
-  slide.className = "carousel__slide";
-  const img = document.createElement("img");
-  img.src = s.src; img.alt = s.cap;
-  img.loading = i === 0 ? "eager" : "lazy";
-  img.onerror = function () { this.replaceWith(window.buildPlaceholder(s.cap, "16/9")); };
-  slide.appendChild(img);
-  carTrack.appendChild(slide);
-
-  const dot = document.createElement("button");
-  dot.className = "carousel__dot";
-  dot.setAttribute("aria-label", "Ir para: " + s.cap);
-  dot.addEventListener("click", () => goTo(i));
-  carDots.appendChild(dot);
-});
-
-function goTo(i) {
-  carIndex = (i + slides.length) % slides.length;
-  carTrack.style.transform = `translateX(-${carIndex * 100}%)`;
-  carCaption.textContent = slides[carIndex].cap;
-  carCounter.textContent = `${String(carIndex + 1).padStart(2, "0")} / ${String(slides.length).padStart(2, "0")}`;
-  carDots.querySelectorAll(".carousel__dot").forEach((d, di) => d.classList.toggle("is-active", di === carIndex));
-}
-goTo(0);
-
-document.getElementById("carPrev").addEventListener("click", () => goTo(carIndex - 1));
-document.getElementById("carNext").addEventListener("click", () => goTo(carIndex + 1));
-
-/* Teclado (com o carrossel focado) */
-document.getElementById("carousel").addEventListener("keydown", (e) => {
-  if (e.key === "ArrowLeft") goTo(carIndex - 1);
-  if (e.key === "ArrowRight") goTo(carIndex + 1);
-});
-
-/* Swipe no mobile */
-let touchX = null;
-const viewport = document.getElementById("carViewport");
-viewport.addEventListener("touchstart", (e) => { touchX = e.touches[0].clientX; }, { passive: true });
-viewport.addEventListener("touchend", (e) => {
-  if (touchX === null) return;
-  const dx = e.changedTouches[0].clientX - touchX;
-  if (Math.abs(dx) > 46) goTo(carIndex + (dx < 0 ? 1 : -1));
-  touchX = null;
-}, { passive: true });
-
-/* ==========================================================
-   06 · TABELA INTERATIVA — empresas
-   ========================================================== */
-const companies = [
-  { name: "Be8", flag: "🇧🇷", country: "Brasil", sector: "Biocombustíveis",
-    logo: "assets/be8.svg",
-    value: 999999999, valueLabel: "n/d",
-    note: "Líder brasileira em biodiesel. Desenvolve em Villeta a biorrefinaria Omega Green, de combustíveis renováveis avançados.",
-    where: "villeta", badge: "Em Villeta" },
-  { name: "Ball Corporation", flag: "🇺🇸", country: "EUA", sector: "Embalagens de alumínio",
-    logo: "assets/Ball_Corporation_logo_2024.svg",
-    value: 80000000, valueLabel: "US$ 80 mi",
-    note: "Maior fabricante mundial de latas de alumínio. Planta na região pela proximidade aos portos.",
-    where: "villeta", badge: "Em Villeta" },
-  { name: "Cremer", flag: "🇩🇪", country: "Alemanha", sector: "Óleos e químicos",
-    logo: "assets/cremer.svg",
-    value: 999999999, valueLabel: "n/d",
-    note: "Grupo alemão com planta de biodiesel e refino de glicerina em Villeta.",
-    where: "villeta", badge: "Em Villeta" },
-  { name: "Lupo", flag: "🇧🇷", country: "Brasil", sector: "Têxtil",
-    logo: "assets/Lupo_logo (1).svg",
-    value: 6000000, valueLabel: "R$ 30 mi",
-    note: "Têxtil centenária brasileira. Fábrica no Paraguai sob regime de Maquila, com custo de produção ~28% menor que no Brasil.",
-    where: "paraguai", badge: "No Paraguai" },
-  { name: "Kingspan", flag: "🇮🇪", country: "Irlanda", sector: "Construção industrializada",
-    logo: "assets/Kingspan_Group_logo.svg",
-    value: 999999999, valueLabel: "n/d",
-    note: "Líder global em painéis isotérmicos, com operação no Brasil (Kingspan Isoeste) e expansão na América do Sul.",
-    where: "paraguai", badge: "No Paraguai" },
-];
-
-const tbody = document.querySelector("#companiesTable tbody");
-let sortKey = null, sortDir = 1, activeFilter = "all", searchTerm = "";
-
-function renderTable() {
-  let rows = companies.filter((c) => {
-    const matchFilter = activeFilter === "all" || c.where === activeFilter;
-    const q = searchTerm.toLowerCase();
-    const matchSearch = !q || [c.name, c.country, c.sector, c.note].join(" ").toLowerCase().includes(q);
-    return matchFilter && matchSearch;
+(function galleryAccordion(){
+  const wrap = document.getElementById("galleryAccordion");
+  if (!wrap) return;
+  const panels = wrap.querySelectorAll(".gallery-panel");
+  function activate(panel){ panels.forEach(p => p.classList.toggle("is-active", p === panel)); }
+  panels.forEach(p => {
+    p.addEventListener("mouseenter", () => { if (window.matchMedia("(hover:hover)").matches) activate(p); });
+    p.addEventListener("click", () => activate(p));
   });
-  if (sortKey) {
-    rows = [...rows].sort((a, b) => {
-      const va = sortKey === "value" ? a.value : String(a[sortKey]).toLowerCase();
-      const vb = sortKey === "value" ? b.value : String(b[sortKey]).toLowerCase();
-      return (va > vb ? 1 : va < vb ? -1 : 0) * sortDir;
-    });
+})();
+
+/* ==========================================================
+   08 · Parallax — hero e bandas de imagem
+   ========================================================== */
+if (!reduceMotion){
+  const heroBgImg = document.querySelector(".hero__bg img");
+  if (heroBgImg){
+    gsap.to(heroBgImg, { yPercent: 9, ease: "none",
+      scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: true } });
   }
-  tbody.innerHTML = "";
-  if (!rows.length) {
-    tbody.innerHTML = `<tr class="table-empty"><td colspan="5">Nenhuma empresa encontrada para "${searchTerm}".</td></tr>`;
-    return;
-  }
-  rows.forEach((c) => {
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td data-label="Empresa"><span class="c-name"><span class="c-flag">${c.flag}</span>${c.name}</span><br>
-          <span class="badge ${c.where === "villeta" ? "" : "badge--soft"}">${c.badge}</span></td>
-      <td data-label="Origem">${c.country}</td>
-      <td data-label="Setor">${c.sector}</td>
-      <td data-label="Investimento"><span class="c-val">${c.valueLabel}</span></td>
-      <td data-label="Destaque" class="c-note">${c.note}</td>`;
-    tbody.appendChild(tr);
+  document.querySelectorAll(".img-band").forEach(band => {
+    const img = band.querySelector("img");
+    if (!img) return;
+    gsap.fromTo(img, { yPercent: -8 }, { yPercent: 8, ease: "none",
+      scrollTrigger: { trigger: band, start: "top bottom", end: "bottom top", scrub: true } });
   });
 }
-renderTable();
-
-document.querySelectorAll("#companiesTable th.sortable").forEach((th) => {
-  th.addEventListener("click", () => {
-    const key = th.dataset.sort;
-    if (sortKey === key) sortDir *= -1; else { sortKey = key; sortDir = 1; }
-    document.querySelectorAll("#companiesTable th").forEach((t) => t.classList.remove("asc", "desc"));
-    th.classList.add(sortDir === 1 ? "asc" : "desc");
-    renderTable();
-  });
-});
-document.getElementById("tableSearch").addEventListener("input", (e) => {
-  searchTerm = e.target.value.trim(); renderTable();
-});
-document.getElementById("tableFilters").addEventListener("click", (e) => {
-  const chip = e.target.closest(".chip");
-  if (!chip) return;
-  document.querySelectorAll("#tableFilters .chip").forEach((c) => c.classList.remove("is-active"));
-  chip.classList.add("is-active");
-  activeFilter = chip.dataset.filter; renderTable();
-});
-
-/* ---------- Mobile: faixa de logotipos monocromáticos ---------- */
-const logosStrip = document.getElementById("logosStrip");
-if (logosStrip) {
-  logosStrip.innerHTML = `
-    <div class="logos-strip__wrap">
-      <p class="logos-strip__label">Empresas que já estão em Villeta e no Paraguai</p>
-      <div class="logos-track">
-        ${companies.map((c) => `
-          <div class="logo-card">
-            <div class="logo-card__mark">
-              <img src="${encodeURI(c.logo)}" alt="${c.name}" loading="lazy"
-                   onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'logo-card__fallback',textContent:${JSON.stringify(c.name)}}))" />
-            </div>
-            <span class="logo-card__name">${c.country}</span>
-            <span class="logo-card__meta">${c.sector} · ${c.valueLabel}</span>
-            <span class="logo-card__badge ${c.where === "villeta" ? "" : "logo-card__badge--soft"}">${c.badge}</span>
-          </div>`).join("")}
-      </div>
-    </div>`;
-}
-
-/* ==========================================================
-   Geral — reveal + menu mobile
-   ========================================================== */
-const observer = new IntersectionObserver(
-  (entries) => entries.forEach((en) => {
-    if (en.isIntersecting) { en.target.classList.add("is-visible"); observer.unobserve(en.target); }
-  }),
-  { threshold: 0.1 }
-);
-document.querySelectorAll(".reveal").forEach((el) => observer.observe(el));
-
-const burger = document.getElementById("burger");
-const navLinks = document.getElementById("navLinks");
-burger.addEventListener("click", () => {
-  const open = navLinks.classList.toggle("is-open");
-  burger.setAttribute("aria-expanded", open);
-  document.body.classList.toggle("menu-open", open);
-  document.body.style.overflow = open ? "hidden" : "";
-});
-navLinks.querySelectorAll("a").forEach((a) =>
-  a.addEventListener("click", () => {
-    navLinks.classList.remove("is-open");
-    burger.setAttribute("aria-expanded", "false");
-    document.body.classList.remove("menu-open");
-    document.body.style.overflow = "";
-  })
-);

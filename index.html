@@ -7,338 +7,432 @@
 <meta name="description" content="Uma Cidade Industrial Completa no coração do Mercosul. Parque industrial e cidade multiuso em Villeta, Paraguai. Regime de Maquila, Ley de Inversiones e Certificado de Origem Mercosul." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,500;0,8..60,600;0,8..60,700;1,8..60,500;1,8..60,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-<link rel="stylesheet" href="style.css?v=8" />
+<link rel="stylesheet" href="style.css?v=12" />
+<noscript><style>.reveal{opacity:1!important;transform:none!important}.mask__in{transform:none!important}.step{opacity:1!important;filter:none!important;transform:none!important}#loader{display:none!important}</style></noscript>
 </head>
 <body>
 
-<!-- ============ NAV ============ -->
-<header class="nav nav--transparent" id="siteNav">
-  <a class="nav__brand" href="#topo">
-    <span class="brand__main">BRACERUM</span><span class="brand__slash">/</span><span class="brand__park">PARK</span>
-  </a>
-  <nav class="nav__links" id="navLinks">
-    <a href="#masterplan">Masterplan</a>
-    <a href="#localizacao">Localização</a>
-    <a href="#parque">O Parque</a>
-    <a href="#vantagens">Vantagens</a>
-    <a href="#empresas">Empresas</a>
-    <a href="#contato" class="nav__cta">Fale conosco</a>
-  </nav>
-  <button class="nav__burger" id="burger" aria-label="Abrir menu" aria-expanded="false">
-    <span></span><span></span><span></span>
-  </button>
-</header>
-
-<!-- ============ HERO CINEMATOGRÁFICO ============ -->
-<section class="cine" id="topo">
-  <div class="cine__bg">
-    <img src="assets/Hotel.jpg" alt="" aria-hidden="true"
-         onerror="this.style.display='none';this.parentElement.classList.add('cine__bg--fallback')" />
+<!-- ============ ENTRADA — escolha de idioma ============ -->
+<div id="langGate" hidden>
+  <img class="gate__mark" src="assets/logo/logo-stacked-wide-cream.svg" alt="Bracerum Park" />
+  <p class="gate__label">Select your language · Escolha seu idioma · Elija su idioma</p>
+  <div class="gate__opts">
+    <button class="gate__opt" data-lang="en"><span class="gate__code">EN</span><span class="gate__name">English (US)</span></button>
+    <button class="gate__opt" data-lang="pt"><span class="gate__code">PT</span><span class="gate__name">Português (BR)</span></button>
+    <button class="gate__opt" data-lang="es"><span class="gate__code">ES</span><span class="gate__name">Español (PY)</span></button>
   </div>
-  <div class="cine__overlay"></div>
-  <div class="cine__content">
-    <p class="cine__kicker">Paraguay &nbsp;·&nbsp; Villeta Industrial City &nbsp;·&nbsp; 2026</p>
-    <h1 class="cine__logo">
-      <span class="brand__main">BRACERUM</span><span class="brand__slash">/</span><em class="brand__park">PARK</em>
-    </h1>
-    <div class="cine__rule"></div>
-    <p class="cine__tagline">Uma Cidade Industrial Completa no coração do Mercosul</p>
-  </div>
-  <a class="cine__scroll" href="#visao" aria-label="Rolar para o conteúdo">
-    <span class="cine__scroll-line"></span>
-    <span class="cine__scroll-txt">Explorar</span>
-  </a>
-</section>
-
-<!-- ============ 01 · VISÃO GERAL ============ -->
-<section class="hero" id="visao">
-  <div class="hero__inner">
-    <div class="hero__copy reveal">
-      <p class="hero__kicker">— O Projeto</p>
-      <h2 class="hero__title">Uma cidade industrial <em>completa</em>, construída por <em>fábricas próprias</em>.</h2>
-      <p class="hero__sub">Parque industrial e cidade multiuso em Villeta: galpões built-to-suit, hotel, centro de convenções, data center, aeroporto corporativo e clube — reunidos em um único masterplan.</p>
-      <div class="hero__actions">
-        <a class="btn btn--primary" href="#contato">Falar com o time <span class="btn__arrow">↗</span></a>
-        <a class="btn btn--outline" href="#vantagens">Por que o Paraguai?</a>
-      </div>
-      <div class="hero__proof">
-        <div><strong>1%</strong><span>Tributo único · Maquila</span></div>
-        <div><strong>1,82 mi m²</strong><span>Na rodovia dos portos</span></div>
-        <div><strong>65 km</strong><span>De Assunção</span></div>
-      </div>
-    </div>
-    <div class="hero__media reveal">
-      <figure>
-        <img src="assets/Fabrica.jpg" alt="Fábrica Bracerum — render noturno" fetchpriority="high"
-             onerror="this.replaceWith(window.buildPlaceholder('Fábrica Bracerum','4/3'))" />
-      </figure>
-      <span class="float-pill float-pill--1">◆ 70 km de Assunção</span>
-      <span class="float-pill float-pill--2">◆ PY19 · Rodovia dos portos</span>
-      <span class="float-pill float-pill--3">◆ 3 fábricas próprias na execução</span>
-    </div>
-  </div>
-</section>
-
-<!-- Barra de credibilidade -->
-<div class="trustbar reveal">
-  <span>Regime de Maquila</span><i>·</i>
-  <span>Ley de Inversiones</span><i>·</i>
-  <span>Certificado de Origem Mercosul</span><i>·</i>
-  <span>Leis federais 7.547 e 7.548 / 2025</span><i>·</i>
-  <span>+270 mi de consumidores no bloco</span>
 </div>
 
-<!-- ============ 02 · MASTERPLAN ============ -->
-<section class="section" id="masterplan">
-  <div class="section__head reveal">
-    <p class="eyebrow">02 — Masterplan</p>
-    <h2>A cidade industrial que <em>fabrica a si mesma</em></h2>
-    <p class="lead">Lote único de 1.819.856 m² sobre o eixo rodoviário dos portos de Villeta. Explore as áreas do plano geral abaixo.</p>
-  </div>
+<!-- ============ LOADER ============ -->
+<div id="loader" aria-hidden="true">
+  <img class="loader__mark" src="assets/logo/logo-tagline-cream.svg" alt="" />
+  <div class="loader__bar"></div>
+  <p class="loader__label" data-i18n="loader.label">Villeta Industrial City</p>
+  <div class="loader__curtain"></div>
+</div>
 
-  <div class="master reveal">
-    <figure class="master__media">
-      <div class="master__rotate">
-        <img src="assets/masterplan.jpg" alt="Planta geral do Bracerum Park — Masterplan" loading="lazy"
-             onerror="this.replaceWith(window.buildPlaceholder('Masterplan · Planta Geral','16/9'))" />
-      </div>
-      <figcaption>Planta geral · Villeta – PY · Área total de 1.819.856 m²</figcaption>
-    </figure>
-
-    <div class="master__legend">
-      <button class="chip is-active" data-area="all">Todos</button>
-      <button class="chip" data-area="industrial">Industrial</button>
-      <button class="chip" data-area="cidade">Cidade &amp; Serviços</button>
-      <button class="chip" data-area="infra">Infraestrutura</button>
+<!-- ============ NAV ============ -->
+<header class="nav" id="siteNav">
+  <a class="nav__brand" href="#topo" aria-label="Bracerum Park">
+    <img src="assets/logo/logo-horizontal-cream.svg" alt="Bracerum Park" />
+  </a>
+  <nav class="nav__links">
+    <a href="#masterplan" data-i18n="nav.masterplan">Masterplan</a>
+    <a href="#localizacao" data-i18n="nav.location">Localização</a>
+    <a href="#jornada" data-i18n="nav.how">Como funciona</a>
+    <a href="#galeria" data-i18n="nav.park">O Parque</a>
+    <a href="tributacao.html" data-i18n="nav.tax">Tributação</a>
+    <a href="bracerum.html" data-i18n="nav.bracerum">Bracerum</a>
+  </nav>
+  <div class="nav__right">
+    <div class="lang" role="group" aria-label="Idioma / Language / Idioma">
+      <button class="lang__btn" data-lang="en" title="English (US)">EN</button>
+      <button class="lang__btn" data-lang="pt" title="Português (BR)">PT</button>
+      <button class="lang__btn" data-lang="es" title="Español (PY)">ES</button>
     </div>
+    <a href="#contato" class="nav__cta" data-i18n="nav.cta">Fale conosco</a>
+  </div>
+</header>
 
-    <ul class="master__grid" id="masterGrid"></ul>
-    <p class="h-hint">Arraste para ver todas as áreas</p>
+<!-- ============ HERO ============ -->
+<section class="hero" id="topo">
+  <div class="hero__bg">
+    <img src="assets/web/hero-hotel-noturno.jpg" alt="Hotel e Centro de Convenções do Bracerum Park iluminados à noite" fetchpriority="high" />
+  </div>
+  <div class="hero__overlay"></div>
+  <canvas class="hero__dots" id="heroDots" aria-hidden="true"></canvas>
+  <div class="hero__content">
+    <div class="hero__mark" id="heroMark">
+
+<svg id="Camada_2" role="img" aria-label="Bracerum Park — Paraguay 2026" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 430.02 118.18">
+  <defs>
+    <style>
+      .cls-1, .cls-2 {
+        fill: #fff8ef;
+      }
+
+      .cls-2 {
+        fill-rule: evenodd;
+      }
+    </style>
+  </defs>
+  <g id="Camada_1-2" data-name="Camada 1">
+    <g>
+      <g>
+        <g>
+          <path class="cls-1" d="M57.67,87.86c5.68,0,8.89,3.37,8.89,7.61,0,2.51-.78,4.69-3.62,6.01,2.8.99,4.57,3.33,4.57,7.16,0,2.18-.78,4.28-2.51,6.05-1.6,1.65-3.62,2.71-8.84,2.71h-13.04v-29.54h14.56ZM56.36,99.42c2.18,0,4.28-.74,4.28-3.29s-2.06-3.17-4.48-3.17h-7.12v6.46h7.32ZM56.65,112.3c2.8,0,4.69-1.19,4.69-4.32,0-2.18-1.65-3.58-4.48-3.58h-7.82v7.9h7.61Z"/>
+          <path class="cls-1" d="M87.91,87.86c5.68,0,8.97,3.91,8.97,8.35,0,3.25-1.6,6.05-4.57,7.03l.99.49c2.51,1.23,2.76,4.2,2.76,6.66v2.76c0,.99.04,3.13,1.32,3.46v.78h-6.83c-.33-.95-.62-2.71-.62-4.2l-.04-3.21c-.04-3.99-2.34-4.15-4.85-4.15h-6.33v11.56h-6.05v-29.54h15.26ZM86.1,100.86c2.96,0,4.61-1.03,4.61-4.03,0-2.34-1.65-3.87-4.15-3.87h-7.86v7.9h7.4Z"/>
+          <path class="cls-1" d="M117.53,87.86l10.41,29.54h-6.71l-1.89-6.09h-10.9l-2.06,6.09h-6.5l10.53-29.54h7.12ZM113.87,94.53l-3.78,11.68h7.53l-3.66-11.68h-.08Z"/>
+          <path class="cls-1" d="M148.91,97.53c-.86-3.74-3.29-5.1-6.42-5.1-4.48,0-7.45,3.58-7.45,10.28,0,6.09,2.59,10.12,7.32,10.12,3.46,0,5.76-1.93,6.54-5.55h6.17c-1.36,7.08-6.09,10.9-12.83,10.9-8.31,0-13.49-5.92-13.49-15.51s5.51-15.59,13.62-15.59c7.16,0,12.14,4.44,12.71,10.45h-6.17Z"/>
+          <path class="cls-1" d="M181.33,87.86v5.22h-15.67v6.21h14.4v5.22h-14.4v7.65h16.37v5.22h-22.42v-29.54h21.72Z"/>
+          <path class="cls-1" d="M202.14,87.86c5.68,0,8.97,3.91,8.97,8.35,0,3.25-1.6,6.05-4.57,7.03l.99.49c2.51,1.23,2.76,4.2,2.76,6.66v2.76c0,.99.04,3.13,1.32,3.46v.78h-6.83c-.33-.95-.62-2.71-.62-4.2l-.04-3.21c-.04-3.99-2.34-4.15-4.85-4.15h-6.33v11.56h-6.05v-29.54h15.26ZM200.33,100.86c2.96,0,4.61-1.03,4.61-4.03,0-2.34-1.65-3.87-4.15-3.87h-7.86v7.9h7.4Z"/>
+          <path class="cls-1" d="M221.73,87.86v19.33c0,3.5,2.02,5.76,5.31,5.76,4.32,0,5.92-2.18,5.92-5.59v-19.5h6.29v19.42c0,6.91-4.07,10.9-12.14,10.9-7.12,0-11.68-3.58-11.68-10.86v-19.46h6.29Z"/>
+          <path class="cls-1" d="M253.85,87.86l5.35,23.28h.08l5.27-23.28h8.93v29.54h-5.76v-24.68h-.08l-5.51,24.68h-6.05l-5.39-24.68h-.08v24.68h-5.76v-29.54h9.01Z"/>
+          <path class="cls-1" d="M311.16,87.86c5.72,0,9.17,3.66,9.17,9.42,0,5.1-3.41,9.46-9.17,9.46h-7.32v10.65h-6.17v-29.54h13.49ZM309.72,101.64c2.67,0,4.44-1.28,4.44-4.61,0-2.92-1.65-4.07-5.22-4.07h-5.1v8.68h5.88Z"/>
+          <path class="cls-1" d="M336.17,87.86l10.41,29.54h-6.71l-1.89-6.09h-10.9l-2.06,6.09h-6.5l10.53-29.54h7.12ZM332.51,94.53l-3.79,11.68h7.53l-3.66-11.68h-.08Z"/>
+          <path class="cls-1" d="M365.62,87.86c5.68,0,8.97,3.91,8.97,8.35,0,3.25-1.6,6.05-4.57,7.03l.99.49c2.51,1.23,2.76,4.2,2.76,6.66v2.76c0,.99.04,3.13,1.32,3.46v.78h-6.83c-.33-.95-.62-2.71-.62-4.2l-.04-3.21c-.04-3.99-2.34-4.15-4.85-4.15h-6.33v11.56h-6.05v-29.54h15.26ZM363.81,100.86c2.96,0,4.61-1.03,4.61-4.03,0-2.34-1.65-3.87-4.15-3.87h-7.86v7.9h7.4Z"/>
+          <path class="cls-1" d="M386.52,87.86v12.01l11.27-12.01h7.98l-12.05,12.09,12.75,17.44h-7.94l-9.13-12.96-2.88,2.96v10h-6.17v-29.54h6.17Z"/>
+        </g>
+        <g>
+          <g>
+            <path class="cls-1" d="M416.54,104.6v-.53l1.1-1.54c.23-.32.41-.6.54-.85.13-.25.23-.49.28-.72.06-.23.08-.46.08-.7,0-.31-.05-.56-.16-.75s-.26-.28-.48-.28c-.19,0-.34.05-.44.16-.1.11-.17.25-.21.43-.04.18-.06.36-.06.56-.15,0-.29-.04-.41-.11s-.19-.21-.19-.41c0-.28.11-.52.33-.72.22-.2.54-.3.98-.3s.76.12,1,.37c.24.25.36.58.36.98,0,.42-.1.82-.31,1.18-.2.36-.47.75-.8,1.17l-1.08,1.45h1.46c.18,0,.3-.05.37-.15.07-.1.13-.25.16-.43l.03-.15h.31l-.02,1.35h-2.85Z"/>
+            <path class="cls-1" d="M421.52,104.67c-.55,0-.93-.25-1.16-.76s-.34-1.23-.34-2.18c0-.61.05-1.13.14-1.56.09-.43.25-.76.47-.99.22-.23.52-.35.89-.35.53,0,.91.25,1.14.75.23.5.34,1.22.34,2.16s-.12,1.65-.35,2.16c-.24.51-.61.77-1.13.77ZM421.52,104.28c.29,0,.49-.22.61-.66s.17-1.06.17-1.87-.06-1.42-.17-1.86-.31-.66-.6-.66-.5.22-.61.66-.17,1.06-.17,1.86.06,1.42.17,1.87.31.66.61.66Z"/>
+            <path class="cls-1" d="M423.57,104.6v-.53l1.1-1.54c.23-.32.41-.6.54-.85.13-.25.23-.49.28-.72.06-.23.08-.46.08-.7,0-.31-.05-.56-.16-.75s-.26-.28-.48-.28c-.19,0-.34.05-.44.16-.1.11-.17.25-.21.43-.04.18-.06.36-.06.56-.15,0-.29-.04-.41-.11s-.19-.21-.19-.41c0-.28.11-.52.33-.72.22-.2.54-.3.98-.3s.76.12,1,.37c.24.25.36.58.36.98,0,.42-.1.82-.31,1.18-.2.36-.47.75-.8,1.17l-1.08,1.45h1.46c.18,0,.3-.05.37-.15.07-.1.13-.25.16-.43l.03-.15h.31l-.02,1.35h-2.85Z"/>
+            <path class="cls-1" d="M428.64,104.67c-.29,0-.54-.1-.76-.29s-.4-.5-.53-.91c-.13-.41-.19-.94-.19-1.58,0-.97.13-1.72.39-2.25s.68-.8,1.25-.8c.36,0,.63.08.82.25.18.17.27.36.27.58,0,.3-.17.45-.53.45,0-.28-.05-.5-.14-.66s-.24-.25-.45-.25c-.29,0-.51.2-.66.6s-.23.99-.24,1.77c.09-.1.22-.2.37-.29s.33-.14.55-.14c.37,0,.67.14.9.43.23.29.34.69.34,1.19,0,.38-.05.71-.16.99-.11.28-.27.51-.47.67s-.45.24-.74.24ZM428.65,104.28c.21,0,.38-.11.49-.34.12-.23.17-.59.17-1.08,0-.46-.06-.79-.17-1-.12-.21-.29-.32-.52-.32-.19,0-.35.05-.48.15-.13.1-.23.21-.3.31,0,.77.08,1.34.22,1.72.14.38.34.56.58.56Z"/>
+          </g>
+          <g>
+            <path class="cls-1" d="M0,104.6v-.33h.11c.14,0,.26-.03.35-.1.09-.07.14-.22.14-.47v-3.91c0-.23-.04-.38-.14-.45-.09-.06-.2-.1-.33-.1h-.13v-.33h1.84c.55,0,.96.14,1.22.43.26.29.39.7.39,1.23,0,.32-.06.62-.17.9-.11.27-.3.49-.56.66s-.6.25-1.03.25h-.36v1.35c0,.23.05.38.14.44s.21.09.35.09h.18v.33H0ZM1.33,102.02h.31c.37,0,.64-.11.8-.32.16-.21.24-.58.24-1.09,0-.45-.07-.78-.22-1s-.39-.32-.73-.32h-.41v2.73Z"/>
+            <path class="cls-1" d="M4.9,104.67c-.27,0-.49-.1-.68-.31-.19-.21-.28-.53-.28-.96s.12-.74.35-.94c.24-.2.6-.31,1.08-.33l.52-.02v-.49c0-.3-.03-.54-.1-.72-.07-.18-.22-.27-.45-.27s-.37.08-.44.24c-.07.16-.1.37-.1.63-.39,0-.59-.16-.59-.49,0-.24.11-.43.32-.56s.5-.2.86-.2c.39,0,.69.1.89.31.2.21.3.57.3,1.07v2.06c0,.22.03.37.09.45.06.08.16.12.3.12h.02v.33h-.95l-.1-.7h-.05c-.09.15-.18.28-.26.4s-.19.21-.3.28c-.12.07-.26.1-.44.1ZM5.12,104.26c.23,0,.42-.11.56-.34.14-.23.21-.51.21-.85v-.65l-.37.02c-.33.02-.56.12-.68.28-.13.17-.19.41-.19.72,0,.24.04.44.11.59.07.15.19.22.36.22Z"/>
+            <path class="cls-1" d="M7.43,104.6v-.33h.02c.14,0,.26-.03.35-.1.1-.07.15-.22.15-.47v-2.5c0-.23-.05-.38-.14-.45-.1-.06-.21-.1-.35-.1h-.02v-.33h1.07l.1.86h.02c.08-.25.2-.47.34-.66.14-.19.34-.28.6-.28.21,0,.37.05.47.16.1.11.16.25.16.43,0,.16-.05.29-.15.38-.1.1-.26.14-.48.14,0-.22-.02-.38-.07-.47-.05-.1-.13-.15-.25-.15-.1,0-.18.05-.25.15-.07.1-.14.23-.19.39-.05.16-.09.34-.11.53-.02.19-.04.38-.04.57v1.34c0,.23.05.38.14.44s.21.09.35.09h.15v.33h-1.86Z"/>
+            <path class="cls-1" d="M11.4,104.67c-.27,0-.49-.1-.68-.31-.19-.21-.28-.53-.28-.96s.12-.74.35-.94c.24-.2.6-.31,1.08-.33l.52-.02v-.49c0-.3-.03-.54-.1-.72-.07-.18-.22-.27-.45-.27s-.37.08-.44.24c-.07.16-.1.37-.1.63-.39,0-.59-.16-.59-.49,0-.24.11-.43.32-.56s.5-.2.86-.2c.39,0,.69.1.89.31.2.21.3.57.3,1.07v2.06c0,.22.03.37.09.45.06.08.16.12.3.12h.02v.33h-.95l-.1-.7h-.05c-.09.15-.18.28-.26.4s-.19.21-.3.28c-.12.07-.26.1-.44.1ZM11.62,104.26c.23,0,.42-.11.56-.34.14-.23.21-.51.21-.85v-.65l-.37.02c-.33.02-.56.12-.68.28-.13.17-.19.41-.19.72,0,.24.04.44.11.59.07.15.19.22.36.22Z"/>
+            <path class="cls-1" d="M15.21,106.49c-.46,0-.8-.1-1.02-.31-.22-.2-.33-.49-.33-.85,0-.31.08-.56.24-.73.16-.17.35-.29.55-.34-.1-.05-.18-.12-.27-.21-.08-.09-.12-.22-.12-.39,0-.16.04-.3.14-.42.09-.12.2-.22.33-.31-.19-.1-.33-.26-.45-.48-.11-.22-.17-.46-.17-.72,0-.46.1-.82.31-1.08s.52-.39.94-.39c.16,0,.3.03.42.08s.23.12.32.19c.04-.04.09-.1.15-.17.06-.07.13-.14.21-.19.08-.06.17-.08.27-.08.12,0,.21.04.27.12.06.08.09.18.09.29s-.03.21-.08.29c-.05.08-.14.13-.26.13,0-.09-.02-.17-.07-.23-.04-.06-.1-.1-.16-.1s-.11.01-.14.04-.08.05-.12.09c.08.11.15.23.2.38.06.15.08.35.08.59,0,.4-.1.73-.29.99s-.5.39-.91.39c-.05,0-.12,0-.2-.01s-.14-.02-.18-.04c-.06.05-.11.12-.16.21-.05.08-.08.19-.08.3,0,.13.04.23.12.28.08.05.18.08.31.08h.66c.26,0,.47.05.63.16.16.1.28.24.35.42s.11.36.11.56c0,.45-.14.81-.42,1.07-.28.26-.71.39-1.29.39ZM15.23,106.11c.29,0,.51-.04.67-.13.16-.09.28-.21.34-.35s.1-.31.1-.49c0-.24-.05-.41-.16-.51-.1-.1-.25-.14-.45-.14h-.65c-.11,0-.21.02-.31.07-.1.05-.18.13-.25.24-.06.12-.1.28-.1.49,0,.24.06.44.19.6.13.16.33.24.6.24ZM15.35,102.71c.22,0,.37-.08.46-.25.09-.16.13-.42.13-.77s-.05-.64-.14-.81c-.09-.18-.25-.26-.46-.26-.39,0-.59.36-.59,1.08,0,.67.2,1.01.6,1.01Z"/>
+            <path class="cls-1" d="M18.88,104.67c-.36,0-.62-.12-.8-.37-.18-.24-.27-.64-.27-1.19v-1.93c0-.23-.05-.38-.14-.44-.09-.06-.2-.09-.34-.09h-.03v-.33h1.2v2.77c0,.36.04.63.13.82s.25.27.49.27c.26,0,.45-.12.56-.36.11-.24.17-.56.17-.94v-1.65c0-.25-.04-.42-.13-.48-.09-.07-.2-.1-.34-.1h-.02v-.33h1.19v3.4c0,.24.05.39.14.45.1.06.21.09.35.09h.03v.33h-1.07l-.1-.65h-.03c-.12.28-.26.47-.42.58-.16.1-.35.16-.57.16Z"/>
+            <path class="cls-1" d="M22.49,104.67c-.27,0-.49-.1-.68-.31-.19-.21-.28-.53-.28-.96s.12-.74.35-.94c.24-.2.6-.31,1.08-.33l.52-.02v-.49c0-.3-.03-.54-.1-.72-.07-.18-.22-.27-.45-.27s-.37.08-.44.24c-.07.16-.1.37-.1.63-.39,0-.59-.16-.59-.49,0-.24.11-.43.32-.56s.5-.2.86-.2c.39,0,.69.1.89.31.2.21.3.57.3,1.07v2.06c0,.22.03.37.09.45.06.08.16.12.3.12h.02v.33h-.95l-.1-.7h-.05c-.09.15-.18.28-.26.4s-.19.21-.3.28c-.12.07-.26.1-.44.1ZM22.71,104.26c.23,0,.42-.11.56-.34.14-.23.21-.51.21-.85v-.65l-.37.02c-.33.02-.56.12-.68.28-.13.17-.19.41-.19.72,0,.24.04.44.11.59.07.15.19.22.36.22Z"/>
+            <path class="cls-1" d="M24.9,106.47v-.37c.41,0,.71-.13.92-.39.2-.26.36-.63.49-1.1l-1.14-3.54c-.06-.18-.12-.29-.17-.34-.06-.05-.14-.08-.27-.08h-.02v-.33h1.58v.33h-.02c-.15,0-.25.03-.3.08s-.08.11-.08.19c0,.07.01.15.03.23.02.09.05.19.09.31l.38,1.28c.08.26.14.49.19.69s.08.37.1.51c.05-.28.13-.61.23-.98l.4-1.58c.03-.08.05-.16.06-.23s.02-.15.02-.22c0-.11-.03-.18-.1-.21-.06-.04-.16-.06-.29-.06h-.02v-.33h1.3v.33h-.02c-.08,0-.15.01-.21.04s-.1.08-.15.16c-.05.08-.09.21-.14.38l-.96,3.32c-.11.39-.21.71-.31.95-.1.25-.2.44-.33.58-.12.14-.28.24-.47.29-.19.06-.43.08-.72.08h-.07Z"/>
+          </g>
+        </g>
+      </g>
+      <g>
+        <polygon class="cls-2" points="171.61 28.93 142.68 28.93 171.61 57.87 171.61 28.93"/>
+        <polygon class="cls-2" points="142.68 0 171.61 0 142.68 28.93 142.68 0"/>
+        <polygon class="cls-2" points="229.48 28.93 200.55 28.93 229.48 57.87 229.48 28.93"/>
+        <polygon class="cls-2" points="229.48 0 258.41 0 229.48 28.93 229.48 0"/>
+        <polygon class="cls-2" points="258.41 28.93 287.34 28.93 258.41 57.87 258.41 28.93"/>
+        <polygon class="cls-2" points="200.55 0 229.48 0 200.55 28.93 200.55 0"/>
+      </g>
+    </g>
+  </g>
+</svg>
+    </div>
+  </div>
+  <a class="hero__scroll" href="#tributacao-teaser" aria-label="Explorar">
+    <span class="hero__scroll-line"></span>
+    <span class="hero__scroll-txt" data-i18n="hero.scroll">Explorar</span>
+  </a>
+</section>
+
+<!-- ============ TRIBUTAÇÃO — teaser ============ -->
+<section class="tax-teaser" id="tributacao-teaser">
+  <div class="tax-teaser__inner">
+    <h2 class="tax-teaser__title reveal" data-i18n="tax.title">A tributação mais <em>competitiva</em> da América do Sul.</h2>
+    <div class="tax-teaser__side reveal">
+      <p data-i18n="tax.desc">Conheça as vantagens tributárias do Paraguai — Regime de Maquila, Ley de Inversiones e Certificado de Origem Mercosul, combinados numa única operação.</p>
+      <a class="btn btn--dark" href="tributacao.html"><span data-i18n="tax.cta">Conhecer as vantagens</span> <span class="btn__arrow">→</span></a>
+    </div>
   </div>
 </section>
 
-<!-- ============ 03 · LOCALIZAÇÃO ============ -->
-<section class="section section--tint" id="localizacao">
-  <div class="section__head reveal">
-    <p class="eyebrow">03 — Localização</p>
-    <h2>A escolha certa tem <em>endereço</em>. Villeta – PY</h2>
-    <p class="lead">Acesso direto à Hidrovia Paraná–Paraguai e ao corredor rodoviário do Mercosul. <a class="link" href="https://maps.app.goo.gl/oV7XiWquCpgAhZYX7" target="_blank" rel="noopener">Abrir no Google Maps ↗</a></p>
-  </div>
+<!-- ============ MASTERPLAN ============ -->
+<section class="masterplan" id="masterplan">
+  <div class="masterplan__viewport" id="mpViewport">
+    <div class="masterplan__stage" id="mpStage">
+      <img src="assets/web/vista-aerea-park.jpg" alt="Vista aérea do masterplan do Bracerum Park em Villeta" draggable="false" />
+      <div class="masterplan__pins" id="mpPins"></div>
+    </div>
+    <div class="masterplan__scrim"></div>
 
-  <div class="hwy-callout reveal">
-    <span class="hwy-callout__badge">PY19</span>
-    <p>O Bracerum Park está localizado <strong>sobre a mesma rodovia que serve o Terport e o Puerto Seguro</strong>: a carga sai do galpão direto para o cais, sem travessias urbanas.</p>
-  </div>
-
-  <div class="map-wrap reveal">
-    <div class="map-holder">
-      <div id="map" role="application" aria-label="Mapa interativo da localização do Bracerum Park, portos fluviais e conexões rodoviárias"></div>
-      <button id="recenterBtn" class="recenter" aria-label="Recentralizar no Bracerum Park">
-        <span class="recenter__ico">◎</span> Recentralizar
-      </button>
-      <button id="parkFinder" class="park-finder" aria-label="Ir para o Bracerum Park">
-        <span class="park-finder__arrow" id="parkFinderArrow">➤</span>
-        <span class="park-finder__txt">Bracerum Park</span>
-      </button>
+    <div class="masterplan__head">
+      <p class="eyebrow eyebrow--dark" data-i18n="mp.eyebrow">O Masterplan</p>
+      <h2 data-i18n="mp.title">1.819.856 m² planejados como uma <em>cidade</em></h2>
     </div>
 
-    <aside class="map-panel" id="mapPanel">
-      <h3>Pontos de interesse</h3>
+    <p class="masterplan__hint" data-i18n="mp.hint">Clique nos pontos para explorar cada área</p>
+    <button class="masterplan__back" id="mpBack" data-i18n="mp.back">← Vista geral</button>
 
-      <div class="acc" data-open="true">
-        <button class="acc__head" aria-expanded="true">
-          <span>⚓ Portos fluviais</span><span class="acc__caret">▾</span>
-        </button>
-        <div class="acc__body"><ul id="portList" class="dist-list"></ul></div>
+    <aside class="area-card" id="areaCard">
+      <div class="area-card__media"><img src="" alt="" /></div>
+      <div class="area-card__body">
+        <p class="area-card__eyebrow"></p>
+        <h3 class="area-card__title"></h3>
+        <p class="area-card__val"></p>
+        <p class="area-card__desc"></p>
+        <div class="area-card__nav">
+          <button type="button" data-area-prev data-i18n="mp.prev">← Anterior</button>
+          <button type="button" data-area-next data-i18n="mp.next">Próxima →</button>
+        </div>
       </div>
-
-      <div class="acc">
-        <button class="acc__head" aria-expanded="false">
-          <span>◆ Rodovias · Mercosul</span><span class="acc__caret">▾</span>
-        </button>
-        <div class="acc__body"><ul id="roadList" class="dist-list"></ul></div>
-      </div>
-
-      <div class="acc">
-        <button class="acc__head" aria-expanded="false">
-          <span>✦ Pontos de referência</span><span class="acc__caret">▾</span>
-        </button>
-        <div class="acc__body"><ul id="refList" class="dist-list"></ul></div>
-      </div>
-
-      <p class="map-note">25°46'18.1"S 57°43'56.6"W · Clique em um ponto para navegar. Use o scroll do mouse sobre o mapa para aproximar e afastar. Traçados seguem as rodovias reais (PY19, Acceso Sur e vicinais).</p>
     </aside>
   </div>
-
 </section>
 
-<!-- ============ 04 · CARROSSEL DO PARQUE ============ -->
-<section class="showcase" id="parque">
-  <div class="showcase__head reveal">
-    <p class="eyebrow eyebrow--light">04 — O Parque</p>
-    <h2>Uma cidade completa <em>para a sua indústria</em></h2>
+<!-- ============ LOCALIZAÇÃO ============ -->
+<section class="loc" id="localizacao">
+  <div class="section__head section__head--dark reveal" style="padding-top:clamp(80px,11vw,150px)">
+    <p class="eyebrow eyebrow--dark" data-i18n="loc.eyebrow">Localização</p>
+    <h2><span class="mask"><span class="mask__in" data-i18n="loc.title">A escolha certa tem <em>endereço</em>.</span></span></h2>
+    <p class="lead" data-i18n="loc.lead">Villeta, Paraguai — acesso direto à Hidrovia Paraná–Paraguai e ao corredor rodoviário do Mercosul, sobre a mesma rodovia (PY19) que serve o Terport e o Puerto Seguro.</p>
   </div>
 
-  <div class="carousel reveal" id="carousel" tabindex="0" aria-roledescription="carrossel" aria-label="Imagens do Bracerum Park">
-    <button class="carousel__nav carousel__nav--prev" id="carPrev" aria-label="Imagem anterior">‹</button>
-    <div class="carousel__viewport" id="carViewport">
-      <div class="carousel__track" id="carTrack"><!-- slides via script.js --></div>
-    </div>
-    <button class="carousel__nav carousel__nav--next" id="carNext" aria-label="Próxima imagem">›</button>
+  <div class="loc-map-wrap">
+    <div id="locMap" role="application" aria-label="Mapa interativo do Bracerum Park"></div>
 
-    <div class="carousel__overlay">
-      <p class="carousel__caption" id="carCaption"></p>
-      <div class="carousel__meta">
-        <span class="carousel__counter" id="carCounter"></span>
-        <div class="carousel__dots" id="carDots"></div>
+    <aside class="loc-panel">
+      <h3 data-i18n="loc.panel">Distâncias do Park</h3>
+      <div class="loc-acc" data-open="true">
+        <button class="loc-acc__head" aria-expanded="true"><span data-i18n="loc.ports">Portos fluviais</span><span class="loc-acc__caret">▼</span></button>
+        <div class="loc-acc__body"><ul id="portList"></ul></div>
+      </div>
+      <div class="loc-acc" data-open="false">
+        <button class="loc-acc__head" aria-expanded="false"><span data-i18n="loc.roads">Rodovias · Mercosul</span><span class="loc-acc__caret">▼</span></button>
+        <div class="loc-acc__body"><ul id="roadList"></ul></div>
+      </div>
+      <div class="loc-acc" data-open="false">
+        <button class="loc-acc__head" aria-expanded="false"><span data-i18n="loc.airports">Aeroportos</span><span class="loc-acc__caret">▼</span></button>
+        <div class="loc-acc__body"><ul id="airportList"></ul></div>
+      </div>
+      <div class="loc-acc" data-open="false">
+        <button class="loc-acc__head" aria-expanded="false"><span data-i18n="loc.air">Distâncias aéreas · Brasil</span><span class="loc-acc__caret">▼</span></button>
+        <div class="loc-acc__body"><ul id="capitalList"></ul></div>
+      </div>
+      <div class="loc-acc" data-open="false">
+        <button class="loc-acc__head" aria-expanded="false"><span data-i18n="loc.refs">Pontos de interesse</span><span class="loc-acc__caret">▼</span></button>
+        <div class="loc-acc__body"><ul id="refList"></ul></div>
+      </div>
+    </aside>
+
+    <aside class="poi-card" id="poiCard">
+      <button class="poi-card__close" aria-label="Fechar">✕</button>
+      <div class="poi-card__media"></div>
+      <div class="poi-card__body">
+        <p class="poi-card__type"></p>
+        <h3 class="poi-card__title"></h3>
+        <div class="poi-card__stats">
+          <div><span data-i18n="loc.fromPark">Do Park</span><b data-poi-km></b></div>
+          <div><span data-i18n="loc.time">Tempo</span><b data-poi-time></b></div>
+        </div>
+        <p class="poi-card__desc"></p>
+        <button class="poi-card__route" data-i18n="loc.showRoute">Ver rota a partir do Park →</button>
+      </div>
+    </aside>
+
+    <div class="park-indicator" id="parkIndicator">
+      <span class="park-indicator__arrow">↑</span>
+      <span>Bracerum Park<small><span data-park-dist></span></small></span>
+    </div>
+
+    <button id="recenterBtn" class="recenter" data-i18n="loc.recenter">Recentralizar</button>
+    <p class="map-note" data-i18n="loc.clickHint">Clique em um ponto do mapa para ver detalhes</p>
+  </div>
+</section>
+
+<!-- ============ COMO FUNCIONA ============ -->
+<section class="steps" id="jornada">
+  <div class="steps__pin" id="stepsPin">
+    <div class="steps__grid">
+      <div class="steps__intro">
+        <p class="eyebrow" data-i18n="steps.eyebrow">Como funciona</p>
+        <h2><span class="mask"><span class="mask__in" data-i18n="steps.title">Da decisão à <em>primeira exportação</em></span></span></h2>
+        <p class="lead" data-i18n="steps.lead">O caminho é conhecido e assessorado em todas as etapas pelas equipes jurídica e contábil do Bracerum Park — do CNIME ao primeiro embarque.</p>
+
+        <div class="steps__visual">
+          <img class="is-active" src="assets/renders/centro-empresarial-1.jpg" alt="" loading="lazy" />
+          <img src="assets/renders/escritorios-2.jpg" alt="" loading="lazy" />
+          <img src="assets/web/internas-07.jpg" alt="" loading="lazy" />
+          <img src="assets/web/internas-01.jpg" alt="" loading="lazy" />
+          <img src="assets/renders/escritorios-3.jpg" alt="" loading="lazy" />
+        </div>
+
+        <div class="steps__progress">
+          <span id="stepsCounter">01 / 05</span>
+          <div class="steps__progress-track"><div class="steps__progress-fill" id="stepsFill"></div></div>
+        </div>
+      </div>
+
+      <div class="steps__list" id="stepsList">
+        <article class="step is-active">
+          <p class="step__num">01</p>
+          <div>
+            <span class="step__tag" data-i18n="steps.1.tag">Etapa 1</span>
+            <h3 class="step__title" data-i18n="steps.1.title">Constituição da empresa</h3>
+            <p class="step__desc" data-i18n="steps.1.desc">Abertura da sociedade paraguaia — 100% de capital estrangeiro, sem exigência de sócio local.</p>
+          </div>
+        </article>
+        <article class="step">
+          <p class="step__num">02</p>
+          <div>
+            <span class="step__tag" data-i18n="steps.2.tag">Etapa 2</span>
+            <h3 class="step__title" data-i18n="steps.2.title">Programa de Maquila</h3>
+            <p class="step__desc" data-i18n="steps.2.desc">Projeto submetido ao CNIME: produto, insumos, mão de obra e destinos de exportação.</p>
+          </div>
+        </article>
+        <article class="step">
+          <p class="step__num">03</p>
+          <div>
+            <span class="step__tag" data-i18n="steps.3.tag">Etapa 3</span>
+            <h3 class="step__title" data-i18n="steps.3.title">Instalação no galpão</h3>
+            <p class="step__desc" data-i18n="steps.3.desc">Built-to-Suit no Park com a velocidade do Steel Frame próprio; máquinas entram sem tributos.</p>
+          </div>
+        </article>
+        <article class="step">
+          <p class="step__num">04</p>
+          <div>
+            <span class="step__tag" data-i18n="steps.4.tag">Etapa 4</span>
+            <h3 class="step__title" data-i18n="steps.4.title">Primeiro embarque</h3>
+            <p class="step__desc" data-i18n="steps.4.desc">Insumos entram suspensos, a produção sai com Certificado de Origem Mercosul.</p>
+          </div>
+        </article>
+        <article class="step">
+          <p class="step__num">05</p>
+          <div>
+            <span class="step__tag" data-i18n="steps.5.tag">Rotina contínua</span>
+            <h3 class="step__title" data-i18n="steps.5.title">Rotina mensal</h3>
+            <p class="step__desc" data-i18n="steps.5.desc">Tributo único de 1% e prestação de contas ao CNIME — rotina fiscal simples e auditável.</p>
+          </div>
+        </article>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ============ 05 · VANTAGENS ============ -->
-<section class="section section--tint" id="vantagens">
-  <div class="section__head reveal">
-    <p class="eyebrow">05 — A Tese Fiscal</p>
-    <h2>A tributação que <em>muda o jogo</em></h2>
-    <p class="lead">Um regime para investir, um para produzir e um para vender. A mesma operação captura os três.</p>
+<!-- ============ GALERIA ============ -->
+<section class="gallery bleed" id="galeria" style="padding:clamp(80px,11vw,150px) 0">
+  <div class="section__head section__head--dark reveal">
+    <p class="eyebrow eyebrow--dark" data-i18n="gal.eyebrow">O Parque</p>
+    <h2><span class="mask"><span class="mask__in" data-i18n="gal.title">Uma cidade completa <em>para a sua indústria</em></span></span></h2>
   </div>
 
-  <div class="regimes reveal">
-    <article class="regime">
-      <span class="regime__num">01</span>
-      <h3>Regime de Maquila</h3>
-      <p class="regime__big">1% <small>tributo único</small></p>
-      <p>Produza e exporte pagando 1% sobre o maior valor entre o agregado nacional e a fatura de exportação — frente a alíquotas de 25% a 35% nos países vizinhos. Benefícios por até 20 anos, renováveis (Lei 7.547/2025).</p>
-      <ul>
-        <li>Importação com tributos suspensos</li>
-        <li>Venda parcial permitida no mercado interno</li>
-        <li>100% de capital estrangeiro permitido</li>
-      </ul>
-    </article>
-    <article class="regime">
-      <span class="regime__num">02</span>
-      <h3>Ley de Inversiones</h3>
-      <p class="regime__big">0% <small>impostos na entrada</small></p>
-      <p>Novo regime que substitui a Lei 60/90: projetos aprovados recebem isenções sobre tudo o que entra no país para construir e equipar a operação (a partir de US$ 13 mi — Lei 7.548/2025).</p>
-      <ul>
-        <li>0% de tributos aduaneiros e 0% de IVA em bens de capital</li>
-        <li>Isenção sobre remessas de lucros e dividendos por 10 anos</li>
-        <li>Isenção sobre financiamento externo</li>
-      </ul>
-    </article>
-    <article class="regime">
-      <span class="regime__num">03</span>
-      <h3>Certificado Mercosul</h3>
-      <p class="regime__big">0% <small>tarifa no bloco</small></p>
-      <p>O Paraguai é membro pleno do Mercosul. Produtos fabricados no Bracerum Park que cumprem as regras de origem circulam com tarifa zero em todo o bloco.</p>
-      <ul>
-        <li>+270 milhões de consumidores</li>
-        <li>Acesso preferencial a Brasil, Argentina e Uruguai</li>
-        <li>Até 35% de tarifa externa (TEC) evitada</li>
-      </ul>
-    </article>
-  </div>
-
-  <div class="extras reveal">
-    <div class="extra"><strong>10 · 10 · 10</strong><span>Regime fiscal do Paraguai</span></div>
-    <div class="extra"><strong>Investor Pass</strong><span>Residência permanente direta · dividendos a 8% para residentes (Res. MIC 283/2026)</span></div>
-    <div class="extra"><strong>Itaipu + Yacyretá</strong><span>Redundância energética em média e alta tensão · subestação a 7,4 km</span></div>
-    <div class="extra"><strong>3 fábricas próprias</strong><span>Steel Frame, Concreto e Pavers — obra sem terceiros, com prazo e custo comprados</span></div>
-  </div>
-</section>
-
-<!-- ============ 06 · EMPRESAS ============ -->
-<section class="section" id="empresas">
-  <div class="section__head reveal">
-    <p class="eyebrow">06 — Validação de Mercado</p>
-    <h2>Empresas que já estão <em>moldando o futuro</em> de Villeta</h2>
-    <p class="lead">Villeta já atrai as indústrias globais: <strong>+US$ 3 bi</strong> em cadeias produtivas na região, aluguéis de galpões subindo <strong>+20% a.a.</strong> e valorização projetada de <strong>+205%</strong> até 2030.</p>
-  </div>
-
-  <div class="table-tools reveal">
-    <input type="search" id="tableSearch" placeholder="Buscar empresa, país ou setor…" aria-label="Buscar na tabela" />
-    <div class="table-filters" id="tableFilters">
-      <button class="chip is-active" data-filter="all">Todas</button>
-      <button class="chip" data-filter="villeta">Em Villeta</button>
-      <button class="chip" data-filter="paraguai">No Paraguai</button>
+  <div class="gallery-accordion" id="galleryAccordion">
+    <div class="gallery-panel is-active">
+      <img src="assets/web/internas-01.jpg" alt="Vias internas do parque industrial" loading="lazy" />
+      <div class="gallery-panel__label"><span class="num">01</span><span class="name" data-i18n="gal.1">Vias do Park</span></div>
+    </div>
+    <div class="gallery-panel">
+      <img src="assets/web/internas-07.jpg" alt="Galpões industriais Built-to-Suit" loading="lazy" />
+      <div class="gallery-panel__label"><span class="num">02</span><span class="name" data-i18n="gal.2">Galpões</span></div>
+    </div>
+    <div class="gallery-panel">
+      <img src="assets/renders/fabrica-bracerum-noturna.jpg" alt="Fábrica Bracerum à noite" loading="lazy" />
+      <div class="gallery-panel__label"><span class="num">03</span><span class="name" data-i18n="gal.3">Fábrica</span></div>
+    </div>
+    <div class="gallery-panel">
+      <img src="assets/web/hero-hotel-noturno.jpg" alt="Hotel e Centro de Convenções" loading="lazy" />
+      <div class="gallery-panel__label"><span class="num">04</span><span class="name" data-i18n="gal.4">Hotel &amp; Convenções</span></div>
+    </div>
+    <div class="gallery-panel">
+      <img src="assets/renders/condominio-casa-fachada.jpg" alt="Condomínio Bracerum Resort" loading="lazy" />
+      <div class="gallery-panel__label"><span class="num">05</span><span class="name" data-i18n="gal.5">Condomínio</span></div>
+    </div>
+    <div class="gallery-panel">
+      <img src="assets/renders/clube-bracerum-1.jpg" alt="Clube Bracerum" loading="lazy" />
+      <div class="gallery-panel__label"><span class="num">06</span><span class="name" data-i18n="gal.6">Clube</span></div>
+    </div>
+    <div class="gallery-panel">
+      <img src="assets/renders/eventos-gastronomia-1.jpg" alt="Eventos e gastronomia" loading="lazy" />
+      <div class="gallery-panel__label"><span class="num">07</span><span class="name" data-i18n="gal.7">Eventos</span></div>
     </div>
   </div>
-
-  <div class="table-wrap reveal">
-    <table class="companies" id="companiesTable">
-      <thead>
-        <tr>
-          <th data-sort="name" class="sortable">Empresa <span class="arrow"></span></th>
-          <th data-sort="country" class="sortable">Origem <span class="arrow"></span></th>
-          <th data-sort="sector" class="sortable">Setor <span class="arrow"></span></th>
-          <th data-sort="value" class="sortable">Investimento <span class="arrow"></span></th>
-          <th>Destaque</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </div>
-  <p class="table-note reveal">Valores conforme divulgação pública / material do projeto. "n/d" = não divulgado.</p>
-
-  <!-- Mobile: faixa de logotipos monocromáticos (preenchida via script.js) -->
-  <div class="logos-strip" id="logosStrip"></div>
 </section>
 
-<!-- ============ 07 · FOOTER ============ -->
+<!-- ============ EMPRESAS ============ -->
+<section class="companies bleed" id="empresas" style="padding:clamp(80px,11vw,150px) 0">
+  <div class="section" style="padding-top:0;padding-bottom:0">
+    <div class="section__head reveal">
+      <p class="eyebrow" data-i18n="co.eyebrow">Validação de mercado</p>
+      <h2><span class="mask"><span class="mask__in" data-i18n="co.title">Empresas que já estão <em>moldando o futuro</em> de Villeta</span></span></h2>
+      <p class="lead" data-i18n="co.lead">+US$ 3 bi em cadeias produtivas na região e mais de 230 empresas brasileiras já produzindo no Paraguai sob regime de maquila.</p>
+    </div>
+    <div class="companies-grid reveal">
+      <div class="companies-grid__item"><img src="assets/be8-gray.svg" alt="Be8" /></div>
+      <div class="companies-grid__item"><img src="assets/Ball_Corporation_logo_2024.svg" alt="Ball Corporation" /></div>
+      <div class="companies-grid__item"><img src="assets/cremer.svg" alt="Cremer" /></div>
+      <div class="companies-grid__item"><img src="assets/Lupo_logo (1).svg" alt="Lupo" /></div>
+      <div class="companies-grid__item"><img src="assets/Kingspan_Group_logo.svg" alt="Kingspan" /></div>
+    </div>
+
+    <div class="advisory reveal" style="margin-top:clamp(56px,7vw,96px)">
+      <div>
+        <h2 data-i18n="adv.title">Do enquadramento tributário ao primeiro embarque, sua empresa não anda sozinha.</h2>
+        <p data-i18n="adv.desc">A Bracerum acompanha sua empresa na escolha do melhor enquadramento — Maquila, Ley de Inversiones ou ambos — com o suporte da equipe jurídica e contábil dedicada do Bracerum Park.</p>
+      </div>
+      <a class="btn btn--dark" href="#contato"><span data-i18n="adv.cta">Falar com o time</span> <span class="btn__arrow">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ HISTÓRIA / BRACERUM ============ -->
+<section class="history">
+  <div class="history__inner">
+    <div class="history__logo reveal">
+      <img src="assets/logo/bracerum-white.svg" alt="Bracerum" />
+      <small data-i18n="hist.small">Origem do grupo</small>
+    </div>
+    <div class="history__text reveal">
+      <h3 data-i18n="hist.title">Décadas de aço, agora uma cidade industrial.</h3>
+      <p data-i18n="hist.desc">A Bracerum nasceu como importadora de aço plano revestido e trader global. A mesma disciplina de operação, logística e execução está por trás do masterplan e das três fábricas próprias que constroem o Bracerum Park.</p>
+      <a class="btn btn--dark" href="bracerum.html" style="margin-top:26px"><span data-i18n="hist.cta">Conhecer a Bracerum</span> <span class="btn__arrow">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
 <footer class="footer" id="contato">
   <div class="footer__inner reveal">
-    <p class="footer__brand"><span class="brand__main">BRACERUM</span><span class="brand__slash">/</span><span class="brand__park">PARK</span></p>
-    <p class="footer__sub">Paraguay · Villeta Industrial City · 2026</p>
-    <h2 class="footer__cta">Vamos construir a porta de entrada industrial do <em>Mercosul</em>?</h2>
+    <div class="footer__top">
+      <img class="footer__brand" src="assets/logo/logo-horizontal-cream.svg" alt="Bracerum Park" />
+      <h2 class="footer__cta" data-i18n="ft.cta">Vamos construir a porta de entrada industrial do <em>Mercosul</em>?</h2>
+    </div>
     <div class="footer__contacts">
       <div class="contact-card">
-        <span class="contact-card__name">Cleber Pavao</span>
-        <span class="contact-card__phone">+55 11 98651-6065</span>
-        <div class="contact-card__links">
-          <a href="https://wa.me/5511986516065?text=Ol%C3%A1%20Cleber.%20Estou%20no%20site%20do%20Bracerum%20Park%20e%20gostaria%20de%20saber%20mais%20sobre%20o%20projeto" target="_blank" rel="noopener" class="contact-btn contact-btn--wa">
-            <svg viewBox="0 0 32 32" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M16.04 3C9.06 3 3.4 8.66 3.4 15.64c0 2.23.58 4.4 1.69 6.32L3.3 28.7l6.9-1.81a12.6 12.6 0 0 0 5.84 1.49h.01c6.98 0 12.64-5.66 12.64-12.64C28.69 8.66 23.02 3 16.04 3zm0 22.99h-.01a10.5 10.5 0 0 1-5.35-1.47l-.38-.23-3.98 1.05 1.06-3.88-.25-.4a10.47 10.47 0 0 1-1.61-5.61c0-5.8 4.72-10.52 10.53-10.52 2.81 0 5.45 1.1 7.44 3.08a10.46 10.46 0 0 1 3.08 7.45c0 5.8-4.72 10.52-10.53 10.52zm5.77-7.88c-.32-.16-1.87-.92-2.16-1.03-.29-.11-.5-.16-.71.16-.21.32-.82 1.03-1 1.24-.18.21-.37.24-.68.08-.32-.16-1.34-.49-2.55-1.57-.94-.84-1.57-1.87-1.76-2.19-.18-.32-.02-.49.14-.65.14-.14.32-.37.47-.55.16-.19.21-.32.32-.53.11-.21.05-.4-.03-.55-.08-.16-.71-1.71-.97-2.35-.26-.62-.52-.53-.71-.54l-.6-.01c-.21 0-.55.08-.84.4-.29.32-1.1 1.08-1.1 2.63 0 1.55 1.13 3.05 1.29 3.26.16.21 2.23 3.4 5.4 4.77.75.33 1.34.52 1.8.67.76.24 1.45.21 1.99.13.61-.09 1.87-.77 2.13-1.5.26-.74.26-1.37.18-1.5-.08-.13-.29-.21-.6-.37z"/></svg>
-            WhatsApp
-          </a>
-          <a href="https://instagram.com/pavaocleber" target="_blank" rel="noopener" class="contact-btn contact-btn--ig">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12 2.16c3.2 0 3.58.01 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.25 1.8-.41 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.8-.25-2.23-.41a3.7 3.7 0 0 1-1.38-.9 3.7 3.7 0 0 1-.9-1.38c-.16-.42-.36-1.06-.41-2.23C2.17 15.58 2.16 15.2 2.16 12s.01-3.58.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41C8.42 2.17 8.8 2.16 12 2.16zm0 1.62c-3.15 0-3.52.01-4.76.07-.9.04-1.39.19-1.71.32-.43.17-.74.37-1.06.69-.32.32-.52.63-.69 1.06-.13.32-.28.81-.32 1.71-.06 1.24-.07 1.61-.07 4.76s.01 3.52.07 4.76c.04.9.19 1.39.32 1.71.17.43.37.74.69 1.06.32.32.63.52 1.06.69.32.13.81.28 1.71.32 1.24.06 1.61.07 4.76.07s3.52-.01 4.76-.07c.9-.04 1.39-.19 1.71-.32.43-.17.74-.37 1.06-.69.32-.32.52-.63.69-1.06.13-.32.28-.81.32-1.71.06-1.24.07-1.61.07-4.76s-.01-3.52-.07-4.76c-.04-.9-.19-1.39-.32-1.71a2.85 2.85 0 0 0-.69-1.06 2.85 2.85 0 0 0-1.06-.69c-.32-.13-.81-.28-1.71-.32-1.24-.06-1.61-.07-4.76-.07zm0 2.76a5.3 5.3 0 1 1 0 10.6 5.3 5.3 0 0 1 0-10.6zm0 8.74a3.44 3.44 0 1 0 0-6.88 3.44 3.44 0 0 0 0 6.88zm6.75-8.93a1.24 1.24 0 1 1-2.48 0 1.24 1.24 0 0 1 2.48 0z"/></svg>
-            @pavaocleber
-          </a>
+        <span class="contact-card__name">Cleber Pavão</span>
+        <span class="contact-card__line"><b data-i18n="ft.py">Paraguai</b><a href="tel:+595985516065">+595 985 516 065</a></span>
+        <span class="contact-card__line"><b data-i18n="ft.br">Brasil</b><a href="tel:+5511986516065">+55 11 98651-6065</a></span>
+        <span class="contact-card__line"><a href="mailto:cleber@bracerum.com">cleber@bracerum.com</a></span>
+        <div class="contact-card__links" style="margin-top:14px">
+          <a href="https://wa.me/595985516065" target="_blank" rel="noopener" class="contact-btn">WhatsApp</a>
+          <a href="https://instagram.com/pavaocleber" target="_blank" rel="noopener" class="contact-btn">@pavaocleber</a>
         </div>
       </div>
       <div class="contact-card">
         <span class="contact-card__name">Sydney Savi</span>
-        <span class="contact-card__phone">+55 47 98803-0200</span>
-        <div class="contact-card__links">
-          <a href="https://wa.me/5547988030200?text=Ol%C3%A1%20Sydney.%20Estou%20no%20site%20do%20Bracerum%20Park%20e%20gostaria%20de%20saber%20mais%20sobre%20o%20projeto" target="_blank" rel="noopener" class="contact-btn contact-btn--wa">
-            <svg viewBox="0 0 32 32" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M16.04 3C9.06 3 3.4 8.66 3.4 15.64c0 2.23.58 4.4 1.69 6.32L3.3 28.7l6.9-1.81a12.6 12.6 0 0 0 5.84 1.49h.01c6.98 0 12.64-5.66 12.64-12.64C28.69 8.66 23.02 3 16.04 3zm0 22.99h-.01a10.5 10.5 0 0 1-5.35-1.47l-.38-.23-3.98 1.05 1.06-3.88-.25-.4a10.47 10.47 0 0 1-1.61-5.61c0-5.8 4.72-10.52 10.53-10.52 2.81 0 5.45 1.1 7.44 3.08a10.46 10.46 0 0 1 3.08 7.45c0 5.8-4.72 10.52-10.53 10.52zm5.77-7.88c-.32-.16-1.87-.92-2.16-1.03-.29-.11-.5-.16-.71.16-.21.32-.82 1.03-1 1.24-.18.21-.37.24-.68.08-.32-.16-1.34-.49-2.55-1.57-.94-.84-1.57-1.87-1.76-2.19-.18-.32-.02-.49.14-.65.14-.14.32-.37.47-.55.16-.19.21-.32.32-.53.11-.21.05-.4-.03-.55-.08-.16-.71-1.71-.97-2.35-.26-.62-.52-.53-.71-.54l-.6-.01c-.21 0-.55.08-.84.4-.29.32-1.1 1.08-1.1 2.63 0 1.55 1.13 3.05 1.29 3.26.16.21 2.23 3.4 5.4 4.77.75.33 1.34.52 1.8.67.76.24 1.45.21 1.99.13.61-.09 1.87-.77 2.13-1.5.26-.74.26-1.37.18-1.5-.08-.13-.29-.21-.6-.37z"/></svg>
-            WhatsApp
-          </a>
-          <a href="https://instagram.com/sydneysavi" target="_blank" rel="noopener" class="contact-btn contact-btn--ig">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12 2.16c3.2 0 3.58.01 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.25 1.8-.41 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.8-.25-2.23-.41a3.7 3.7 0 0 1-1.38-.9 3.7 3.7 0 0 1-.9-1.38c-.16-.42-.36-1.06-.41-2.23C2.17 15.58 2.16 15.2 2.16 12s.01-3.58.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41C8.42 2.17 8.8 2.16 12 2.16zm0 1.62c-3.15 0-3.52.01-4.76.07-.9.04-1.39.19-1.71.32-.43.17-.74.37-1.06.69-.32.32-.52.63-.69 1.06-.13.32-.28.81-.32 1.71-.06 1.24-.07 1.61-.07 4.76s.01 3.52.07 4.76c.04.9.19 1.39.32 1.71.17.43.37.74.69 1.06.32.32.63.52 1.06.69.32.13.81.28 1.71.32 1.24.06 1.61.07 4.76.07s3.52-.01 4.76-.07c.9-.04 1.39-.19 1.71-.32.43-.17.74-.37 1.06-.69.32-.32.52-.63.69-1.06.13-.32.28-.81.32-1.71.06-1.24.07-1.61.07-4.76s-.01-3.52-.07-4.76c-.04-.9-.19-1.39-.32-1.71a2.85 2.85 0 0 0-.69-1.06 2.85 2.85 0 0 0-1.06-.69c-.32-.13-.81-.28-1.71-.32-1.24-.06-1.61-.07-4.76-.07zm0 2.76a5.3 5.3 0 1 1 0 10.6 5.3 5.3 0 0 1 0-10.6zm0 8.74a3.44 3.44 0 1 0 0-6.88 3.44 3.44 0 0 0 0 6.88zm6.75-8.93a1.24 1.24 0 1 1-2.48 0 1.24 1.24 0 0 1 2.48 0z"/></svg>
-            @sydneysavi
-          </a>
+        <span class="contact-card__line"><b data-i18n="ft.py">Paraguai</b><a href="tel:+595983030200">+595 983 030 200</a></span>
+        <span class="contact-card__line"><b data-i18n="ft.br">Brasil</b><a href="tel:+5547988030200">+55 47 98803-0200</a></span>
+        <span class="contact-card__line"><a href="mailto:sydney@bracerum.com">sydney@bracerum.com</a></span>
+        <div class="contact-card__links" style="margin-top:14px">
+          <a href="https://wa.me/595983030200" target="_blank" rel="noopener" class="contact-btn">WhatsApp</a>
+          <a href="https://instagram.com/sydneysavi" target="_blank" rel="noopener" class="contact-btn">@sydneysavi</a>
         </div>
       </div>
     </div>
     <div class="footer__meta">
       <a href="https://maps.app.goo.gl/oV7XiWquCpgAhZYX7" target="_blank" rel="noopener">25°46'18.1"S 57°43'56.6"W · Villeta, Paraguai</a>
-      <span>© 2026 Bracerum Park. Todos os direitos reservados.</span>
+      <span data-i18n="ft.rights">© 2026 Bracerum Park. Todos os direitos reservados.</span>
     </div>
   </div>
 </footer>
 
-<!-- WhatsApp flutuante -->
-<a class="wa-float" target="_blank" rel="noopener" aria-label="Falar no WhatsApp"
-   href="https://wa.me/5511986516065?text=Ol%C3%A1%20Cleber.%20Estou%20no%20site%20do%20Bracerum%20Park%20e%20gostaria%20de%20saber%20mais%20sobre%20o%20projeto">
-  <svg viewBox="0 0 32 32" width="30" height="30" fill="currentColor" aria-hidden="true">
+<a class="wa-float" target="_blank" rel="noopener" aria-label="WhatsApp"
+   href="https://wa.me/595985516065?text=Ol%C3%A1.%20Estou%20no%20site%20do%20Bracerum%20Park%20e%20gostaria%20de%20saber%20mais%20sobre%20o%20projeto">
+  <svg viewBox="0 0 32 32" width="22" height="22" fill="currentColor" aria-hidden="true">
     <path d="M16.04 3C9.06 3 3.4 8.66 3.4 15.64c0 2.23.58 4.4 1.69 6.32L3.3 28.7l6.9-1.81a12.6 12.6 0 0 0 5.84 1.49h.01c6.98 0 12.64-5.66 12.64-12.64C28.69 8.66 23.02 3 16.04 3zm0 22.99h-.01a10.5 10.5 0 0 1-5.35-1.47l-.38-.23-3.98 1.05 1.06-3.88-.25-.4a10.47 10.47 0 0 1-1.61-5.61c0-5.8 4.72-10.52 10.53-10.52 2.81 0 5.45 1.1 7.44 3.08a10.46 10.46 0 0 1 3.08 7.45c0 5.8-4.72 10.52-10.53 10.52zm5.77-7.88c-.32-.16-1.87-.92-2.16-1.03-.29-.11-.5-.16-.71.16-.21.32-.82 1.03-1 1.24-.18.21-.37.24-.68.08-.32-.16-1.34-.49-2.55-1.57-.94-.84-1.57-1.87-1.76-2.19-.18-.32-.02-.49.14-.65.14-.14.32-.37.47-.55.16-.19.21-.32.32-.53.11-.21.05-.4-.03-.55-.08-.16-.71-1.71-.97-2.35-.26-.62-.52-.53-.71-.54l-.6-.01c-.21 0-.55.08-.84.4-.29.32-1.1 1.08-1.1 2.63 0 1.55 1.13 3.05 1.29 3.26.16.21 2.23 3.4 5.4 4.77.75.33 1.34.52 1.8.67.76.24 1.45.21 1.99.13.61-.09 1.87-.77 2.13-1.5.26-.74.26-1.37.18-1.5-.08-.13-.29-.21-.6-.37z"/>
   </svg>
 </a>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-<script src="script.js?v=8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="i18n.js?v=12"></script>
+<script src="script.js?v=12"></script>
 </body>
 </html>
