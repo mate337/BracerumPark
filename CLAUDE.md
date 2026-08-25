@@ -7,7 +7,7 @@ Site institucional do **Bracerum Park**, cidade industrial multiuso em Villeta, 
 O site tem **3 páginas**: `index.html`, `tributacao.html` e `bracerum.html`, mais `i18n.js`, `style.css` e `script.js`.
 
 ### Regras de design **obrigatórias** (definidas pelo cliente)
-- **Paleta: SOMENTE preto, branco e bege/marrom** (`--ink #0e0d0b`, `--paper #f7f3ea`, `--sand #cbb88f`, `--brown #473315`). **Zero vermelho e zero azul na UI.** (O vermelho/azul do hero é a iluminação cênica do render — ok. O azul-claro do rio no mapa é semântico, para indicar água — aprovado pelo pedido do cliente.)
+- **Paleta: preto, branco e bege/marrom** (`--ink #0e0d0b`, `--paper #f7f3ea`, `--sand #cbb88f`, `--brown #473315`). **Zero vermelho.** Azul só nos três casos pedidos pelo cliente: a faixa institucional da Bracerum (`--brc-blue #1c4d9d`), a água do mapa (semântica) e a iluminação cênica do render do hero.
 - **Tipografia: Helvetica** (UI/corpo, stack de sistema) **+ Noto Serif** (display/títulos, itálico como ênfase no lugar de cor).
 - **Cantos quadrados** — sem border-radius chamativo.
 - **Nav oculta enquanto o hero está em tela cheia**; entra deslizando após rolar. **Não existe menu lateral/painel** (removido a pedido).
@@ -21,13 +21,13 @@ O HTML carrega **português**; `i18n.js` traz dicionários **EN** e **ES** que s
 **Atenção:** o helper chama-se `tr()` e **não** `L()`, porque `L` é o global do Leaflet. Ao adicionar texto novo, incluir a chave nos dois dicionários (há um script de conferência no histórico da sessão).
 
 ### Estrutura do index
-loader → hero (Ken Burns + dots) → teaser de tributação → masterplan com zoom por área (`AREAS` no script.js, coordenadas em % sobre `assets/web/vista-aerea-park.jpg`) → mapa Leaflet dark full-bleed → "Como funciona" (coluna sticky + IntersectionObserver — **não usar pin do ScrollTrigger, causou sobreposição e espaço em branco**) → sanfona escura → empresas → assessoria → faixa história → footer.
+loader → hero (Ken Burns + dots) → teaser de tributação → masterplan com zoom por área (`AREAS` no script.js, coordenadas em % sobre `assets/web/vista-aerea-park.jpg`) → mapa Leaflet dark full-bleed → "Como funciona" (seção de exatamente `100svh` fixada com `ScrollTrigger.pin`: primeiro ela se centraliza, depois o scroll avança os tópicos. **A altura fixa é o que evita a sobreposição e o espaço em branco da v2** — se mudar o conteúdo, manter o bloco cabendo em uma tela) → sanfona escura → empresas → assessoria → faixa história → footer.
 
 ### Mapa
 **Água:** o basemap é o CARTO Voyager (claro) num pane próprio com `filter: invert(1) hue-rotate(180deg)…` — isso deixa o terreno escuro e faz rios e lagos serem desenhados **pelo próprio mapa** em azul, com traçado real. Os rótulos vêm do `dark_only_labels` num pane separado, sem filtro. **Não desenhar polilinha de rio por cima** (foi rejeitado pelo cliente).
 **Rotas:** o traçado real por vias vem de `assets/routes.json`, pré-calculado com o OSRM pelo script em `docs/` (regerar com `build_routes.py` se os pontos mudarem). Sem chamada a API em runtime. Capitais brasileiras são trechos aéreos e seguem em arco.
 **Nota:** os km/tempo exibidos são os do catálogo (fonte de verdade do cliente) e diferem do OSRM em alguns trechos curtos (ex.: Terport 23 km/20 min no catálogo vs. 35,7 km/36 min pelas vias públicas do OSM) — o número exibido é o do cliente, a linha é a real.
-Grupos de POI (portos, rodovias, aeroportos, distâncias aéreas de capitais brasileiras, referências); clique no ponto abre cartão com descrição para empresários; clique na lista traça rota indicativa (arco) a partir do Park; indicador flutuante aponta o Park quando ele sai do enquadramento; rótulos de pontos a menos de 12 km só aparecem a partir do zoom 11.
+Grupos de POI (portos, rodovias, aeroportos, distâncias aéreas de capitais brasileiras, referências); clicar no ponto do mapa ou no item da lista faz o mesmo: abre o cartão (foto + descrição para empresários), traça a rota e destaca o item; indicador flutuante aponta o Park quando ele sai do enquadramento; rótulos de pontos a menos de 12 km só aparecem a partir do zoom 11.
 
 O **conteúdo e os dados de negócio** vêm do catálogo V15 e de bracerum.com — fonte de verdade, não inventar números.
 
@@ -53,4 +53,4 @@ Faltam (mencionados no `LEIA-ME.txt` original, ainda não enviados): `tecnologic
 
 ## Próximo passo
 
-Aguardando o usuário: (1) confirmar/enviar o dado de anos de história da Bracerum para a tarja azul; (2) enviar os renders em alta resolução da planta humanizada (Entrada 01) e do masterplan grid completo para recalibrar os hotspots; (3) revisar o protótipo v1 e apontar ajustes de conteúdo/visual.
+Aguardando o usuário: (1) o logo oficial da Bracerum para a faixa azul; (2) as fotos dos pontos de interesse do mapa; (3) o dado de anos de história da Bracerum como importadora de aço.
