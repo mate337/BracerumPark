@@ -54,6 +54,35 @@ por outra. Quando o cliente enviar fotos próprias, trocar o arquivo e ajustar o
 - Implementação: HTML/CSS/JS (mesma stack do projeto atual, sem framework pesado, a menos que o usuário peça).
 - Qualidade: seguir os checklists de UX/UI e visual do guia (acessibilidade WCAG, estados de componente, performance, responsividade mobile-first) antes de considerar qualquer seção "pronta".
 
+### Teste no navegador — `agent-browser`
+
+Automação de navegador via [`agent-browser`](https://github.com/vercel-labs/agent-browser)
+(CLI Rust da Vercel Labs, Chrome por CDP). Usar para conferir o site de verdade — entrada de
+idioma, loader, Ken Burns do hero, zoom do masterplan, pin da seção "Como funciona", mapa
+Leaflet — em vez de julgar só pelo código.
+
+O ambiente do Claude Code na web é efêmero: reinstalar por sessão com
+`npm i -g agent-browser && agent-browser install` (em Linux, `--with-deps` se o Chrome não subir).
+O que fica versionado é o stub da skill em `.agents/skills/agent-browser/` (com symlink em
+`.claude/skills/`) mais o `skills-lock.json`; o conteúdo real vem do CLI com
+`agent-browser skills get core`, então nunca desatualiza.
+
+Fluxo típico (o site é estático, basta servir a pasta):
+
+```bash
+python3 -m http.server 8123 &
+NO_PROXY=127.0.0.1,localhost agent-browser open http://127.0.0.1:8123/index.html
+NO_PROXY=127.0.0.1,localhost agent-browser snapshot      # árvore de acessibilidade com refs @eN
+NO_PROXY=127.0.0.1,localhost agent-browser click @e2     # ex.: escolher o idioma na entrada
+NO_PROXY=127.0.0.1,localhost agent-browser screenshot hero.png
+NO_PROXY=127.0.0.1,localhost agent-browser close
+```
+
+**Atenção:** o `NO_PROXY` é necessário porque o ambiente roteia HTTPS por um proxy — sem ele o
+Chrome não alcança o `127.0.0.1`. E o caminho do `screenshot` é resolvido no diretório de trabalho
+do daemon (o diretório de onde ele subiu), não no do comando — salvar fora do repositório ou
+apagar depois, para não versionar PNG de teste.
+
 ## Assets já disponíveis em `/assets`
 
 Imagens reais do projeto (renders): `masterplan.jpg`, `Hotel.jpg`, `Fabrica.jpg`, `casas.jpg`, `convencoes.jpg`, `convenco2.jpg`, `escritorios.jpg`, `Clube.jpg`, `Eventos.jpg`. Logo oficial da Bracerum (grupo): `Bracerum Vertical - Branca.svg`, normalizado em `assets/logo/bracerum-{white,blue,black}.svg` — é um lockup próprio, diferente do logo do Park. Logos de empresas parceiras/validação de mercado: `Ball_Corporation_logo_2024.svg`, `Kingspan_Group_logo.svg`, `Lupo_logo (1).svg`, `cremer.svg`, `be8.svg`.
