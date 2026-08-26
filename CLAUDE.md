@@ -2,7 +2,7 @@
 
 Site institucional do **Bracerum Park**, cidade industrial multiuso em Villeta, Paraguai (Mercosul). Público-alvo: investidores e indústrias avaliando instalar operação no parque.
 
-## Estado do projeto (v4 — 2026-08-25)
+## Estado do projeto (v4.1 — 2026-08-26)
 
 O site tem **3 páginas**: `index.html`, `tributacao.html` e `bracerum.html`, mais `i18n.js`, `style.css` e `script.js`.
 
@@ -31,8 +31,18 @@ Grupos de POI (portos, rodovias, aeroportos, distâncias aéreas de capitais bra
 
 O **conteúdo e os dados de negócio** vêm do catálogo V15 e de bracerum.com — fonte de verdade, não inventar números.
 
+### Fotos dos pontos de interesse (v4.1)
+Os 27 POIs do mapa têm foto em `assets/pois/`, todas do **Wikimedia Commons** sob licença livre
+(CC / CC0 / domínio público) — inventário completo em `assets/pois/CREDITOS.md` e `CREDITOS.json`.
+Cada POI tem `img` e `credit: {pt,en,es}` em `script.js`; o crédito é renderizado em texto pequeno
+sobre a foto, no rodapé do cartão (`.poi-card__credit`). **Não usar imagem de busca comum do Google**
+— são protegidas por direito autoral e o site é comercial.
+Não existe foto livre dos terminais privados (Terport, Puerto Seguro, Caacupemí): esses três usam
+foto de contexto, rotulada como "Foto ilustrativa" no próprio crédito para não passar uma coisa
+por outra. Quando o cliente enviar fotos próprias, trocar o arquivo e ajustar o `credit`.
+
 **Pendências conhecidas** (aguardar o usuário):
-- **Fotos dos pontos de interesse do mapa** (Terport, Puerto Seguro, aeroporto etc.): o cartão já tem o espaço reservado, mostrando "Foto do local" enquanto não chegam. Basta preencher o campo `img` do POI em `script.js`.
+- Fotos próprias dos terminais (Terport, Puerto Seguro, Caacupemí) para substituir as ilustrativas.
 - Faixa de história / página Bracerum: falta o número de anos da Bracerum como importadora de aço. O site institucional só traz "2018–2026" no copyright, então usei 2018 como início da operação como trader — **confirmar com o cliente**.
 - Pinos do masterplan já seguem as marcações do cliente; refinar se ele apontar ajustes.
 - Hero: imagem recuperada da capa do catálogo (+2.2x de exposição). Se o render original em alta for enviado, substituir `assets/web/hero-hotel-noturno.jpg`.
@@ -52,4 +62,4 @@ Faltam (mencionados no `LEIA-ME.txt` original, ainda não enviados): `tecnologic
 
 ## Próximo passo
 
-Aguardando o usuário: (1) as fotos dos pontos de interesse do mapa; (2) o dado de anos de história da Bracerum como importadora de aço.
+Aguardando o usuário: (1) fotos próprias dos terminais privados, para substituir as ilustrativas; (2) o dado de anos de história da Bracerum como importadora de aço.
