@@ -234,12 +234,30 @@ html.no-motion .hero__bg img{transform:none}
    ========================================================== */
 .masterplan{position:relative;background:var(--ink);color:var(--t-dark);overflow:hidden}
 .masterplan__viewport{position:relative;height:100svh;min-height:640px;overflow:hidden}
-.masterplan__stage{
-  position:absolute;inset:0;will-change:transform;
-  transform-origin:50% 50%;
+/* bordas esmaecidas avisam que a planta continua para os lados */
+.masterplan__viewport::before,.masterplan__viewport::after{
+  content:"";position:absolute;top:0;bottom:0;width:46px;z-index:4;
+  pointer-events:none;opacity:0;transition:opacity var(--dur-m) var(--ease);
 }
+.masterplan__viewport::before{left:0;background:linear-gradient(90deg,rgba(10,9,7,.6),rgba(10,9,7,0))}
+.masterplan__viewport::after{right:0;background:linear-gradient(270deg,rgba(10,9,7,.6),rgba(10,9,7,0))}
+.masterplan.mp-can-pan .masterplan__viewport::before,
+.masterplan.mp-can-pan .masterplan__viewport::after{opacity:1}
+.masterplan.is-zoomed .masterplan__viewport::before,
+.masterplan.is-zoomed .masterplan__viewport::after{opacity:0}
+/* O palco tem a proporção da própria imagem e é dimensionado para cobrir o
+   viewport. É isso que faz os pinos (posicionados em % sobre a planta) caírem
+   sempre no lugar certo — com object-fit:cover sobre o viewport eles saíam de
+   posição em qualquer tela de proporção diferente, como no celular. */
+.masterplan__stage{
+  position:absolute;top:50%;left:50%;will-change:transform;
+  transform-origin:50% 50%;touch-action:pan-y;
+}
+.masterplan__stage.can-pan{cursor:grab}
+.masterplan__stage.is-dragging{cursor:grabbing}
 .masterplan__stage > img{
   position:absolute;inset:0;width:100%;height:100%;object-fit:cover;user-select:none;-webkit-user-drag:none;
+  pointer-events:none;
 }
 .masterplan__scrim{
   position:absolute;inset:0;pointer-events:none;
@@ -263,6 +281,9 @@ html.no-motion .hero__bg img{transform:none}
   pointer-events:none;transition:opacity var(--dur-m);
 }
 .masterplan.is-zoomed .masterplan__hint{opacity:0}
+.masterplan__hint--drag{display:none}
+.masterplan.mp-can-pan .masterplan__hint--pins{display:none}
+.masterplan.mp-can-pan .masterplan__hint--drag{display:block}
 
 /* pinos */
 .pin{
@@ -346,6 +367,22 @@ html.no-motion .pin__dot::after{animation:none;display:none}
 }
 
 /* labels permanentes dos pontos */
+/* pontos do mapa — alvo de toque grande, ponto pequeno */
+.poi-marker{display:flex;align-items:center;justify-content:center;cursor:pointer;background:none;border:0}
+.poi-marker__dot{
+  display:block;width:9px;height:9px;border:1.5px solid var(--ink);
+  transition:transform var(--dur-s) var(--ease),box-shadow var(--dur-s);
+}
+.poi-marker__dot--port{background:#7cc3e8}
+.poi-marker__dot--road{background:var(--sand)}
+.poi-marker__dot--ref{background:#9c9484}
+.poi-marker__dot--air{width:11px;height:11px;background:var(--paper);transform:rotate(45deg)}
+.poi-marker:hover .poi-marker__dot{transform:scale(1.6)}
+.poi-marker:hover .poi-marker__dot--air{transform:rotate(45deg) scale(1.45)}
+.poi-marker.is-active .poi-marker__dot{transform:scale(1.6);box-shadow:0 0 0 5px rgba(203,184,143,.32)}
+.poi-marker.is-active .poi-marker__dot--air{transform:rotate(45deg) scale(1.45)}
+
+.map-label{cursor:pointer}
 .map-label{
   background:rgba(14,13,11,.88);border:1px solid var(--line-dark);border-radius:0;
   color:var(--t-dark);font:600 10.5px/1.4 var(--sans);letter-spacing:.04em;
@@ -353,6 +390,9 @@ html.no-motion .pin__dot::after{animation:none;display:none}
 }
 .map-label::before{display:none}
 .map-label b{color:var(--sand);font-weight:700}
+.map-label:hover{background:var(--ink);border-color:var(--sand)}
+.map-label.is-active{background:var(--paper);color:var(--ink);border-color:var(--paper)}
+.map-label.is-active b{color:var(--brown)}
 .map-label--park{
   background:var(--paper);color:var(--ink);border-color:var(--paper);
   font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
@@ -869,4 +909,12 @@ html:not(.js) #langGate{display:none}
 @media (max-width: 640px){
   body{font-size:15px}
   .section{padding-left:20px;padding-right:20px}
+}
+
+/* No celular a planta é 3:2 e a tela é bem mais alta: cobrir a tela inteira
+   deixaria a imagem larga demais para arrastar. Uma faixa mais baixa reduz
+   o percurso do arrasto sem perder detalhe. */
+@media (max-width:720px){
+  .masterplan__viewport{height:clamp(420px,68svh,600px);min-height:0}
+  .masterplan__hint{bottom:16px;font-size:.58rem;padding:0 76px 0 20px;text-align:left;left:0;transform:none;width:100%}
 }

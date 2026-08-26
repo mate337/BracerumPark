@@ -324,7 +324,7 @@ const AREAS = [
     pin.innerHTML = a.side === "left"
       ? `<span class="pin__tag"></span><span class="pin__dot"></span>`
       : `<span class="pin__dot"></span><span class="pin__tag"></span>`;
-    pin.addEventListener("click", () => zoomTo(i));
+    pin.addEventListener("click", () => { if (moved > 6) return; zoomTo(i); });
     pinsWrap.appendChild(pin);
   });
 
@@ -347,13 +347,45 @@ const AREAS = [
     else { card.style.right = "auto"; card.style.left = "var(--gap)"; }
   }
 
-  function setStage(s, x, y, cb){
+  /* --- Dimensão do palco ---
+     O palco recebe a proporção da imagem e é escalado para cobrir o viewport.
+     Em tela alta e estreita (celular) ele fica mais largo que a tela: o que
+     sobra vira área de arrasto, em vez de ficar cortado sem aviso. */
+  const stageImg = stage.querySelector("img");
+  let SW = 0, SH = 0, panX = 0, panY = 0, maxPanX = 0, maxPanY = 0, canPan = false;
+  const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+
+  function ratio(){
+    return (stageImg && stageImg.naturalWidth) ? stageImg.naturalWidth / stageImg.naturalHeight : 1.5;
+  }
+
+  function fitStage(){
+    const w = viewport.offsetWidth, h = viewport.offsetHeight, ar = ratio();
+    SW = w; SH = w / ar;
+    if (SH < h){ SH = h; SW = h * ar; }
+    stage.style.width = SW + "px";
+    stage.style.height = SH + "px";
+    maxPanX = Math.max(0, (SW - w) / 2);
+    maxPanY = Math.max(0, (SH - h) / 2);
+    panX = clamp(panX, -maxPanX, maxPanX);
+    panY = clamp(panY, -maxPanY, maxPanY);
+    /* sobra de poucos pixels (desktop widescreen) não vira arrasto: só ligamos
+       quando realmente há planta escondida fora da tela. */
+    canPan = maxPanX > w * 0.04 || maxPanY > h * 0.04;
+    stage.classList.toggle("can-pan", canPan);
+    section.classList.toggle("mp-can-pan", canPan);
+    if (active < 0) setStage(1, panX, panY, null, true);
+  }
+
+  function setStage(s, x, y, cb, instant){
+    const dur = instant ? 0 : (reduceMotion ? 0 : 1.15);
     if (hasGsap){
-      gsap.to(stage, { scale: s, x, y, duration: reduceMotion ? 0 : 1.15, ease: "power3.inOut", onComplete: cb });
+      gsap.to(stage, { xPercent: -50, yPercent: -50, scale: s, x, y, duration: dur,
+                       ease: "power3.inOut", overwrite: "auto", onComplete: cb });
     } else {
-      stage.style.transition = "transform .9s cubic-bezier(.19,.8,.22,1)";
-      stage.style.transform = `translate(${x}px, ${y}px) scale(${s})`;
-      if (cb) setTimeout(cb, 900);
+      stage.style.transition = instant ? "none" : "transform .9s cubic-bezier(.19,.8,.22,1)";
+      stage.style.transform = `translate(-50%, -50%) translate(${x}px, ${y}px) scale(${s})`;
+      if (cb) setTimeout(cb, instant ? 0 : 900);
     }
   }
 
@@ -362,9 +394,9 @@ const AREAS = [
     const a = AREAS[active];
     const w = viewport.offsetWidth, h = viewport.offsetHeight;
     const s = window.innerWidth < 720 ? 2.7 : 2.2;
-    const maxX = (s - 1) / 2 * w, maxY = (s - 1) / 2 * h;
-    const tx = Math.max(-maxX, Math.min(maxX, (0.5 - a.x / 100) * w * s));
-    const ty = Math.max(-maxY, Math.min(maxY, (0.5 - a.y / 100) * h * s));
+    const maxX = Math.max(0, SW * s / 2 - w / 2), maxY = Math.max(0, SH * s / 2 - h / 2);
+    const tx = clamp((0.5 - a.x / 100) * SW * s, -maxX, maxX);
+    const ty = clamp((0.5 - a.y / 100) * SH * s, -maxY, maxY);
     section.classList.add("is-zoomed");
     card.classList.remove("is-open");
     setStage(s, tx, ty, () => { fillCard(a); card.classList.add("is-open"); });
@@ -374,14 +406,61 @@ const AREAS = [
     active = -1;
     section.classList.remove("is-zoomed");
     card.classList.remove("is-open");
-    setStage(1, 0, 0);
+    setStage(1, panX, panY);
   }
+
+  /* --- Arrastar a planta ---
+     touch-action:pan-y deixa a rolagem vertical da página passar; o gesto
+     horizontal é nosso. Um arrasto não pode virar clique no pino. */
+  let armed = false, dragging = false, moved = 0;
+  let startX = 0, startY = 0, baseX = 0, baseY = 0, pid = null;
+  stage.addEventListener("pointerdown", e => {
+    if (active >= 0 || !canPan) return;
+    if (e.button !== undefined && e.button !== 0) return;
+    armed = true; dragging = false; moved = 0; pid = e.pointerId;
+    startX = e.clientX; startY = e.clientY; baseX = panX; baseY = panY;
+  });
+  stage.addEventListener("pointermove", e => {
+    if (!armed) return;
+    const dx = e.clientX - startX, dy = e.clientY - startY;
+    moved = Math.max(moved, Math.abs(dx), Math.abs(dy));
+    /* só captura o ponteiro depois que virou arrasto de verdade — capturar
+       no pointerdown roubaria o clique dos pinos. */
+    if (!dragging){
+      if (moved < 5) return;
+      dragging = true;
+      stage.classList.add("is-dragging");
+      try { stage.setPointerCapture(pid); } catch (err) {}
+    }
+    panX = clamp(baseX + dx, -maxPanX, maxPanX);
+    panY = clamp(baseY + dy, -maxPanY, maxPanY);
+    setStage(1, panX, panY, null, true);
+  });
+  function endDrag(){
+    if (!armed) return;
+    armed = false;
+    if (dragging){
+      dragging = false;
+      stage.classList.remove("is-dragging");
+      try { stage.releasePointerCapture(pid); } catch (err) {}
+    }
+    setTimeout(() => { moved = 0; }, 0);
+  }
+  stage.addEventListener("pointerup", endDrag);
+  stage.addEventListener("pointercancel", endDrag);
+  stage.addEventListener("lostpointercapture", endDrag);
+
+  if (stageImg){
+    if (stageImg.complete) fitStage();
+    stageImg.addEventListener("load", fitStage);
+  }
+  fitStage();
 
   back.addEventListener("click", resetZoom);
   card.querySelector("[data-area-prev]").addEventListener("click", () => zoomTo(active - 1));
   card.querySelector("[data-area-next]").addEventListener("click", () => zoomTo(active + 1));
   document.addEventListener("keydown", e => { if (e.key === "Escape" && active >= 0) resetZoom(); });
-  window.addEventListener("resize", () => { if (active >= 0) zoomTo(active); });
+  window.addEventListener("resize", () => { fitStage(); if (active >= 0) zoomTo(active); });
   document.addEventListener("langchange", () => {
     renderPins();
     if (active >= 0) fillCard(AREAS[active]);
@@ -407,17 +486,17 @@ const ports = [
     credit: { pt: "Foto ilustrativa: barcaça porta-contêineres na hidrovia · Claudio Elias / Wikimedia Commons · Domínio público",
               en: "Illustrative photo: container barge on the waterway · Claudio Elias / Wikimedia Commons · Public domain",
               es: "Foto ilustrativa: barcaza portacontenedores en la hidrovía · Claudio Elias / Wikimedia Commons · Dominio público" },
-    desc: { pt: "Terminal privado de contêineres em Villeta, aberto 24h durante todo o ano. O calado do Rio Paraguai neste trecho permite navegação mesmo no período de seca — sem os gargalos e as filas dos portos de Assunção.",
-            en: "Private container terminal in Villeta, open 24/7 all year round. The Paraguay River's draft along this stretch allows navigation even in the dry season — without the bottlenecks and queues of Asunción's ports.",
-            es: "Terminal privada de contenedores en Villeta, abierta 24 h todo el año. El calado del Río Paraguay en este tramo permite navegación incluso en época de seca — sin los cuellos de botella ni las filas de los puertos de Asunción." } },
+    desc: { pt: "Terminal privado de contêineres mais moderno da hidrovia, aberto 24h o ano todo: US$ 40 milhões investidos, capacidade para 95 mil contêineres por ano e pátio para mais de 7.000 unidades, com guindastes elétricos de 38 m de alcance e sistema Navis N4. Fica no km 1.578,5 da hidrovia, ao sul dos passos de Itapirú e Guyratí — por isso opera mesmo na seca extrema, sem as filas dos portos de Assunção.",
+            en: "The waterway's most modern private container terminal, open 24/7 year-round: US$ 40 million invested, capacity for 95,000 containers a year and a yard for over 7,000 units, with 38 m-reach electric cranes and the Navis N4 system. It sits at km 1,578.5 of the waterway, south of the Itapirú and Guyratí passes — so it keeps operating through extreme low water, without the queues of Asunción's ports.",
+            es: "La terminal privada de contenedores más moderna de la hidrovía, abierta 24 h todo el año: US$ 40 millones invertidos, capacidad para 95.000 contenedores al año y patio para más de 7.000 unidades, con grúas eléctricas de 38 m de alcance y sistema Navis N4. Está en el km 1.578,5 de la hidrovía, al sur de los pasos Itapirú y Guyratí — por eso opera incluso en bajante extrema, sin las filas de los puertos de Asunción." } },
   { name: "Puerto Seguro Fluvial", type: T.port, km: "33 km", tempo: "30 min", lat: -25.4728, lng: -57.5539,
     img: "assets/pois/puerto-seguro.jpg",
-    credit: { pt: "Foto ilustrativa: zona industrial de Villeta · Aterovi / Wikimedia Commons · Domínio público",
+    credit: { pt: "Foto ilustrativa: cinturão industrial de Villeta · Aterovi / Wikimedia Commons · Domínio público",
               en: "Illustrative photo: Villeta's industrial belt · Aterovi / Wikimedia Commons · Public domain",
-              es: "Foto ilustrativa: zona industrial de Villeta · Aterovi / Wikimedia Commons · Dominio público" },
-    desc: { pt: "Terminal de carga geral e projeto, com pátio alfandegado. Rota natural para equipamentos industriais e cargas de grande volume que chegam ao parque.",
-            en: "General and project cargo terminal with a bonded yard. The natural route for industrial equipment and oversized cargo arriving at the park.",
-            es: "Terminal de carga general y de proyecto, con patio aduanero. Ruta natural para equipos industriales y cargas de gran volumen que llegan al parque." } },
+              es: "Foto ilustrativa: cinturón industrial de Villeta · Aterovi / Wikimedia Commons · Dominio público" },
+    desc: { pt: "Maior terminal multipropósito do Paraguai, em operação desde 2012 e em expansão: contêineres, carga solta, granel, rodados e carga de projeto no mesmo recinto. Opera com guindaste elétrico Liebherr FCC 280 (80 t) e guindaste móvel para peças de 260 a 300 t — a rota natural para o maquinário pesado que chega ao parque.",
+            en: "Paraguay's largest multipurpose terminal, operating since 2012 and still expanding: containers, breakbulk, dry bulk, ro-ro and project cargo in one facility. It runs a Liebherr FCC 280 electric crane (80 t) and a mobile crane rated for 260–300 t lifts — the natural route for the heavy machinery arriving at the park.",
+            es: "La mayor terminal multipropósito del Paraguay, en operación desde 2012 y en expansión: contenedores, carga suelta, granel, rodados y carga de proyecto en el mismo recinto. Opera con grúa eléctrica Liebherr FCC 280 (80 t) y grúa móvil para piezas de 260 a 300 t — la ruta natural para la maquinaria pesada que llega al parque." } },
   { name: "Caacupemí Villeta", type: T.port, km: "42 km", tempo: "1 h", lat: -25.5060, lng: -57.5450,
     img: "assets/pois/caacupemi.jpg",
     credit: { pt: "Foto ilustrativa: comboio de barcaças no rio · Falk2 / Wikimedia Commons · CC BY-SA 4.0",
@@ -428,9 +507,9 @@ const ports = [
             es: "Terminal de contenedores con servicio regular de barcazas a Montevideo y Buenos Aires, conectando la producción del parque al Atlántico." } },
   { name: "Emb. Puerto Alegre", type: T.port, km: "4 km", tempo: "10 min", lat: -25.7930, lng: -57.7565,
     img: "assets/pois/puerto-alegre.jpg",
-    credit: { pt: "Beira do rio Paraguai em Villeta · Aterovi / Wikimedia Commons · Domínio público",
-              en: "Paraguay River bank at Villeta · Aterovi / Wikimedia Commons · Public domain",
-              es: "Orilla del río Paraguay en Villeta · Aterovi / Wikimedia Commons · Dominio público" },
+    credit: { pt: "Embarcações de carga no rio Paraguai · Cmasi / Wikimedia Commons · CC BY-SA 4.0",
+              en: "Cargo vessels on the Paraguay River · Cmasi / Wikimedia Commons · CC BY-SA 4.0",
+              es: "Embarcaciones de carga en el río Paraguay · Cmasi / Wikimedia Commons · CC BY-SA 4.0" },
     desc: { pt: "Atracadouro local a poucos minutos do portão do parque, usado para cargas de apoio e movimentação regional.",
             en: "Local wharf minutes from the park gate, used for support cargo and regional movements.",
             es: "Atracadero local a pocos minutos del portón del parque, usado para cargas de apoyo y movimiento regional." } },
@@ -444,17 +523,17 @@ const ports = [
             es: "Atracadero fluvial vecino al parque, alternativa de corta distancia para operaciones puntuales." } },
   { name: "Terminal Villa Oliva", type: T.port, km: "38 km", tempo: "50 min", lat: -26.0060, lng: -57.8890,
     img: "assets/pois/villa-oliva.jpg",
-    credit: { pt: "Villa Oliva, à beira da hidrovia · gomezminck / Wikimedia Commons · CC BY-SA 3.0",
-              en: "Villa Oliva, on the waterway · gomezminck / Wikimedia Commons · CC BY-SA 3.0",
-              es: "Villa Oliva, a orillas de la hidrovía · gomezminck / Wikimedia Commons · CC BY-SA 3.0" },
+    credit: { pt: "Foto ilustrativa: navio atracado e guindastes no rio Paraguai · Cmasi / Wikimedia Commons · CC BY-SA 4.0",
+              en: "Illustrative photo: moored ship and cranes on the Paraguay River · Cmasi / Wikimedia Commons · CC BY-SA 4.0",
+              es: "Foto ilustrativa: buque atracado y grúas en el río Paraguay · Cmasi / Wikimedia Commons · CC BY-SA 4.0" },
     desc: { pt: "Terminal de barcaças e granéis ao sul de Villeta, com acesso direto à hidrovia.",
             en: "Barge and bulk terminal south of Villeta, with direct waterway access.",
             es: "Terminal de barcazas y graneles al sur de Villeta, con acceso directo a la hidrovía." } },
   { name: "Porto de Assunção", type: T.port, km: "71 km", tempo: "1 h 20", lat: -25.2780, lng: -57.6430,
     img: "assets/pois/porto-assuncao.jpg",
-    credit: { pt: "Porto de Assunção · Horacio Oteiza / Wikimedia Commons · CC BY-SA 3.0",
-              en: "Port of Asunción · Horacio Oteiza / Wikimedia Commons · CC BY-SA 3.0",
-              es: "Puerto de Asunción · Horacio Oteiza / Wikimedia Commons · CC BY-SA 3.0" },
+    credit: { pt: "Navio de carga atracado no Porto de Assunção · Cmasi / Wikimedia Commons · CC BY-SA 4.0",
+              en: "Cargo ship moored at the Port of Asunción · Cmasi / Wikimedia Commons · CC BY-SA 4.0",
+              es: "Buque de carga atracado en el Puerto de Asunción · Cmasi / Wikimedia Commons · CC BY-SA 4.0" },
     desc: { pt: "Porto histórico da capital, hoje voltado a carga geral. Villeta absorveu o fluxo de contêineres por ser mais próxima e menos congestionada.",
             en: "The capital's historic port, today focused on general cargo. Villeta absorbed container flows by being closer and less congested.",
             es: "Puerto histórico de la capital, hoy orientado a carga general. Villeta absorbió el flujo de contenedores por estar más cerca y menos congestionado." } },
@@ -641,24 +720,79 @@ const refs = [
   L.control.zoom({ position: "bottomright" }).addTo(map);
 
   /* --- Basemap ---
-     O terreno vem de um mapa claro (Voyager) invertido por filtro CSS: o
-     resultado é um mapa escuro em que rios e lagos são desenhados em azul
-     pelo próprio basemap, com o traçado real — nada é sobreposto por cima.
-     Os rótulos vêm numa camada separada, sem filtro. */
+     Mapa vetorial do OpenFreeMap (sem chave de API, uso comercial liberado),
+     estilo dark repintado com a paleta do projeto. A água é desenhada pelo
+     próprio mapa, com o traçado real dos rios — nada é sobreposto por cima.
+     O CARTO foi abandonado porque passou a carimbar "API KEY REQUIRED".
+     Sem WebGL, cai para um raster claro invertido por filtro CSS. */
   map.createPane("basePane");
   const basePane = map.getPane("basePane");
   basePane.style.zIndex = 200;
-  basePane.classList.add("leaflet-pane--base");
-  L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png", {
-    attribution: "&copy; OpenStreetMap &copy; CARTO", maxZoom: 19, pane: "basePane"
-  }).addTo(map);
 
-  map.createPane("labelPane");
-  map.getPane("labelPane").style.zIndex = 210;
-  map.getPane("labelPane").style.pointerEvents = "none";
-  L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png", {
-    maxZoom: 19, pane: "labelPane", opacity: .8
-  }).addTo(map);
+  const PALETA = {
+    ink:   "#0e0d0b",
+    ink2:  "#15140f",
+    wood:  "#141610",
+    water: "#1b4a6e",
+    river: "#3d84b4",
+    road:  "#3a3529",
+    roadHi:"#5c5340",
+    text:  "rgba(247,243,234,.78)",
+    halo:  "rgba(14,13,11,.92)",
+    wtext: "rgba(126,178,214,.9)"
+  };
+
+  function repaint(gl){
+    const layers = gl.getStyle().layers || [];
+    const set = (id, prop, val) => { try { gl.setPaintProperty(id, prop, val); } catch (e) {} };
+    layers.forEach(l => {
+      const id = l.id, sl = l["source-layer"] || "";
+      if (l.type === "background") set(id, "background-color", PALETA.ink);
+      else if (sl === "water" && l.type === "fill") set(id, "fill-color", PALETA.water);
+      else if (sl === "waterway"){
+        set(id, "line-color", PALETA.river);
+        set(id, "line-opacity", .95);
+        try { gl.setPaintProperty(id, "line-width",
+          ["interpolate", ["linear"], ["zoom"], 6, 1.1, 10, 2.2, 14, 4]); } catch (e) {}
+      }
+      else if (sl === "water_name"){
+        set(id, "text-color", PALETA.wtext); set(id, "text-halo-color", PALETA.halo);
+      }
+      else if (sl === "landcover" || sl === "landuse") set(id, "fill-color", PALETA.wood);
+      else if (sl === "building") set(id, "fill-color", PALETA.ink2);
+      else if (sl === "place"){
+        set(id, "text-color", PALETA.text); set(id, "text-halo-color", PALETA.halo);
+      }
+      else if (sl.startsWith("transportation_name")){
+        set(id, "text-color", "rgba(203,184,143,.72)"); set(id, "text-halo-color", PALETA.halo);
+      }
+      else if (sl === "transportation" && l.type === "line"){
+        set(id, "line-color", /motorway|major/.test(id) ? PALETA.roadHi : PALETA.road);
+      }
+      else if (sl === "boundary") set(id, "line-color", "rgba(203,184,143,.28)");
+      else if (sl === "aeroway") set(id, "line-color", PALETA.roadHi);
+    });
+  }
+
+  const podeVetor = typeof L.maplibreGL === "function" &&
+    typeof maplibregl !== "undefined" &&
+    (!maplibregl.supported || maplibregl.supported());
+
+  if (podeVetor){
+    const vec = L.maplibreGL({
+      style: "https://tiles.openfreemap.org/styles/dark",
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &middot; OpenFreeMap',
+      pane: "basePane", interactive: false
+    }).addTo(map);
+    const gl = vec.getMaplibreMap();
+    gl.on("load", () => repaint(gl));
+    gl.on("styledata", () => repaint(gl));
+  } else {
+    basePane.classList.add("leaflet-pane--base");
+    L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}", {
+      attribution: "&copy; OpenStreetMap &middot; Esri", maxZoom: 16, pane: "basePane"
+    }).addTo(map);
+  }
 
   /* --- Park --- */
   const parkIcon = L.divIcon({
@@ -669,13 +803,13 @@ const refs = [
   L.marker([PARK.lat, PARK.lng], { icon: parkIcon, zIndexOffset: 1000 }).addTo(map)
     .bindTooltip("Bracerum Park", { permanent: true, direction: "top", offset: [0, -12], className: "map-label map-label--park" });
 
-  const icons = {
-    port: '<div style="width:9px;height:9px;background:#7cc3e8;border:1.5px solid #0e0d0b"></div>',
-    road: '<div style="width:9px;height:9px;background:#cbb88f;border:1.5px solid #0e0d0b"></div>',
-    air:  '<div style="width:11px;height:11px;background:#f7f3ea;border:1.5px solid #0e0d0b;transform:rotate(45deg)"></div>',
-    ref:  '<div style="width:9px;height:9px;background:#9c9484;border:1.5px solid #0e0d0b"></div>'
-  };
-  const mkIcon = kind => L.divIcon({ className: "", html: icons[kind], iconSize: [10, 10], iconAnchor: [5, 5] });
+  /* Área de toque de 28px em volta do ponto: no celular um alvo de 10px é
+     pequeno demais e o usuário acaba clicando no mapa em vez do ponto. */
+  const mkIcon = kind => L.divIcon({
+    className: "poi-marker",
+    html: `<span class="poi-marker__dot poi-marker__dot--${kind}"></span>`,
+    iconSize: [28, 28], iconAnchor: [14, 14]
+  });
 
   /* --- Card de POI --- */
   const card = document.getElementById("poiCard");
@@ -768,6 +902,23 @@ const refs = [
   function selectPoi(p){
     document.querySelectorAll(".dist-item").forEach(d =>
       d.classList.toggle("is-active", d.dataset.poi === p.name));
+    /* destaca o ponto no mapa, venha o clique da lista ou do próprio mapa */
+    groups.forEach(g => g.list.forEach(o => {
+      if (!o._marker) return;
+      const on = o === p;
+      const el = o._marker.getElement();
+      if (el) el.classList.toggle("is-active", on);
+      const tip = o._marker.getTooltip();
+      const tipEl = tip && tip.getElement();
+      if (tipEl) tipEl.classList.toggle("is-active", on);
+    }));
+    /* clicando no mapa, abre a sanfona do grupo e traz o item para a vista */
+    const li = document.querySelector(`.dist-item[data-poi="${window.CSS && CSS.escape ? CSS.escape(p.name) : p.name}"]`);
+    if (li){
+      const acc = li.closest(".loc-acc");
+      if (acc && acc.dataset.open === "false") acc.querySelector(".loc-acc__head").click();
+      li.scrollIntoView({ block: "nearest" });
+    }
     openCard(p);
     drawRoute(p);
   }
@@ -783,11 +934,17 @@ const refs = [
     g.list.forEach((p, i) => {
       const dir = i % 2 === 0 ? "right" : "left";
       const kind = g.kind === "capital" ? "air" : g.kind;
-      const m = L.marker([p.lat, p.lng], { icon: mkIcon(kind) }).addTo(map);
+      const m = L.marker([p.lat, p.lng], {
+        icon: mkIcon(kind), riseOnHover: true, keyboard: true, title: p.name, alt: p.name
+      }).addTo(map);
+      /* interactive: true faz o próprio rótulo abrir o cartão — é ele o alvo
+         grande na tela; clicar nele e não acontecer nada confunde. */
       m.bindTooltip(`${p.name} · <b>${p.km}</b> · ${p.tempo}`, {
-        permanent: true, direction: dir, offset: [dir === "right" ? 9 : -9, 0], className: "map-label"
+        permanent: true, interactive: true, direction: dir,
+        offset: [dir === "right" ? 11 : -11, 0], className: "map-label"
       });
       m.on("click", () => selectPoi(p));
+      m.on("keypress", e => { if (e.originalEvent && e.originalEvent.key === "Enter") selectPoi(p); });
       p._marker = m;
       p._kind = g.kind;
       // pontos muito próximos do Park só ganham rótulo quando há zoom suficiente

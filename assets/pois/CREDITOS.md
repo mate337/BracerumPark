@@ -31,9 +31,9 @@ desses locais, basta trocar o arquivo e ajustar o campo `credit` em `script.js`.
 | `porto-alberdi.jpg` | [Puerto de Alberdi.jpg](https://commons.wikimedia.org/wiki/File:Puerto_de_Alberdi.jpg) | CC BY-SA 4.0 | Ulises Icardi |
 | `porto-alegre-rs.jpg` | [Porto Alegre Skyline.JPG](https://commons.wikimedia.org/wiki/File:Porto_Alegre_Skyline.JPG) | CC BY-SA 3.0 | (WT-shared) Ricardo Rmx |
 | `porto-assuncao.jpg` | [Atardecer en el Puerto de Asunción - panoramio.jpg](https://commons.wikimedia.org/wiki/File:Atardecer_en_el_Puerto_de_Asunci%C3%B3n_-_panoramio.jpg) | CC BY-SA 3.0 | Horacio “Hache” Otei… |
-| `puerto-alegre.jpg` | [Villeta canoa.jpg](https://commons.wikimedia.org/wiki/File:Villeta_canoa.jpg) | Public domain | Aterovi |
+| `puerto-alegre.jpg` | [Ships in river Paraguay 088.jpg](https://commons.wikimedia.org/wiki/File:Ships_in_river_Paraguay_088.jpg) | CC BY-SA 4.0 | Cmasi |
 | `puerto-lobato.jpg` | [TankerBargeParanaRiver.JPG](https://commons.wikimedia.org/wiki/File:TankerBargeParanaRiver.JPG) | Public domain | Claudio Elias |
 | `puerto-seguro.jpg` | [Villeta INC.jpg](https://commons.wikimedia.org/wiki/File:Villeta_INC.jpg) | Public domain | Aterovi |
 | `rio-de-janeiro.jpg` | [Pão de Açúcar 2020.jpg](https://commons.wikimedia.org/wiki/File:P%C3%A3o_de_A%C3%A7%C3%BAcar_2020.jpg) | CC BY-SA 3.0 | Boaventuravinicius |
 | `terport-villeta.jpg` | [BczaPortacontenedores.JPG](https://commons.wikimedia.org/wiki/File:BczaPortacontenedores.JPG) | Public domain | Claudio Elias |
-| `villa-oliva.jpg` | [ATARDECER EN UNA CASITA DE VILLA OLIVA - panoramio.jpg](https://commons.wikimedia.org/wiki/File:ATARDECER_EN_UNA_CASITA_DE_VILLA_OLIVA_-_panoramio.jpg) | CC BY-SA 3.0 | gomezminck |
+| `villa-oliva.jpg` | [Boat docked in river Paraguay 1553.jpg](https://commons.wikimedia.org/wiki/File:Boat_docked_in_river_Paraguay_1553.jpg) | CC BY-SA 4.0 | Cmasi |

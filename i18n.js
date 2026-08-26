@@ -22,6 +22,7 @@ const I18N = {
     "mp.eyebrow": "The Masterplan",
     "mp.title": "1,819,856 m² planned as a <em>city</em>",
     "mp.hint": "Click the points to explore each area",
+    "mp.hintDrag": "Drag to see the whole plan · tap the points",
     "mp.back": "← Overview", "mp.prev": "← Previous", "mp.next": "Next →",
 
     /* localização */
@@ -221,6 +222,7 @@ const I18N = {
     "mp.eyebrow": "El Masterplan",
     "mp.title": "1.819.856 m² planificados como una <em>ciudad</em>",
     "mp.hint": "Haga clic en los puntos para explorar cada área",
+    "mp.hintDrag": "Arrastra para ver todo el plano · toca los puntos",
     "mp.back": "← Vista general", "mp.prev": "← Anterior", "mp.next": "Siguiente →",
 
     "loc.eyebrow": "Ubicación",

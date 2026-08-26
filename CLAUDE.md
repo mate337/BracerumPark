@@ -2,7 +2,7 @@
 
 Site institucional do **Bracerum Park**, cidade industrial multiuso em Villeta, Paraguai (Mercosul). Público-alvo: investidores e indústrias avaliando instalar operação no parque.
 
-## Estado do projeto (v4.1 — 2026-08-26)
+## Estado do projeto (v4.2 — 2026-08-26)
 
 O site tem **3 páginas**: `index.html`, `tributacao.html` e `bracerum.html`, mais `i18n.js`, `style.css` e `script.js`.
 
@@ -21,15 +21,29 @@ O HTML carrega **português**; `i18n.js` traz dicionários **EN** e **ES** que s
 **Atenção:** o helper chama-se `tr()` e **não** `L()`, porque `L` é o global do Leaflet. Ao adicionar texto novo, incluir a chave nos dois dicionários (há um script de conferência no histórico da sessão).
 
 ### Estrutura do index
-loader → hero (Ken Burns + dots) → teaser de tributação → masterplan com zoom por área (`AREAS` no script.js, coordenadas em % sobre `assets/web/vista-aerea-park.jpg`) → mapa Leaflet dark full-bleed → "Como funciona" (seção de exatamente `100svh` fixada com `ScrollTrigger.pin`: primeiro ela se centraliza, depois o scroll avança os tópicos. **A altura fixa é o que evita a sobreposição e o espaço em branco da v2** — se mudar o conteúdo, manter o bloco cabendo em uma tela) → sanfona escura → empresas → assessoria → faixa história → footer.
+loader → hero (Ken Burns + dots) → teaser de tributação → masterplan com zoom por área (`AREAS` no script.js, coordenadas em % sobre `assets/web/vista-aerea-park.jpg`; o palco `#mpStage` tem a **proporção da própria imagem** e é dimensionado para cobrir o viewport — é isso que mantém os pinos no lugar em qualquer tela. Quando a planta é mais larga que a tela, o bloco fica **arrastável na horizontal** e as bordas esmaecem; no celular a faixa é mais baixa, `clamp(420px,68svh,600px)`, para o arrasto não ser longo demais) → mapa Leaflet dark full-bleed → "Como funciona" (seção de exatamente `100svh` fixada com `ScrollTrigger.pin`: primeiro ela se centraliza, depois o scroll avança os tópicos. **A altura fixa é o que evita a sobreposição e o espaço em branco da v2** — se mudar o conteúdo, manter o bloco cabendo em uma tela) → sanfona escura → empresas → assessoria → faixa história → footer.
 
 ### Mapa
-**Água:** o basemap é o CARTO Voyager (claro) num pane próprio com `filter: invert(1) hue-rotate(180deg)…` — isso deixa o terreno escuro e faz rios e lagos serem desenhados **pelo próprio mapa** em azul, com traçado real. Os rótulos vêm do `dark_only_labels` num pane separado, sem filtro. **Não desenhar polilinha de rio por cima** (foi rejeitado pelo cliente).
-**Rotas:** o traçado real por vias vem de `assets/routes.json`, pré-calculado com o OSRM pelo script em `docs/` (regerar com `build_routes.py` se os pontos mudarem). Sem chamada a API em runtime. Capitais brasileiras são trechos aéreos e seguem em arco.
-**Nota:** os km/tempo exibidos são os do catálogo (fonte de verdade do cliente) e diferem do OSRM em alguns trechos curtos (ex.: Terport 23 km/20 min no catálogo vs. 35,7 km/36 min pelas vias públicas do OSM) — o número exibido é o do cliente, a linha é a real.
-Grupos de POI (portos, rodovias, aeroportos, distâncias aéreas de capitais brasileiras, referências); clicar no ponto do mapa ou no item da lista faz o mesmo: abre o cartão (foto + descrição para empresários), traça a rota e destaca o item; indicador flutuante aponta o Park quando ele sai do enquadramento; rótulos de pontos a menos de 12 km só aparecem a partir do zoom 11.
-
-O **conteúdo e os dados de negócio** vêm do catálogo V15 e de bracerum.com — fonte de verdade, não inventar números.
+**Basemap:** mapa **vetorial do OpenFreeMap** (estilo `dark`) via `maplibre-gl` + `maplibre-gl-leaflet`,
+dentro do Leaflet — **sem chave de API e com uso comercial liberado**. O CARTO foi abandonado em
+2026-08 porque passou a carimbar "API KEY REQUIRED" em todas as tiles públicas. O estilo é repintado
+em runtime pela função `repaint()` em `script.js` (constante `PALETA`): fundo `--ink`, água `#1b4a6e`,
+rios `#3d84b4`, rodovias em tons de areia, rótulos claros — **zero vermelho**. A água e os rios são
+desenhados pelo próprio mapa, com traçado real; **não desenhar polilinha de rio por cima**
+(foi rejeitado pelo cliente). Sem WebGL, cai para um raster claro (Esri Light Gray) invertido pelo
+filtro CSS `.leaflet-pane--base`.
+**Rotas:** o traçado real por vias vem de `assets/routes.json`, pré-calculado com o OSRM pelo script em
+`docs/` (regerar com `build_routes.py` se os pontos mudarem). Sem chamada a API em runtime. Capitais
+brasileiras são trechos aéreos e seguem em arco.
+**Nota:** os km/tempo exibidos são os do catálogo (fonte de verdade do cliente) e diferem do OSRM em
+alguns trechos curtos (ex.: Terport 23 km/20 min no catálogo vs. 35,7 km/36 min pelas vias públicas do
+OSM) — o número exibido é o do cliente, a linha é a real.
+**Interação:** clicar no ponto do mapa, no rótulo do ponto ou no item da lista faz a mesma coisa —
+abre o cartão (foto + descrição para empresários), traça a rota, destaca o ponto e o item, e abre a
+sanfona correspondente na lateral. Os marcadores têm área de toque de 28px (`.poi-marker`) porque o
+ponto de 9px era pequeno demais no celular; os rótulos são `interactive: true` pelo mesmo motivo.
+Indicador flutuante aponta o Park quando ele sai do enquadramento; rótulos de pontos a menos de 12 km
+só aparecem a partir do zoom 11.
 
 ### Fotos dos pontos de interesse (v4.1)
 Os 27 POIs do mapa têm foto em `assets/pois/`, todas do **Wikimedia Commons** sob licença livre
@@ -37,9 +51,15 @@ Os 27 POIs do mapa têm foto em `assets/pois/`, todas do **Wikimedia Commons** s
 Cada POI tem `img` e `credit: {pt,en,es}` em `script.js`; o crédito é renderizado em texto pequeno
 sobre a foto, no rodapé do cartão (`.poi-card__credit`). **Não usar imagem de busca comum do Google**
 — são protegidas por direito autoral e o site é comercial.
-Não existe foto livre dos terminais privados (Terport, Puerto Seguro, Caacupemí): esses três usam
-foto de contexto, rotulada como "Foto ilustrativa" no próprio crédito para não passar uma coisa
-por outra. Quando o cliente enviar fotos próprias, trocar o arquivo e ajustar o `credit`.
+O critério é **empresarial**: a foto tem que mostrar infraestrutura e escala (cais, guindaste, pátio,
+comboio de barcaças) — pôr do sol e paisagem bonita não servem para este público.
+Não existe foto livre dos terminais privados (Terport, Puerto Seguro, Caacupemí) — checado no Wikimedia
+Commons e no Openverse (Flickr CC). Esses usam foto de contexto, rotulada como "Foto ilustrativa" no
+próprio crédito. **O caminho certo é pedir as fotos aos próprios terminais** (terport.com.py,
+puertosegurofluvial.com, caacupemi.com.py): eles ganham com a divulgação e uma autorização por e-mail
+resolve. Quando chegarem, trocar o arquivo em `assets/pois/` e ajustar o `credit`.
+Onde a foto não existe, a **descrição** carrega a escala: Terport e Puerto Seguro trazem investimento,
+capacidade e equipamento, apurados nas fontes do setor.
 
 **Pendências conhecidas** (aguardar o usuário):
 - Fotos próprias dos terminais (Terport, Puerto Seguro, Caacupemí) para substituir as ilustrativas.
