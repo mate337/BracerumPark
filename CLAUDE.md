@@ -67,6 +67,20 @@ capacidade e equipamento, apurados nas fontes do setor.
 - Pinos do masterplan já seguem as marcações do cliente; refinar se ele apontar ajustes.
 - Hero: imagem recuperada da capa do catálogo (+2.2x de exposição). Se o render original em alta for enviado, substituir `assets/web/hero-hotel-noturno.jpg`.
 
+## APROVA — aplicativo de aprovação de mídias sociais (`/aprovacoes`)
+
+Ferramenta **separada do site**, na pasta `aprovacoes/`. Fluxo criar → revisar →
+aprovar → agendar para Instagram, Facebook, LinkedIn e mídia paga, com duas contas
+(administrador e aprovador), pré-visualização fiel em Feed/Perfil × Mobile/Desktop,
+opções de legenda escolhidas pelo aprovador, comentários com foto e nome de quem
+sugeriu, e marcadores clicados sobre a própria peça. Sem framework, sem build,
+estado em `localStorage`. Documentação completa em `aprovacoes/README.md`.
+
+**Design próprio, não o do site:** preto + laranja (`--brand #ff6a1a`), degradês,
+vidro e cantos arredondados — as referências visuais que o cliente passou para esta
+ferramenta são outras. As regras de paleta e cantos quadrados do site institucional
+**não valem aqui**.
+
 ## Stack de design/dev combinada
 
 - Prototipação/handoff: seguir princípios do guia de ferramentas (Figma-like: tokens, componentes, estados) mesmo sem Figma disponível aqui — traduzir isso direto em CSS custom properties e componentes reutilizáveis.
