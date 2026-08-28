@@ -54,6 +54,7 @@ por outra. Quando o cliente enviar fotos próprias, trocar o arquivo e ajustar o
 - Implementação: HTML/CSS/JS (mesma stack do projeto atual, sem framework pesado, a menos que o usuário peça).
 - Qualidade: seguir os checklists de UX/UI e visual do guia (acessibilidade WCAG, estados de componente, performance, responsividade mobile-first) antes de considerar qualquer seção "pronta".
 - Revisão de UI: a skill `web-design-guidelines` (de `vercel-labs/agent-skills`) audita arquivos contra as Web Interface Guidelines da Vercel e devolve os achados em `arquivo:linha`. Também é um stub — busca as regras atualizadas em `vercel-labs/web-interface-guidelines` na hora da revisão. Complementa o `agent-browser`: uma lê o código, a outra confere o site rodando.
+- Componentes: a skill `building-components` (de `vercel/components.build`) traz 15 referências `.mdx` sobre design de componentes. **Atenção ao escopo:** a maior parte pressupõe React + TypeScript + Tailwind + registry shadcn, que **não** é a stack deste site (HTML/CSS/JS puro, sem build nem npm). O que transfere de fato é `references/accessibility.mdx` (HTML semântico, navegação por teclado, ARIA, foco, contraste) e `references/design-tokens.mdx` (arquitetura de CSS custom properties semânticas — casa com os tokens `--ink`/`--paper`/`--sand`/`--brown` do `style.css`). Ignorar as partes de `as-child`, polimorfismo, npm, registry e marketplaces enquanto o site não usar framework.
 
 ### Teste no navegador — `agent-browser`
 
