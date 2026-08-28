@@ -53,6 +53,7 @@ por outra. Quando o cliente enviar fotos próprias, trocar o arquivo e ajustar o
 - Animação: **GSAP** (ferramenta adicionada pelo usuário) para scroll, transições e microinterações — inspirado nos padrões Osmo documentados em `docs/design-references.md`.
 - Implementação: HTML/CSS/JS (mesma stack do projeto atual, sem framework pesado, a menos que o usuário peça).
 - Qualidade: seguir os checklists de UX/UI e visual do guia (acessibilidade WCAG, estados de componente, performance, responsividade mobile-first) antes de considerar qualquer seção "pronta".
+- Revisão de UI: a skill `web-design-guidelines` (de `vercel-labs/agent-skills`) audita arquivos contra as Web Interface Guidelines da Vercel e devolve os achados em `arquivo:linha`. Também é um stub — busca as regras atualizadas em `vercel-labs/web-interface-guidelines` na hora da revisão. Complementa o `agent-browser`: uma lê o código, a outra confere o site rodando.
 
 ### Teste no navegador — `agent-browser`
 
