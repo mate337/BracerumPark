@@ -1,0 +1,112 @@
+/* =========================================================
+   Bracerum Park · carrosséis Instagram (1080 × 1350)
+   Paleta preto / branco / bege-marrom · sem vermelho
+   Helvetica (TeX Gyre Heros) + Noto Serif
+   ========================================================= */
+:root{
+  --ink:#0e0d0b; --ink-2:#191713; --ink-3:#24211c;
+  --paper:#f7f3ea; --paper-2:#ece5d4;
+  --sand:#cbb88f; --brown:#473315;
+  --sans:"TeX Gyre Heros","Helvetica Neue",Helvetica,Arial,sans-serif;
+  --serif:"Noto Serif",Georgia,"Times New Roman",serif;
+  --m:72px;                 /* margem de respiro (mínimo pedido: 30px) */
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:1080px;height:1350px}
+body{font-family:var(--sans);-webkit-font-smoothing:antialiased;background:var(--ink)}
+
+.slide{position:relative;width:1080px;height:1350px;overflow:hidden;background:var(--ink);color:var(--paper)}
+.slide--paper{background:var(--paper);color:var(--ink)}
+
+/* ---------- fundo ---------- */
+.bg{position:absolute;inset:0}
+.bg img{width:100%;height:100%;object-fit:cover;display:block}
+.bg--blur img{filter:blur(26px) saturate(.8);transform:scale(1.12)}
+.veil{position:absolute;inset:0}
+.veil--cover{background:
+  linear-gradient(180deg,rgba(14,13,11,.72) 0%,rgba(14,13,11,.34) 32%,rgba(14,13,11,.30) 54%,rgba(14,13,11,.88) 100%)}
+.veil--photo{background:linear-gradient(180deg,rgba(14,13,11,.30) 0%,rgba(14,13,11,.05) 40%,rgba(14,13,11,.55) 100%)}
+.veil--cta{background:linear-gradient(180deg,rgba(14,13,11,.78) 0%,rgba(14,13,11,.62) 45%,rgba(14,13,11,.86) 100%)}
+
+/* grão */
+.grain{position:absolute;inset:-20%;opacity:.16;mix-blend-mode:overlay;pointer-events:none}
+
+/* ---------- moldura de fios ---------- */
+.frame{position:absolute;inset:0;width:1080px;height:1350px;pointer-events:none}
+.frame path{fill:none;stroke:rgba(247,243,234,.42);stroke-width:1}
+.slide--paper .frame path{stroke:rgba(14,13,11,.28)}
+
+/* ---------- conteúdo ---------- */
+.pad{position:absolute;inset:var(--m)}
+.stack{position:absolute;left:var(--m);right:var(--m)}
+
+.eyebrow{
+  font-family:var(--sans);font-size:20px;font-weight:700;letter-spacing:.20em;
+  text-transform:uppercase;color:var(--sand);line-height:1.4}
+.slide--paper .eyebrow{color:var(--brown)}
+
+h1,h2{font-family:var(--serif);font-weight:400;letter-spacing:-.015em;line-height:1.10}
+h1 em,h2 em{font-style:italic}
+.h-cover{font-size:82px;text-align:right;line-height:1.12}
+.h-lg{font-size:66px}
+.h-md{font-size:54px}
+
+.body{font-family:var(--sans);font-size:29px;line-height:1.56;color:rgba(247,243,234,.84)}
+.slide--paper .body{color:rgba(14,13,11,.80)}
+.body p+p{margin-top:26px}
+
+.rule{height:1px;background:rgba(247,243,234,.30)}
+.slide--paper .rule{background:rgba(14,13,11,.22)}
+
+/* logo */
+.logo-h{position:absolute;left:var(--m);top:var(--m);width:290px}
+.logo-c{width:460px;display:block;margin:0 auto}
+
+/* rodapé */
+.foot{position:absolute;left:var(--m);right:var(--m);bottom:52px;
+  display:flex;justify-content:space-between;align-items:flex-end;
+  font-size:18px;letter-spacing:.16em;text-transform:uppercase;
+  color:rgba(247,243,234,.55)}
+.slide--paper .foot{color:rgba(14,13,11,.50)}
+.foot b{font-weight:700;color:rgba(247,243,234,.85)}
+.slide--paper .foot b{color:rgba(14,13,11,.80)}
+
+/* ---------- número grande ---------- */
+.stat{font-family:var(--serif);font-weight:400;line-height:.86;letter-spacing:-.03em}
+.stat .unit{font-size:.28em;font-style:italic;letter-spacing:0;margin-left:.12em;vertical-align:.55em}
+.stat-cap{font-family:var(--serif);font-style:italic;font-size:40px;line-height:1.32;color:var(--sand)}
+
+/* ---------- listas ---------- */
+.rows{width:100%;border-collapse:collapse}
+.rows tr{border-top:1px solid rgba(247,243,234,.24)}
+.slide--paper .rows tr{border-top:1px solid rgba(14,13,11,.20)}
+.rows tr:last-child{border-bottom:1px solid rgba(247,243,234,.24)}
+.slide--paper .rows tr:last-child{border-bottom:1px solid rgba(14,13,11,.20)}
+.rows td{vertical-align:top}
+.rows .k{font-family:var(--serif);font-weight:500;color:var(--brown);width:34%;padding-right:40px}
+.slide:not(.slide--paper) .rows .k{color:var(--sand)}
+.rows .v{font-family:var(--sans);color:rgba(14,13,11,.78)}
+.slide:not(.slide--paper) .rows .v{color:rgba(247,243,234,.82)}
+
+/* ---------- trio de números ---------- */
+.trio{display:grid;grid-template-columns:1fr 1fr 1fr;gap:34px}
+.trio .big{font-family:var(--serif);font-size:100px;line-height:1;letter-spacing:-.03em;color:var(--sand)}
+.trio .lbl{font-family:var(--sans);font-size:24px;line-height:1.45;color:rgba(247,243,234,.80);margin-top:20px}
+.trio .rule{margin-top:24px}
+
+/* ---------- ícones institucionais ---------- */
+.icons{display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px;text-align:center}
+.icons svg{height:44px;display:block;margin:0 auto 26px}
+.icons span{font-size:21px;line-height:1.42;letter-spacing:.04em;color:rgba(247,243,234,.92);white-space:pre-line}
+
+/* ---------- pílula CTA ---------- */
+.pill{max-width:830px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:30px;
+  border:1px solid rgba(247,243,234,.75);border-radius:999px;padding:30px 42px}
+.pill span{font-size:23px;line-height:1.45;letter-spacing:.05em;text-transform:uppercase;white-space:pre-line}
+.pill svg{width:44px;flex:none}
+
+/* crédito de foto */
+.credit{position:absolute;font-size:15px;line-height:1.4;color:rgba(247,243,234,.72);
+  letter-spacing:.02em;max-width:640px}
+
+.legal{font-size:16px;line-height:1.45;color:rgba(247,243,234,.55);letter-spacing:.02em}

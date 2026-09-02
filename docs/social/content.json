@@ -1,0 +1,541 @@
+{
+  "meta": {
+    "series": "Paraguai para empresários brasileiros",
+    "cta": "CLIQUE NO LINK DA BIO E CONHEÇA\nO MELHOR DO PARAGUAI PARA SUA EMPRESA.",
+    "trio": [
+      {
+        "icon": "py",
+        "label": "BENEFÍCIOS FISCAIS\nDO PARAGUAI."
+      },
+      {
+        "icon": "br",
+        "label": "QUALIDADE DE\nCONSTRUÇÃO\nBRASILEIRA."
+      },
+      {
+        "icon": "chart",
+        "label": "PROJETADO COMO\nUMA CIDADE."
+      }
+    ],
+    "disclaimer": "Conteúdo informativo, não constitui assessoria jurídica ou tributária. Legislação vigente em setembro de 2026."
+  },
+  "carousels": [
+    {
+      "slug": "01-lei-de-maquila",
+      "name": "Lei de Maquila",
+      "slides": [
+        {
+          "type": "cover",
+          "image": "assets/web/internas-07.jpg",
+          "eyebrow": "PARAGUAI · REGIME INDUSTRIAL",
+          "title": "Lei de Maquila:<br>produzir aqui,<br><em>pagar 1%</em>"
+        },
+        {
+          "type": "text",
+          "bg": "ink",
+          "eyebrow": "O QUE É",
+          "title": "O regime que transformou o<br>Paraguai em <em>plataforma industrial</em>",
+          "body": [
+            "Sua empresa brasileira instala uma unidade no Paraguai, importa matéria-prima e insumos em regime temporário, industrializa em território paraguaio e exporta o produto acabado.",
+            "O marco foi renovado: a Ley 7547/25, promulgada em 8 de setembro de 2025 e regulamentada pelo Decreto 5714/2026, substitui a antiga Ley 1064/97 e moderniza todo o regime."
+          ]
+        },
+        {
+          "type": "stat",
+          "eyebrow": "TRIBUTO ÚNICO DE MAQUILA",
+          "value": "1%",
+          "caption": "sobre o valor agregado em<br>território paraguaio",
+          "body": "A base de cálculo é o valor agregado no país — insumos comprados localmente, serviços contratados e salários pagos — ou o valor da fatura de exportação, o que for maior. Esse tributo único substitui os demais impostos nacionais, departamentais e municipais que incidiriam sobre a operação de maquila."
+        },
+        {
+          "type": "list",
+          "bg": "paper",
+          "eyebrow": "COMO FUNCIONA NA PRÁTICA",
+          "title": "O que entra, o que sai",
+          "items": [
+            {
+              "k": "Matéria-prima e insumos",
+              "v": "entram em admissão temporária, sem tributos, por 12 meses prorrogáveis por mais 12."
+            },
+            {
+              "k": "Bens de capital",
+              "v": "permanecem no país enquanto durar o programa de maquila."
+            },
+            {
+              "k": "IVA",
+              "v": "recuperado em certificados de crédito fiscal negociáveis, em prazo de 60 dias."
+            },
+            {
+              "k": "Mercado interno",
+              "v": "até 10% do volume exportado no ano anterior pode ser vendido no Paraguai, nacionalizando a mercadoria."
+            }
+          ]
+        },
+        {
+          "type": "photo",
+          "image": "assets/renders/escritorios-3.jpg",
+          "eyebrow": "NOVIDADE DA LEY 7547/25",
+          "title": "Maquila agora também é serviço",
+          "body": "Pela primeira vez o regime alcança serviços intangíveis: software, BPO, consultoria e outsourcing exportados a partir do Paraguai — sem exigência de certificação industrial, apenas registro administrativo no CNIME."
+        },
+        {
+          "type": "trio",
+          "eyebrow": "RESUMO",
+          "title": "Por que a maquila<br>fecha a conta",
+          "items": [
+            {
+              "big": "1%",
+              "label": "tributo único sobre o valor agregado, no lugar da carga tributária ordinária."
+            },
+            {
+              "big": "0%",
+              "label": "tributo na entrada de insumos e bens de capital em regime temporário."
+            },
+            {
+              "big": "10%",
+              "label": "da produção exportada no ano anterior pode ser vendida no mercado paraguaio."
+            }
+          ]
+        },
+        {
+          "type": "cta",
+          "image": "assets/renders/fabrica-bracerum-noturna.jpg"
+        }
+      ]
+    },
+    {
+      "slug": "02-lei-de-inversiones",
+      "name": "Lei de Inversiones",
+      "slides": [
+        {
+          "type": "cover",
+          "image": "assets/renders/centro-empresarial-1.jpg",
+          "eyebrow": "PARAGUAI · INCENTIVOS À INVERSÃO",
+          "title": "A Lei 60/90<br>virou<br><em>Lei 7548/25</em>"
+        },
+        {
+          "type": "text",
+          "bg": "ink",
+          "eyebrow": "O QUE MUDOU",
+          "title": "O regime de incentivos de 1990<br>foi <em>inteiramente reescrito</em>",
+          "body": [
+            "A Ley 7548/25 — promulgada em 8 de setembro de 2025 e regulamentada pelo Decreto 5432/2026 — estabelece o novo regime de incentivos fiscais para a inversão nacional e estrangeira, no lugar da histórica Ley 60/90.",
+            "O trâmite de aprovação do projeto de investimento tem prazo máximo de 75 dias, com média de 45 dias."
+          ]
+        },
+        {
+          "type": "stat",
+          "eyebrow": "IMPORTAÇÃO DE BENS DE CAPITAL",
+          "value": "0%",
+          "caption": "de imposto aduaneiro<br>e de IVA",
+          "body": "Máquinas, equipamentos e linhas de produção entram no Paraguai sem imposto aduaneiro e sem IVA. A isenção de IVA também vale para a compra local de bens de capital e para a primeira venda desses bens entre empresas beneficiárias do regime."
+        },
+        {
+          "type": "list",
+          "bg": "paper",
+          "eyebrow": "OS BENEFÍCIOS, UM A UM",
+          "title": "O que a Ley 7548/25 concede",
+          "items": [
+            {
+              "k": "Aduana e IVA",
+              "v": "exoneração na importação de bens de capital."
+            },
+            {
+              "k": "IVA local",
+              "v": "isenção na compra de bens de capital de fabricantes paraguaios."
+            },
+            {
+              "k": "Dividendos (IDU)",
+              "v": "exoneração por 10 anos a partir da primeira distribuição, para investimentos a partir de US$ 13 milhões."
+            },
+            {
+              "k": "Juros e comissões (INR)",
+              "v": "exoneração sobre empréstimos que financiam o projeto, no mesmo patamar de US$ 13 milhões."
+            },
+            {
+              "k": "Turismo e entretenimento",
+              "v": "isenção aduaneira e de IVA para projetos acima de US$ 20 milhões."
+            }
+          ]
+        },
+        {
+          "type": "photo",
+          "image": "assets/renders/centro-empresarial-2.jpg",
+          "eyebrow": "SOBRE UMA BASE JÁ BAIXA",
+          "title": "A regra 10-10-10",
+          "body": "O incentivo incide sobre um dos sistemas mais simples da região: IRE de 10% sobre o lucro, IVA de 10% e IRP de 10%. Na distribuição de lucros, o IDU é de 8% para sócio residente no Paraguai e 15% para não residente. O país adota regime territorial: renda de fonte estrangeira não é tributada."
+        },
+        {
+          "type": "trio",
+          "eyebrow": "RESUMO",
+          "title": "O que isso significa<br>para o seu CAPEX",
+          "items": [
+            {
+              "big": "0%",
+              "label": "de tarifa e IVA na máquina que você importa para instalar a fábrica."
+            },
+            {
+              "big": "10",
+              "label": "anos de isenção do imposto sobre dividendos, a partir de US$ 13 milhões."
+            },
+            {
+              "big": "75",
+              "label": "dias é o prazo máximo de trâmite do projeto de investimento."
+            }
+          ]
+        },
+        {
+          "type": "cta",
+          "image": "assets/renders/centro-empresarial-1.jpg"
+        }
+      ]
+    },
+    {
+      "slug": "03-garantia-de-investimento",
+      "name": "Garantia de investimento (20 anos)",
+      "slides": [
+        {
+          "type": "cover",
+          "image": "assets/web/vista-aerea-park.jpg",
+          "eyebrow": "PARAGUAI · SEGURANÇA JURÍDICA",
+          "title": "Sua alíquota<br>travada por<br><em>até 20 anos</em>"
+        },
+        {
+          "type": "text",
+          "bg": "ink",
+          "eyebrow": "LEY 5542/15",
+          "title": "Um contrato de investimento<br>assinado com <em>o Estado</em>",
+          "body": [
+            "A Ley 5542/15, de Garantias para as Inversões e Fomento à Geração de Emprego e ao Desenvolvimento Econômico e Social, sancionada e promulgada em 16 de dezembro de 2015, permite firmar contrato de investimento com o Estado paraguaio.",
+            "O contrato garante a invariabilidade da alíquota do Imposto de Renda que incide sobre a atividade, tratamento igualitário entre capital nacional e estrangeiro e segurança jurídica pelo prazo pactuado."
+          ]
+        },
+        {
+          "type": "list",
+          "bg": "paper",
+          "eyebrow": "OS PRAZOS",
+          "title": "Quanto tempo de<br>invariabilidade tributária",
+          "items": [
+            {
+              "k": "10 anos",
+              "v": "prazo geral de invariabilidade da alíquota do Imposto de Renda."
+            },
+            {
+              "k": "15 anos",
+              "v": "para projetos de investimento acima de US$ 50 milhões e abaixo de US$ 100 milhões."
+            },
+            {
+              "k": "20 anos",
+              "v": "para projetos de investimento iguais ou superiores a US$ 100 milhões."
+            },
+            {
+              "k": "Canon anual",
+              "v": "1% do valor do investimento, nas condições fixadas pela administração tributária."
+            }
+          ]
+        },
+        {
+          "type": "stat",
+          "eyebrow": "O QUE FICA CONGELADO",
+          "value": "10%",
+          "caption": "a alíquota do IRE, pelo<br>prazo do contrato",
+          "body": "O que o contrato protege é a alíquota do Imposto de Renda que grava a atividade desenvolvida. Indústrias de alto conteúdo social ainda contam com a exoneração da taxa adicional sobre a distribuição de lucros e alíquota reduzida na remessa de lucros ao exterior."
+        },
+        {
+          "type": "photo",
+          "image": "assets/renders/condominio-casa-fachada.jpg",
+          "eyebrow": "POR QUE ISSO PESA NA DECISÃO",
+          "title": "Previsibilidade é ativo",
+          "body": "Uma indústria se paga em 10, 15, 20 anos. O que trava um projeto raramente é a alíquota de hoje — é o risco de ela mudar amanhã. Aqui a regra do jogo entra em contrato, com prazo e assinatura."
+        },
+        {
+          "type": "trio",
+          "eyebrow": "RESUMO",
+          "title": "Garantia de investimento<br>em três linhas",
+          "items": [
+            {
+              "big": "20",
+              "label": "anos de alíquota invariável no topo da escala, a partir de US$ 100 milhões."
+            },
+            {
+              "big": "1%",
+              "label": "de canon anual sobre o investimento contratado."
+            },
+            {
+              "big": "=",
+              "label": "tratamento igualitário entre capital nacional e estrangeiro."
+            }
+          ]
+        },
+        {
+          "type": "cta",
+          "image": "assets/web/vista-aerea-park.jpg"
+        }
+      ]
+    },
+    {
+      "slug": "04-produto-mercosul",
+      "name": "Produto Mercosul",
+      "slides": [
+        {
+          "type": "cover",
+          "image": "assets/web/internas-01.jpg",
+          "eyebrow": "PARAGUAI · ACESSO A MERCADO",
+          "title": "Fabricou aqui,<br>entra no Brasil<br><em>com tarifa zero</em>"
+        },
+        {
+          "type": "text",
+          "bg": "ink",
+          "eyebrow": "PRODUTO MERCOSUL",
+          "title": "O Paraguai é sócio fundador —<br>e isso vai <em>na nota fiscal</em>",
+          "body": [
+            "O Mercosul é uma união aduaneira. O produto fabricado no Paraguai que obtém o Certificado de Origem circula com 0% de tarifa entre Brasil, Argentina, Uruguai e Paraguai.",
+            "São cerca de 270 milhões de consumidores nos quatro sócios — com o Brasil, seu maior mercado, do outro lado da fronteira."
+          ]
+        },
+        {
+          "type": "stat",
+          "eyebrow": "REGIME DE ORIGEM DO MERCOSUL",
+          "value": "40%",
+          "caption": "de valor agregado regional<br>para o certificado de origem",
+          "body": "Essa é a regra geral: 40% de conteúdo regional qualifica a mercadoria como originária e libera a tarifa zero no bloco. O percentual pode variar conforme a NCM do produto — há regras específicas por posição tarifária."
+        },
+        {
+          "type": "list",
+          "bg": "paper",
+          "eyebrow": "A VANTAGEM PARAGUAIA",
+          "title": "60% de insumo de fora<br>do bloco — até 2038",
+          "items": [
+            {
+              "k": "Paraguai",
+              "v": "pode usar até 60% de insumos extrazona no valor final do produto."
+            },
+            {
+              "k": "Demais sócios",
+              "v": "trabalham com o limite de 45% de conteúdo extrazona."
+            },
+            {
+              "k": "Validade",
+              "v": "esse tratamento diferenciado vale até 31 de dezembro de 2038."
+            },
+            {
+              "k": "Na prática",
+              "v": "importa o componente da Ásia, agrega 40% no Paraguai e vende ao Brasil sem tarifa."
+            }
+          ]
+        },
+        {
+          "type": "photo",
+          "image": "assets/web/internas-02.jpg",
+          "eyebrow": "MAQUILA + ORIGEM",
+          "title": "Os dois regimes conversam",
+          "body": "A maquila não exige percentual mínimo de valor agregado nacional — mas o Certificado de Origem, sim. Quem estrutura a operação para cumprir os 40% regionais combina o tributo único de 1% com a entrada livre de tarifa no maior mercado do bloco."
+        },
+        {
+          "type": "trio",
+          "eyebrow": "RESUMO",
+          "title": "Produto Mercosul<br>em três números",
+          "items": [
+            {
+              "big": "0%",
+              "label": "de tarifa na entrada do produto originário nos sócios do bloco."
+            },
+            {
+              "big": "40%",
+              "label": "de valor agregado regional é a régua geral do certificado de origem."
+            },
+            {
+              "big": "60%",
+              "label": "de insumo extrazona é o teto exclusivo do Paraguai, até 2038."
+            }
+          ]
+        },
+        {
+          "type": "cta",
+          "image": "assets/web/internas-01.jpg"
+        }
+      ]
+    },
+    {
+      "slug": "05-rota-bioceanica",
+      "name": "Rota Bioceânica",
+      "slides": [
+        {
+          "type": "cover",
+          "image": "assets/renders/rodovia-acesso.jpg",
+          "eyebrow": "PARAGUAI · LOGÍSTICA",
+          "title": "A Bioceânica<br>redesenhou<br><em>o mapa</em>"
+        },
+        {
+          "type": "text",
+          "bg": "ink",
+          "eyebrow": "O CORREDOR",
+          "title": "Do Centro-Oeste brasileiro<br>ao <em>Pacífico</em>, por terra",
+          "body": [
+            "São cerca de 3.400 km ligando o Centro-Oeste do Brasil ao Chaco paraguaio, ao norte argentino e aos portos do norte do Chile — Antofagasta, Iquique e Mejillones.",
+            "A ponte internacional entre Carmelo Peralta (Paraguai) e Porto Murtinho (Mato Grosso do Sul) teve a união física das duas margens em 16 de julho de 2026."
+          ]
+        },
+        {
+          "type": "stat",
+          "eyebrow": "GANHO DE TEMPO ATÉ A ÁSIA",
+          "value": "−10",
+          "unit": "dias",
+          "caption": "de trânsito entre o coração<br>do continente e o Pacífico",
+          "body": "Sair pelo Pacífico encurta a viagem até os mercados asiáticos em cerca de dez dias em relação à rota atlântica. Para carga de alto valor e para quem vende à Ásia, isso muda a conta de estoque, de capital de giro e de prazo de entrega."
+        },
+        {
+          "type": "list",
+          "bg": "paper",
+          "eyebrow": "OS NÚMEROS DA OBRA",
+          "title": "Ponte da Bioceânica",
+          "items": [
+            {
+              "k": "1.294 m",
+              "v": "de extensão, com trecho estaiado de 632 m e vão central de 350 m."
+            },
+            {
+              "k": "US$ 136 mi",
+              "v": "de investimento, financiado integralmente pela Itaipu."
+            },
+            {
+              "k": "1.990 km",
+              "v": "da ponte até o porto de Antofagasta; 2.390 km até Iquique."
+            },
+            {
+              "k": "2026–2027",
+              "v": "acabamento do pavimento em setembro de 2026 e viadutos de acesso previstos para fevereiro de 2027."
+            }
+          ]
+        },
+        {
+          "type": "photo",
+          "image": "assets/web/internas-07.jpg",
+          "eyebrow": "O QUE MUDA PARA QUEM PRODUZ EM VILLETA",
+          "title": "Duas saídas, dois oceanos",
+          "body": "De Villeta, a conexão com o corredor é pela Transchaco (Ruta PY09), a mesma espinha que atravessa o Chaco até Loma Plata e Pozo Hondo. É o Pacífico por terra somado à hidrovia Paraguai-Paraná, que já leva a carga ao Atlântico."
+        },
+        {
+          "type": "trio",
+          "eyebrow": "RESUMO",
+          "title": "Bioceânica<br>em três linhas",
+          "items": [
+            {
+              "big": "3.400",
+              "label": "quilômetros de corredor entre o Atlântico e o Pacífico."
+            },
+            {
+              "big": "10",
+              "label": "dias a menos de trânsito rumo aos mercados da Ásia."
+            },
+            {
+              "big": "4",
+              "label": "países conectados: Brasil, Paraguai, Argentina e Chile."
+            }
+          ]
+        },
+        {
+          "type": "cta",
+          "image": "assets/renders/rodovia-acesso.jpg"
+        }
+      ]
+    },
+    {
+      "slug": "06-portos-proximos",
+      "name": "Portos perto do Bracerum Park",
+      "slides": [
+        {
+          "type": "cover",
+          "image": "assets/pois/terport-villeta.jpg",
+          "credit": "Foto ilustrativa: barcaça porta-contêineres na hidrovia · Claudio Elias / Wikimedia Commons · Domínio público",
+          "eyebrow": "BRACERUM PARK · VILLETA, PARAGUAI",
+          "title": "O porto fica a<br><em>20 minutos</em><br>do portão"
+        },
+        {
+          "type": "text",
+          "bg": "ink",
+          "eyebrow": "POR QUE VILLETA",
+          "title": "O cinturão portuário que<br><em>substituiu Assunção</em>",
+          "body": [
+            "Villeta concentrou o fluxo de contêineres do Paraguai por estar mais ao sul dos passos críticos da hidrovia e por não ter as filas do porto da capital.",
+            "Da hidrovia Paraguai-Paraná saem os comboios de barcaças rumo a Montevidéu e Buenos Aires — e de lá, ao mundo. O Bracerum Park fica em 25°46'18\"S 57°43'57\"W, no meio desse cinturão."
+          ]
+        },
+        {
+          "type": "list",
+          "bg": "paper",
+          "eyebrow": "A RÉGUA DE DISTÂNCIAS",
+          "title": "Do portão do Park<br>até cada terminal",
+          "items": [
+            {
+              "k": "4 km · 10 min",
+              "v": "Embarcadero Puerto Alegre"
+            },
+            {
+              "k": "6 km · 15 min",
+              "v": "Puerto Lobato"
+            },
+            {
+              "k": "23 km · 20 min",
+              "v": "Terport Villeta"
+            },
+            {
+              "k": "33 km · 30 min",
+              "v": "Puerto Seguro Fluvial"
+            },
+            {
+              "k": "38 km · 50 min",
+              "v": "Terminal Villa Oliva"
+            },
+            {
+              "k": "42 km · 1 h",
+              "v": "Caacupemí Villeta"
+            },
+            {
+              "k": "71 km · 1 h 20",
+              "v": "Porto de Assunção"
+            }
+          ]
+        },
+        {
+          "type": "photo",
+          "image": "assets/pois/terport-villeta.jpg",
+          "credit": "Foto ilustrativa: barcaça porta-contêineres na hidrovia · Claudio Elias / Wikimedia Commons · Domínio público",
+          "eyebrow": "23 KM · 20 MINUTOS",
+          "title": "Terport Villeta",
+          "body": "O terminal privado de contêineres mais moderno da hidrovia, aberto 24 horas o ano todo: US$ 40 milhões investidos, capacidade para 95 mil contêineres por ano e pátio para mais de 7.000 unidades, com guindastes elétricos de 38 m de alcance e sistema Navis N4. Fica no km 1.578,5 da hidrovia — por isso opera mesmo na seca extrema."
+        },
+        {
+          "type": "photo",
+          "image": "assets/pois/puerto-seguro.jpg",
+          "credit": "Foto ilustrativa: cinturão industrial de Villeta · Aterovi / Wikimedia Commons · Domínio público",
+          "eyebrow": "33 KM · 30 MINUTOS",
+          "title": "Puerto Seguro Fluvial",
+          "body": "O maior terminal multipropósito do Paraguai, em operação desde 2012: contêineres, carga solta, granel, rodados e carga de projeto no mesmo recinto. Guindaste elétrico Liebherr FCC 280 de 80 t e guindaste móvel para peças de 260 a 300 t — a rota natural do maquinário pesado que chega ao parque."
+        },
+        {
+          "type": "trio",
+          "eyebrow": "RESUMO",
+          "title": "Logística do Park<br>em três linhas",
+          "items": [
+            {
+              "big": "7",
+              "label": "terminais fluviais em um raio de 71 km do portão do parque."
+            },
+            {
+              "big": "20",
+              "label": "minutos até o terminal de contêineres mais moderno da hidrovia."
+            },
+            {
+              "big": "24h",
+              "label": "de operação portuária, o ano todo, mesmo na seca extrema."
+            }
+          ]
+        },
+        {
+          "type": "cta",
+          "image": "assets/pois/caacupemi.jpg"
+        }
+      ]
+    }
+  ]
+}
