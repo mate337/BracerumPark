@@ -1120,3 +1120,40 @@ if (!reduceMotion){
       scrollTrigger: { trigger: band, start: "top bottom", end: "bottom top", scrub: true } });
   });
 }
+
+/* ==========================================================
+   09 · v5 — motion dos blocos de projeto e das páginas novas
+   Parallax lento na imagem cheia e entrada escalonada dos
+   cartões. Tudo desligado quando o usuário pede menos motion.
+   ========================================================== */
+if (!reduceMotion){
+  /* imagem dos blocos de projeto e do hero das páginas internas */
+  document.querySelectorAll(".proj__media img, .pagehero img").forEach(img => {
+    const alvo = img.closest(".proj__media, .pagehero");
+    gsap.fromTo(img, { yPercent: -6 }, {
+      yPercent: 6, ease: "none",
+      scrollTrigger: { trigger: alvo, start: "top bottom", end: "bottom top", scrub: true }
+    });
+  });
+
+  /* cartões e células entram em cascata */
+  document.querySelectorAll(".cards, .futuro__grid, .specbar").forEach(grid => {
+    gsap.from(grid.children, {
+      y: 26, opacity: 0, duration: .7, ease: "power2.out", stagger: .07,
+      scrollTrigger: { trigger: grid, start: "top 86%", once: true }
+    });
+  });
+}
+
+/* A tira horizontal rola com a roda do mouse no desktop — sem isso o
+   usuário de trackpad não descobre que ela anda para o lado. */
+document.querySelectorAll(".strip").forEach(strip => {
+  strip.addEventListener("wheel", e => {
+    if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
+    const max = strip.scrollWidth - strip.clientWidth;
+    if (max < 4) return;
+    const antes = strip.scrollLeft;
+    strip.scrollLeft = Math.max(0, Math.min(max, antes + e.deltaY));
+    if (strip.scrollLeft !== antes) e.preventDefault();
+  }, { passive: false });
+});

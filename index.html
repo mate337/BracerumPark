@@ -10,7 +10,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
 <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" />
-<link rel="stylesheet" href="style.css?v=13" />
+<link rel="stylesheet" href="style.css?v=14" />
 <noscript><style>.reveal{opacity:1!important;transform:none!important}.mask__in{transform:none!important}.step{opacity:1!important;filter:none!important;transform:none!important}#loader{display:none!important}</style></noscript>
 </head>
 <body>
@@ -41,11 +41,12 @@
   </a>
   <nav class="nav__links">
     <a href="#masterplan" data-i18n="nav.masterplan">Masterplan</a>
-    <a href="#localizacao" data-i18n="nav.location">Localização</a>
-    <a href="#jornada" data-i18n="nav.how">Como funciona</a>
     <a href="#galeria" data-i18n="nav.park">O Parque</a>
+    <a href="hotel.html" data-i18n="nav.hotel">Hotel</a>
+    <a href="resort.html" data-i18n="nav.resort">Resort</a>
+    <a href="select.html" data-i18n="nav.select">Select</a>
+    <a href="#localizacao" data-i18n="nav.location">Localização</a>
     <a href="tributacao.html" data-i18n="nav.tax">Tributação</a>
-    <a href="bracerum.html" data-i18n="nav.bracerum">Bracerum</a>
   </nav>
   <div class="nav__right">
     <div class="lang" role="group" aria-label="Idioma / Language / Idioma">
@@ -134,19 +135,8 @@
   </a>
 </section>
 
-<!-- ============ TRIBUTAÇÃO — teaser ============ -->
-<section class="tax-teaser" id="tributacao-teaser">
-  <div class="tax-teaser__inner">
-    <h2 class="tax-teaser__title reveal" data-i18n="tax.title">A tributação mais <em>competitiva</em> da América do Sul.</h2>
-    <div class="tax-teaser__side reveal">
-      <p data-i18n="tax.desc">Conheça as vantagens tributárias do Paraguai — Regime de Maquila, Ley de Inversiones e Certificado de Origem Mercosul, combinados numa única operação.</p>
-      <a class="btn btn--dark" href="tributacao.html"><span data-i18n="tax.cta">Conhecer as vantagens</span> <span class="btn__arrow">→</span></a>
-    </div>
-  </div>
-</section>
-
 <!-- ============ MASTERPLAN ============ -->
-<section class="masterplan" id="masterplan">
+<section class="masterplan" id="masterplan" style="padding-top:clamp(64px,8vw,124px)">
   <div class="masterplan__viewport" id="mpViewport">
     <div class="masterplan__stage" id="mpStage">
       <img src="assets/web/vista-aerea-park.jpg" alt="Vista aérea do masterplan do Bracerum Park em Villeta" draggable="false" />
@@ -179,63 +169,106 @@
   </div>
 </section>
 
-<!-- ============ LOCALIZAÇÃO ============ -->
-<section class="loc" id="localizacao">
-  <div class="section__head section__head--dark reveal" style="padding-top:clamp(80px,11vw,150px)">
-    <p class="eyebrow eyebrow--dark" data-i18n="loc.eyebrow">Localização</p>
-    <h2><span class="mask"><span class="mask__in" data-i18n="loc.title">A escolha certa tem <em>endereço</em>.</span></span></h2>
-    <p class="lead" data-i18n="loc.lead">Villeta, Paraguai — acesso direto à Hidrovia Paraná–Paraguai e ao corredor rodoviário do Mercosul, sobre a mesma rodovia (PY19) que serve o Terport e o Puerto Seguro.</p>
+<!-- ============ GALERIA ============ -->
+<section class="gallery bleed" id="galeria" style="padding:clamp(80px,11vw,150px) 0">
+  <div class="section__head section__head--dark reveal">
+    <p class="eyebrow eyebrow--dark" data-i18n="gal.eyebrow">O Parque</p>
+    <h2><span class="mask"><span class="mask__in" data-i18n="gal.title">Uma cidade completa <em>para a sua indústria</em></span></span></h2>
+    <p class="lead" data-i18n="gal.lead">Vias dimensionadas para bitrem, faixa técnica arborizada, drenagem por cordões e iluminação a cada 30 m — a infraestrutura essencial é entregue pronta pelo parque.</p>
+    <a class="btn btn--dark" href="qualidade.html" style="margin-top:22px"><span data-i18n="gal.cta">Ver a qualidade de construção</span> <span class="btn__arrow">→</span></a>
   </div>
 
-  <div class="loc-map-wrap">
-    <div id="locMap" role="application" aria-label="Mapa interativo do Bracerum Park"></div>
-
-    <aside class="loc-panel">
-      <h3 data-i18n="loc.panel">Distâncias do Park</h3>
-      <div class="loc-acc" data-open="true">
-        <button class="loc-acc__head" aria-expanded="true"><span data-i18n="loc.ports">Portos fluviais</span><span class="loc-acc__caret">▼</span></button>
-        <div class="loc-acc__body"><ul id="portList"></ul></div>
-      </div>
-      <div class="loc-acc" data-open="false">
-        <button class="loc-acc__head" aria-expanded="false"><span data-i18n="loc.roads">Rodovias · Mercosul</span><span class="loc-acc__caret">▼</span></button>
-        <div class="loc-acc__body"><ul id="roadList"></ul></div>
-      </div>
-      <div class="loc-acc" data-open="false">
-        <button class="loc-acc__head" aria-expanded="false"><span data-i18n="loc.airports">Aeroportos</span><span class="loc-acc__caret">▼</span></button>
-        <div class="loc-acc__body"><ul id="airportList"></ul></div>
-      </div>
-      <div class="loc-acc" data-open="false">
-        <button class="loc-acc__head" aria-expanded="false"><span data-i18n="loc.air">Distâncias aéreas · Brasil</span><span class="loc-acc__caret">▼</span></button>
-        <div class="loc-acc__body"><ul id="capitalList"></ul></div>
-      </div>
-      <div class="loc-acc" data-open="false">
-        <button class="loc-acc__head" aria-expanded="false"><span data-i18n="loc.refs">Pontos de interesse</span><span class="loc-acc__caret">▼</span></button>
-        <div class="loc-acc__body"><ul id="refList"></ul></div>
-      </div>
-    </aside>
-
-    <aside class="poi-card" id="poiCard">
-      <button class="poi-card__close" aria-label="Fechar">✕</button>
-      <div class="poi-card__media"></div>
-      <div class="poi-card__body">
-        <p class="poi-card__type"></p>
-        <h3 class="poi-card__title"></h3>
-        <div class="poi-card__stats">
-          <div><span data-i18n="loc.fromPark">Do Park</span><b data-poi-km></b></div>
-          <div><span data-i18n="loc.time">Tempo</span><b data-poi-time></b></div>
-        </div>
-        <p class="poi-card__desc"></p>
-        <button class="poi-card__route" data-i18n="loc.showRoute">Ver rota a partir do Park →</button>
-      </div>
-    </aside>
-
-    <div class="park-indicator" id="parkIndicator">
-      <span class="park-indicator__arrow">↑</span>
-      <span>Bracerum Park<small><span data-park-dist></span></small></span>
+  <div class="gallery-accordion" id="galleryAccordion">
+    <div class="gallery-panel is-active">
+      <img src="assets/park/vias-noturna.jpg" alt="Vias internas do parque industrial" loading="lazy" />
+      <div class="gallery-panel__label"><span class="num">01</span><span class="name" data-i18n="gal.1">Vias do Park</span></div>
     </div>
+    <div class="gallery-panel">
+      <img src="assets/park/vias-galpao.jpg" alt="Galpões industriais Built-to-Suit" loading="lazy" />
+      <div class="gallery-panel__label"><span class="num">02</span><span class="name" data-i18n="gal.2">Galpões</span></div>
+    </div>
+    <div class="gallery-panel">
+      <img src="assets/park/fabrica-bracerum.jpg" alt="Fábrica Bracerum à noite" loading="lazy" />
+      <div class="gallery-panel__label"><span class="num">03</span><span class="name" data-i18n="gal.3">Fábrica</span></div>
+    </div>
+    <div class="gallery-panel">
+      <img src="assets/park/hotel-conjunto.jpg" alt="Hotel e Centro de Convenções" loading="lazy" />
+      <div class="gallery-panel__label"><span class="num">04</span><span class="name" data-i18n="gal.4">Hotel &amp; Convenções</span></div>
+    </div>
+    <div class="gallery-panel">
+      <img src="assets/park/resort-lago-aereo.jpg" alt="Condomínio Bracerum Resort" loading="lazy" />
+      <div class="gallery-panel__label"><span class="num">05</span><span class="name" data-i18n="gal.5">Condomínio</span></div>
+    </div>
+    <div class="gallery-panel">
+      <img src="assets/park/amen-salao-eventos.jpg" alt="Eventos e gastronomia" loading="lazy" />
+      <div class="gallery-panel__label"><span class="num">06</span><span class="name" data-i18n="gal.7">Eventos</span></div>
+    </div>
+  </div>
+</section>
 
-    <button id="recenterBtn" class="recenter" data-i18n="loc.recenter">Recentralizar</button>
-    <p class="map-note" data-i18n="loc.clickHint">Clique em um ponto do mapa para ver detalhes</p>
+<!-- ============ HOTEL ============ -->
+<section class="proj" id="hotel">
+  <a class="proj__media" href="hotel.html" tabindex="-1" aria-hidden="true">
+    <img src="assets/park/hotel-conjunto.jpg" alt="Hotel e Centro de Convenções do Bracerum Park" loading="lazy" />
+  </a>
+  <p class="proj__mark"><b>Bracerum</b> Hotel</p>
+  <div class="proj__body">
+    <div class="reveal">
+      <h2 class="proj__title" data-i18n="ph.title">O hotel e o centro de convenções <em>no mesmo endereço</em> da sua fábrica</h2>
+    </div>
+    <div class="proj__aside reveal">
+      <p data-i18n="ph.desc">A equipe da matriz dorme a minutos da linha de produção. O centro de convenções e o auditório recebem feiras setoriais, treinamentos e lançamentos sem ninguém precisar ir a Assunção.</p>
+      <ul class="proj__facts">
+        <li><span data-i18n="ph.f1k">Auditório</span><b data-i18n="ph.f1v">1.200 pessoas</b></li>
+        <li><span data-i18n="ph.f2k">Convenções</span><b data-i18n="ph.f2v">Contíguo ao hotel</b></li>
+        <li><span data-i18n="ph.f3k">Distância da fábrica</span><b data-i18n="ph.f3v">Dentro do parque</b></li>
+      </ul>
+      <a class="btn btn--dark" href="hotel.html"><span data-i18n="ph.cta">Conhecer o hotel</span> <span class="btn__arrow">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ RESORT ============ -->
+<section class="proj" id="resort">
+  <a class="proj__media" href="resort.html" tabindex="-1" aria-hidden="true">
+    <img src="assets/park/resort-lago-aereo.jpg" alt="Bracerum Resort — condomínio fechado de casas" loading="lazy" />
+  </a>
+  <p class="proj__mark"><b>Bracerum</b> Resort</p>
+  <div class="proj__body">
+    <div class="reveal">
+      <h2 class="proj__title" data-i18n="pr.title">Um condomínio fechado <em>dentro</em> da cidade industrial</h2>
+    </div>
+    <div class="proj__aside reveal">
+      <p data-i18n="pr.desc">142.067 m² de setor residencial e recreativo integrados ao ecossistema do parque: casas, lago, clubhouse, piscina e quadras. Quem dirige a operação mora a minutos dela.</p>
+      <ul class="proj__facts">
+        <li><span data-i18n="pr.f1k">Área residencial</span><b data-i18n="pr.f1v">142.067 m²</b></li>
+        <li><span data-i18n="pr.f2k">Lazer</span><b data-i18n="pr.f2v">Clubhouse, lago e quadras</b></li>
+        <li><span data-i18n="pr.f3k">Acesso</span><b data-i18n="pr.f3v">Portaria própria</b></li>
+      </ul>
+      <a class="btn btn--dark" href="resort.html"><span data-i18n="pr.cta">Conhecer o resort</span> <span class="btn__arrow">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SELECT ============ -->
+<section class="proj" id="select">
+  <a class="proj__media" href="select.html" tabindex="-1" aria-hidden="true">
+    <img src="assets/park/select-comercial-noite.jpg" alt="Bracerum Select — comércio e serviços do parque" loading="lazy" />
+  </a>
+  <p class="proj__mark"><b>Bracerum</b> Select</p>
+  <div class="proj__body">
+    <div class="reveal">
+      <h2 class="proj__title" data-i18n="ps.title">Tudo o que a operação precisa, <em>a pé</em></h2>
+    </div>
+    <div class="proj__aside reveal">
+      <p data-i18n="ps.desc">Curadoria de comércio e serviços dentro do parque: shopping, academia, posto de combustível, market, praça de alimentação e a infraestrutura de apoio que a indústria usa todo dia — contabilidade, imobiliária, manutenção e serviços técnicos.</p>
+      <ul class="proj__facts">
+        <li><span data-i18n="ps.f1k">Shopping e academia</span><b data-i18n="ps.f1v">No masterplan</b></li>
+        <li><span data-i18n="ps.f2k">Posto e market</span><b data-i18n="ps.f2v">Aberto ao parque</b></li>
+        <li><span data-i18n="ps.f3k">Apoio ao caminhoneiro</span><b data-i18n="ps.f3v">Pátio dedicado</b></li>
+      </ul>
+      <a class="btn btn--dark" href="select.html"><span data-i18n="ps.cta">Conhecer o Select</span> <span class="btn__arrow">→</span></a>
+    </div>
   </div>
 </section>
 
@@ -308,42 +341,63 @@
   </div>
 </section>
 
-<!-- ============ GALERIA ============ -->
-<section class="gallery bleed" id="galeria" style="padding:clamp(80px,11vw,150px) 0">
-  <div class="section__head section__head--dark reveal">
-    <p class="eyebrow eyebrow--dark" data-i18n="gal.eyebrow">O Parque</p>
-    <h2><span class="mask"><span class="mask__in" data-i18n="gal.title">Uma cidade completa <em>para a sua indústria</em></span></span></h2>
+<!-- ============ LOCALIZAÇÃO ============ -->
+<section class="loc" id="localizacao">
+  <div class="section__head section__head--dark reveal" style="padding-top:clamp(80px,11vw,150px)">
+    <p class="eyebrow eyebrow--dark" data-i18n="loc.eyebrow">Localização</p>
+    <h2><span class="mask"><span class="mask__in" data-i18n="loc.title">A escolha certa tem <em>endereço</em>.</span></span></h2>
+    <p class="lead" data-i18n="loc.lead">Villeta, Paraguai — acesso direto à Hidrovia Paraná–Paraguai e ao corredor rodoviário do Mercosul, sobre a mesma rodovia (PY19) que serve o Terport e o Puerto Seguro.</p>
   </div>
 
-  <div class="gallery-accordion" id="galleryAccordion">
-    <div class="gallery-panel is-active">
-      <img src="assets/web/internas-01.jpg" alt="Vias internas do parque industrial" loading="lazy" />
-      <div class="gallery-panel__label"><span class="num">01</span><span class="name" data-i18n="gal.1">Vias do Park</span></div>
+  <div class="loc-map-wrap">
+    <div id="locMap" role="application" aria-label="Mapa interativo do Bracerum Park"></div>
+
+    <aside class="loc-panel">
+      <h3 data-i18n="loc.panel">Distâncias do Park</h3>
+      <div class="loc-acc" data-open="true">
+        <button class="loc-acc__head" aria-expanded="true"><span data-i18n="loc.ports">Portos fluviais</span><span class="loc-acc__caret">▼</span></button>
+        <div class="loc-acc__body"><ul id="portList"></ul></div>
+      </div>
+      <div class="loc-acc" data-open="false">
+        <button class="loc-acc__head" aria-expanded="false"><span data-i18n="loc.roads">Rodovias · Mercosul</span><span class="loc-acc__caret">▼</span></button>
+        <div class="loc-acc__body"><ul id="roadList"></ul></div>
+      </div>
+      <div class="loc-acc" data-open="false">
+        <button class="loc-acc__head" aria-expanded="false"><span data-i18n="loc.airports">Aeroportos</span><span class="loc-acc__caret">▼</span></button>
+        <div class="loc-acc__body"><ul id="airportList"></ul></div>
+      </div>
+      <div class="loc-acc" data-open="false">
+        <button class="loc-acc__head" aria-expanded="false"><span data-i18n="loc.air">Distâncias aéreas · Brasil</span><span class="loc-acc__caret">▼</span></button>
+        <div class="loc-acc__body"><ul id="capitalList"></ul></div>
+      </div>
+      <div class="loc-acc" data-open="false">
+        <button class="loc-acc__head" aria-expanded="false"><span data-i18n="loc.refs">Pontos de interesse</span><span class="loc-acc__caret">▼</span></button>
+        <div class="loc-acc__body"><ul id="refList"></ul></div>
+      </div>
+    </aside>
+
+    <aside class="poi-card" id="poiCard">
+      <button class="poi-card__close" aria-label="Fechar">✕</button>
+      <div class="poi-card__media"></div>
+      <div class="poi-card__body">
+        <p class="poi-card__type"></p>
+        <h3 class="poi-card__title"></h3>
+        <div class="poi-card__stats">
+          <div><span data-i18n="loc.fromPark">Do Park</span><b data-poi-km></b></div>
+          <div><span data-i18n="loc.time">Tempo</span><b data-poi-time></b></div>
+        </div>
+        <p class="poi-card__desc"></p>
+        <button class="poi-card__route" data-i18n="loc.showRoute">Ver rota a partir do Park →</button>
+      </div>
+    </aside>
+
+    <div class="park-indicator" id="parkIndicator">
+      <span class="park-indicator__arrow">↑</span>
+      <span>Bracerum Park<small><span data-park-dist></span></small></span>
     </div>
-    <div class="gallery-panel">
-      <img src="assets/web/internas-07.jpg" alt="Galpões industriais Built-to-Suit" loading="lazy" />
-      <div class="gallery-panel__label"><span class="num">02</span><span class="name" data-i18n="gal.2">Galpões</span></div>
-    </div>
-    <div class="gallery-panel">
-      <img src="assets/renders/fabrica-bracerum-noturna.jpg" alt="Fábrica Bracerum à noite" loading="lazy" />
-      <div class="gallery-panel__label"><span class="num">03</span><span class="name" data-i18n="gal.3">Fábrica</span></div>
-    </div>
-    <div class="gallery-panel">
-      <img src="assets/web/hero-hotel-noturno.jpg" alt="Hotel e Centro de Convenções" loading="lazy" />
-      <div class="gallery-panel__label"><span class="num">04</span><span class="name" data-i18n="gal.4">Hotel &amp; Convenções</span></div>
-    </div>
-    <div class="gallery-panel">
-      <img src="assets/renders/condominio-casa-fachada.jpg" alt="Condomínio Bracerum Resort" loading="lazy" />
-      <div class="gallery-panel__label"><span class="num">05</span><span class="name" data-i18n="gal.5">Condomínio</span></div>
-    </div>
-    <div class="gallery-panel">
-      <img src="assets/renders/clube-bracerum-1.jpg" alt="Clube Bracerum" loading="lazy" />
-      <div class="gallery-panel__label"><span class="num">06</span><span class="name" data-i18n="gal.6">Clube</span></div>
-    </div>
-    <div class="gallery-panel">
-      <img src="assets/renders/eventos-gastronomia-1.jpg" alt="Eventos e gastronomia" loading="lazy" />
-      <div class="gallery-panel__label"><span class="num">07</span><span class="name" data-i18n="gal.7">Eventos</span></div>
-    </div>
+
+    <button id="recenterBtn" class="recenter" data-i18n="loc.recenter">Recentralizar</button>
+    <p class="map-note" data-i18n="loc.clickHint">Clique em um ponto do mapa para ver detalhes</p>
   </div>
 </section>
 
@@ -362,8 +416,51 @@
       <div class="companies-grid__item"><img src="assets/Lupo_logo (1).svg" alt="Lupo" /></div>
       <div class="companies-grid__item"><img src="assets/Kingspan_Group_logo.svg" alt="Kingspan" /></div>
     </div>
+  </div>
+</section>
 
-    <div class="advisory reveal" style="margin-top:clamp(56px,7vw,96px)">
+<!-- ============ FUTURO DE VILLETA ============ -->
+<section class="section futuro" id="futuro">
+  <div class="section__head reveal">
+    <p class="eyebrow" data-i18n="fv.eyebrow">Futuro de Villeta</p>
+    <h2><span class="mask"><span class="mask__in" data-i18n="fv.title">A cidade que virou o <em>porto industrial</em> do Paraguai</span></span></h2>
+    <p class="lead" data-i18n="fv.lead">Villeta concentra hoje os terminais privados que movimentam a carga do país e o corredor rodoviário que liga o Mercosul. O que era zona rural virou o endereço industrial mais disputado do Paraguai — e o Bracerum Park nasce no meio dele.</p>
+  </div>
+  <div class="futuro__grid reveal">
+    <div class="futuro__cell">
+      <span class="num">PY02</span>
+      <h3 data-i18n="fv.1.t">Corredor duplicado</h3>
+      <p data-i18n="fv.1.d">A Ruta PY02 é o principal corredor logístico terrestre do país, ligando a região metropolitana a Ciudad del Este e à fronteira brasileira. A duplicação recente derrubou o tempo de trânsito de carga.</p>
+    </div>
+    <div class="futuro__cell">
+      <span class="num">Bitrem</span>
+      <h3 data-i18n="fv.2.t">Alta capacidade liberada</h3>
+      <p data-i18n="fv.2.d">A infraestrutura do corredor comporta veículos de alta capacidade de carga, como bitrens — o que reduz o custo logístico por tonelada transportada.</p>
+    </div>
+    <div class="futuro__cell">
+      <span class="num">2 oceanos</span>
+      <h3 data-i18n="fv.3.t">Atlântico e Pacífico</h3>
+      <p data-i18n="fv.3.d">Acesso direto à Hidrovia Paraná–Paraguai, com rotas para o Atlântico e o Pacífico, e conexão futura com a Rota Bioceânica, que abre a saída para o Chile.</p>
+    </div>
+    <div class="futuro__cell">
+      <span class="num">65 km</span>
+      <h3 data-i18n="fv.4.t">Capital e aeroporto</h3>
+      <p data-i18n="fv.4.d">Assunção e o aeroporto internacional ficam a cerca de 65 km, com voos diários. Sem passar pelo congestionamento da capital: as vias interurbanas emendam direto na rodovia troncal.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TRIBUTAÇÃO — teaser ============ -->
+<section class="tax-teaser" id="tributacao-teaser">
+  <div class="tax-teaser__inner">
+    <h2 class="tax-teaser__title reveal" data-i18n="tax.title">A tributação mais <em>competitiva</em> da América do Sul.</h2>
+    <div class="tax-teaser__side reveal">
+      <p data-i18n="tax.desc">Conheça as vantagens tributárias do Paraguai — Regime de Maquila, Ley de Inversiones e Certificado de Origem Mercosul, combinados numa única operação.</p>
+      <a class="btn btn--dark" href="tributacao.html"><span data-i18n="tax.cta">Conhecer as vantagens</span> <span class="btn__arrow">→</span></a>
+    </div>
+  </div>
+  <div class="section" style="padding-top:0">
+    <div class="advisory reveal" >
       <div>
         <h2 data-i18n="adv.title">Do enquadramento tributário ao primeiro embarque, sua empresa não anda sozinha.</h2>
         <p data-i18n="adv.desc">A Bracerum acompanha sua empresa na escolha do melhor enquadramento — Maquila, Ley de Inversiones ou ambos — com o suporte da equipe jurídica e contábil dedicada do Bracerum Park.</p>
@@ -412,13 +509,14 @@
         <span class="contact-card__line"><b data-i18n="ft.br">Brasil</b><a href="tel:+5547988030200">+55 47 98803-0200</a></span>
         <span class="contact-card__line"><a href="mailto:sydney@bracerum.com">sydney@bracerum.com</a></span>
         <div class="contact-card__links" style="margin-top:14px">
-          <a href="https://wa.me/595983030200" target="_blank" rel="noopener" class="contact-btn">WhatsApp</a>
+          <a href="https://wa.me/5547988030200" target="_blank" rel="noopener" class="contact-btn">WhatsApp</a>
           <a href="https://instagram.com/sydneysavi" target="_blank" rel="noopener" class="contact-btn">@sydneysavi</a>
         </div>
       </div>
     </div>
     <div class="footer__meta">
-      <a href="https://maps.app.goo.gl/oV7XiWquCpgAhZYX7" target="_blank" rel="noopener">25°46'18.1"S 57°43'56.6"W · Villeta, Paraguai</a>
+      <a href="https://maps.app.goo.gl/oV7XiWquCpgAhZYX7" target="_blank" rel="noopener"
+         data-i18n="ft.addr">Acceso Sur · Ruta PY19 — Villeta, Departamento Central, Paraguai</a>
       <span data-i18n="ft.rights">© 2026 Bracerum Park. Todos os direitos reservados.</span>
     </div>
   </div>
@@ -436,7 +534,8 @@
 <script src="https://unpkg.com/@maplibre/maplibre-gl-leaflet@0.0.22/leaflet-maplibre-gl.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-<script src="i18n.js?v=13"></script>
-<script src="script.js?v=13"></script>
+<script src="i18n.js?v=14"></script>
+<script src="script.js?v=14"></script>
 </body>
 </html>
+

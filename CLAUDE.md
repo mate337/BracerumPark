@@ -2,9 +2,10 @@
 
 Site institucional do **Bracerum Park**, cidade industrial multiuso em Villeta, Paraguai (Mercosul). Público-alvo: investidores e indústrias avaliando instalar operação no parque.
 
-## Estado do projeto (v4.2 — 2026-08-26)
+## Estado do projeto (v5 — 2026-09-02)
 
-O site tem **3 páginas**: `index.html`, `tributacao.html` e `bracerum.html`, mais `i18n.js`, `style.css` e `script.js`.
+O site tem **7 páginas**: `index.html`, `tributacao.html`, `bracerum.html`, `hotel.html`,
+`resort.html`, `select.html` e `qualidade.html`, mais `i18n.js`, `style.css` e `script.js`.
 
 ### Regras de design **obrigatórias** (definidas pelo cliente)
 - **Paleta: preto, branco e bege/marrom** (`--ink #0e0d0b`, `--paper #f7f3ea`, `--sand #cbb88f`, `--brown #473315`). **Zero vermelho.** Azul só nos três casos pedidos pelo cliente: a faixa institucional da Bracerum (`--brc-blue #1c4d9d`), a água do mapa (semântica) e a iluminação cênica do render do hero.
@@ -20,8 +21,39 @@ Na primeira visita aparece uma tela (`#langGate`) com EN/PT/ES antes do site. Ao
 O HTML carrega **português**; `i18n.js` traz dicionários **EN** e **ES** que sobrescrevem via `data-i18n="chave"`. Chave ausente cai no PT original — a página nunca quebra. Conteúdo dinâmico (pinos, POIs, listas do mapa) usa objetos `{pt,en,es}` lidos pelo helper `tr()` e re-renderiza no evento `langchange`.
 **Atenção:** o helper chama-se `tr()` e **não** `L()`, porque `L` é o global do Leaflet. Ao adicionar texto novo, incluir a chave nos dois dicionários (há um script de conferência no histórico da sessão).
 
-### Estrutura do index
-loader → hero (Ken Burns + dots) → teaser de tributação → masterplan com zoom por área (`AREAS` no script.js, coordenadas em % sobre `assets/web/vista-aerea-park.jpg`; o palco `#mpStage` tem a **proporção da própria imagem** e é dimensionado para cobrir o viewport — é isso que mantém os pinos no lugar em qualquer tela. Quando a planta é mais larga que a tela, o bloco fica **arrastável na horizontal** e as bordas esmaecem; no celular a faixa é mais baixa, `clamp(420px,68svh,600px)`, para o arrasto não ser longo demais) → mapa Leaflet dark full-bleed → "Como funciona" (seção de exatamente `100svh` fixada com `ScrollTrigger.pin`: primeiro ela se centraliza, depois o scroll avança os tópicos. **A altura fixa é o que evita a sobreposição e o espaço em branco da v2** — se mudar o conteúdo, manter o bloco cabendo em uma tela) → sanfona escura → empresas → assessoria → faixa história → footer.
+### Estrutura do index (ordem definida pelo cliente na v5)
+loader → hero → **respiro** → masterplan com zoom por área (`AREAS` no script.js, coordenadas em %
+sobre `assets/web/vista-aerea-park.jpg`; o palco `#mpStage` tem a **proporção da própria imagem** e é
+dimensionado para cobrir o viewport — é isso que mantém os pinos no lugar em qualquer tela. Quando a
+planta é mais larga que a tela, o bloco fica **arrastável na horizontal** e as bordas esmaecem; no
+celular a faixa é mais baixa, `clamp(420px,68svh,600px)`) → galeria sanfona "Fotos do Parque" (o
+**Clube saiu** — está dentro do Select) → **bloco Hotel** → **bloco Resort** → **bloco Select** →
+"Como funciona" (seção de exatamente `100svh` fixada com `ScrollTrigger.pin`. **A altura fixa é o que
+evita a sobreposição e o espaço em branco da v2** — se mudar o conteúdo, manter o bloco cabendo em uma
+tela) → mapa Leaflet dark full-bleed → empresas → **Futuro de Villeta** → tributação + assessoria + CTA
+→ faixa Bracerum → footer.
+
+### Páginas de projeto (v5)
+Cada sub-projeto tem página própria, montada a partir do **masterplan R04** (PDF do OTIFF, set/2026):
+- `hotel.html` — Bracerum Hotel + Centro de Convenções + auditório de 1.200 lugares.
+- `resort.html` — condomínio fechado, 142.067 m², clubhouse, lago e quadras.
+- `select.html` — curadoria de comércio (shopping, academia, posto, market) e de serviços de apoio.
+- `qualidade.html` — hierarquia viária, drenagem, áreas verdes e sustentabilidade.
+
+Os blocos `.proj` da home e os heros `.pagehero` usam a mesma regra: **a imagem é link e o botão
+também é link de verdade** — o cliente reclamou de botão sem ação, os dois navegam.
+
+### Renders do masterplan R04
+`assets/park/` tem 42 renders extraídos do PDF (`pdfimages` pega a maior imagem embutida de cada
+página, sem a marca d'água do OTIFF, que é um objeto sobreposto). 7,3 MB no total, 1400 px de largura.
+O texto do PDF vem com **fonte subset**: os glifos estão deslocados (ASCII +0x273 numa fonte, +0x1D
+noutra) — o decodificador está em `/tmp/pdf/dec.py` no histórico da sessão, se precisar reler o PDF.
+
+**Dados oficiais do R04** (usar estes, não os do catálogo V15 quando divergirem):
+terreno +1.800.000 m² · Resort 142.067 m² · parcelas industriais 987.304 m² · pista de 1.280 m ·
+auditório 1.200 pessoas · 12 setores principais.
+**Conflito conhecido:** o catálogo V15 dizia pista de **1.480 m**, o R04 diz **1.280 m**. O site ainda
+exibe 1.480 m no masterplan — confirmar com o cliente qual vale.
 
 ### Mapa
 **Basemap:** mapa **vetorial do OpenFreeMap** (estilo `dark`) via `maplibre-gl` + `maplibre-gl-leaflet`,
@@ -62,6 +94,13 @@ Onde a foto não existe, a **descrição** carrega a escala: Terport e Puerto Se
 capacidade e equipamento, apurados nas fontes do setor.
 
 **Pendências conhecidas** (aguardar o usuário):
+- **Logos do Bracerum Select, Hotel e Resort** — estão em `C:\Users\User\OneDrive\Desktop\Chat gpt archives`,
+  fora do alcance desta sessão. As páginas usam um lockup tipográfico provisório (`.sublogo`).
+- **Tipologias das casas do Resort** — o R04 define o setor residencial mas não traz plantas por
+  unidade; a seção existe com o esqueleto pronto, esperando o quadro de áreas.
+- **Lazer próprio do hotel** (piscina, spa, academia no bloco de hospedagem) — não está no R04.
+- **Ciclovias**: o esquema vial do R04 documenta veredas de 1,50 a 3,90 m e franjas técnicas de
+  0,80 m, mas **não rotula ciclovia**. Confirmar com o cliente antes de afirmar que existe.
 - Fotos próprias dos terminais (Terport, Puerto Seguro, Caacupemí) para substituir as ilustrativas.
 - Faixa de história / página Bracerum: falta o número de anos da Bracerum como importadora de aço. O site institucional só traz "2018–2026" no copyright, então usei 2018 como início da operação como trader — **confirmar com o cliente**.
 - Pinos do masterplan já seguem as marcações do cliente; refinar se ele apontar ajustes.

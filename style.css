@@ -918,3 +918,188 @@ html:not(.js) #langGate{display:none}
   .masterplan__viewport{height:clamp(420px,68svh,600px);min-height:0}
   .masterplan__hint{bottom:16px;font-size:.58rem;padding:0 76px 0 20px;text-align:left;left:0;transform:none;width:100%}
 }
+
+/* ==========================================================
+   v5 · BLOCOS DE PROJETO NA HOME (Hotel, Resort, Select)
+   Imagem full-bleed + painel de texto. A imagem é link (o
+   cliente pediu para manter) e o botão também é link de
+   verdade — os dois navegam.
+   ========================================================== */
+.proj{position:relative;background:var(--ink);color:var(--t-dark);overflow:hidden}
+.proj__media{
+  position:relative;display:block;height:clamp(420px,72svh,760px);overflow:hidden;
+  background:var(--ink-2);
+}
+.proj__media img{
+  width:100%;height:100%;object-fit:cover;display:block;
+  transform:scale(1.06);transition:transform 1.4s var(--ease),filter .6s var(--ease);
+  filter:saturate(.96);
+}
+.proj__media:hover img{transform:scale(1.1)}
+.proj__media::after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(180deg,rgba(10,9,7,.5) 0%,rgba(10,9,7,0) 38%,rgba(10,9,7,.1) 62%,rgba(10,9,7,.82) 100%);
+}
+.proj__mark{
+  position:absolute;left:var(--gap);top:clamp(96px,10vw,132px);z-index:3;
+  font:700 .68rem/1 var(--sans);letter-spacing:.34em;text-transform:uppercase;
+  color:var(--t-dark);text-shadow:0 2px 18px rgba(10,9,7,.6);
+}
+.proj__mark b{font-weight:700;color:var(--sand)}
+.proj__body{
+  position:relative;z-index:2;margin-top:clamp(-140px,-11vw,-90px);
+  padding:0 var(--gap) clamp(70px,9vw,120px);
+  display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);
+  gap:clamp(28px,5vw,80px);align-items:end;
+}
+.proj__title{
+  font-family:var(--serif);font-weight:400;line-height:1.02;
+  font-size:clamp(2.1rem,4.6vw,4rem);color:var(--t-dark);max-width:14ch;
+  text-shadow:0 2px 30px rgba(10,9,7,.55);
+}
+.proj__title em{font-style:italic;color:var(--sand)}
+/* o título encosta na base da imagem; o painel da direita começa abaixo
+   dela, sobre o fundo escuro — texto sobre foto perde legibilidade. */
+.proj__aside{padding-top:clamp(96px,11vw,152px)}
+.proj__aside p{color:var(--t-dark-soft);max-width:46ch;font-size:.98rem;line-height:1.75}
+.proj__facts{
+  list-style:none;margin:clamp(22px,3vw,34px) 0 clamp(26px,3.4vw,38px);padding:0;
+  border-top:1px solid var(--line-dark);
+}
+.proj__facts li{
+  display:flex;justify-content:space-between;align-items:baseline;gap:18px;
+  padding:13px 0;border-bottom:1px solid var(--line-dark);
+}
+.proj__facts span{
+  font:600 .62rem/1 var(--sans);letter-spacing:.2em;text-transform:uppercase;color:var(--t-dark-mute);
+}
+.proj__facts b{font-family:var(--serif);font-weight:500;font-size:1.06rem;color:var(--t-dark)}
+@media (max-width:900px){
+  .proj__body{grid-template-columns:1fr;margin-top:-70px;align-items:start}
+  .proj__aside{padding-top:0}
+  .proj__title{max-width:18ch}
+}
+
+/* ==========================================================
+   v5 · FUTURO DE VILLETA
+   ========================================================== */
+.futuro{background:var(--paper-2);color:var(--t-light)}
+.futuro__grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+  gap:1px;background:var(--line-light);border:1px solid var(--line-light);
+  margin-top:clamp(40px,5vw,70px);
+}
+.futuro__cell{background:var(--paper);padding:clamp(26px,3vw,38px)}
+.futuro__cell .num{
+  font-family:var(--serif);font-style:italic;font-weight:500;
+  font-size:clamp(1.9rem,3.2vw,2.7rem);color:var(--brown);line-height:1;display:block;
+}
+.futuro__cell h3{
+  font:600 .66rem/1.3 var(--sans);letter-spacing:.2em;text-transform:uppercase;
+  color:var(--t-light-mute);margin:.9em 0 .7em;
+}
+.futuro__cell p{font-size:.88rem;line-height:1.7;color:var(--t-light-soft)}
+
+/* ==========================================================
+   v5 · PÁGINAS DE PROJETO (hotel, resort, select, qualidade)
+   ========================================================== */
+.pagehero{position:relative;height:clamp(520px,88svh,900px);overflow:hidden;background:var(--ink)}
+.pagehero img{width:100%;height:100%;object-fit:cover;display:block}
+.pagehero::after{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(10,9,7,.7) 0%,rgba(10,9,7,.15) 42%,rgba(10,9,7,.9) 100%);
+}
+.pagehero__in{
+  position:absolute;left:0;right:0;bottom:clamp(46px,6vw,88px);z-index:2;
+  padding:0 var(--gap);color:var(--t-dark);
+}
+.pagehero__kicker{
+  font:700 .66rem/1 var(--sans);letter-spacing:.34em;text-transform:uppercase;color:var(--sand);
+}
+.pagehero h1{
+  font-family:var(--serif);font-weight:400;line-height:1;margin:.42em 0 .3em;
+  font-size:clamp(2.4rem,6.4vw,5.4rem);max-width:15ch;
+}
+.pagehero h1 em{font-style:italic;color:var(--sand)}
+.pagehero__lead{max-width:52ch;color:var(--t-dark-soft);font-size:1.02rem;line-height:1.7}
+
+/* faixa de números */
+.specbar{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  background:var(--ink-2);color:var(--t-dark);border-top:1px solid var(--line-dark);
+}
+.specbar div{padding:clamp(26px,3.4vw,44px) clamp(20px,2.6vw,38px);border-right:1px solid var(--line-dark)}
+.specbar div:last-child{border-right:0}
+.specbar b{
+  display:block;font-family:var(--serif);font-weight:500;line-height:1;
+  font-size:clamp(1.7rem,3.1vw,2.6rem);color:var(--t-dark);
+}
+.specbar span{
+  display:block;margin-top:.8em;font:600 .6rem/1.4 var(--sans);
+  letter-spacing:.2em;text-transform:uppercase;color:var(--t-dark-mute);
+}
+
+/* bloco alternado texto + imagem */
+.split{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+  gap:clamp(30px,5vw,80px);align-items:center;
+}
+.split--flip .split__text{order:2}
+.split__media{position:relative;overflow:hidden;background:var(--ink-2)}
+.split__media img{width:100%;height:100%;object-fit:cover;display:block;aspect-ratio:4/3}
+.split__text h2{font-size:clamp(1.6rem,3vw,2.5rem);margin-bottom:.5em}
+.split__text p{max-width:48ch;line-height:1.8}
+.split__text .btn{margin-top:26px}
+.split__list{list-style:none;padding:0;margin:26px 0 0}
+.split__list li{
+  padding:12px 0 12px 26px;border-bottom:1px solid var(--line-light);
+  position:relative;font-size:.92rem;line-height:1.6;
+}
+.split__list li::before{
+  content:"";position:absolute;left:0;top:19px;width:9px;height:9px;
+  background:var(--sand);transform:rotate(45deg);
+}
+.section--dark .split__list li{border-bottom-color:var(--line-dark)}
+
+/* tira horizontal de imagens */
+.strip{display:flex;gap:1px;overflow-x:auto;scroll-snap-type:x mandatory;background:var(--line-dark)}
+.strip figure{
+  flex:0 0 clamp(280px,44vw,620px);scroll-snap-align:start;margin:0;
+  position:relative;background:var(--ink);
+}
+.strip img{width:100%;height:clamp(240px,42svh,440px);object-fit:cover;display:block}
+.strip figcaption{
+  position:absolute;left:0;right:0;bottom:0;padding:34px 18px 14px;
+  font:600 .6rem/1.4 var(--sans);letter-spacing:.18em;text-transform:uppercase;
+  color:var(--t-dark);background:linear-gradient(transparent,rgba(10,9,7,.85));
+}
+
+/* cartões de tipologia (casas do resort, serviços do select) */
+.cards{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:1px;background:var(--line-light);border:1px solid var(--line-light);
+}
+.section--dark .cards{background:var(--line-dark);border-color:var(--line-dark)}
+.card{background:var(--paper);padding:clamp(24px,2.8vw,36px);display:flex;flex-direction:column;gap:12px}
+.section--dark .card{background:var(--ink-2)}
+.card__tag{
+  font:700 .58rem/1 var(--sans);letter-spacing:.22em;text-transform:uppercase;color:var(--brown);
+}
+.section--dark .card__tag{color:var(--sand)}
+.card h3{font-family:var(--serif);font-weight:500;font-size:1.2rem;line-height:1.25}
+.card p{font-size:.88rem;line-height:1.7;color:var(--t-light-soft)}
+.section--dark .card p{color:var(--t-dark-soft)}
+.card__media{margin:-24px -24px 4px;overflow:hidden;background:var(--ink-2)}
+.card__media img{width:100%;aspect-ratio:16/10;object-fit:cover;display:block}
+
+/* marca provisória dos sub-projetos, até chegarem os logos */
+.sublogo{display:flex;flex-direction:column;gap:.35em;line-height:1}
+.sublogo__b{
+  font:700 .72rem/1 var(--sans);letter-spacing:.4em;text-transform:uppercase;color:var(--t-dark-mute);
+}
+.sublogo__n{
+  font-family:var(--serif);font-weight:400;font-size:clamp(1.5rem,2.6vw,2.1rem);
+  letter-spacing:.02em;color:var(--t-dark);
+}
+.section--light .sublogo__b{color:var(--t-light-mute)}
+.section--light .sublogo__n{color:var(--t-light)}
