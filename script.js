@@ -10,6 +10,14 @@ const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").match
 if (reduceMotion) document.documentElement.classList.add("no-motion");
 if (hasGsap) gsap.registerPlugin(ScrollTrigger);
 
+/* A jornada vem depois dos três capítulos de experiência e antes do mapa.
+   Mantemos o bloco reutilizável sem duplicar a marcação extensa da seção. */
+(function homeOrder(){
+  const steps = document.getElementById("jornada");
+  const location = document.getElementById("localizacao");
+  if (steps && location) location.before(steps);
+})();
+
 /* ==========================================================
    00 · LOADER + entrada do hero
    ========================================================== */
