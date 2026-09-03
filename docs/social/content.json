@@ -72,7 +72,7 @@
         },
         {
           "type": "photo",
-          "image": "assets/renders/escritorios-3.jpg",
+          "image": "assets/renders/centro-empresarial-1.jpg",
           "eyebrow": "NOVIDADE DA LEY 7547/25",
           "title": "Maquila agora também é serviço",
           "body": "Pela primeira vez o regime alcança serviços intangíveis: software, BPO, consultoria e outsourcing exportados a partir do Paraguai — sem exigência de certificação industrial, apenas registro administrativo no CNIME."
@@ -108,7 +108,7 @@
       "slides": [
         {
           "type": "cover",
-          "image": "assets/renders/centro-empresarial-1.jpg",
+          "image": "assets/web/internas-06.jpg",
           "eyebrow": "PARAGUAI · INCENTIVOS À INVERSÃO",
           "title": "A Lei 60/90<br>virou<br><em>Lei 7548/25</em>"
         },
@@ -116,7 +116,7 @@
           "type": "text",
           "bg": "ink",
           "eyebrow": "O QUE MUDOU",
-          "title": "O regime de incentivos de 1990<br>foi <em>inteiramente reescrito</em>",
+          "title": "O regime de incentivos<br>de 1990 foi <em>reescrito</em>",
           "body": [
             "A Ley 7548/25 — promulgada em 8 de setembro de 2025 e regulamentada pelo Decreto 5432/2026 — estabelece o novo regime de incentivos fiscais para a inversão nacional e estrangeira, no lugar da histórica Ley 60/90.",
             "O trâmite de aprovação do projeto de investimento tem prazo máximo de 75 dias, com média de 45 dias."
@@ -242,7 +242,7 @@
         },
         {
           "type": "photo",
-          "image": "assets/renders/condominio-casa-fachada.jpg",
+          "image": "assets/web/internas-01.jpg",
           "eyebrow": "POR QUE ISSO PESA NA DECISÃO",
           "title": "Previsibilidade é ativo",
           "body": "Uma indústria se paga em 10, 15, 20 anos. O que trava um projeto raramente é a alíquota de hoje — é o risco de ela mudar amanhã. Aqui a regra do jogo entra em contrato, com prazo e assinatura."
@@ -261,14 +261,14 @@
               "label": "de canon anual sobre o investimento contratado."
             },
             {
-              "big": "=",
-              "label": "tratamento igualitário entre capital nacional e estrangeiro."
+              "big": "2015",
+              "label": "ano da lei — o regime já tem uma década de contratos firmados."
             }
           ]
         },
         {
           "type": "cta",
-          "image": "assets/web/vista-aerea-park.jpg"
+          "image": "assets/web/internas-06.jpg"
         }
       ]
     },
@@ -286,7 +286,7 @@
           "type": "text",
           "bg": "ink",
           "eyebrow": "PRODUTO MERCOSUL",
-          "title": "O Paraguai é sócio fundador —<br>e isso vai <em>na nota fiscal</em>",
+          "title": "O Paraguai é sócio fundador<br>e isso vai <em>na nota fiscal</em>",
           "body": [
             "O Mercosul é uma união aduaneira. O produto fabricado no Paraguai que obtém o Certificado de Origem circula com 0% de tarifa entre Brasil, Argentina, Uruguai e Paraguai.",
             "São cerca de 270 milhões de consumidores nos quatro sócios — com o Brasil, seu maior mercado, do outro lado da fronteira."
@@ -361,7 +361,7 @@
       "slides": [
         {
           "type": "cover",
-          "image": "assets/renders/rodovia-acesso.jpg",
+          "image": "assets/web/internas-02.jpg",
           "eyebrow": "PARAGUAI · LOGÍSTICA",
           "title": "A Bioceânica<br>redesenhou<br><em>o mapa</em>"
         },
@@ -445,8 +445,8 @@
       "slides": [
         {
           "type": "cover",
-          "image": "assets/pois/terport-villeta.jpg",
-          "credit": "Foto ilustrativa: barcaça porta-contêineres na hidrovia · Claudio Elias / Wikimedia Commons · Domínio público",
+          "image": "assets/pois/puerto-lobato.jpg",
+          "credit": "Foto ilustrativa: comboio de barcaças na hidrovia · Claudio Elias / Wikimedia Commons · Domínio público",
           "eyebrow": "BRACERUM PARK · VILLETA, PARAGUAI",
           "title": "O porto fica a<br><em>20 minutos</em><br>do portão"
         },
@@ -506,8 +506,8 @@
         },
         {
           "type": "photo",
-          "image": "assets/pois/puerto-seguro.jpg",
-          "credit": "Foto ilustrativa: cinturão industrial de Villeta · Aterovi / Wikimedia Commons · Domínio público",
+          "image": "assets/pois/villa-oliva.jpg",
+          "credit": "Foto ilustrativa: navio atracado e guindastes no rio Paraguai · Cmasi / Wikimedia Commons · CC BY-SA 4.0",
           "eyebrow": "33 KM · 30 MINUTOS",
           "title": "Puerto Seguro Fluvial",
           "body": "O maior terminal multipropósito do Paraguai, em operação desde 2012: contêineres, carga solta, granel, rodados e carga de projeto no mesmo recinto. Guindaste elétrico Liebherr FCC 280 de 80 t e guindaste móvel para peças de 260 a 300 t — a rota natural do maquinário pesado que chega ao parque."

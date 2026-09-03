@@ -13,7 +13,7 @@ Fontes: Noto Serif (display) + TeX Gyre Heros, clone métrico da Helvetica.
 """
 import json, os, re, subprocess, sys, tempfile
 from pathlib import Path
-from PIL import Image
+from PIL import Image, ImageFilter
 
 ROOT   = Path(__file__).resolve().parents[2]
 HERE   = Path(__file__).resolve().parent
@@ -100,8 +100,8 @@ def fit(text, base, cap, floor=0.72):
 
 # ------------------------------------------------------------------- os slides
 def s_cover(s, meta, i, n):
-    cred = (f'<div class="credit" style="left:var(--m);bottom:186px">{s["credit"]}</div>'
-            if s.get("credit") else "")
+    cred = (f'<div class="credit" style="right:var(--m);bottom:150px;text-align:right;'
+            f'max-width:470px">{s["credit"]}</div>' if s.get("credit") else "")
     size = 82 if len(re.sub("<[^>]+>", "", s["title"])) <= 46 else 70
     return f"""
 <div class="slide">
@@ -256,6 +256,7 @@ def shoot(html, dest, tmp):
     im = Image.open(raw).convert("RGB")
     im = im.crop((0, 0, W * SCALE, H * SCALE))          # a janela é mais alta de propósito
     im = im.resize((W, H), Image.LANCZOS)
+    im = im.filter(ImageFilter.UnsharpMask(radius=1.1, percent=38, threshold=3))
     im.save(dest, "PNG", dpi=(DPI, DPI), optimize=True)
     return dest
 
