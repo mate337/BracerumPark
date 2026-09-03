@@ -1,0 +1,11 @@
+# AI Generated Files
+src/generated/
+assets/generated/
+.ai_metadata.json
+.env.openai
+/tmp/branch_name.txt
+
+# OpenAI API Keys
+*.apikey
+.openai_key
+OPENAI_API_KEY
