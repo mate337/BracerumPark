@@ -2,7 +2,7 @@
 
 Site institucional do **Bracerum Park**, cidade industrial multiuso em Villeta, Paraguai (Mercosul). Público-alvo: investidores e indústrias avaliando instalar operação no parque.
 
-## Estado do projeto (v5 — 2026-09-02)
+## Estado do projeto (v5.1 — 2026-09-03)
 
 O site tem **7 páginas**: `index.html`, `tributacao.html`, `bracerum.html`, `hotel.html`,
 `resort.html`, `select.html` e `qualidade.html`, mais `i18n.js`, `style.css` e `script.js`.
@@ -32,6 +32,44 @@ celular a faixa é mais baixa, `clamp(420px,68svh,600px)`) → galeria sanfona "
 evita a sobreposição e o espaço em branco da v2** — se mudar o conteúdo, manter o bloco cabendo em uma
 tela) → mapa Leaflet dark full-bleed → empresas → **Futuro de Villeta** → tributação + assessoria + CTA
 → faixa Bracerum → footer.
+
+### Revisão de acabamento (v5.1 — 2026-09-03)
+Passagem de QA nas páginas novas, com render real no Chromium em 1600×900, 1800×700 e 390×844.
+O que mudou e **por que não voltar atrás**:
+- **Coluna única.** `--pad-align` (`max(--gap, (100% - --max)/2 + --gap)`) alinha à coluna do
+  `.section` tudo que sangra de borda a borda: `.pagehero__in`, `.specbar`, `.strip`, `.proj__body`,
+  `.proj__mark` e `.img-band__copy`. Antes o texto do hero começava 120 px à esquerda do corpo.
+- **`.section--dark` sangra.** O `.section` é uma coluna de 1360 px; o bloco escuro pintado só nela
+  deixava tarja bege dos dois lados em tela larga. Agora um `::before` de `100vw` pinta o fundo
+  inteiro e só o conteúdo fica na coluna.
+- **Grade de cartões sem buracos.** A linha era o `gap:1px` sobre um fundo pintado — com 6 cartões em
+  4 colunas as células que sobravam viravam retângulos pretos. Agora cada `.card` desenha a própria
+  borda e a coluna é explícita (`--cols`, `.cards--3` para blocos de 3 e 6).
+- **Tira de fotos.** A barra de rolagem nativa saiu. O JS envolve cada `.strip` num `.striprail`,
+  esconde a barra e monta régua de posição + setas (`.strip__ui`); a tira arrasta com o mouse, anda
+  com a roda e a régua é clicável. **Sem JS a barra nativa volta** (a regra que a esconde é
+  `.striprail > .strip`) — é o único jeito de andar com a tira nesse caso.
+- **Hero.** `min-height` em vez de `height`: em janela baixa e larga o título subia por baixo da nav.
+  Dois véus (vertical + lateral a 100°, vertical no celular) garantem contraste sobre render claro.
+  A imagem é 114% da altura porque o parallax do GSAP a desloca ±6% — no tamanho exato aparecia
+  faixa de fundo no topo (vale também para `.proj__media img`).
+- **Ritmo.** Duas seções seguidas do mesmo tom somavam 300 px de vazio; agora 66 px no mesmo tom e
+  110 + 110 na troca de tom.
+- **Legibilidade.** Parágrafos do `.split` ganharam respiro (vinham colados). Desenho técnico usa
+  `.split__media--plan` (proporção natural, `object-fit:contain`) — o recorte 4:3 cortava o título e
+  as notas do corte viário.
+- **Ligações mortas.** `#contato` não existia em hotel/resort/select/qualidade: o botão "Fale
+  conosco" da nav não fazia nada. O id está no `<footer>`. Dois botões estavam sem modificador de
+  cor (`class="btn "`) e sumiam no hover.
+- **Recado interno fora do ar.** A seção de tipologias do Resort publicava três cartões "Aguardando
+  dados — a preencher com o quadro de áreas do cliente" e o hotel dizia "assim que o cliente fechar
+  esse escopo". Virou convite comercial ("Pedir as plantas das casas") com âncora no contato.
+- **Legendas da galeria** (18) e o `aria-label` da tira agora têm chave em EN e ES — estavam em
+  português no site inglês.
+- **Selo dos sub-projetos.** Os heros de hotel/resort/select usam o lockup `.sublogo`
+  (BRACERUM + nome em serifada). **Os logos/selos enviados pelo usuário não chegaram a esta sessão**
+  (árvore limpa, nenhum branch remoto os traz) — quando chegarem, trocar o `<p class="sublogo">` pelo
+  `<img>` do SVG.
 
 ### Páginas de projeto (v5)
 Cada sub-projeto tem página própria, montada a partir do **masterplan R04** (PDF do OTIFF, set/2026):
@@ -94,10 +132,12 @@ Onde a foto não existe, a **descrição** carrega a escala: Terport e Puerto Se
 capacidade e equipamento, apurados nas fontes do setor.
 
 **Pendências conhecidas** (aguardar o usuário):
-- **Logos do Bracerum Select, Hotel e Resort** — estão em `C:\Users\User\OneDrive\Desktop\Chat gpt archives`,
-  fora do alcance desta sessão. As páginas usam um lockup tipográfico provisório (`.sublogo`).
+- **Logos/selos do Bracerum Select, Hotel e Resort** — o usuário disse ter subido os arquivos em
+  `assets/`, mas eles **não chegaram ao repositório** (árvore limpa em 2026-09-03, nenhum branch
+  remoto os traz). Os heros usam o lockup tipográfico provisório (`.sublogo`).
 - **Tipologias das casas do Resort** — o R04 define o setor residencial mas não traz plantas por
-  unidade; a seção existe com o esqueleto pronto, esperando o quadro de áreas.
+  unidade. A seção agora é um convite comercial ("Pedir as plantas das casas"); quando o quadro de
+  áreas chegar, ela vira grade de `.cards` com uma tipologia por cartão.
 - **Lazer próprio do hotel** (piscina, spa, academia no bloco de hospedagem) — não está no R04.
 - **Ciclovias**: o esquema vial do R04 documenta veredas de 1,50 a 3,90 m e franjas técnicas de
   0,80 m, mas **não rotula ciclovia**. Confirmar com o cliente antes de afirmar que existe.

@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="style.css?v=14" />
+<link rel="stylesheet" href="style.css?v=15" />
 <noscript><style>.reveal{opacity:1!important;transform:none!important}.mask__in{transform:none!important}#loader{display:none!important}</style></noscript>
 </head>
 <body>
@@ -61,7 +61,10 @@
 <section class="pagehero">
   <img src="assets/park/resort-lago-aereo.jpg" alt="Bracerum Resort — condomínio fechado no Bracerum Park" />
   <div class="pagehero__in">
-    <p class="pagehero__kicker" data-i18n="pr.kicker">Bracerum Resort</p>
+    <p class="sublogo">
+      <span class="sublogo__b">Bracerum</span>
+      <span class="sublogo__n">Resort</span>
+    </p>
     <h1 data-i18n="pr.h1">Morar a <em>minutos</em> da própria operação</h1>
     <p class="pagehero__lead" data-i18n="pr.lead">142.067 m² de setor residencial e recreativo integrados ao ecossistema do parque: condomínio fechado de casas, lago, clubhouse, piscina e quadras.</p>
   </div>
@@ -85,7 +88,7 @@
         <li data-i18n="pr.oq.l4">Ruas residenciais de 10,60 m, com calçada de 1,50 m dos dois lados</li>
       </ul>
     </div>
-    <div class="split__media"><img src="assets/park/resort-implantacao.jpg" alt="Implantação do Bracerum Resort vista de cima" loading="lazy" /></div>
+    <div class="split__media split__media--plan"><img src="assets/park/resort-implantacao.jpg" alt="Implantação do Bracerum Resort vista de cima" loading="lazy" /></div>
   </div>
 </section>
 <section class="section section--dark">
@@ -117,11 +120,11 @@
     </article>
   </div>
 </section>
-<section class="strip" aria-label="Galeria">
-  <figure><img src="assets/park/resort-clubhouse.jpg" alt="Clubhouse, piscina e quadras" loading="lazy" /><figcaption>Clubhouse, piscina e quadras</figcaption></figure>
-  <figure><img src="assets/park/resort-lago-fonte.jpg" alt="Lago central" loading="lazy" /><figcaption>Lago central</figcaption></figure>
-  <figure><img src="assets/park/resort-lago-caiaque.jpg" alt="Percurso do lago ao entardecer" loading="lazy" /><figcaption>Percurso do lago ao entardecer</figcaption></figure>
-  <figure><img src="assets/park/resort-implantacao.jpg" alt="Implantação geral" loading="lazy" /><figcaption>Implantação geral</figcaption></figure>
+<section class="strip" aria-label="Galeria" data-i18n-attr="aria-label:strip.aria">
+  <figure><img src="assets/park/resort-clubhouse.jpg" alt="Clubhouse, piscina e quadras" loading="lazy" /><figcaption data-i18n="pr.g1">Clubhouse, piscina e quadras</figcaption></figure>
+  <figure><img src="assets/park/resort-lago-fonte.jpg" alt="Lago central" loading="lazy" /><figcaption data-i18n="pr.g2">Lago central</figcaption></figure>
+  <figure><img src="assets/park/resort-lago-caiaque.jpg" alt="Percurso do lago ao entardecer" loading="lazy" /><figcaption data-i18n="pr.g3">Percurso do lago ao entardecer</figcaption></figure>
+  <figure><img src="assets/park/resort-implantacao.jpg" alt="Implantação geral" loading="lazy" /><figcaption data-i18n="pr.g4">Implantação geral</figcaption></figure>
 </section>
 <section class="section">
   <div class="split split--flip reveal">
@@ -137,29 +140,13 @@
   <div class="section__head reveal">
     <p class="eyebrow" data-i18n="pr.casas.eyebrow">Tipologias</p>
     <h2><span class="mask"><span class="mask__in" data-i18n="pr.casas.title">As casas e os <em>projetos</em> de cada uma</span></span></h2>
-    <p class="lead" data-i18n="pr.casas.lead">As opções de compra, com o detalhamento de área, dormitórios, suítes, garagem e acabamento de cada tipologia, entram aqui assim que o quadro de áreas das casas for liberado — o masterplan R04 define o setor residencial, mas ainda não traz as plantas por unidade.</p>
-  </div>
-  <div class="cards reveal">
-    <article class="card">
-      <p class="card__tag" data-i18n="pr.casas.c1t">Aguardando dados</p>
-      <h3 data-i18n="pr.casas.c1h">Tipologia A</h3>
-      <p data-i18n="pr.casas.c1d">Área construída, dormitórios, suítes, vagas e diferenciais — a preencher com o quadro de áreas do cliente.</p>
-    </article>
-    <article class="card">
-      <p class="card__tag" data-i18n="pr.casas.c2t">Aguardando dados</p>
-      <h3 data-i18n="pr.casas.c2h">Tipologia B</h3>
-      <p data-i18n="pr.casas.c2d">Área construída, dormitórios, suítes, vagas e diferenciais — a preencher com o quadro de áreas do cliente.</p>
-    </article>
-    <article class="card">
-      <p class="card__tag" data-i18n="pr.casas.c3t">Aguardando dados</p>
-      <h3 data-i18n="pr.casas.c3h">Tipologia C</h3>
-      <p data-i18n="pr.casas.c3d">Área construída, dormitórios, suítes, vagas e diferenciais — a preencher com o quadro de áreas do cliente.</p>
-    </article>
+    <p class="lead" data-i18n="pr.casas.lead">O quadro de áreas por unidade — metragem construída, dormitórios, suítes, vagas e acabamento — está em fechamento com o escritório de arquitetura. O time comercial envia as plantas e a tabela de tipologias assim que forem liberadas.</p>
+    <a class="btn btn--light" href="#contato"><span data-i18n="pr.casas.cta">Pedir as plantas das casas</span> <span class="btn__arrow">&rarr;</span></a>
   </div>
 </section>
 
 <!-- ============ FOOTER ============ -->
-<footer class="footer">
+<footer class="footer" id="contato">
   <div class="footer__inner reveal">
     <div class="footer__top">
       <img class="footer__brand" src="assets/logo/logo-horizontal-cream.svg" alt="Bracerum Park" />
@@ -196,7 +183,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-<script src="i18n.js?v=14"></script>
-<script src="script.js?v=14"></script>
+<script src="i18n.js?v=15"></script>
+<script src="script.js?v=15"></script>
 </body>
 </html>

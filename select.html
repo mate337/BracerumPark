@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="style.css?v=14" />
+<link rel="stylesheet" href="style.css?v=15" />
 <noscript><style>.reveal{opacity:1!important;transform:none!important}.mask__in{transform:none!important}#loader{display:none!important}</style></noscript>
 </head>
 <body>
@@ -61,7 +61,10 @@
 <section class="pagehero">
   <img src="assets/park/select-comercial-noite.jpg" alt="Bracerum Select — comércio e serviços do Bracerum Park" />
   <div class="pagehero__in">
-    <p class="pagehero__kicker" data-i18n="ps.kicker">Bracerum Select</p>
+    <p class="sublogo">
+      <span class="sublogo__b">Bracerum</span>
+      <span class="sublogo__n">Select</span>
+    </p>
     <h1 data-i18n="ps.h1">O parque também precisa de <em>padaria, banco e borracheiro</em></h1>
     <p class="pagehero__lead" data-i18n="ps.lead">Curadoria de comércio e de serviços dentro do Bracerum Park: shopping, academia, posto, market, praça de alimentação e a infraestrutura de apoio que a indústria usa todo dia.</p>
   </div>
@@ -94,7 +97,7 @@
     <h2><span class="mask"><span class="mask__in" data-i18n="ps.com.title">O que abre <em>para dentro</em> do parque</span></span></h2>
     <p class="lead" data-i18n="ps.com.lead">O setor comercial do masterplan concentra o que atende tanto quem trabalha no parque quanto quem mora no Resort.</p>
   </div>
-  <div class="cards reveal">
+  <div class="cards cards--3 reveal">
     <article class="card">
       <p class="card__tag" data-i18n="ps.com.c1t">Varejo</p>
       <h3 data-i18n="ps.com.c1h">Shopping e centro comercial</h3>
@@ -127,12 +130,12 @@
     </article>
   </div>
 </section>
-<section class="strip" aria-label="Galeria">
-  <figure><img src="assets/park/select-shopping-lago.jpg" alt="Setor comercial junto ao lago" loading="lazy" /><figcaption>Setor comercial junto ao lago</figcaption></figure>
-  <figure><img src="assets/park/select-posto-noturno.jpg" alt="Posto de serviço" loading="lazy" /><figcaption>Posto de serviço</figcaption></figure>
-  <figure><img src="assets/park/select-market-interior.jpg" alt="Market de conveniência" loading="lazy" /><figcaption>Market de conveniência</figcaption></figure>
-  <figure><img src="assets/park/select-posto-cobertura.jpg" alt="Cobertura do posto" loading="lazy" /><figcaption>Cobertura do posto</figcaption></figure>
-  <figure><img src="assets/park/select-apoio-caminhoes.jpg" alt="Pátio de apoio ao caminhoneiro" loading="lazy" /><figcaption>Pátio de apoio ao caminhoneiro</figcaption></figure>
+<section class="strip" aria-label="Galeria" data-i18n-attr="aria-label:strip.aria">
+  <figure><img src="assets/park/select-shopping-lago.jpg" alt="Setor comercial junto ao lago" loading="lazy" /><figcaption data-i18n="ps.g1">Setor comercial junto ao lago</figcaption></figure>
+  <figure><img src="assets/park/select-posto-noturno.jpg" alt="Posto de serviço" loading="lazy" /><figcaption data-i18n="ps.g2">Posto de serviço</figcaption></figure>
+  <figure><img src="assets/park/select-market-interior.jpg" alt="Market de conveniência" loading="lazy" /><figcaption data-i18n="ps.g3">Market de conveniência</figcaption></figure>
+  <figure><img src="assets/park/select-posto-cobertura.jpg" alt="Cobertura do posto" loading="lazy" /><figcaption data-i18n="ps.g4">Cobertura do posto</figcaption></figure>
+  <figure><img src="assets/park/select-apoio-caminhoes.jpg" alt="Pátio de apoio ao caminhoneiro" loading="lazy" /><figcaption data-i18n="ps.g5">Pátio de apoio ao caminhoneiro</figcaption></figure>
 </section>
 <section class="section">
   <div class="section__head reveal">
@@ -140,7 +143,7 @@
     <h2><span class="mask"><span class="mask__in" data-i18n="ps.srv.title">A rede que mantém a <em>operação de pé</em></span></span></h2>
     <p class="lead" data-i18n="ps.srv.lead">Fornecedores de serviço credenciados, disponíveis dentro do parque — do escritório contábil ao borracheiro.</p>
   </div>
-  <div class="cards reveal">
+  <div class="cards cards--3 reveal">
     <article class="card">
       <p class="card__tag" data-i18n="ps.srv.c1t">Administrativo</p>
       <h3 data-i18n="ps.srv.c1h">Contabilidade e assessoria</h3>
@@ -175,7 +178,7 @@
 </section>
 
 <!-- ============ FOOTER ============ -->
-<footer class="footer">
+<footer class="footer" id="contato">
   <div class="footer__inner reveal">
     <div class="footer__top">
       <img class="footer__brand" src="assets/logo/logo-horizontal-cream.svg" alt="Bracerum Park" />
@@ -212,7 +215,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-<script src="i18n.js?v=14"></script>
-<script src="script.js?v=14"></script>
+<script src="i18n.js?v=15"></script>
+<script src="script.js?v=15"></script>
 </body>
 </html>

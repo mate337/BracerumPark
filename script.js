@@ -1145,15 +1145,138 @@ if (!reduceMotion){
   });
 }
 
-/* A tira horizontal rola com a roda do mouse no desktop — sem isso o
-   usuário de trackpad não descobre que ela anda para o lado. */
+/* ==========================================================
+   10 · v5 — tira horizontal de fotos
+   A barra de rolagem nativa embaixo das fotos ficou feia e difícil
+   de usar. A tira agora esconde a barra e ganha três formas de
+   andar: roda do mouse, arrastar e as setas. Uma régua fina mostra
+   onde o usuário está — é a barra de rolagem, redesenhada.
+   Os controles são montados aqui para não repetir markup nas
+   quatro páginas de projeto.
+   ========================================================== */
 document.querySelectorAll(".strip").forEach(strip => {
+
+  /* --- estrutura: .striprail > .strip + .strip__ui --- */
+  const rail = document.createElement("div");
+  rail.className = "striprail";
+  strip.parentNode.insertBefore(rail, strip);
+  rail.appendChild(strip);
+
+  const ui = document.createElement("div");
+  ui.className = "strip__ui";
+  ui.innerHTML =
+    '<div class="strip__track"><span class="strip__thumb"></span></div>' +
+    '<div class="strip__nav">' +
+      '<button class="strip__btn" data-dir="-1" type="button">' +
+        '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M15 4 7 12l8 8"/></svg>' +
+      '</button>' +
+      '<button class="strip__btn" data-dir="1" type="button">' +
+        '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M9 4l8 8-8 8"/></svg>' +
+      '</button>' +
+    '</div>';
+  rail.after(ui);
+
+  const track = ui.querySelector(".strip__track");
+  const thumb = ui.querySelector(".strip__thumb");
+  const btns  = [...ui.querySelectorAll(".strip__btn")];
+
+  /* rótulos das setas — texto dinâmico, re-traduzido no langchange */
+  const ROTULOS = {
+    "-1": { pt: "Fotos anteriores", en: "Previous photos",  es: "Fotos anteriores" },
+    "1":  { pt: "Próximas fotos",   en: "Next photos",      es: "Siguientes fotos" }
+  };
+  const rotular = () => btns.forEach(b => {
+    b.setAttribute("aria-label", tr(ROTULOS[b.dataset.dir]));
+    b.title = tr(ROTULOS[b.dataset.dir]);
+  });
+  rotular();
+  document.addEventListener("langchange", rotular);
+
+  strip.setAttribute("role", "region");
+  strip.tabIndex = 0;
+
+  const passo = () => {
+    const fig = strip.querySelector("figure");
+    return fig ? fig.getBoundingClientRect().width + 1 : strip.clientWidth * .8;
+  };
+  const maxScroll = () => Math.max(0, strip.scrollWidth - strip.clientWidth);
+
+  /* --- régua de posição + estado das setas --- */
+  function sincronizar(){
+    const max = maxScroll();
+    const visivel = max > 4;
+    ui.style.display = visivel ? "" : "none";
+    rail.classList.toggle("has-next", visivel && strip.scrollLeft < max - 4);
+    if (!visivel) return;
+    const fracao = strip.clientWidth / strip.scrollWidth;
+    const avanco  = strip.scrollLeft / max;
+    thumb.style.width = (fracao * 100) + "%";
+    thumb.style.transform = "translateX(" + (avanco * (100 / fracao - 100)) + "%)";
+    btns[0].disabled = strip.scrollLeft < 4;
+    btns[1].disabled = strip.scrollLeft > max - 4;
+  }
+  strip.addEventListener("scroll", sincronizar, { passive: true });
+  window.addEventListener("resize", sincronizar);
+  sincronizar();
+  /* as fotos são lazy: quando a última carrega, a largura muda */
+  strip.querySelectorAll("img").forEach(img => {
+    if (!img.complete) img.addEventListener("load", sincronizar, { once: true });
+  });
+
+  /* --- setas --- */
+  btns.forEach(b => b.addEventListener("click", () => {
+    strip.scrollBy({ left: passo() * Number(b.dataset.dir), behavior: reduceMotion ? "auto" : "smooth" });
+  }));
+
+  /* --- clicar na régua para saltar --- */
+  track.addEventListener("click", e => {
+    const r = track.getBoundingClientRect();
+    strip.scrollTo({ left: ((e.clientX - r.left) / r.width) * maxScroll(),
+                     behavior: reduceMotion ? "auto" : "smooth" });
+  });
+
+  /* --- roda do mouse: rolagem vertical anda para o lado --- */
   strip.addEventListener("wheel", e => {
     if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
-    const max = strip.scrollWidth - strip.clientWidth;
+    const max = maxScroll();
     if (max < 4) return;
     const antes = strip.scrollLeft;
     strip.scrollLeft = Math.max(0, Math.min(max, antes + e.deltaY));
     if (strip.scrollLeft !== antes) e.preventDefault();
   }, { passive: false });
+
+  /* --- arrastar com o mouse (mesma lógica do masterplan: só vira
+         arrasto depois de 4 px, senão roubaria o clique) --- */
+  let pid = null, x0 = 0, s0 = 0, armado = false, arrastando = false;
+  strip.addEventListener("pointerdown", e => {
+    if (e.pointerType === "touch" || e.button !== 0) return;   // o toque já rola sozinho
+    armado = true; arrastando = false; pid = e.pointerId;
+    x0 = e.clientX; s0 = strip.scrollLeft;
+  });
+  strip.addEventListener("pointermove", e => {
+    if (!armado || e.pointerId !== pid) return;
+    const d = e.clientX - x0;
+    if (!arrastando){
+      if (Math.abs(d) < 4) return;
+      arrastando = true;
+      strip.classList.add("is-dragging");
+      strip.setPointerCapture(pid);
+    }
+    strip.scrollLeft = s0 - d;
+    e.preventDefault();
+  });
+  const soltar = e => {
+    if (!armado || (e.pointerId != null && e.pointerId !== pid)) return;
+    armado = false;
+    if (arrastando){
+      arrastando = false;
+      strip.classList.remove("is-dragging");
+      try { strip.releasePointerCapture(pid); } catch (err) {}
+      /* engole o clique que fecharia o arrasto virando navegação */
+      strip.addEventListener("click", ev => { ev.preventDefault(); ev.stopPropagation(); },
+                             { capture: true, once: true });
+    }
+  };
+  strip.addEventListener("pointerup", soltar);
+  strip.addEventListener("pointercancel", soltar);
 });
