@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Camada_2" data-name="Camada 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 309.36 140.33">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #190f05;
+        font-size: 35.69px;
+      }
+
+      .cls-2 {
+        font-family: NotoSerif-ExtraCondensedLight, 'Noto Serif';
+        font-weight: 300;
+      }
+
+      .cls-3 {
+        fill: none;
+        fill-rule: evenodd;
+        stroke: #190f05;
+        stroke-miterlimit: 10;
+      }
+
+      .cls-4 {
+        font-family: NotoSerif-ExtraCondensedSemiBoldItalic, 'Noto Serif';
+        font-style: italic;
+        font-weight: 600;
+        letter-spacing: 0em;
+      }
+    </style>
+  </defs>
+  <g id="Camada_1-2" data-name="Camada 1">
+    <g>
+      <text class="cls-1" transform="translate(29.11 80.87) rotate(-8.35) scale(1.02 .99) skewX(-8.06)"><tspan class="cls-2"><tspan x="0" y="0">Refugio residencial</tspan></tspan><tspan class="cls-2" x="0" y="32.16" xml:space="preserve">de  </tspan><tspan class="cls-4" x="45.57" y="32.16">alto estándar</tspan></text>
+      <path class="cls-3" d="M290.97,99.61L18.41,139.63c-9.88,1.45-17.89-5.28-17.9-15.04l-.02-63.59c0-9.76,8.01-18.84,17.89-20.29L290.94.7c9.88-1.45,17.89,5.28,17.9,15.04l.02,63.59c0,9.76-8.01,18.84-17.89,20.29Z"/>
+    </g>
+  </g>
+</svg>

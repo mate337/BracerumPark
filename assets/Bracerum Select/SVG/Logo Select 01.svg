@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Camada_2" data-name="Camada 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 839.24 397.77">
+  <defs>
+    <style>
+      .cls-1 {
+        letter-spacing: -.02em;
+      }
+
+      .cls-2 {
+        letter-spacing: -.1em;
+      }
+
+      .cls-3 {
+        font-family: NotoSerif-ExtraCondensedLight, 'Noto Serif';
+        font-weight: 300;
+      }
+
+      .cls-4 {
+        letter-spacing: 0em;
+      }
+
+      .cls-5 {
+        font-family: HelveticaLTPro-Bold, 'Helvetica LT Pro';
+        font-size: 93.3px;
+        font-weight: 700;
+      }
+
+      .cls-5, .cls-6, .cls-7, .cls-8 {
+        fill: #190f05;
+      }
+
+      .cls-6 {
+        fill-rule: evenodd;
+      }
+
+      .cls-7 {
+        font-family: NotoSerif-ExtraCondensed, 'Noto Serif';
+        font-size: 18.04px;
+      }
+
+      .cls-9 {
+        letter-spacing: -.04em;
+      }
+
+      .cls-10 {
+        letter-spacing: -.02em;
+      }
+
+      .cls-10, .cls-11 {
+        font-family: NotoSerif-ExtraCondensedMediumItalic, 'Noto Serif';
+        font-style: italic;
+        font-weight: 500;
+      }
+
+      .cls-8 {
+        font-size: 35.62px;
+      }
+    </style>
+  </defs>
+  <g id="Camada_1-2" data-name="Camada 1">
+    <g>
+      <g>
+        <g>
+          <polygon class="cls-6" points="311.69 65.61 246.08 65.61 311.69 131.25 311.69 65.61"/>
+          <polygon class="cls-6" points="246.08 0 311.69 0 246.08 65.61 246.08 0"/>
+          <polygon class="cls-6" points="442.93 65.61 377.32 65.61 442.93 131.25 442.93 65.61"/>
+          <polygon class="cls-6" points="442.93 0 508.55 0 442.93 65.61 442.93 0"/>
+          <polygon class="cls-6" points="508.55 65.61 574.16 65.61 508.55 131.25 508.55 65.61"/>
+          <polygon class="cls-6" points="377.32 0 442.93 0 377.32 65.61 377.32 0"/>
+        </g>
+        <g>
+          <text class="cls-5" transform="translate(141.7 234.12)"><tspan class="cls-4" x="0" y="0">BR</tspan><tspan class="cls-9" x="133.97" y="0">A</tspan><tspan class="cls-4" x="197.22" y="0">CE</tspan><tspan class="cls-1" x="326.06" y="0">R</tspan><tspan class="cls-4" x="391.18" y="0">UM</tspan><tspan class="cls-2" x="-54.67" y="80.37">P</tspan><tspan class="cls-4" x="-2.15" y="80.37">ARK SELECT</tspan></text>
+          <g>
+            <text class="cls-7" transform="translate(754.65 284.13)"><tspan x="0" y="0">Condomínio</tspan></text>
+            <text class="cls-7" transform="translate(0 279.75)"><tspan x="0" y="0">Complexo</tspan><tspan x="0" y="21.65">Industrial</tspan></text>
+          </g>
+        </g>
+      </g>
+      <text class="cls-8" transform="translate(101.11 383.91)"><tspan class="cls-3" x="0" y="0">Selección de locales </tspan><tspan class="cls-11" x="260.25" y="0">come</tspan><tspan class="cls-10" x="333.27" y="0">r</tspan><tspan class="cls-11" x="347.16" y="0">ciales de alta gama</tspan></text>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Camada_2" data-name="Camada 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 378.45 188.7">
+  <defs>
+    <style>
+      .cls-1 {
+        font-size: 22.19px;
+      }
+
+      .cls-1, .cls-2, .cls-3, .cls-4 {
+        fill: #190f05;
+      }
+
+      .cls-5 {
+        letter-spacing: 0em;
+      }
+
+      .cls-6 {
+        font-family: NotoSerif-ExtraCondensedLight, 'Noto Serif';
+        font-weight: 300;
+      }
+
+      .cls-7 {
+        letter-spacing: -.02em;
+      }
+
+      .cls-2 {
+        fill-rule: evenodd;
+      }
+
+      .cls-3 {
+        font-family: HelveticaLTPro-Bold, 'Helvetica LT Pro';
+        font-size: 58.12px;
+        font-weight: 700;
+      }
+
+      .cls-8 {
+        font-family: NotoSerif-ExtraCondensedSemiBoldItalic, 'Noto Serif';
+        font-style: italic;
+        font-weight: 600;
+      }
+
+      .cls-4 {
+        font-family: NotoSerif-ExtraCondensed, 'Noto Serif';
+        font-size: 11.24px;
+      }
+    </style>
+  </defs>
+  <g id="Camada_1-2" data-name="Camada 1">
+    <g>
+      <g>
+        <polygon class="cls-2" points="129.46 40.88 88.58 40.88 129.46 81.77 129.46 40.88"/>
+        <polygon class="cls-2" points="88.58 0 129.46 0 88.58 40.88 88.58 0"/>
+        <polygon class="cls-2" points="211.22 40.88 170.35 40.88 211.22 81.77 211.22 40.88"/>
+        <polygon class="cls-2" points="211.22 0 252.1 0 211.22 40.88 211.22 0"/>
+        <polygon class="cls-2" points="252.1 40.88 292.98 40.88 252.1 81.77 252.1 40.88"/>
+        <polygon class="cls-2" points="170.35 0 211.22 0 170.35 40.88 170.35 0"/>
+      </g>
+      <text class="cls-1" transform="translate(36.15 180.07)"><tspan class="cls-6" x="0" y="0">Refugio residencial de </tspan><tspan class="cls-8" x="182.51" y="0">alto estándar</tspan></text>
+      <g>
+        <text class="cls-3" transform="translate(70.54 145.86)"><tspan class="cls-5" x="0" y="0">RESO</tspan><tspan class="cls-7" x="163.79" y="0">R</tspan><tspan class="cls-5" x="204.36" y="0">T</tspan></text>
+        <g>
+          <text class="cls-4" transform="translate(325.74 129.55)"><tspan x="0" y="0">Condomínio</tspan></text>
+          <text class="cls-4" transform="translate(0 126.82)"><tspan x="0" y="0">Complexo</tspan><tspan x="0" y="13.49">Industrial</tspan></text>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>

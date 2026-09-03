@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Camada_2" data-name="Camada 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 334.41 128.01">
+  <defs>
+    <style>
+      .cls-1 {
+        font-size: 12.73px;
+      }
+
+      .cls-1, .cls-2 {
+        fill: #190f05;
+      }
+
+      .cls-3 {
+        font-family: NotoSerif-ExtraCondensedSemiBoldItalic, 'Noto Serif';
+        font-weight: 600;
+        letter-spacing: 0em;
+      }
+
+      .cls-3, .cls-4 {
+        font-style: italic;
+      }
+
+      .cls-4 {
+        font-family: NotoSerif-ExtraCondensedMediumItalic, 'Noto Serif';
+        font-size: 57.27px;
+        font-weight: 500;
+      }
+
+      .cls-5 {
+        letter-spacing: 0em;
+      }
+
+      .cls-6 {
+        letter-spacing: 0em;
+      }
+
+      .cls-7 {
+        letter-spacing: -.02em;
+      }
+
+      .cls-2 {
+        font-family: HelveticaLTPro-Bold, 'Helvetica LT Pro';
+        font-size: 58.12px;
+        font-weight: 700;
+      }
+
+      .cls-8 {
+        letter-spacing: -.04em;
+      }
+
+      .cls-9 {
+        letter-spacing: -.02em;
+      }
+
+      .cls-10 {
+        letter-spacing: -.02em;
+      }
+
+      .cls-11 {
+        font-family: NotoSerif-ExtraCondensed, 'Noto Serif';
+      }
+    </style>
+  </defs>
+  <g id="Camada_1-2" data-name="Camada 1">
+    <g>
+      <g>
+        <text class="cls-2" transform="translate(.55 49.93)"><tspan class="cls-6" x="0" y="0">BR</tspan><tspan class="cls-8" x="83.46" y="0">A</tspan><tspan class="cls-6" x="122.87" y="0">CE</tspan><tspan class="cls-7" x="203.14" y="0">R</tspan><tspan class="cls-6" x="243.71" y="0">UM</tspan></text>
+        <text class="cls-1" transform="translate(190.83 91.28)"><tspan class="cls-11"><tspan x="0" y="0">Condominio cer</tspan><tspan class="cls-9" x="77.7" y="0">r</tspan><tspan x="82.32" y="0">ado</tspan></tspan><tspan class="cls-11" x="0" y="15.28">de casas en </tspan><tspan class="cls-3" x="57.43" y="15.28">Villeta</tspan></text>
+      </g>
+      <text class="cls-4" transform="translate(1.03 105.73)"><tspan class="cls-5" x="0" y="0">RESO</tspan><tspan class="cls-10" x="121.24" y="0">R</tspan><tspan class="cls-5" x="151.43" y="0">T</tspan></text>
+    </g>
+  </g>
+</svg>
