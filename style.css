@@ -94,14 +94,6 @@ html.no-motion .mask__in{transform:none}
 .reveal.is-in{opacity:1;transform:none;transition:opacity var(--dur-l) var(--ease), transform var(--dur-l) var(--ease)}
 html.no-motion .reveal{opacity:1;transform:none}
 
-/* Reveal de imagem: cortina + escala (GSAP) */
-.img-reveal{overflow:hidden;position:relative}
-.img-reveal > img{transform:scale(1.14);will-change:transform}
-.img-reveal::after{content:"";position:absolute;inset:0;background:var(--paper);transform:scaleY(1);transform-origin:top}
-.section--dark .img-reveal::after,.on-dark .img-reveal::after{background:var(--ink)}
-html.no-motion .img-reveal > img{transform:none}
-html.no-motion .img-reveal::after{display:none}
-
 /* ---------- Layout ---------- */
 .section{max-width:var(--max);margin:0 auto;padding:clamp(80px,11vw,150px) var(--gap)}
 /* O .section é uma coluna de 1360 px centrada. Um bloco escuro
@@ -147,12 +139,27 @@ html.no-motion .img-reveal::after{display:none}
 .btn--dark{color:var(--paper)}
 .btn--dark:hover{color:var(--ink)}
 .btn--dark:hover::before{background:var(--paper)}
-.btn--solid-dark{background:var(--ink);color:var(--paper);border-color:var(--ink)}
-.btn--solid-dark::before{background:var(--brown)}
-.btn--solid-dark:hover{color:var(--paper);border-color:var(--brown)}
 .btn:focus-visible{outline:2px solid var(--brown);outline-offset:3px}
+/* sólido claro — para a ação principal sobre o marrom */
+.btn--paper{background:var(--paper);color:var(--ink);border-color:var(--paper)}
+.btn--paper::before{background:var(--ink)}
+.btn--paper:hover{color:var(--paper);border-color:var(--ink)}
+/* ação secundária: link com traço, sem competir com o botão ao lado */
+.linkarrow{
+  display:inline-flex;align-items:center;gap:.7em;padding-bottom:4px;
+  font:600 .74rem/1 var(--sans);letter-spacing:.18em;text-transform:uppercase;
+  border-bottom:1px solid currentColor;color:inherit;
+  transition:opacity var(--dur-s) var(--ease);
+}
+.linkarrow:hover{opacity:.68}
+.linkarrow:hover .btn__arrow{transform:translateX(4px)}
+.linkarrow:focus-visible{outline:2px solid currentColor;outline-offset:4px}
 .btn__arrow{font-family:var(--sans);transition:transform var(--dur-s) var(--ease)}
 .btn:hover .btn__arrow{transform:translateX(4px)}
+@media (max-width:480px){
+  /* rótulo em duas linhas por causa do espaçamento entre letras */
+  .btn{padding:15px 20px;letter-spacing:.12em}
+}
 
 /* ==========================================================
    NAV — oculta sobre o hero, entra após rolar
@@ -238,24 +245,165 @@ html.no-motion .hero__bg img{transform:none}
 .hero__scroll-txt{font:600 .62rem/1 var(--sans);letter-spacing:.3em;text-transform:uppercase}
 
 /* ==========================================================
-   TRIBUTAÇÃO — teaser
+   v6 · VILLETA — argumento + prova, um ato só
+   Antes eram duas seções ("Empresas" e "Futuro de Villeta") com
+   300 px de vazio entre elas, falando do mesmo assunto.
    ========================================================== */
-.tax-teaser{background:var(--ink);color:var(--t-dark)}
-.tax-teaser__inner{
-  max-width:var(--max);margin:0 auto;
-  padding:clamp(90px,13vw,170px) var(--gap);
-  display:grid;grid-template-columns:1.5fr 1fr;gap:clamp(32px,6vw,96px);align-items:end;
+.villeta{background:var(--paper-2);color:var(--t-light);overflow:hidden}
+/* a esteira é irmã do .section e traz o próprio respiro — somar os
+   dois deixava 200 px de vazio entre os números e os logos. */
+.villeta > .section{padding-bottom:0}
+
+/* --- as quatro razões: uma aberta por vez --- */
+/* As colunas são medidas fixas (não max-content) porque a linha do
+   cabeçalho e o parágrafo do corpo são grids separados: só com a
+   mesma medida o texto aberto alinha embaixo do título. */
+.fatos{
+  --f1:2.2rem;--f2:clamp(6.5rem,12vw,11rem);--fg:clamp(14px,2.4vw,34px);
+  border-top:1px solid var(--line-light);
 }
-.tax-teaser__title{
-  font-family:var(--serif);font-weight:500;
-  font-size:clamp(2.1rem,4.6vw,3.9rem);line-height:1.1;letter-spacing:-.01em;
+.fato{border-bottom:1px solid var(--line-light)}
+.fato__head{
+  width:100%;display:grid;align-items:baseline;
+  grid-template-columns:var(--f1) var(--f2) 1fr auto;
+  gap:var(--fg);
+  padding:clamp(20px,2.4vw,30px) 0;text-align:left;
 }
-.tax-teaser__title em{font-style:italic;color:var(--sand)}
-.tax-teaser__side p{
-  color:var(--t-dark-soft);font-size:1.02rem;line-height:1.75;max-width:38ch;margin-bottom:28px;
+.fato__i{
+  font:600 .62rem/1 var(--sans);letter-spacing:.2em;color:var(--t-light-mute);
+  transition:color var(--dur-s);
 }
-@media (max-width: 860px){
-  .tax-teaser__inner{grid-template-columns:1fr;align-items:start}
+.fato__k{
+  font-family:var(--serif);font-style:italic;font-weight:500;line-height:1;
+  font-size:clamp(1.35rem,2.4vw,2rem);color:var(--brown);white-space:nowrap;
+  transition:transform var(--dur-m) var(--ease);transform-origin:left bottom;
+}
+.fato__t{
+  font:600 .68rem/1.4 var(--sans);letter-spacing:.2em;text-transform:uppercase;
+  color:var(--t-light);align-self:center;
+}
+/* o sinal é desenhado em CSS: dois traços, o vertical some ao abrir */
+.fato__sign{position:relative;width:14px;height:14px;align-self:center}
+.fato__sign::before,.fato__sign::after{
+  content:"";position:absolute;inset:50% 0 auto 0;height:1px;background:var(--t-light);
+  transition:transform var(--dur-m) var(--ease),opacity var(--dur-s);
+}
+.fato__sign::after{transform:rotate(90deg)}
+.fato.is-open .fato__sign::after{transform:rotate(0);opacity:0}
+.fato.is-open .fato__i{color:var(--brown)}
+.fato.is-open .fato__k{transform:scale(1.06)}
+.fato__head:hover .fato__k{transform:scale(1.06)}
+.fato__head:focus-visible{outline:2px solid var(--brown);outline-offset:4px}
+/* abre por grid-template-rows: anima altura automática sem medir nada em JS */
+.fato__body{
+  display:grid;grid-template-rows:0fr;
+  transition:grid-template-rows var(--dur-m) var(--ease);
+}
+.fato__body > div{overflow:hidden}
+.fato.is-open .fato__body{grid-template-rows:1fr}
+.fato__body p{
+  max-width:62ch;font-size:.95rem;line-height:1.8;color:var(--t-light-soft);
+  padding:0 0 clamp(24px,3vw,34px);
+  margin-left:calc(var(--f1) + var(--f2) + 2 * var(--fg));
+}
+@media (max-width:860px){
+  .fato__head{grid-template-columns:var(--f1) 1fr auto;row-gap:4px}
+  .fato__i{grid-row:1}
+  .fato__k{grid-column:2}
+  .fato__t{grid-column:2;grid-row:2}
+  .fato__sign{grid-column:3;grid-row:1}
+  .fato__body p{margin-left:calc(var(--f1) + var(--fg))}
+}
+
+/* --- a prova --- */
+/* eyebrow e números na mesma linha: em duas linhas sobrava metade da
+   largura vazia e a prova parecia outra seção. */
+.prova{
+  margin-top:clamp(50px,6vw,86px);
+  display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr) minmax(0,1.1fr);
+  gap:clamp(20px,3vw,48px);align-items:start;
+}
+.prova > .eyebrow{padding-top:.5em}
+.prova__stats{display:contents}
+.prova__stats b{
+  display:block;font-family:var(--serif);font-weight:500;line-height:1;
+  font-size:clamp(1.9rem,3.6vw,3rem);color:var(--t-light);
+}
+.prova__stats span{
+  display:block;margin-top:.7em;font-size:.9rem;line-height:1.6;
+  color:var(--t-light-soft);max-width:30ch;
+}
+
+/* --- esteira de logos --- */
+.esteira{
+  overflow:hidden;padding:clamp(56px,7vw,96px) 0 clamp(70px,9vw,120px);
+  /* esmaece nas pontas: a esteira entra e sai, não começa e termina */
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);
+          mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);
+}
+.esteira__track{display:flex;width:max-content;animation:esteira 42s linear infinite}
+.esteira:hover .esteira__track{animation-play-state:paused}
+.esteira__set{display:flex;align-items:center}
+.esteira__set img{
+  height:32px;width:auto;margin:0 clamp(26px,5.5vw,84px);
+  filter:grayscale(1);opacity:.55;transition:filter var(--dur-s),opacity var(--dur-s);
+}
+.esteira__set img:hover{filter:grayscale(0);opacity:1}
+@keyframes esteira{to{transform:translateX(-50%)}}
+/* sem motion a esteira para e vira uma fileira centrada */
+html.no-motion .esteira__track{animation:none}
+html.no-motion .esteira{
+  -webkit-mask-image:none;mask-image:none;
+  display:flex;justify-content:center;
+}
+html.no-motion .esteira__set[aria-hidden]{display:none}
+
+/* ==========================================================
+   v6 · TRIBUTAÇÃO — argumento, números e conclusão
+   ========================================================== */
+.tax{background:var(--ink);color:var(--t-dark);position:relative;isolation:isolate}
+.tax::before{
+  content:"";position:absolute;z-index:-1;top:0;bottom:0;
+  left:50%;width:100vw;transform:translateX(-50%);background:var(--ink);
+}
+.tax .section__head h2{font-size:clamp(2.1rem,4.4vw,3.6rem)}
+
+.cifras{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  border-top:1px solid var(--line-dark);border-left:1px solid var(--line-dark);
+}
+.cifra{
+  padding:clamp(26px,3.2vw,42px) clamp(22px,2.4vw,34px);
+  border-right:1px solid var(--line-dark);border-bottom:1px solid var(--line-dark);
+}
+.cifra b{
+  display:block;font-family:var(--serif);font-weight:500;line-height:1;
+  font-size:clamp(2.2rem,4.4vw,3.6rem);color:var(--sand);
+  font-variant-numeric:tabular-nums;
+}
+.cifra span{
+  display:block;margin-top:1em;font-size:.9rem;line-height:1.65;
+  color:var(--t-dark-soft);max-width:30ch;
+}
+
+/* a conclusão em marrom: fecha o ato e destaca a única ação principal */
+.tax__close{
+  background:var(--brown);color:var(--paper);
+  margin-top:clamp(44px,5.5vw,80px);
+  padding:clamp(38px,5vw,72px);
+  display:grid;grid-template-columns:1.5fr auto;gap:clamp(28px,4vw,64px);align-items:center;
+}
+.tax__close h3{font-size:clamp(1.5rem,2.8vw,2.3rem);max-width:24ch;line-height:1.2}
+.tax__close p{
+  color:rgba(247,243,234,.76);margin-top:.9em;max-width:54ch;
+  font-size:.95rem;line-height:1.75;
+}
+.tax__actions{display:flex;flex-direction:column;gap:18px;align-items:flex-start}
+@media (max-width:860px){
+  .tax__close{grid-template-columns:1fr}
+}
+@media (max-width:760px){
+  .prova{grid-template-columns:1fr;gap:26px}
 }
 
 /* ==========================================================
@@ -294,8 +442,11 @@ html.no-motion .hero__bg img{transform:none}
 }
 .masterplan__head{
   position:absolute;top:0;left:0;right:0;z-index:6;
-  padding:clamp(28px,4.5vw,60px) var(--gap) 0;
+  padding:clamp(28px,4.5vw,60px) var(--pad-align) clamp(60px,7vw,96px);
   pointer-events:none;
+  /* o título dividia espaço com os rótulos dos pinos e os dois ficavam
+     ilegíveis; o véu separa as duas camadas. */
+  background:linear-gradient(180deg,rgba(10,9,7,.8) 0%,rgba(10,9,7,.45) 46%,rgba(10,9,7,0) 100%);
 }
 .masterplan__head .eyebrow{pointer-events:auto}
 .masterplan__head h2{
@@ -382,7 +533,8 @@ html.no-motion .pin__dot::after{animation:none;display:none}
    LOCALIZAÇÃO — mapa full-bleed
    ========================================================== */
 .loc{background:var(--ink);color:var(--t-dark);padding-bottom:0}
-.loc .section__head{padding:0 var(--gap);max-width:calc(860px + 2*var(--gap))}
+.loc .section__head{padding:0 var(--pad-align);max-width:none}
+.loc .section__head > *{max-width:860px}
 .loc-map-wrap{
   position:relative;width:100%;height:clamp(520px,78vh,820px);
   margin-top:clamp(28px,4vw,56px);isolation:isolate;
@@ -483,7 +635,7 @@ html.no-motion .pin__dot::after{animation:none;display:none}
 .steps__pin{
   max-width:none;margin:0 auto;height:100svh;
   display:flex;align-items:center;
-  padding:0 var(--gap);overflow:hidden;
+  padding:0 var(--pad-align);overflow:hidden;
 }
 .steps__grid{
   width:100%;max-width:var(--max);margin:0 auto;
@@ -538,7 +690,8 @@ html.no-motion .step{opacity:1;filter:none;transform:none}
    GALERIA — sanfona quadrada em fundo escuro
    ========================================================== */
 .gallery{background:var(--ink);color:var(--t-dark)}
-.gallery .section__head{padding:0 var(--gap);max-width:calc(860px + 2*var(--gap))}
+.gallery .section__head{padding:0 var(--pad-align);max-width:none}
+.gallery .section__head > *{max-width:860px}
 .gallery-accordion{display:flex;height:min(680px,80vh);width:100%;background:var(--ink)}
 .gallery-panel{
   position:relative;flex:1;overflow:hidden;cursor:pointer;min-width:60px;
@@ -577,37 +730,6 @@ html.no-motion .step{opacity:1;filter:none;transform:none}
 }
 
 /* ==========================================================
-   EMPRESAS
-   ========================================================== */
-.companies{background:var(--paper-2)}
-.companies-grid{
-  display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--line-light);
-  border:1px solid var(--line-light);
-}
-.companies-grid__item{
-  background:var(--paper);padding:clamp(22px,3.4vw,44px);
-  display:flex;align-items:center;justify-content:center;min-height:130px;
-}
-.companies-grid__item img{
-  max-height:36px;width:auto;max-width:78%;
-  filter:grayscale(1);opacity:.6;transition:filter var(--dur-s),opacity var(--dur-s);
-}
-.companies-grid__item:hover img{filter:grayscale(0);opacity:1}
-@media (max-width: 860px){ .companies-grid{grid-template-columns:repeat(2,1fr)} }
-
-/* ==========================================================
-   ASSESSORIA
-   ========================================================== */
-.advisory{
-  background:var(--brown);color:var(--paper);
-  padding:clamp(48px,6.5vw,84px);
-  display:grid;grid-template-columns:1.4fr auto;gap:36px;align-items:center;
-}
-.advisory h2{font-size:clamp(1.6rem,3vw,2.5rem);max-width:22ch}
-.advisory p{color:rgba(247,243,234,.72);margin-top:.8em;max-width:56ch;font-size:.95rem}
-@media (max-width: 800px){ .advisory{grid-template-columns:1fr} }
-
-/* ==========================================================
    HISTÓRIA — faixa institucional escura
    ========================================================== */
 .history{
@@ -634,18 +756,17 @@ html.no-motion .step{opacity:1;filter:none;transform:none}
 /* ==========================================================
    FOOTER
    ========================================================== */
-.footer{background:var(--ink);color:var(--t-dark);padding:clamp(70px,9vw,120px) var(--gap) 36px}
+.footer{background:var(--ink);color:var(--t-dark);padding:clamp(70px,9vw,120px) var(--pad-align) 36px}
 .footer__inner{max-width:var(--max);margin:0 auto}
 .footer__brand{height:24px;width:auto}
 .footer__cta{
-  font-size:clamp(1.8rem,3.8vw,3rem);max-width:18ch;margin-top:.6em;
+  font-size:clamp(1.8rem,3.8vw,3rem);max-width:26ch;margin-top:.6em;
 }
 .footer__cta em{color:var(--sand)}
 .footer__top{padding-bottom:52px;border-bottom:1px solid var(--line-dark)}
 .footer__contacts{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line-dark);border:1px solid var(--line-dark);margin-top:48px}
 .contact-card{background:var(--ink);padding:26px 28px}
 .contact-card__name{display:block;font-family:var(--serif);font-size:1.15rem;font-weight:500}
-.contact-card__phone{display:block;color:var(--t-dark-soft);font-size:.85rem;margin:.3em 0 1em}
 .contact-card__links{display:flex;gap:10px;flex-wrap:wrap}
 .contact-btn{
   font:600 .66rem/1 var(--sans);letter-spacing:.14em;text-transform:uppercase;
@@ -945,6 +1066,14 @@ html:not(.js) #langGate{display:none}
   body{font-size:15px}
   .section{padding-left:20px;padding-right:20px}
 }
+/* uma coluna só: o eyebrow do masterplan, da galeria, do mapa, das
+   etapas e do footer nasciam em 70, 120 e 190 px na mesma página. */
+@media (max-width: 640px){
+  .pagehero__in,.specbar,.strip,.proj__body,.proj__mark,
+  .masterplan__head,.gallery .section__head,.loc .section__head,.steps__pin,.footer{
+    --pad-align:20px;
+  }
+}
 
 /* No celular a planta é 3:2 e a tela é bem mais alta: cobrir a tela inteira
    deixaria a imagem larga demais para arrastar. Uma faixa mais baixa reduz
@@ -1017,26 +1146,6 @@ html:not(.js) #langGate{display:none}
 }
 
 /* ==========================================================
-   v5 · FUTURO DE VILLETA
-   ========================================================== */
-.futuro{background:var(--paper-2);color:var(--t-light)}
-.futuro__grid{
-  display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
-  gap:1px;background:var(--line-light);border:1px solid var(--line-light);
-  margin-top:clamp(40px,5vw,70px);
-}
-.futuro__cell{background:var(--paper);padding:clamp(26px,3vw,38px)}
-.futuro__cell .num{
-  font-family:var(--serif);font-style:italic;font-weight:500;
-  font-size:clamp(1.9rem,3.2vw,2.7rem);color:var(--brown);line-height:1;display:block;
-}
-.futuro__cell h3{
-  font:600 .66rem/1.3 var(--sans);letter-spacing:.2em;text-transform:uppercase;
-  color:var(--t-light-mute);margin:.9em 0 .7em;
-}
-.futuro__cell p{font-size:.88rem;line-height:1.7;color:var(--t-light-soft)}
-
-/* ==========================================================
    v5 · PÁGINAS DE PROJETO (hotel, resort, select, qualidade)
 
    Regra de ouro destas páginas: TUDO se alinha à mesma coluna.
@@ -1047,7 +1156,8 @@ html:not(.js) #langGate{display:none}
    ========================================================== */
 
 /* recuo que alinha um bloco full-bleed à coluna do .section */
-.pagehero__in,.specbar,.strip,.proj__body,.proj__mark{
+.pagehero__in,.specbar,.strip,.proj__body,.proj__mark,
+.masterplan__head,.gallery .section__head,.loc .section__head,.steps__pin,.footer{
   --pad-align: max(var(--gap), calc((100% - var(--max)) / 2 + var(--gap)));
 }
 
@@ -1264,7 +1374,6 @@ html:not(.js) #langGate{display:none}
   border-top:1px solid var(--line-light);border-left:1px solid var(--line-light);
 }
 .cards--3{--cols:3}
-.cards--2{--cols:2}
 .section--dark .cards{border-top-color:var(--line-dark);border-left-color:var(--line-dark)}
 .card{
   background:transparent;padding:clamp(24px,2.8vw,36px);
@@ -1293,5 +1402,3 @@ html:not(.js) #langGate{display:none}
   font-family:var(--serif);font-weight:400;font-size:clamp(1.4rem,2.4vw,2rem);
   letter-spacing:.02em;color:var(--t-dark);
 }
-.section--light .sublogo__b{color:var(--brown)}
-.section--light .sublogo__n{color:var(--t-light)}

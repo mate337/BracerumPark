@@ -10,7 +10,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
 <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" />
-<link rel="stylesheet" href="style.css?v=15" />
+<link rel="stylesheet" href="style.css?v=16" />
 <noscript><style>.reveal{opacity:1!important;transform:none!important}.mask__in{transform:none!important}.step{opacity:1!important;filter:none!important;transform:none!important}#loader{display:none!important}</style></noscript>
 </head>
 <body>
@@ -401,71 +401,131 @@
   </div>
 </section>
 
-<!-- ============ EMPRESAS ============ -->
-<section class="companies bleed" id="empresas" style="padding:clamp(80px,11vw,150px) 0">
-  <div class="section" style="padding-top:0;padding-bottom:0">
+<!-- ============ VILLETA — a cidade e quem já está nela ============
+     Eram duas seções ("Empresas" e "Futuro de Villeta") falando do
+     mesmo assunto, separadas por 300 px de vazio. Viraram um ato só:
+     o argumento (por que Villeta) e a prova (quem já produz aqui). -->
+<section class="villeta" id="villeta">
+  <div class="section">
     <div class="section__head reveal">
+      <p class="eyebrow" data-i18n="fv.eyebrow">Futuro de Villeta</p>
+      <h2><span class="mask"><span class="mask__in" data-i18n="fv.title">A cidade que virou o <em>porto industrial</em> do Paraguai</span></span></h2>
+      <p class="lead" data-i18n="fv.lead">Villeta concentra hoje os terminais privados que movimentam a carga do país e o corredor rodoviário que liga o Mercosul. O que era zona rural virou o endereço industrial mais disputado do Paraguai — e o Bracerum Park nasce no meio dele.</p>
+    </div>
+
+    <!-- as quatro razões, abertas uma por vez -->
+    <div class="fatos" id="fatos">
+      <article class="fato is-open">
+        <button class="fato__head" type="button" aria-expanded="true" aria-controls="fato1">
+          <span class="fato__i">01</span>
+          <span class="fato__k">PY02</span>
+          <span class="fato__t" data-i18n="fv.1.t">Corredor duplicado</span>
+          <span class="fato__sign" aria-hidden="true"></span>
+        </button>
+        <div class="fato__body" id="fato1"><div><p data-i18n="fv.1.d">A Ruta PY02 é o principal corredor logístico terrestre do país, ligando a região metropolitana a Ciudad del Este e à fronteira brasileira. A duplicação recente derrubou o tempo de trânsito de carga.</p></div></div>
+      </article>
+      <article class="fato">
+        <button class="fato__head" type="button" aria-expanded="false" aria-controls="fato2">
+          <span class="fato__i">02</span>
+          <span class="fato__k" data-i18n="fv.2.k">Bitrem</span>
+          <span class="fato__t" data-i18n="fv.2.t">Alta capacidade liberada</span>
+          <span class="fato__sign" aria-hidden="true"></span>
+        </button>
+        <div class="fato__body" id="fato2"><div><p data-i18n="fv.2.d">A infraestrutura do corredor comporta veículos de alta capacidade de carga, como bitrens — o que reduz o custo logístico por tonelada transportada.</p></div></div>
+      </article>
+      <article class="fato">
+        <button class="fato__head" type="button" aria-expanded="false" aria-controls="fato3">
+          <span class="fato__i">03</span>
+          <span class="fato__k" data-i18n="fv.3.k">2 oceanos</span>
+          <span class="fato__t" data-i18n="fv.3.t">Atlântico e Pacífico</span>
+          <span class="fato__sign" aria-hidden="true"></span>
+        </button>
+        <div class="fato__body" id="fato3"><div><p data-i18n="fv.3.d">Acesso direto à Hidrovia Paraná–Paraguai, com rotas para o Atlântico e o Pacífico, e conexão futura com a Rota Bioceânica, que abre a saída para o Chile.</p></div></div>
+      </article>
+      <article class="fato">
+        <button class="fato__head" type="button" aria-expanded="false" aria-controls="fato4">
+          <span class="fato__i">04</span>
+          <span class="fato__k">65 km</span>
+          <span class="fato__t" data-i18n="fv.4.t">Capital e aeroporto</span>
+          <span class="fato__sign" aria-hidden="true"></span>
+        </button>
+        <div class="fato__body" id="fato4"><div><p data-i18n="fv.4.d">Assunção e o aeroporto internacional ficam a cerca de 65 km, com voos diários. Sem passar pelo congestionamento da capital: as vias interurbanas emendam direto na rodovia troncal.</p></div></div>
+      </article>
+    </div>
+
+    <!-- a prova: quem já produz por aqui -->
+    <div class="prova reveal">
       <p class="eyebrow" data-i18n="co.eyebrow">Validação de mercado</p>
-      <h2><span class="mask"><span class="mask__in" data-i18n="co.title">Empresas que já estão <em>moldando o futuro</em> de Villeta</span></span></h2>
-      <p class="lead" data-i18n="co.lead">+US$ 3 bi em cadeias produtivas na região e mais de 230 empresas brasileiras já produzindo no Paraguai sob regime de maquila.</p>
+      <div class="prova__stats">
+        <div><b data-i18n="vl.s1v">+US$ 3 bi</b><span data-i18n="vl.s1k">em cadeias produtivas na região</span></div>
+        <div><b data-i18n="vl.s2v">230+</b><span data-i18n="vl.s2k">empresas brasileiras sob regime de maquila</span></div>
+      </div>
     </div>
-    <div class="companies-grid reveal">
-      <div class="companies-grid__item"><img src="assets/be8-gray.svg" alt="Be8" /></div>
-      <div class="companies-grid__item"><img src="assets/Ball_Corporation_logo_2024.svg" alt="Ball Corporation" /></div>
-      <div class="companies-grid__item"><img src="assets/cremer.svg" alt="Cremer" /></div>
-      <div class="companies-grid__item"><img src="assets/Lupo_logo (1).svg" alt="Lupo" /></div>
-      <div class="companies-grid__item"><img src="assets/Kingspan_Group_logo.svg" alt="Kingspan" /></div>
+  </div>
+
+  <!-- a esteira de logos sangra de borda a borda: diz "muitas", não "cinco" -->
+  <div class="esteira" aria-label="Empresas já instaladas na região"
+       data-i18n-attr="aria-label:vl.logos">
+    <div class="esteira__track">
+      <div class="esteira__set">
+        <img src="assets/be8-gray.svg" alt="Be8" />
+        <img src="assets/Ball_Corporation_logo_2024.svg" alt="Ball Corporation" />
+        <img src="assets/cremer.svg" alt="Cremer" />
+        <img src="assets/Lupo_logo (1).svg" alt="Lupo" />
+        <img src="assets/Kingspan_Group_logo.svg" alt="Kingspan" />
+      </div>
+      <div class="esteira__set" aria-hidden="true">
+        <img src="assets/be8-gray.svg" alt="" />
+        <img src="assets/Ball_Corporation_logo_2024.svg" alt="" />
+        <img src="assets/cremer.svg" alt="" />
+        <img src="assets/Lupo_logo (1).svg" alt="" />
+        <img src="assets/Kingspan_Group_logo.svg" alt="" />
+      </div>
     </div>
   </div>
 </section>
 
-<!-- ============ FUTURO DE VILLETA ============ -->
-<section class="section futuro" id="futuro">
-  <div class="section__head reveal">
-    <p class="eyebrow" data-i18n="fv.eyebrow">Futuro de Villeta</p>
-    <h2><span class="mask"><span class="mask__in" data-i18n="fv.title">A cidade que virou o <em>porto industrial</em> do Paraguai</span></span></h2>
-    <p class="lead" data-i18n="fv.lead">Villeta concentra hoje os terminais privados que movimentam a carga do país e o corredor rodoviário que liga o Mercosul. O que era zona rural virou o endereço industrial mais disputado do Paraguai — e o Bracerum Park nasce no meio dele.</p>
-  </div>
-  <div class="futuro__grid reveal">
-    <div class="futuro__cell">
-      <span class="num">PY02</span>
-      <h3 data-i18n="fv.1.t">Corredor duplicado</h3>
-      <p data-i18n="fv.1.d">A Ruta PY02 é o principal corredor logístico terrestre do país, ligando a região metropolitana a Ciudad del Este e à fronteira brasileira. A duplicação recente derrubou o tempo de trânsito de carga.</p>
+<!-- ============ TRIBUTAÇÃO ============
+     O teaser e o bloco de assessoria eram duas seções com dois CTAs
+     concorrendo. Agora é um ato: o argumento, os números que o
+     sustentam e a conclusão — quem conduz a empresa por esse caminho. -->
+<section class="tax" id="tributacao-teaser">
+  <div class="section">
+    <div class="section__head section__head--dark reveal">
+      <p class="eyebrow eyebrow--dark" data-i18n="tx.eyebrow">Tributação</p>
+      <h2><span class="mask"><span class="mask__in" data-i18n="tax.title">A tributação mais <em>competitiva</em> da América do Sul.</span></span></h2>
+      <p class="lead" data-i18n="tax.desc">Conheça as vantagens tributárias do Paraguai — Regime de Maquila, Ley de Inversiones e Certificado de Origem Mercosul, combinados numa única operação.</p>
     </div>
-    <div class="futuro__cell">
-      <span class="num">Bitrem</span>
-      <h3 data-i18n="fv.2.t">Alta capacidade liberada</h3>
-      <p data-i18n="fv.2.d">A infraestrutura do corredor comporta veículos de alta capacidade de carga, como bitrens — o que reduz o custo logístico por tonelada transportada.</p>
-    </div>
-    <div class="futuro__cell">
-      <span class="num">2 oceanos</span>
-      <h3 data-i18n="fv.3.t">Atlântico e Pacífico</h3>
-      <p data-i18n="fv.3.d">Acesso direto à Hidrovia Paraná–Paraguai, com rotas para o Atlântico e o Pacífico, e conexão futura com a Rota Bioceânica, que abre a saída para o Chile.</p>
-    </div>
-    <div class="futuro__cell">
-      <span class="num">65 km</span>
-      <h3 data-i18n="fv.4.t">Capital e aeroporto</h3>
-      <p data-i18n="fv.4.d">Assunção e o aeroporto internacional ficam a cerca de 65 km, com voos diários. Sem passar pelo congestionamento da capital: as vias interurbanas emendam direto na rodovia troncal.</p>
-    </div>
-  </div>
-</section>
 
-<!-- ============ TRIBUTAÇÃO — teaser ============ -->
-<section class="tax-teaser" id="tributacao-teaser">
-  <div class="tax-teaser__inner">
-    <h2 class="tax-teaser__title reveal" data-i18n="tax.title">A tributação mais <em>competitiva</em> da América do Sul.</h2>
-    <div class="tax-teaser__side reveal">
-      <p data-i18n="tax.desc">Conheça as vantagens tributárias do Paraguai — Regime de Maquila, Ley de Inversiones e Certificado de Origem Mercosul, combinados numa única operação.</p>
-      <a class="btn btn--dark" href="tributacao.html"><span data-i18n="tax.cta">Conhecer as vantagens</span> <span class="btn__arrow">→</span></a>
+    <!-- os números contam ao entrar na tela (data-count no <b>) -->
+    <div class="cifras" id="cifras">
+      <div class="cifra">
+        <b data-count="1" data-suffix="%">1%</b>
+        <span data-i18n="tx.f1k">Tributo único sobre o valor agregado, no regime de Maquila</span>
+      </div>
+      <div class="cifra">
+        <b data-count="100" data-suffix="%">100%</b>
+        <span data-i18n="tx.f2k">De capital estrangeiro permitido, sem exigência de sócio local</span>
+      </div>
+      <div class="cifra">
+        <b data-count="20" data-i18n-attr="data-unit:tx.years" data-unit="anos">20 anos</b>
+        <span data-i18n="tx.f3k">De benefícios garantidos pela Ley de Inversiones, renováveis</span>
+      </div>
+      <div class="cifra">
+        <b data-count="10" data-i18n-attr="data-unit:tx.years" data-unit="anos">10 anos</b>
+        <span data-i18n="tx.f4k">De isenção sobre remessas de lucros e dividendos ao exterior</span>
+      </div>
     </div>
-  </div>
-  <div class="section" style="padding-top:0">
-    <div class="advisory reveal" >
+
+    <div class="tax__close reveal">
       <div>
-        <h2 data-i18n="adv.title">Do enquadramento tributário ao primeiro embarque, sua empresa não anda sozinha.</h2>
+        <h3 data-i18n="adv.title">Do enquadramento tributário ao primeiro embarque, sua empresa não anda sozinha.</h3>
         <p data-i18n="adv.desc">A Bracerum acompanha sua empresa na escolha do melhor enquadramento — Maquila, Ley de Inversiones ou ambos — com o suporte da equipe jurídica e contábil dedicada do Bracerum Park.</p>
       </div>
-      <a class="btn btn--dark" href="#contato"><span data-i18n="adv.cta">Falar com o time</span> <span class="btn__arrow">→</span></a>
+      <div class="tax__actions">
+        <a class="btn btn--paper" href="tributacao.html"><span data-i18n="tax.cta">Conhecer as vantagens</span> <span class="btn__arrow">&rarr;</span></a>
+        <a class="linkarrow" href="#contato"><span data-i18n="adv.cta">Falar com o time</span> <span class="btn__arrow">&rarr;</span></a>
+      </div>
     </div>
   </div>
 </section>
@@ -534,8 +594,9 @@
 <script src="https://unpkg.com/@maplibre/maplibre-gl-leaflet@0.0.22/leaflet-maplibre-gl.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-<script src="i18n.js?v=15"></script>
-<script src="script.js?v=15"></script>
+<script src="i18n.js?v=16"></script>
+<script src="script.js?v=16"></script>
+<script src="home.js?v=16"></script>
 </body>
 </html>
 

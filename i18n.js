@@ -6,6 +6,19 @@
 
 const I18N = {
   en: {
+    "fv.2.k": "Road-train",
+    "fv.3.k": "2 oceans",
+    "vl.s1v": "+US$ 3 bn",
+    "vl.s1k": "in production chains across the region",
+    "vl.s2v": "230+",
+    "vl.s2k": "Brazilian companies under the maquila regime",
+    "vl.logos": "Companies already operating in the region",
+    "tx.eyebrow": "Taxation",
+    "tx.years": "years",
+    "tx.f1k": "Single tax on value added, under the Maquila regime",
+    "tx.f2k": "Foreign capital allowed, with no local partner required",
+    "tx.f3k": "Of benefits guaranteed by the Investment Law, renewable",
+    "tx.f4k": "Of exemption on profit and dividend remittances abroad",
     "ph.g1": "The complex from above",
     "ph.g2": "The signature roof, lit",
     "ph.g3": "Central gallery",
@@ -258,7 +271,7 @@ const I18N = {
     "pq.manobra.cta": "See the Bracerum Select",
     /* nav */
     "nav.masterplan": "Masterplan", "nav.location": "Location", "nav.how": "How it works",
-    "nav.park": "The Park", "nav.companies": "Companies", "nav.tax": "Taxation",
+    "nav.park": "The Park", "nav.tax": "Taxation",
     "nav.bracerum": "Bracerum", "nav.cta": "Get in touch",
     "loader.label": "Villeta Industrial City",
     "hero.scroll": "Explore",
@@ -282,9 +295,8 @@ const I18N = {
     "loc.panel": "Distances from the Park",
     "loc.ports": "River ports", "loc.roads": "Roads · Mercosur",
     "loc.air": "Air distances · Brazil", "loc.refs": "Points of interest",
-    "loc.recenter": "Recenter", "loc.routeOn": "Route shown from the Park",
+    "loc.recenter": "Recenter",
     "loc.clickHint": "Click a point on the map for details",
-    "loc.parkAt": "Bracerum Park", "loc.away": "away",
     "loc.airports": "Airports", "loc.fromPark": "From the Park", "loc.time": "Time",
     "loc.showRoute": "Show route from the Park →", "loc.photoSlot": "Site photo",
 
@@ -307,12 +319,10 @@ const I18N = {
     "gal.eyebrow": "The Park",
     "gal.title": "A complete city <em>for your industry</em>",
     "gal.1": "Park roads", "gal.2": "Warehouses", "gal.3": "Factory",
-    "gal.4": "Hotel &amp; Conventions", "gal.5": "Residential", "gal.6": "Club", "gal.7": "Events",
+    "gal.4": "Hotel &amp; Conventions", "gal.5": "Residential", "gal.7": "Events",
 
     /* empresas */
     "co.eyebrow": "Market validation",
-    "co.title": "Companies already <em>shaping the future</em> of Villeta",
-    "co.lead": "+US$ 3 bn in production chains in the region and more than 230 Brazilian companies already producing in Paraguay under the maquila regime.",
 
     /* assessoria */
     "adv.title": "From tax structuring to the first shipment, your company is never on its own.",
@@ -355,7 +365,6 @@ const I18N = {
     "tp.myth.title": "What people say — <em>and what the data shows</em>",
     "tp.cta.title": "Want to model your savings with your own HS code?",
     "tp.cta.desc": "The seventh question — \"how much do I save?\" — is the one we answer with your spreadsheet, your HS code, in the first conversation.",
-
     "tp.r1.small": "Single tax", "tp.r1.title": "Maquila Regime · Law 7,547/2025",
     "tp.r1.desc": "Produce and export paying 1% on the greater of national value added or the export invoice — against 25% to 35% rates in neighbouring countries.",
     "tp.r1.l1": "Imports with suspended taxes", "tp.r1.l2": "Partial domestic sales allowed",
@@ -459,6 +468,19 @@ const I18N = {
   },
 
   es: {
+    "fv.2.k": "Bitrén",
+    "fv.3.k": "2 océanos",
+    "vl.s1v": "+US$ 3 mil mill.",
+    "vl.s1k": "en cadenas productivas en la región",
+    "vl.s2v": "230+",
+    "vl.s2k": "empresas brasileñas bajo régimen de maquila",
+    "vl.logos": "Empresas ya instaladas en la región",
+    "tx.eyebrow": "Tributación",
+    "tx.years": "años",
+    "tx.f1k": "Tributo único sobre el valor agregado, en el régimen de Maquila",
+    "tx.f2k": "De capital extranjero permitido, sin exigencia de socio local",
+    "tx.f3k": "De beneficios garantizados por la Ley de Inversiones, renovables",
+    "tx.f4k": "De exención sobre remesas de utilidades y dividendos al exterior",
     "ph.g1": "El conjunto visto desde arriba",
     "ph.g2": "La cubierta icónica iluminada",
     "ph.g3": "Galería central",
@@ -710,33 +732,28 @@ const I18N = {
     "pq.manobra.p2": "El patio de apoyo al camionero es un sector propio del masterplan, con área de descanso, comedor, vestuarios y enfermería — el conductor descansa dentro del parque, no en la banquina de la ruta.",
     "pq.manobra.cta": "Ver el Bracerum Select",
     "nav.masterplan": "Masterplan", "nav.location": "Ubicación", "nav.how": "Cómo funciona",
-    "nav.park": "El Parque", "nav.companies": "Empresas", "nav.tax": "Tributación",
+    "nav.park": "El Parque", "nav.tax": "Tributación",
     "nav.bracerum": "Bracerum", "nav.cta": "Contáctenos",
     "loader.label": "Villeta Industrial City",
     "hero.scroll": "Explorar",
-
     "tax.title": "La tributación más <em>competitiva</em> de América del Sur.",
     "tax.desc": "Conozca las ventajas tributarias del Paraguay — Régimen de Maquila, Ley de Inversiones y Certificado de Origen Mercosur, combinados en una sola operación.",
     "tax.cta": "Conocer las ventajas",
-
     "mp.eyebrow": "El Masterplan",
     "mp.title": "1.819.856 m² planificados como una <em>ciudad</em>",
     "mp.hint": "Haga clic en los puntos para explorar cada área",
     "mp.hintDrag": "Arrastra para ver todo el plano · toca los puntos",
     "mp.back": "← Vista general", "mp.prev": "← Anterior", "mp.next": "Siguiente →",
-
     "loc.eyebrow": "Ubicación",
     "loc.title": "La elección correcta tiene <em>dirección</em>.",
     "loc.lead": "Villeta, Paraguay — acceso directo a la Hidrovía Paraná–Paraguay y al corredor vial del Mercosur, sobre la misma ruta (PY19) que sirve al Terport y al Puerto Seguro.",
     "loc.panel": "Distancias desde el Park",
     "loc.ports": "Puertos fluviales", "loc.roads": "Rutas · Mercosur",
     "loc.air": "Distancias aéreas · Brasil", "loc.refs": "Puntos de interés",
-    "loc.recenter": "Recentrar", "loc.routeOn": "Ruta mostrada desde el Park",
+    "loc.recenter": "Recentrar",
     "loc.clickHint": "Haga clic en un punto del mapa para ver detalles",
-    "loc.parkAt": "Bracerum Park", "loc.away": "de distancia",
     "loc.airports": "Aeropuertos", "loc.fromPark": "Desde el Park", "loc.time": "Tiempo",
     "loc.showRoute": "Ver ruta desde el Park →", "loc.photoSlot": "Foto del lugar",
-
     "steps.eyebrow": "Cómo funciona",
     "steps.title": "De la decisión a la <em>primera exportación</em>",
     "steps.lead": "El camino es conocido y acompañado en todas las etapas por los equipos jurídico y contable del Bracerum Park — del CNIME al primer embarque.",
@@ -750,29 +767,21 @@ const I18N = {
     "steps.4.desc": "Los insumos entran suspendidos y la producción sale con Certificado de Origen Mercosur.",
     "steps.5.tag": "Rutina continua", "steps.5.title": "Rutina mensual",
     "steps.5.desc": "Tributo único del 1% y rendición de cuentas al CNIME — rutina fiscal simple y auditable.",
-
     "gal.eyebrow": "El Parque",
     "gal.title": "Una ciudad completa <em>para su industria</em>",
     "gal.1": "Vías del Park", "gal.2": "Galpones", "gal.3": "Fábrica",
-    "gal.4": "Hotel y Convenciones", "gal.5": "Condominio", "gal.6": "Club", "gal.7": "Eventos",
-
+    "gal.4": "Hotel y Convenciones", "gal.5": "Condominio", "gal.7": "Eventos",
     "co.eyebrow": "Validación de mercado",
-    "co.title": "Empresas que ya están <em>moldeando el futuro</em> de Villeta",
-    "co.lead": "+US$ 3 mil millones en cadenas productivas en la región y más de 230 empresas brasileñas ya producen en Paraguay bajo régimen de maquila.",
-
     "adv.title": "Del encuadre tributario al primer embarque, su empresa no anda sola.",
     "adv.desc": "Bracerum acompaña a su empresa en la elección del mejor encuadre — Maquila, Ley de Inversiones o ambos — con el soporte del equipo jurídico y contable dedicado del Bracerum Park.",
     "adv.cta": "Hablar con el equipo",
-
     "hist.small": "Origen del grupo",
     "hist.title": "Décadas de acero, ahora una ciudad industrial.",
     "hist.desc": "Bracerum nació como importadora de acero plano y trader global. La misma disciplina de operación, logística y ejecución está detrás del masterplan y de las tres fábricas propias que construyen el Bracerum Park.",
     "hist.cta": "Conocer Bracerum",
-
     "ft.cta": "¿Construimos juntos la puerta de entrada industrial del <em>Mercosur</em>?",
     "ft.rights": "© 2026 Bracerum Park. Todos los derechos reservados.",
     "ft.br": "Brasil", "ft.py": "Paraguay",
-
     "tp.eyebrow": "Tesis fiscal",
     "tp.title": "La tributación más <em>competitiva</em> de América del Sur",
     "tp.lead": "Tres instrumentos legales que, combinados, forman uno de los regímenes fiscales más competitivos del hemisferio — de la inversión a la venta final. Todos renovados y modernizados en 2025.",
@@ -797,7 +806,6 @@ const I18N = {
     "tp.myth.title": "Lo que se dice — <em>y lo que muestran los datos</em>",
     "tp.cta.title": "¿Quiere simular su ahorro con su propio NCM?",
     "tp.cta.desc": "La séptima pregunta — \"¿cuánto ahorro?\" — es la que respondemos con su planilla, en su NCM, en la primera conversación.",
-
     "tp.r1.small": "Tributo único", "tp.r1.title": "Régimen de Maquila · Ley 7.547/2025",
     "tp.r1.desc": "Produzca y exporte pagando 1% sobre el mayor valor entre el agregado nacional y la factura de exportación — frente a alícuotas de 25% a 35% en los países vecinos.",
     "tp.r1.l1": "Importación con tributos suspendidos", "tp.r1.l2": "Venta parcial permitida en el mercado interno",

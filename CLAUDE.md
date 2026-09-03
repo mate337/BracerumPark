@@ -2,10 +2,13 @@
 
 Site institucional do **Bracerum Park**, cidade industrial multiuso em Villeta, Paraguai (Mercosul). Público-alvo: investidores e indústrias avaliando instalar operação no parque.
 
-## Estado do projeto (v5.1 — 2026-09-03)
+## Estado do projeto (v6 — 2026-09-03)
 
 O site tem **7 páginas**: `index.html`, `tributacao.html`, `bracerum.html`, `hotel.html`,
-`resort.html`, `select.html` e `qualidade.html`, mais `i18n.js`, `style.css` e `script.js`.
+`resort.html`, `select.html` e `qualidade.html`, mais `i18n.js`, `style.css`, `script.js` e
+`home.js`. **`home.js` só a home carrega**: são os 52 KB do masterplan e do mapa (áreas, POIs,
+rotas) que as seis páginas internas baixavam e interpretavam à toa. Ele roda depois do
+`script.js` porque usa `hasGsap`, `reduceMotion` e `tr()`.
 
 ### Regras de design **obrigatórias** (definidas pelo cliente)
 - **Paleta: preto, branco e bege/marrom** (`--ink #0e0d0b`, `--paper #f7f3ea`, `--sand #cbb88f`, `--brown #473315`). **Zero vermelho.** Azul só nos três casos pedidos pelo cliente: a faixa institucional da Bracerum (`--brc-blue #1c4d9d`), a água do mapa (semântica) e a iluminação cênica do render do hero.
@@ -30,8 +33,32 @@ celular a faixa é mais baixa, `clamp(420px,68svh,600px)`) → galeria sanfona "
 **Clube saiu** — está dentro do Select) → **bloco Hotel** → **bloco Resort** → **bloco Select** →
 "Como funciona" (seção de exatamente `100svh` fixada com `ScrollTrigger.pin`. **A altura fixa é o que
 evita a sobreposição e o espaço em branco da v2** — se mudar o conteúdo, manter o bloco cabendo em uma
-tela) → mapa Leaflet dark full-bleed → empresas → **Futuro de Villeta** → tributação + assessoria + CTA
-→ faixa Bracerum → footer.
+tela) → mapa Leaflet dark full-bleed → **Villeta** (um ato só: as quatro razões em sanfona, a prova
+em números e a esteira de logos) → **Tributação** (um ato só: o argumento, as quatro cifras que
+contam ao entrar na tela e a conclusão em marrom com o CTA) → faixa Bracerum → footer.
+
+### Fusão de blocos e alinhamento geral (v6 — 2026-09-03)
+- **Villeta virou um ato só.** "Empresas" e "Futuro de Villeta" eram duas seções sobre o mesmo
+  assunto, separadas por 300 px de vazio. Agora: argumento (`.fatos`, sanfona de quatro razões com
+  `<button>` + `aria-expanded`, altura animada por `grid-template-rows:0fr→1fr` — nada de medir
+  `scrollHeight`), prova (`.prova`, eyebrow e números na mesma linha) e a `.esteira`, marquee CSS
+  dos logos com máscara nas pontas, que para no hover e some com `html.no-motion`.
+- **Tributação virou um ato só.** O teaser e o bloco de assessoria tinham dois CTAs concorrendo.
+  Agora: argumento → `.cifras` (1% · 100% · 20 anos · 10 anos, que contam ao entrar na tela;
+  o texto do HTML é a fonte da verdade se o JS não rodar) → `.tax__close` marrom com o CTA
+  principal (`.btn--paper`) e o secundário (`.linkarrow`). Os quatro números saíram de
+  `tributacao.html` — não invente outros.
+- **Uma coluna só, no site inteiro.** Na home o conteúdo nascia em 70 px (masterplan, galeria,
+  mapa), 120 px (etapas, footer) e 190 px (blocos de projeto) na mesma página. O `--pad-align`
+  agora vale também para `.masterplan__head`, `.gallery/.loc .section__head`, `.steps__pin` e
+  `.footer` — todas as seções de todas as páginas começam na mesma coluna (medido com
+  `alinha.js` no histórico da sessão).
+- **Véu no masterplan.** O título dividia espaço com os rótulos dos pinos e os dois ficavam
+  ilegíveis; `.masterplan__head` ganhou degradê próprio.
+- **CSS morto removido** (`.img-reveal`, `.on-dark`, `.btn--solid-dark`, `.contact-card__phone`,
+  `.section--light`) e **5 chaves de i18n órfãs** (`nav.companies`, `loc.routeOn`, `loc.parkAt`,
+  `loc.away`, `gal.6`). Os dicionários EN/ES estão com 486 chaves cada, em paridade e sem órfãs.
+- **Peso.** Páginas internas: 206 KB → 160 KB de código próprio (-22%).
 
 ### Revisão de acabamento (v5.1 — 2026-09-03)
 Passagem de QA nas páginas novas, com render real no Chromium em 1600×900, 1800×700 e 390×844.
@@ -86,6 +113,11 @@ também é link de verdade** — o cliente reclamou de botão sem ação, os doi
 página, sem a marca d'água do OTIFF, que é um objeto sobreposto). 7,3 MB no total, 1400 px de largura.
 O texto do PDF vem com **fonte subset**: os glifos estão deslocados (ASCII +0x273 numa fonte, +0x1D
 noutra) — o decodificador está em `/tmp/pdf/dec.py` no histórico da sessão, se precisar reler o PDF.
+
+**Assets órfãos:** 47 MB de renders originais do cliente em `assets/` (`Hotel.jpg`, `convenco2.jpg`,
+`Clube.jpg`, `INTERNAS PARK *.png` etc.) não são referenciados por nenhuma página — as versões
+web estão em `assets/web/` e `assets/park/`. São material-fonte do cliente: **não apagar sem
+perguntar**. O site entregue tem 2,05 MB na home.
 
 **Dados oficiais do R04** (usar estes, não os do catálogo V15 quando divergirem):
 terreno +1.800.000 m² · Resort 142.067 m² · parcelas industriais 987.304 m² · pista de 1.280 m ·
