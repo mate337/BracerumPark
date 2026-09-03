@@ -25,8 +25,8 @@ O HTML carrega **português**; `i18n.js` traz dicionários **EN** e **ES** que s
 **Atenção:** o helper chama-se `tr()` e **não** `L()`, porque `L` é o global do Leaflet. Ao adicionar texto novo, incluir a chave nos dois dicionários (há um script de conferência no histórico da sessão).
 
 ### Estrutura do index (ordem definida pelo cliente na v5)
-loader → hero → **respiro** → masterplan com zoom por área (`AREAS` no script.js, coordenadas em %
-sobre `assets/web/vista-aerea-park.jpg`; o palco `#mpStage` tem a **proporção da própria imagem** e é
+loader → hero → **respiro** → masterplan com zoom por área (`AREAS` no home.js, coordenadas em %
+sobre `assets/web/vista-aerea-park-02.jpg`; o palco `#mpStage` tem a **proporção da própria imagem** e é
 dimensionado para cobrir o viewport — é isso que mantém os pinos no lugar em qualquer tela. Quando a
 planta é mais larga que a tela, o bloco fica **arrastável na horizontal** e as bordas esmaecem; no
 celular a faixa é mais baixa, `clamp(420px,68svh,600px)`) → galeria sanfona "Fotos do Parque" (o
@@ -36,6 +36,26 @@ evita a sobreposição e o espaço em branco da v2** — se mudar o conteúdo, m
 tela) → mapa Leaflet dark full-bleed → **Villeta** (um ato só: as quatro razões em sanfona, a prova
 em números e a esteira de logos) → **Tributação** (um ato só: o argumento, as quatro cifras que
 contam ao entrar na tela e a conclusão em marrom com o CTA) → faixa Bracerum → footer.
+
+### Masterplan novo e passador de fotos (v6.1 — 2026-09-03)
+- **A planta mudou** para `assets/Vista Aerea Park 02.png` (3570×2080, enviada pelo cliente). A
+  versão web é `assets/web/vista-aerea-park-02.jpg`, 2600×1515 a 80% — 2200 px ficava mole no zoom
+  de 2,2× e 2800 px não compensava os 60 KB a mais. A vista antiga saiu do repositório.
+- **Os 10 pinos foram remarcados** sobre a nova imagem, conferidos com recortes ampliados e um
+  grid em % (o script está no histórico da sessão). Coordenadas atuais: Clube 33/30 · Portaria
+  39,5/33,5 · Fábricas 32/42,5 · Lotes 55/45 · ETE-ETA 27/42 · Hangares 20/58,5 · Pista 33/71 ·
+  Convenções 77/32,5 · Hotel 77,5/27,5 · Resort 72/40.
+- **O losango passou a marcar o ponto.** O pino é uma linha (losango + rótulo) e o
+  `translate(-50%,-50%)` centrava a linha inteira, jogando o losango para o lado do lugar real.
+  Agora o deslocamento é de meio losango (`-7px`), e `.pin--left` usa `calc(-100% + 7px)`.
+- **O cartão virou um passador de fotos.** Cada área tem `imgs: []` em vez de `img` — Hotel com 6,
+  Centro de Convenções com 7, Resort com 6. Setas, pontos de posição, arrasto e setas do teclado.
+  Só a foto atual e as vizinhas recebem `src` (o resto fica em `data-src`), senão abrir o cartão
+  do Hotel puxaria seis imagens de uma vez.
+- **O palco cabe numa tela.** `.masterplan__viewport` era `100svh` *mais* o respiro do topo, então
+  a seção era mais alta que a tela e o rodapé do cartão nascia fora do enquadramento. Agora é
+  `calc(100svh - respiro)`.
+- Cartão e botão "vista geral" alinhados à mesma coluna do resto da página (`--pad-align`).
 
 ### Fusão de blocos e alinhamento geral (v6 — 2026-09-03)
 - **Villeta virou um ato só.** "Empresas" e "Futuro de Villeta" eram duas seções sobre o mesmo
@@ -164,9 +184,10 @@ Onde a foto não existe, a **descrição** carrega a escala: Terport e Puerto Se
 capacidade e equipamento, apurados nas fontes do setor.
 
 **Pendências conhecidas** (aguardar o usuário):
-- **Logos/selos do Bracerum Select, Hotel e Resort** — o usuário disse ter subido os arquivos em
-  `assets/`, mas eles **não chegaram ao repositório** (árvore limpa em 2026-09-03, nenhum branch
-  remoto os traz). Os heros usam o lockup tipográfico provisório (`.sublogo`).
+- **Logos/selos do Bracerum Select, Hotel e Resort** — **chegaram** em `assets/Bracerum Hotel/`,
+  `assets/Bracerum Resort/` e `assets/Bracerum Select/` (SVG e PNG). Ainda **não estão aplicados**:
+  os heros de hotel/resort/select seguem com o lockup tipográfico `.sublogo`. Trocar o
+  `<p class="sublogo">` pelo `<img>` do SVG correspondente.
 - **Tipologias das casas do Resort** — o R04 define o setor residencial mas não traz plantas por
   unidade. A seção agora é um convite comercial ("Pedir as plantas das casas"); quando o quadro de
   áreas chegar, ela vira grade de `.cards` com uma tipologia por cartão.

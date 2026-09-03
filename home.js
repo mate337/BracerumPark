@@ -9,10 +9,12 @@
 
 /* ==========================================================
    04 · MASTERPLAN — zoom por área
-   Coordenadas em % sobre assets/web/vista-aerea-park.jpg
    ========================================================== */
+/* Coordenadas em % sobre assets/web/vista-aerea-park-02.jpg (2600x1515).
+   Cada área traz a lista de fotos que o passador do cartão mostra —
+   a primeira é a capa. */
 const AREAS = [
-  { x: 25, y: 26, side: "right",
+  { x: 33, y: 30, side: "right",
     tag: { pt: "Clube do Caminhoneiro", en: "Truck Drivers' Club", es: "Club del Camionero" },
     eyebrow: { pt: "Serviços rodoviários", en: "Road services", es: "Servicios viales" },
     title: { pt: "Clube do Caminhoneiro", en: "Truck Drivers' Club", es: "Club del Camionero" },
@@ -22,9 +24,12 @@ const AREAS = [
     desc: { pt: "O motorista descansa dentro do Park, não na rodovia — apoio completo à logística.",
             en: "Drivers rest inside the Park, not on the highway — full logistics support.",
             es: "El conductor descansa dentro del Park, no en la ruta — apoyo logístico completo." },
-    img: "assets/web/internas-02.jpg" },
+    imgs: [ "assets/web/internas-02.jpg",
+            "assets/park/select-apoio-caminhoes.jpg",
+            "assets/park/select-posto-noturno.jpg",
+            "assets/park/select-posto-cobertura.jpg" ] },
 
-  { x: 22, y: 33, side: "right",
+  { x: 39.5, y: 33.5, side: "right",
     tag: { pt: "Portaria", en: "Main gate", es: "Portería" },
     eyebrow: { pt: "Acesso e operação", en: "Access and operations", es: "Acceso y operación" },
     title: { pt: "Portaria & Estacionamento de caminhões", en: "Main gate & Truck parking", es: "Portería y estacionamiento de camiones" },
@@ -34,9 +39,11 @@ const AREAS = [
     desc: { pt: "Entrada operacional do Park, com controle de acesso dedicado para caminhões e visitantes.",
             en: "The Park's operational entrance, with dedicated access control for trucks and visitors.",
             es: "Entrada operativa del Park, con control de acceso dedicado para camiones y visitantes." },
-    img: "assets/web/internas-01.jpg" },
+    imgs: [ "assets/web/internas-01.jpg",
+            "assets/park/vias-noturna.jpg",
+            "assets/park/vias-galpao.jpg" ] },
 
-  { x: 57, y: 35, side: "right",
+  { x: 32, y: 42.5, side: "right",
     tag: { pt: "Fábricas Bracerum", en: "Bracerum factories", es: "Fábricas Bracerum" },
     eyebrow: { pt: "Execução própria", en: "In-house execution", es: "Ejecución propia" },
     title: { pt: "Fábricas Bracerum", en: "Bracerum factories", es: "Fábricas Bracerum" },
@@ -44,9 +51,11 @@ const AREAS = [
     desc: { pt: "Três unidades fabris do grupo constroem o parque sem depender de terceiros — prazo, custo e risco de obra comprados.",
             en: "Three of the group's factories build the park without third parties — schedule, cost and construction risk secured.",
             es: "Tres unidades fabriles del grupo construyen el parque sin depender de terceros — plazo, costo y riesgo de obra asegurados." },
-    img: "assets/renders/fabrica-bracerum-noturna.jpg" },
+    imgs: [ "assets/renders/fabrica-bracerum-noturna.jpg",
+            "assets/park/fabrica-bracerum.jpg",
+            "assets/web/internas-07.jpg" ] },
 
-  { x: 46, y: 46, side: "right",
+  { x: 55, y: 45, side: "right",
     tag: { pt: "Lotes industriais", en: "Industrial lots", es: "Lotes industriales" },
     eyebrow: { pt: "Área industrial", en: "Industrial area", es: "Área industrial" },
     title: { pt: "Lotes industriais & Built-to-Suit", en: "Industrial lots & Built-to-Suit", es: "Lotes industriales y Built-to-Suit" },
@@ -56,9 +65,12 @@ const AREAS = [
     desc: { pt: "Galpões sob medida, venda ou locação, erguidos com o Steel Frame do próprio grupo.",
             en: "Made-to-measure warehouses, for sale or lease, built with the group's own Steel Frame.",
             es: "Galpones a medida, venta o alquiler, levantados con el Steel Frame del propio grupo." },
-    img: "assets/web/internas-07.jpg" },
+    imgs: [ "assets/web/internas-07.jpg",
+            "assets/park/vias-galpao.jpg",
+            "assets/park/vias-caminhoes.jpg",
+            "assets/web/internas-06.jpg" ] },
 
-  { x: 8, y: 61, side: "right",
+  { x: 27, y: 42, side: "left",
     tag: { pt: "ETE / ETA", en: "Water plants", es: "PTAR / PTAP" },
     eyebrow: { pt: "Infraestrutura", en: "Infrastructure", es: "Infraestructura" },
     title: { pt: "E.T.E. / E.T.A. & Subestação", en: "Water & effluent plants and Substation", es: "PTAR / PTAP y Subestación" },
@@ -68,9 +80,10 @@ const AREAS = [
     desc: { pt: "Energia de duas usinas (Itaipu e Yacyretá) e tratamento próprio de água e efluentes — operação industrial contínua.",
             en: "Power from two plants (Itaipu and Yacyretá) plus on-site water and effluent treatment — continuous industrial operation.",
             es: "Energía de dos usinas (Itaipú y Yacyretá) y tratamiento propio de agua y efluentes — operación industrial continua." },
-    img: "assets/web/internas-06.jpg" },
+    imgs: [ "assets/park/ete-eta.jpg",
+            "assets/park/vias-noturna.jpg" ] },
 
-  { x: 9, y: 73, side: "right",
+  { x: 20, y: 58.5, side: "right",
     tag: { pt: "Hangares", en: "Hangars", es: "Hangares" },
     eyebrow: { pt: "Aviação executiva", en: "Business aviation", es: "Aviación ejecutiva" },
     title: { pt: "Hangares, lounge e abastecimento", en: "Hangars, lounge and refuelling", es: "Hangares, lounge y abastecimiento" },
@@ -78,9 +91,10 @@ const AREAS = [
     desc: { pt: "Estrutura de hangaragem e abastecimento junto à pista, para a aeronave do investidor ficar no próprio parque.",
             en: "Hangar and refuelling facilities next to the runway, so the investor's aircraft stays inside the park.",
             es: "Estructura de hangaraje y abastecimiento junto a la pista, para que la aeronave del inversor quede en el propio parque." },
-    img: "assets/web/vista-aerea-park.jpg" },
+    imgs: [ "assets/park/aero-pista.jpg",
+            "assets/park/aero-torre.jpg" ] },
 
-  { x: 47, y: 84, side: "right",
+  { x: 33, y: 71, side: "right",
     tag: { pt: "Pista de pouso", en: "Runway", es: "Pista de aterrizaje" },
     eyebrow: { pt: "Aeroporto corporativo", en: "Corporate airport", es: "Aeropuerto corporativo" },
     title: { pt: "Pista de pouso & Heliponto", en: "Runway & Helipad", es: "Pista de aterrizaje y Helipuerto" },
@@ -88,9 +102,10 @@ const AREAS = [
     desc: { pt: "Acesso executivo direto ao Park, sem depender de Assunção.",
             en: "Direct executive access to the Park, without depending on Asunción.",
             es: "Acceso ejecutivo directo al Park, sin depender de Asunción." },
-    img: "assets/web/vista-aerea-park.jpg" },
+    imgs: [ "assets/park/aero-pista.jpg",
+            "assets/park/aero-torre.jpg" ] },
 
-  { x: 87, y: 17, side: "left",
+  { x: 77, y: 32.5, side: "left",
     tag: { pt: "Centro de convenções", en: "Convention centre", es: "Centro de convenciones" },
     eyebrow: { pt: "Eventos & negócios", en: "Events & business", es: "Eventos y negocios" },
     title: { pt: "Centro de Convenções", en: "Convention Centre", es: "Centro de Convenciones" },
@@ -98,9 +113,15 @@ const AREAS = [
     desc: { pt: "Feiras, lançamentos setoriais e showrooms de marca sob a cobertura envidraçada.",
             en: "Trade fairs, sector launches and brand showrooms under the glazed roof.",
             es: "Ferias, lanzamientos sectoriales y showrooms de marca bajo la cubierta vidriada." },
-    img: "assets/renders/pavilhao-eventos-1.jpg" },
+    imgs: [ "assets/renders/pavilhao-eventos-1.jpg",
+            "assets/park/hotel-auditorio.jpg",
+            "assets/park/hotel-galeria.jpg",
+            "assets/park/hotel-galeria-marcas.jpg",
+            "assets/park/hotel-fachada-azul.jpg",
+            "assets/renders/pavilhao-eventos-2.jpg",
+            "assets/renders/eventos-gastronomia-1.jpg" ] },
 
-  { x: 82, y: 22, side: "left",
+  { x: 77.5, y: 27.5, side: "left",
     tag: { pt: "Hotel", en: "Hotel", es: "Hotel" },
     eyebrow: { pt: "Hospitalidade", en: "Hospitality", es: "Hospitalidad" },
     title: { pt: "Hotel & Apart-hotel", en: "Hotel & Apart-hotel", es: "Hotel y Apart-hotel" },
@@ -108,9 +129,14 @@ const AREAS = [
     desc: { pt: "Hospedagem executiva dentro do masterplan — a equipe da matriz dorme a minutos da fábrica.",
             en: "Executive accommodation inside the masterplan — head-office teams sleep minutes from the plant.",
             es: "Hospedaje ejecutivo dentro del masterplan — el equipo de la casa matriz duerme a minutos de la fábrica." },
-    img: "assets/web/hero-hotel-noturno.jpg" },
+    imgs: [ "assets/web/hero-hotel-noturno.jpg",
+            "assets/park/hotel-noturno.jpg",
+            "assets/park/hotel-conjunto.jpg",
+            "assets/park/hotel-aereo.jpg",
+            "assets/renders/capa-hotel-noturna.jpg",
+            "assets/renders/hotel-convencoes-noturna.jpg" ] },
 
-  { x: 79, y: 30, side: "left",
+  { x: 72, y: 40, side: "left",
     tag: { pt: "Bracerum Resort", en: "Bracerum Resort", es: "Bracerum Resort" },
     eyebrow: { pt: "Condomínio & clube", en: "Residential & club", es: "Condominio y club" },
     title: { pt: "Condomínio Bracerum Resort", en: "Bracerum Resort Residential", es: "Condominio Bracerum Resort" },
@@ -120,7 +146,12 @@ const AREAS = [
     desc: { pt: "Residências e lazer para a comunidade corporativa do parque.",
             en: "Homes and leisure for the park's corporate community.",
             es: "Residencias y ocio para la comunidad corporativa del parque." },
-    img: "assets/renders/condominio-casa-fachada.jpg" }
+    imgs: [ "assets/park/resort-lago-aereo.jpg",
+            "assets/renders/condominio-casa-fachada.jpg",
+            "assets/park/resort-clubhouse.jpg",
+            "assets/park/resort-lago-fonte.jpg",
+            "assets/park/resort-lago-caiaque.jpg",
+            "assets/park/resort-implantacao.jpg" ] }
 ];
 
 (function masterplan(){
@@ -132,7 +163,10 @@ const AREAS = [
   const back = document.getElementById("mpBack");
   if (!viewport || !stage) return;
 
-  const cardImg = card.querySelector(".area-card__media img");
+  const slides = document.getElementById("acSlides");
+  const dots   = document.getElementById("acDots");
+  const acPrev = document.getElementById("acPrev");
+  const acNext = document.getElementById("acNext");
   const cardEyebrow = card.querySelector(".area-card__eyebrow");
   const cardTitle = card.querySelector(".area-card__title");
   const cardVal = card.querySelector(".area-card__val");
@@ -162,14 +196,80 @@ const AREAS = [
   }
   renderPins();
 
+  /* --- passador de fotos do cartão ---
+     Cada área tem uma lista de imagens. As lâminas são montadas a cada
+     abertura; só a atual e as vizinhas recebem src, senão abrir o cartão
+     do Hotel puxaria seis fotos de uma vez. */
+  let fotos = [], foto = 0;
+
+  function carregarVizinhas(){
+    slides.querySelectorAll(".ac-slide").forEach((el, i) => {
+      const img = el.querySelector("img");
+      if (!img.src && Math.abs(i - foto) <= 1) img.src = img.dataset.src;
+    });
+  }
+
+  function mostrarFoto(i, instant){
+    if (!fotos.length) return;
+    foto = (i + fotos.length) % fotos.length;
+    slides.style.transition = instant || reduceMotion ? "none" : "";
+    slides.style.transform = `translate3d(${-foto * 100}%,0,0)`;
+    dots.querySelectorAll("button").forEach((b, k) => {
+      b.classList.toggle("is-on", k === foto);
+      b.setAttribute("aria-current", String(k === foto));
+    });
+    carregarVizinhas();
+  }
+
+  function montarFotos(a){
+    fotos = a.imgs || [];
+    const nome = tr(a.title);
+    slides.innerHTML = fotos.map((src, i) =>
+      `<div class="ac-slide"><img data-src="${src}" alt="${nome} — ${i + 1}/${fotos.length}" draggable="false"></div>`
+    ).join("");
+    dots.innerHTML = fotos.length > 1
+      ? fotos.map((_, i) => `<button type="button" data-i="${i}"><span></span></button>`).join("")
+      : "";
+    dots.querySelectorAll("button").forEach(b => {
+      b.setAttribute("aria-label", `${tr(a.title)} ${Number(b.dataset.i) + 1}`);
+      b.addEventListener("click", () => mostrarFoto(Number(b.dataset.i)));
+    });
+    const unica = fotos.length < 2;
+    acPrev.hidden = acNext.hidden = unica;
+    mostrarFoto(0, true);
+  }
+
+  acPrev.addEventListener("click", () => mostrarFoto(foto - 1));
+  acNext.addEventListener("click", () => mostrarFoto(foto + 1));
+
+  /* arrastar/deslizar sobre as fotos — no celular é o gesto esperado */
+  let px = 0, arrastando = false;
+  slides.addEventListener("pointerdown", e => { px = e.clientX; arrastando = true; });
+  slides.addEventListener("pointerup", e => {
+    if (!arrastando) return;
+    arrastando = false;
+    const d = e.clientX - px;
+    if (Math.abs(d) > 40) mostrarFoto(foto + (d < 0 ? 1 : -1));
+  });
+  slides.addEventListener("pointercancel", () => { arrastando = false; });
+
+  /* setas do teclado andam nas fotos enquanto o cartão está aberto */
+  document.addEventListener("keydown", e => {
+    if (!card.classList.contains("is-open") || fotos.length < 2) return;
+    if (e.key === "ArrowRight") { mostrarFoto(foto + 1); e.preventDefault(); }
+    if (e.key === "ArrowLeft")  { mostrarFoto(foto - 1); e.preventDefault(); }
+  });
+
   function fillCard(a){
-    cardImg.src = a.img; cardImg.alt = tr(a.title);
+    montarFotos(a);
     cardEyebrow.textContent = tr(a.eyebrow);
     cardTitle.textContent = tr(a.title);
     cardVal.textContent = tr(a.val);
     cardDesc.textContent = tr(a.desc);
-    if (a.x < 45){ card.style.left = "auto"; card.style.right = "var(--gap)"; }
-    else { card.style.right = "auto"; card.style.left = "var(--gap)"; }
+    /* o cartão fica do lado oposto ao da área, na mesma coluna do resto
+       da página (--pad-align), para não cobrir o que o usuário abriu. */
+    if (a.x < 45){ card.style.left = "auto"; card.style.right = "var(--pad-align)"; }
+    else { card.style.right = "auto"; card.style.left = "var(--pad-align)"; }
   }
 
   /* --- Dimensão do palco ---
@@ -449,7 +549,7 @@ const airports = [
             en: "Asunción's international airport, with daily direct flights to São Paulo (~2 h). From boarding gate to park gate in about an hour.",
             es: "Aeropuerto internacional de Asunción, con vuelos diarios directos a São Paulo (~2 h). De la puerta de embarque al portón del parque en cerca de una hora." } },
   { name: "Pista do Bracerum Park", type: T.air, km: "0 km", tempo: "—", lat: -25.7790, lng: -57.7290,
-    img: "assets/web/vista-aerea-park.jpg",
+    img: "assets/park/aero-pista.jpg",
     credit: { pt: "Render do masterplan · Bracerum Park",
               en: "Masterplan render · Bracerum Park",
               es: "Render del masterplan · Bracerum Park" },

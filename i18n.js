@@ -6,6 +6,8 @@
 
 const I18N = {
   en: {
+    "mp.photoPrev": "Previous photo",
+    "mp.photoNext": "Next photo",
     "fv.2.k": "Road-train",
     "fv.3.k": "2 oceans",
     "vl.s1v": "+US$ 3 bn",
@@ -468,6 +470,8 @@ const I18N = {
   },
 
   es: {
+    "mp.photoPrev": "Foto anterior",
+    "mp.photoNext": "Foto siguiente",
     "fv.2.k": "Bitrén",
     "fv.3.k": "2 océanos",
     "vl.s1v": "+US$ 3 mil mill.",

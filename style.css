@@ -410,7 +410,12 @@ html.no-motion .esteira__set[aria-hidden]{display:none}
    MASTERPLAN — vista aérea com zoom (estilo oftheoak)
    ========================================================== */
 .masterplan{position:relative;background:var(--ink);color:var(--t-dark);overflow:hidden}
-.masterplan__viewport{position:relative;height:100svh;min-height:640px;overflow:hidden}
+/* 100svh menos o respiro do topo: assim a seção inteira — planta,
+   cartão e botão de voltar — cabe numa tela só. */
+.masterplan__viewport{
+  position:relative;height:calc(100svh - clamp(64px,8vw,124px));
+  min-height:600px;overflow:hidden;
+}
 /* bordas esmaecidas avisam que a planta continua para os lados */
 .masterplan__viewport::before,.masterplan__viewport::after{
   content:"";position:absolute;top:0;bottom:0;width:46px;z-index:4;
@@ -466,8 +471,11 @@ html.no-motion .esteira__set[aria-hidden]{display:none}
 .masterplan.mp-can-pan .masterplan__hint--drag{display:block}
 
 /* pinos */
+/* O pino é uma linha (losango + rótulo). Centrar a linha inteira jogava
+   o losango para o lado do ponto real — quem marca o lugar é o losango,
+   então o deslocamento é de meio losango, não de meia linha. */
 .pin{
-  position:absolute;transform:translate(-50%,-50%);z-index:5;
+  position:absolute;transform:translate(-7px,-50%);z-index:5;
   display:flex;align-items:center;gap:10px;
   transition:opacity var(--dur-m) var(--ease);
 }
@@ -492,19 +500,62 @@ html.no-motion .pin__dot::after{animation:none;display:none}
   padding:7px 10px;white-space:nowrap;border:1px solid var(--line-dark);
 }
 .pin:hover .pin__dot{background:var(--sand);transform:rotate(45deg) scale(1.15)}
-.pin--left{flex-direction:row}
+.pin--left{flex-direction:row;transform:translate(calc(-100% + 7px),-50%)}
 .masterplan.is-zoomed .pin{opacity:0;pointer-events:none}
 
 /* cartão de área (aparece no zoom) */
 .area-card{
-  position:absolute;z-index:7;left:var(--gap);bottom:clamp(24px,4vw,48px);
+  position:absolute;z-index:7;left:var(--pad-align);bottom:clamp(24px,4vw,48px);
   width:min(400px,calc(100vw - 2*var(--gap)));
   background:var(--paper);color:var(--t-light);
   opacity:0;visibility:hidden;transform:translateY(24px);
 }
 .area-card.is-open{opacity:1;visibility:visible;transform:none;transition:opacity var(--dur-m) var(--ease),transform var(--dur-m) var(--ease),visibility 0s}
-.area-card__media{aspect-ratio:16/9;overflow:hidden;background:var(--paper-2)}
-.area-card__media img{width:100%;height:100%;object-fit:cover}
+/* --- passador de fotos do cartão de área --- */
+.area-card__media{position:relative;aspect-ratio:16/9;overflow:hidden;background:var(--ink-2)}
+.ac-slides{
+  display:flex;height:100%;
+  transition:transform .55s var(--ease);will-change:transform;
+  cursor:grab;touch-action:pan-y;
+}
+.ac-slides:active{cursor:grabbing}
+.ac-slide{flex:0 0 100%;height:100%}
+.ac-slide img{width:100%;height:100%;object-fit:cover;display:block;user-select:none}
+.ac-arrow{
+  position:absolute;top:50%;transform:translateY(-50%);z-index:2;
+  width:34px;height:34px;display:grid;place-items:center;
+  background:rgba(14,13,11,.62);color:var(--paper);
+  backdrop-filter:blur(6px);
+  opacity:0;transition:opacity var(--dur-s),background var(--dur-s);
+}
+.ac-arrow--prev{left:8px}
+.ac-arrow--next{right:8px}
+.area-card__media:hover .ac-arrow,
+.ac-arrow:focus-visible{opacity:1}
+.ac-arrow:hover{background:var(--paper);color:var(--ink)}
+.ac-arrow:focus-visible{outline:2px solid var(--paper);outline-offset:2px}
+.ac-arrow[hidden]{display:none}
+/* no toque não existe hover: as setas ficam sempre visíveis */
+@media (hover:none){ .ac-arrow{opacity:1} }
+/* uma sombra suave no pé da foto: sem ela os pontos inativos sumiam
+   sobre render claro. */
+.area-card__media::after{
+  content:"";position:absolute;left:0;right:0;bottom:0;height:64px;z-index:1;
+  background:linear-gradient(transparent,rgba(10,9,7,.55));pointer-events:none;
+}
+.ac-dots{
+  position:absolute;left:0;right:0;bottom:9px;z-index:2;
+  display:flex;justify-content:center;gap:6px;pointer-events:none;
+}
+.ac-dots button{
+  pointer-events:auto;padding:6px 3px;line-height:0;
+}
+.ac-dots span{
+  display:block;width:16px;height:2px;background:rgba(247,243,234,.5);
+  transition:background var(--dur-s);
+}
+.ac-dots button.is-on span{background:var(--paper)}
+.ac-dots button:focus-visible{outline:1px solid var(--paper);outline-offset:2px}
 .area-card__body{padding:22px 24px 24px}
 .area-card__eyebrow{font:700 .62rem/1 var(--sans);letter-spacing:.2em;text-transform:uppercase;color:var(--brown)}
 .area-card__title{font-family:var(--serif);font-size:1.35rem;font-weight:500;margin:.45em 0 .2em}
@@ -520,7 +571,7 @@ html.no-motion .pin__dot::after{animation:none;display:none}
 }
 .area-card__nav button:hover{color:var(--brown)}
 .masterplan__back{
-  position:absolute;top:96px;right:var(--gap);z-index:7;
+  position:absolute;top:96px;right:var(--pad-align);z-index:7;
   font:600 .68rem/1 var(--sans);letter-spacing:.18em;text-transform:uppercase;
   color:var(--t-dark);background:rgba(14,13,11,.72);backdrop-filter:blur(8px);
   border:1px solid var(--line-dark);padding:13px 20px;
@@ -1066,15 +1117,6 @@ html:not(.js) #langGate{display:none}
   body{font-size:15px}
   .section{padding-left:20px;padding-right:20px}
 }
-/* uma coluna só: o eyebrow do masterplan, da galeria, do mapa, das
-   etapas e do footer nasciam em 70, 120 e 190 px na mesma página. */
-@media (max-width: 640px){
-  .pagehero__in,.specbar,.strip,.proj__body,.proj__mark,
-  .masterplan__head,.gallery .section__head,.loc .section__head,.steps__pin,.footer{
-    --pad-align:20px;
-  }
-}
-
 /* No celular a planta é 3:2 e a tela é bem mais alta: cobrir a tela inteira
    deixaria a imagem larga demais para arrastar. Uma faixa mais baixa reduz
    o percurso do arrasto sem perder detalhe. */
@@ -1157,7 +1199,8 @@ html:not(.js) #langGate{display:none}
 
 /* recuo que alinha um bloco full-bleed à coluna do .section */
 .pagehero__in,.specbar,.strip,.proj__body,.proj__mark,
-.masterplan__head,.gallery .section__head,.loc .section__head,.steps__pin,.footer{
+.masterplan__head,.masterplan__back,.area-card,
+.gallery .section__head,.loc .section__head,.steps__pin,.footer{
   --pad-align: max(var(--gap), calc((100% - var(--max)) / 2 + var(--gap)));
 }
 
