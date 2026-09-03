@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Camada_2" data-name="Camada 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 309.97 85.66">
+  <defs>
+    <style>
+      .cls-1 {
+        font-size: 22.19px;
+      }
+
+      .cls-1, .cls-2, .cls-3 {
+        fill: #190f05;
+      }
+
+      .cls-4 {
+        letter-spacing: 0em;
+      }
+
+      .cls-5 {
+        font-family: NotoSerif-ExtraCondensedLight, 'Noto Serif';
+        font-weight: 300;
+      }
+
+      .cls-6 {
+        letter-spacing: -.02em;
+      }
+
+      .cls-2 {
+        font-family: HelveticaLTPro-Bold, 'Helvetica LT Pro';
+        font-size: 58.12px;
+        font-weight: 700;
+      }
+
+      .cls-7 {
+        font-family: NotoSerif-ExtraCondensedSemiBoldItalic, 'Noto Serif';
+        font-style: italic;
+        font-weight: 600;
+      }
+
+      .cls-3 {
+        font-family: NotoSerif-ExtraCondensed, 'Noto Serif';
+        font-size: 11.24px;
+      }
+    </style>
+  </defs>
+  <g id="Camada_1-2" data-name="Camada 1">
+    <g>
+      <text class="cls-1" transform="translate(3.83 77.03)"><tspan class="cls-5" x="0" y="0">Refugio residencial de </tspan><tspan class="cls-7" x="182.51" y="0">alto estándar</tspan></text>
+      <g>
+        <text class="cls-2" transform="translate(0 49.93)"><tspan class="cls-4" x="0" y="0">RESO</tspan><tspan class="cls-6" x="163.79" y="0">R</tspan><tspan class="cls-4" x="204.36" y="0">T</tspan></text>
+        <text class="cls-3" transform="translate(238.61 35.93)"><tspan x="0" y="0">Condomínio</tspan><tspan x="0" y="13.49">Industrial</tspan></text>
+      </g>
+    </g>
+  </g>
+</svg>
