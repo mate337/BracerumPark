@@ -930,34 +930,6 @@ html.no-motion .step{opacity:1;filter:none;transform:none}
 .myth-row__a{font-size:.86rem;color:var(--t-dark-soft)}
 @media (max-width: 760px){ .myth-row{grid-template-columns:1fr} }
 
-/* ==========================================================
-   ENTRADA — escolha de idioma antes do site
-   ========================================================== */
-#langGate{
-  position:fixed;inset:0;z-index:300;background:var(--ink);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:clamp(38px,6vh,66px);padding:32px;
-}
-#langGate .gate__mark{width:min(400px,72vw);opacity:0}
-#langGate .gate__label{
-  font:700 .64rem/1 var(--sans);letter-spacing:.32em;text-transform:uppercase;
-  color:var(--t-dark-mute);opacity:0;text-align:center;
-}
-#langGate .gate__opts{display:flex;gap:1px;background:var(--line-dark);border:1px solid var(--line-dark);opacity:0}
-#langGate .gate__opt{
-  background:var(--ink);padding:clamp(18px,2.6vh,26px) clamp(24px,4vw,52px);
-  display:flex;flex-direction:column;align-items:center;gap:8px;
-  transition:background var(--dur-s) var(--ease), color var(--dur-s);
-  color:var(--t-dark);
-}
-#langGate .gate__opt:hover,#langGate .gate__opt:focus-visible{background:var(--paper);color:var(--ink);outline:none}
-#langGate .gate__code{font-family:var(--serif);font-style:italic;font-size:clamp(1.6rem,3vw,2.2rem);font-weight:500;line-height:1}
-#langGate .gate__name{font:600 .6rem/1 var(--sans);letter-spacing:.18em;text-transform:uppercase;opacity:.62}
-#langGate .gate__opt:hover .gate__name{opacity:.85}
-@media (max-width: 560px){
-  #langGate .gate__opts{flex-direction:column}
-}
-html:not(.js) #langGate{display:none}
 
 /* ==========================================================
    SELETOR DE IDIOMA
@@ -971,6 +943,17 @@ html:not(.js) #langGate{display:none}
 .lang__btn:hover{color:var(--t-dark)}
 .lang__btn.is-active{background:var(--paper);color:var(--ink)}
 .nav__right{display:flex;align-items:center;gap:clamp(12px,1.6vw,22px)}
+
+/* Seletor de idioma do hero: a nav só entra depois do hero, então sem ele
+   a primeira tela ficaria sem nenhuma forma de trocar de idioma. Sai de
+   cena exatamente quando a nav entra (classe is-off, posta pelo script). */
+.hero__lang{
+  position:absolute;z-index:6;top:clamp(22px,3.4vw,34px);
+  right:max(var(--gap), calc((100% - var(--max)) / 2 + var(--gap)));
+  background:rgba(14,13,11,.55);backdrop-filter:blur(8px);
+  transition:opacity var(--dur-m) var(--ease),transform var(--dur-m) var(--ease),visibility 0s;
+}
+.hero__lang.is-off{opacity:0;visibility:hidden;transform:translateY(-8px);pointer-events:none}
 @media (max-width: 520px){
   .lang__btn{padding:6px 6px;font-size:.6rem}
 }

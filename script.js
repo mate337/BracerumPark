@@ -13,6 +13,8 @@ if (hasGsap) gsap.registerPlugin(ScrollTrigger);
 
 /* ==========================================================
    00 · LOADER + entrada do hero
+   Não existe mais tela de escolha de idioma antes do site: o loader
+   roda assim que o i18n aplica o idioma e entrega o hero.
    ========================================================== */
 (function loader(){
   const el = document.getElementById("loader");
@@ -35,30 +37,6 @@ if (hasGsap) gsap.registerPlugin(ScrollTrigger);
     if (heroMark) gsap.fromTo(heroMark,
       { autoAlpha: 0, y: 26 },
       { autoAlpha: 1, y: 0, duration: 1.1, ease: "power3.out", delay: .2 });
-  }
-
-  const gate = document.getElementById("langGate");
-
-  /* Entrada de idioma: aparece antes de tudo na primeira visita. */
-  function animateGateIn(){
-    if (!gate) return;
-    if (reduceMotion){
-      gate.querySelectorAll(".gate__mark, .gate__label, .gate__opts")
-        .forEach(n => { n.style.opacity = 1; });
-      return;
-    }
-    gsap.timeline({ defaults: { ease: "power3.out" } })
-      .fromTo(gate.querySelector(".gate__mark"), { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: .8 })
-      .fromTo(gate.querySelector(".gate__label"), { opacity: 0 }, { opacity: 1, duration: .5 }, "-=.4")
-      .fromTo(gate.querySelector(".gate__opts"), { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: .6 }, "-=.35");
-  }
-  function animateGateOut(done){
-    if (!gate) { done(); return; }
-    if (reduceMotion){ gate.remove(); done(); return; }
-    gsap.timeline({ onComplete(){ gate.remove(); done(); } })
-      .to(gate.querySelectorAll(".gate__mark, .gate__label, .gate__opts"),
-          { opacity: 0, y: -14, duration: .4, stagger: .05, ease: "power2.in" })
-      .to(gate, { autoAlpha: 0, duration: .35 }, "-=.1");
   }
 
   function runLoader(){
@@ -86,21 +64,15 @@ if (hasGsap) gsap.registerPlugin(ScrollTrigger);
   }
 
   let started = false;
-  function begin(showedGate){
+  function begin(){
     if (started) return;
     started = true;
-    if (showedGate) animateGateOut(runLoader);
-    else { gate?.remove(); runLoader(); }
+    runLoader();
   }
 
-  document.addEventListener("bp:langready", e => begin(e.detail && e.detail.gate));
-  // Se a entrada aparecer, anima os elementos dela assim que o DOM estiver pronto
-  document.addEventListener("DOMContentLoaded", () => {
-    if (gate && !gate.hidden) animateGateIn();
-  });
+  document.addEventListener("bp:langready", begin);
   // Rede de segurança: se o i18n não carregar, o site entra mesmo assim.
-  // Nunca dispara enquanto a tela de entrada estiver à espera da escolha.
-  setTimeout(() => { if (!gate || gate.hidden) begin(false); }, 4000);
+  setTimeout(begin, 4000);
 })();
 
 /* ==========================================================
@@ -111,7 +83,14 @@ if (hasGsap) gsap.registerPlugin(ScrollTrigger);
   if (!nav) return;
   const hero = document.querySelector(".hero");
   if (!hero || nav.dataset.always === "true"){ nav.classList.add("is-visible"); return; }
-  function update(){ nav.classList.toggle("is-visible", window.scrollY > hero.offsetHeight - 90); }
+  /* O seletor de idioma do hero e o da nav nunca aparecem juntos: um
+     substitui o outro na mesma rolagem. */
+  const heroLang = document.querySelector(".hero__lang");
+  function update(){
+    const naVez = window.scrollY > hero.offsetHeight - 90;
+    nav.classList.toggle("is-visible", naVez);
+    if (heroLang) heroLang.classList.toggle("is-off", naVez);
+  }
   update();
   window.addEventListener("scroll", update, { passive: true });
 })();

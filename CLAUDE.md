@@ -2,7 +2,7 @@
 
 Site institucional do **Bracerum Park**, cidade industrial multiuso em Villeta, Paraguai (Mercosul). Público-alvo: investidores e indústrias avaliando instalar operação no parque.
 
-## Estado do projeto (v6 — 2026-09-03)
+## Estado do projeto (v6.2 — 2026-09-14)
 
 O site tem **7 páginas**: `index.html`, `tributacao.html`, `bracerum.html`, `hotel.html`,
 `resort.html`, `select.html` e `qualidade.html`, mais `i18n.js`, `style.css`, `script.js` e
@@ -18,7 +18,17 @@ rotas) que as seis páginas internas baixavam e interpretavam à toa. Ele roda d
 - Referências de motion aprovadas: zoom por área do masterplan estilo **oftheoak.co.uk/oak-species**, infográfico com destaque no scroll estilo **freehand.ai**, qualidade geral estilo **oryzo.ai**.
 
 ### Entrada de idioma
-Na primeira visita aparece uma tela (`#langGate`) com EN/PT/ES antes do site. Ao escolher, ela sai e o loader assume. Quem já escolheu entra direto. O fluxo é: `i18n.js` dispara `bp:langready` → `script.js` anima a saída da entrada e roda o loader. Há um timeout de segurança de 4s que **não** dispara enquanto a entrada estiver aberta.
+**Não existe tela de escolha de idioma antes do site** (removida a pedido do cliente na v6.2). O site
+abre direto no hero: `i18n.js` aplica o idioma salvo em `localStorage` ou, na primeira visita, o do
+navegador, e dispara `bp:langready` → `script.js` roda o loader e entrega o hero. O timeout de
+segurança de 4s continua, caso o i18n não carregue.
+
+A troca de idioma vive em **dois seletores que nunca aparecem juntos**: `.hero__lang` (canto superior
+direito do hero) enquanto o hero ocupa a tela, e o `.lang` da nav depois que ela entra. Quem faz o
+revezamento é o módulo `nav()` do `script.js`, na mesma rolagem que mostra a nav (classe `is-off` no
+seletor do hero). **O seletor do hero é necessário**: a nav fica escondida sobre o hero, então sem ele
+a primeira tela ficaria sem nenhuma forma de trocar de idioma. Nas páginas internas a nav tem
+`data-always="true"` e está sempre visível — lá não há (nem precisa de) seletor no hero.
 
 ### Idiomas (i18n.js)
 O HTML carrega **português**; `i18n.js` traz dicionários **EN** e **ES** que sobrescrevem via `data-i18n="chave"`. Chave ausente cai no PT original — a página nunca quebra. Conteúdo dinâmico (pinos, POIs, listas do mapa) usa objetos `{pt,en,es}` lidos pelo helper `tr()` e re-renderiza no evento `langchange`.
