@@ -1130,12 +1130,18 @@ html.no-motion .step{opacity:1;filter:none;transform:none}
   content:"";position:absolute;inset:0;pointer-events:none;
   background:linear-gradient(180deg,rgba(10,9,7,.5) 0%,rgba(10,9,7,0) 38%,rgba(10,9,7,.1) 62%,rgba(10,9,7,.82) 100%);
 }
+/* Selo do sub-projeto sobre a foto. É o SVG do cliente com o texto já
+   convertido em contorno (docs/build_logos.py) — dentro de um <img> o SVG
+   não enxerga as webfonts da página e o texto vivo sairia deformado.
+   A altura é por logo: o lockup do Hotel tem a palavra "Bracerum" muito
+   maior dentro da caixa que os do Resort e do Select, então a mesma altura
+   deixaria os três em pesos diferentes. */
 .proj__mark{
   position:absolute;left:var(--pad-align);top:clamp(96px,10vw,132px);z-index:3;
-  font:700 .68rem/1 var(--sans);letter-spacing:.34em;text-transform:uppercase;
-  color:var(--t-dark);text-shadow:0 2px 18px rgba(10,9,7,.6);
+  display:block;width:auto;height:var(--mark-h,clamp(66px,7vw,94px));
+  filter:drop-shadow(0 2px 18px rgba(10,9,7,.6));
 }
-.proj__mark b{font-weight:700;color:var(--sand)}
+.proj__mark--hotel{--mark-h:clamp(46px,4.9vw,64px)}
 .proj__body{
   position:relative;z-index:2;margin-top:clamp(-140px,-11vw,-90px);
   padding:0 var(--pad-align) clamp(70px,9vw,120px);
@@ -1199,7 +1205,7 @@ html.no-motion .step{opacity:1;filter:none;transform:none}
 }
 /* A imagem é maior que o quadro porque o GSAP a desloca ±6% no
    parallax — no tamanho exato aparecia uma faixa de fundo no topo. */
-.pagehero img{
+.pagehero > img{
   position:absolute;left:0;top:-7%;width:100%;height:114%;
   object-fit:cover;display:block;
 }
@@ -1239,9 +1245,14 @@ html.no-motion .step{opacity:1;filter:none;transform:none}
   }
 }
 
-/* selo do sub-projeto no hero — lockup tipográfico provisório,
-   trocar pelo SVG do cliente quando ele chegar (ver .sublogo). */
-.pagehero .sublogo{margin-bottom:clamp(14px,1.8vw,22px)}
+/* selo do sub-projeto no hero — SVG do cliente (ver .proj__mark para o
+   porquê do contorno). Mesma lógica de altura por logo. */
+.pagehero .sublogo{
+  display:block;width:auto;height:var(--sublogo-h,clamp(92px,10vw,140px));
+  margin-bottom:clamp(16px,2.2vw,28px);
+  filter:drop-shadow(0 2px 26px rgba(10,9,7,.55));
+}
+.sublogo--hotel{--sublogo-h:clamp(70px,7.5vw,104px)}
 
 /* ---------- faixa de números ---------- */
 .specbar{
@@ -1419,12 +1430,3 @@ html.no-motion .step{opacity:1;filter:none;transform:none}
 @media (max-width:1040px){ .cards{--cols:2} }
 @media (max-width:600px){ .cards{--cols:1} }
 
-/* marca provisória dos sub-projetos, até chegarem os logos */
-.sublogo{display:flex;flex-direction:column;gap:.4em;line-height:1}
-.sublogo__b{
-  font:700 .66rem/1 var(--sans);letter-spacing:.36em;text-transform:uppercase;color:var(--sand);
-}
-.sublogo__n{
-  font-family:var(--serif);font-weight:400;font-size:clamp(1.4rem,2.4vw,2rem);
-  letter-spacing:.02em;color:var(--t-dark);
-}
