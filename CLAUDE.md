@@ -10,6 +10,36 @@ O site tem **7 páginas**: `index.html`, `tributacao.html`, `bracerum.html`, `ho
 rotas) que as seis páginas internas baixavam e interpretavam à toa. Ele roda depois do
 `script.js` porque usa `hasGsap`, `reduceMotion` e `tr()`.
 
+### Logos dos sub-projetos e favicon (v6.2 — 2026-09-14)
+- **Os selos do cliente entraram no ar.** `hotel.html`, `resort.html` e `select.html` trocaram o
+  lockup tipográfico provisório (`<p class="sublogo">`, agora removido do CSS) pelo SVG real, e os
+  três blocos `.proj` da home trocaram o `.proj__mark` de texto pelo mesmo selo. Lockups escolhidos:
+  `Logo Hotel 02`, `Logo Resort 04` e `Logo Select 01` — são os três que trazem o mesmo arranjo
+  (losango em cima, palavra Bracerum, descritores miúdos), então lidos em sequência formam família.
+- **Por que os SVGs do cliente não vão direto para o `<img>`.** Eles saem do Illustrator com
+  `<text>` vivo em fontes proprietárias (`NotoSerif-ExtraCondensed*`, `HelveticaLTPro-Bold`).
+  Dentro de um `<img>` o SVG é um documento isolado: a webfont que a página carrega **não chega
+  nele** e o texto cai numa serifada de sistema, com larguras erradas — o logo sai deformado.
+  `docs/build_logos.py` redesenha o texto como `<path>` (Noto Serif variável em `wdth=62.5` para a
+  ExtraCondensed, Liberation Sans Bold no lugar da Helvetica LT Pro) e grava em `assets/logo/`
+  `{hotel,resort,select}-{cream,ink}.svg`. Conferido contra o PNG de referência do próprio cliente
+  (`assets/Bracerum Hotel/PNG/Logo Hotel 02@200x.png`): bate. **Os SVGs originais do cliente ficam
+  onde estão** — são a fonte, não o arquivo publicado. Se ele reenviar um logo, rodar o script de
+  novo em vez de editar o arquivo gerado.
+- **Altura por logo, não a mesma para os três.** O lockup do Hotel tem a palavra "Bracerum" muito
+  maior dentro da caixa que os do Resort e do Select; com a mesma altura os três saíam em pesos
+  diferentes. Daí `--sublogo-h` / `--mark-h` com um valor menor só para o hotel.
+- **`.pagehero img` virou `.pagehero > img`.** A regra do fundo do hero (`position:absolute`,
+  `height:114%`) pegava qualquer imagem dentro da seção — inclusive o selo novo.
+- **Favicon.** `assets/favicon.svg` é gerado pelo mesmo script a partir de
+  `assets/FavIcon{Preto,Branco}.svg`: **um arquivo só**, que troca de cor sozinho com
+  `prefers-color-scheme` (ink `#0e0d0b` no claro, creme `#fff8ef` no escuro). Não são dois `<link>`
+  com `media` porque o **Chrome ignora o atributo `media` em `<link rel="icon">`** — a media query
+  tem que morar dentro do SVG. Junto vai `assets/apple-touch-icon.png` (180×180, marca creme sobre
+  ink), que é o que o iOS usa na tela de início e não aceita SVG. As sete páginas declaram os dois.
+  **Nota:** a marca do cliente é uma faixa de 2,5:1, então na aba ela aparece deitada (16×6 px).
+  Se ele quiser um ícone que preencha o quadrado, é preciso uma versão recortada da marca — pedir.
+
 ### Regras de design **obrigatórias** (definidas pelo cliente)
 - **Paleta: preto, branco e bege/marrom** (`--ink #0e0d0b`, `--paper #f7f3ea`, `--sand #cbb88f`, `--brown #473315`). **Zero vermelho.** Azul só nos três casos pedidos pelo cliente: a faixa institucional da Bracerum (`--brc-blue #1c4d9d`), a água do mapa (semântica) e a iluminação cênica do render do hero.
 - **Tipografia: Helvetica** (UI/corpo, stack de sistema) **+ Noto Serif** (display/títulos, itálico como ênfase no lugar de cor).
@@ -194,10 +224,6 @@ Onde a foto não existe, a **descrição** carrega a escala: Terport e Puerto Se
 capacidade e equipamento, apurados nas fontes do setor.
 
 **Pendências conhecidas** (aguardar o usuário):
-- **Logos/selos do Bracerum Select, Hotel e Resort** — **chegaram** em `assets/Bracerum Hotel/`,
-  `assets/Bracerum Resort/` e `assets/Bracerum Select/` (SVG e PNG). Ainda **não estão aplicados**:
-  os heros de hotel/resort/select seguem com o lockup tipográfico `.sublogo`. Trocar o
-  `<p class="sublogo">` pelo `<img>` do SVG correspondente.
 - **Tipologias das casas do Resort** — o R04 define o setor residencial mas não traz plantas por
   unidade. A seção agora é um convite comercial ("Pedir as plantas das casas"); quando o quadro de
   áreas chegar, ela vira grade de `.cards` com uma tipologia por cartão.
