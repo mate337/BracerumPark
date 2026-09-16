@@ -1,210 +1,218 @@
-# Comando de execução — montar o filme de 60s do Bracerum Park no After Effects
+# Comando de execução — filme de 60 s do Bracerum Park no After Effects (v2)
 
-> Arquivo de instrução autossuficiente. Leia inteiro antes de começar e execute sem pedir
-> confirmação: todas as decisões já estão tomadas aqui. Onde este arquivo e qualquer outra fonte
-> divergirem, **este arquivo vence**.
+> Arquivo autossuficiente. Leia inteiro antes de começar e execute sem pedir confirmação — todas as
+> decisões já estão tomadas aqui. Onde este arquivo divergir de qualquer outra fonte, **ele vence**.
+>
+> **Esta é a v2 e ela substitui a v1 inteira.** A v1 gerou 28 planos curtos e o cliente recusou:
+> ficou com cara de apresentação, não de filme. O alvo agora é **poucos planos longos, tipografia
+> grande e transições desenhadas**. Se o seu resultado tiver mais de 15 cortes, você repetiu o erro.
 
-## 1. Quem faz o quê
+## 1. O trabalho
 
-Você vai produzir o projeto do **filme institucional de 60 s do Bracerum Park** no After Effects,
-montado com os assets que já existem no repositório. Os takes 3D definitivos **ainda não foram
-produzidos** — por isso o projeto nasce completo, com cada plano num precomp próprio, usando
-render estático ou o clipe aéreo como *stand-in*. Quando um take 3D ficar pronto, ele substitui o
-conteúdo do precomp correspondente e nada mais na timeline muda. **Essa estrutura é o objetivo
-principal do trabalho**, mais do que o preview em si.
+Montar o filme institucional de 60 s do **Bracerum Park** — cidade industrial em Villeta, Paraguai —
+no After Effects. São **6 takes 3D**, que **ainda não foram produzidos**. O projeto nasce completo,
+com cada take num precomp próprio alimentado por um *stand-in* (render estático ou o clipe aéreo de
+referência). Quando o take 3D chegar, ele substitui o conteúdo do precomp e **nada na timeline
+muda**. Essa estrutura é tão importante quanto o resultado visual.
 
 **Repositório:** `github.com/mate337/BracerumPark` · branch **`claude/park-v5-paginas-projetos`**
-**Contexto completo do filme:** `docs/roteiro-video-60s.md` (roteiro + brief dos 20 takes 3D).
-Leia antes de montar — mas a tabela da seção 6 **deste** arquivo é a fonte de verdade da timeline.
+**Roteiro completo:** `docs/roteiro-video-60s.md` (v5) — leia para contexto; a tabela da seção 6
+**deste** arquivo é a fonte de verdade da timeline.
 
 ## 2. Entregáveis
 
-1. **`docs/ae/bracerum-60s.jsx`** — ExtendScript que, rodado em `Arquivo > Scripts > Executar
-   arquivo de script`, monta o projeto inteiro do zero: importa assets, cria os precomps, monta a
-   master, aplica keyframes, textos, véus e marcadores. Rodar duas vezes seguidas não pode duplicar
-   nada (limpe ou reaproveite pelo nome).
+1. **`docs/ae/bracerum-60s.jsx`** — ExtendScript que monta o projeto do zero em
+   `Arquivo > Scripts > Executar arquivo de script`. Rodar duas vezes não pode duplicar nada.
 2. **`docs/ae/LEIA-ME.md`** — como rodar, o que instalar antes, como trocar um stand-in pelo take 3D.
-3. **Se você tiver acesso ao After Effects:** rode o script, corrija o que falhar, salve
-   `docs/ae/Bracerum_Park_60s.aep` e renderize `docs/ae/preview/bracerum-60s_preview.mp4`
-   (H.264, 1920×1080, 30 fps). **Se não tiver:** entregue 1 e 2, e diga isso claramente no LEIA-ME —
-   não finja que renderizou.
+3. **Com acesso ao AE:** rode, corrija o que falhar, salve `docs/ae/Bracerum_Park_60s.aep` e
+   renderize `docs/ae/preview/bracerum-60s_v2.mp4` (H.264, 1920×1080, 30 fps). **Sem acesso:**
+   entregue 1 e 2 e diga isso no LEIA-ME — não afirme que renderizou.
 
-## 3. Restrições técnicas que causam retrabalho se ignoradas
+## 3. Restrições técnicas que causam retrabalho
 
 - **ExtendScript é ES3.** Nada de `let`, `const`, arrow function, template literal, `JSON.parse`,
-  `Array.prototype.forEach`. Use `var`, `function`, concatenação com `+` e `for` clássico.
-- **Envolva tudo em `app.beginUndoGroup("Bracerum 60s") / app.endUndoGroup()`** e cheque
-  `app.project` antes de criar qualquer coisa.
-- **O After Effects não importa SVG.** Os logos já estão convertidos em PNG em `docs/ae/build/`.
-  Não tente importar nada de `assets/logo/*.svg`.
-- **Fontes:** *Noto Serif* (display/títulos — Google Fonts, gratuita, instalar antes) e *Helvetica*
-  (UI/números; se não houver, **Arial**). Nomes PostScript: `NotoSerif-Regular`,
-  `NotoSerif-Italic`, `Helvetica` / `ArialMT`, `Helvetica-Bold` / `Arial-BoldMT`.
-- **O clipe aéreo é 24 fps numa comp de 30 fps.** Interprete o footage como 24 fps, ligue
-  **Frame Blending → Pixel Motion** na camada e só então aplique o time-stretch da tabela. Sem isso
-  o movimento tranca.
-- **Caminhos relativos ao repositório.** O script deve resolver os assets a partir da pasta do
-  próprio `.jsx` (`File($.fileName).parent.parent.parent` = raiz do repo), nunca com caminho
-  absoluto da sua máquina.
+  `forEach`. Use `var`, `function`, `+` e `for` clássico.
+- Envolva tudo em `app.beginUndoGroup("Bracerum 60s v2") / app.endUndoGroup()`.
+- **O After Effects não importa SVG.** Os logos já estão rasterizados a 3000 px em
+  `docs/ae/build/`. Não tente importar `assets/logo/*.svg`.
+- **Fontes:** *Noto Serif* (Google Fonts, instalar antes) e *Helvetica* (ou **Arial**). Nomes
+  PostScript: `NotoSerif-Regular`, `NotoSerif-Italic`, `Helvetica`/`ArialMT`,
+  `Helvetica-Bold`/`Arial-BoldMT`.
+- **O clipe de referência é 24 fps numa comp de 30.** Interprete como 24 fps e ligue **Frame
+  Blending → Pixel Motion** antes de qualquer time-stretch, senão o movimento tranca.
+- **Nenhum caminho absoluto no `.jsx`.** Resolva a partir da pasta do próprio script
+  (`File($.fileName).parent.parent.parent` = raiz do repo).
 
-## 4. Regras de marca (não negociáveis — vêm do cliente)
+## 4. Regras de marca (do cliente, não negociáveis)
 
 - **Paleta:** `--ink #0e0d0b` · `--paper #f7f3ea` · `--sand #cbb88f` · `--brown #473315`.
-- **ZERO VERMELHO** em qualquer elemento gráfico, em qualquer frame.
-- **Azul só em três lugares:** a fachada noturna do hotel (T14, é iluminação cênica do render), o
-  mapa, e a faixa institucional Bracerum `#1c4d9d` na assinatura final.
+- **ZERO VERMELHO em qualquer frame.** Vale para gráfico, rótulo de mapa, rota e efeito.
+  **Isto elimina o glitch de separação RGB** (o do Spider-Verse, que joga vermelho e ciano na tela).
+  O glitch deste filme é de **deslocamento**: fatias horizontais deslocadas em X, ruído de blocos e
+  um frame de `--ink` puro, tudo dentro da paleta. Se a sua ferramenta de glitch só faz channel
+  split, **não use** — faça o deslocamento à mão com camadas fatiadas.
+- **Azul só em dois lugares:** a fachada noturna do hotel (é a iluminação cênica do render) e a
+  faixa institucional Bracerum `#1c4d9d` na assinatura final.
 - **Tipografia:** Noto Serif nos nomes de marca e ênfases (itálico como ênfase, **nunca cor**);
-  Helvetica/Arial em números, legendas e dados.
-- **Cantos quadrados.** Sem border-radius, sem sombra, sem bisel, sem brilho.
-- Transições são **corte seco**, exceto onde a tabela disser outra coisa. Nada de dissolve
-  cruzado genérico, wipe, zoom-blur ou "transição de template".
+  Helvetica/Arial em números e dados.
+- **Cantos quadrados.** Sem sombra, sem bisel, sem brilho, sem contorno.
+- **Nada de efeito de template:** light leak, lens flare artificial, partícula, zoom-blur de
+  transição, "cinematic preset". O filme é sóbrio: movimento de câmera, tipografia e as quatro
+  transições da seção 5.
 
-## 5. Estrutura obrigatória do projeto
+## 5. As quatro transições — como fazer cada uma no AE
 
-```
-01_MASTER/      BP_60s_MASTER          1920×1080 · 30 fps · 60 s · 16 bpc · sRGB
-02_TAKES/       T01_parque_geral, T02_zoomout, T03_planta, T04_galpoes, T05_doca,
-                T06_fabrica, T07_aerodromo, T08_enfermaria, T09_creche, T10_bombeiros,
-                T11_comercial, T12_academia, T13_posto, T14_hotel, T15_auditorio,
-                T16_convencoes, T17_resort_lago, T18_beira_lago, T19_quadras, T20_saida,
-                B01_engenheiro, B02_barcacas, B03_galpao_interior
-03_ASSETS/      imagens, clipe e PNGs de apoio importados
-04_GRAFISMO/    cartelas, legendas, assinatura, véus
-```
+Cada uma tem função. Nenhuma entra "porque ficou bonito". **Não invente uma quinta.**
 
-Cada precomp de take tem **a duração do plano na master** (as durações estão na tabela) e o
-mesmo tamanho da master. **Um plano = um precomp**, sempre — é o que permite trocar o stand-in
-pelo take 3D sem tocar na timeline.
+**Match cut** (0:09 e 0:55) — corte no meio do movimento, não no fim. Os dois planos precisam ter a
+mesma direção e a mesma velocidade aparente na emenda. Ajuste a velocidade do plano seguinte até
+que a emenda não seja percebida como corte. Reforce com **Directional Blur** de 4 frames (ângulo do
+movimento, comprimento 0→12→0). Nada de dissolve.
 
-**Precomps sem asset** (T08, T09, T10, T12 e os três `B0x`): monte como *slate* — fundo `--ink`,
-o ID do take em Helvetica `--sand` no topo, a descrição em Noto Serif `--paper` no centro e a nota
-em Helvetica `--paper` a 65% embaixo. **Texto de verdade, editável** — não use imagem pronta.
+**Masking / reveal** (0:30, 0:40, 0:46) — o logo do sub-projeto está em `--paper` sobre `--ink`;
+uma máscara retangular sobe revelando o logo em 10 frames, segura 8, e então a **própria forma do
+logo vira matte**: duplique a camada do take abaixo, aplique o logo como *Alpha Matte*, e escale o
+matte de 100% para 2000% em 14 frames com Easy Ease. O take aparece de dentro das letras.
 
-## 6. Timeline — a tabela é a fonte de verdade
+**Gradient wipe** (0:03, 0:36, 0:50) — camada de rampa como fonte: crie um sólido, aplique
+**Gradient Ramp** (preto→branco, ângulo 100°), aplique **Fast Box Blur** de 60 px nela, e use-a como
+*Gradient Layer* do efeito **Gradient Wipe** na camada de saída. Anime `Transition Completion`
+0→100 em 12 frames, `Transition Softness` em 35.
 
-`IN` é o tempo na master. Movimento: `escala a→b` é o Ken Burns (Escala uniforme, dois keyframes,
-**Suavização Easy Ease com influência 45** nos dois, nunca linear). Assets são relativos à raiz do repo.
+**Glitch** (0:23, **uma vez só no filme**) — 0,4 s. Três elementos, todos na paleta:
+(a) 5 fatias horizontais da imagem deslocadas em X entre −60 e +60 px, mudando a cada 2 frames;
+(b) dois frames de `--ink` puro intercalados; (c) um frame com a tipografia duplicada e deslocada
+6 px. **Sem separação de canal, sem vermelho.** Se o cliente pedir um segundo glitch, o lugar é 0:50.
 
-| IN | Dur | Precomp | Asset (stand-in) | Movimento | Texto na tela |
+## 6. Timeline — fonte de verdade
+
+`IN` = tempo na master. Stand-in = o que usar **agora**, até o take 3D existir.
+Todos os caminhos são relativos à raiz do repositório.
+
+| IN | Dur | Precomp | Conteúdo | Stand-in | Saída |
 |---|---|---|---|---|---|
-| 0:00.0 | 3,0s | T01_parque_geral | `assets/video/voo-passaro-01.mp4` · trecho 0,0–1,8 s · time-stretch **166,67%** | nenhum (o movimento é do clipe) | — |
-| 0:03.0 | 2,0s | B01_engenheiro | *slate* | — | `VILLETA · PARAGUAI` |
-| 0:05.0 | 4,0s | T02_zoomout | `assets/web/vista-aerea-park-02.jpg` | escala **150→62**, subindo (posição Y +90 px) | `65 km de Assunção` · `Hidrovia Paraná–Paraguai` · `Ruta PY19 · Acceso Sur` |
-| 0:09.0 | 3,0s | T03_planta | `assets/web/vista-aerea-park-02.jpg` | escala **118→104** | **1.819.856 m²** + *planejados* (itálico serifado) |
-| 0:12.0 | 2,0s | B02_barcacas | *slate* | — | — |
-| 0:14.0 | 2,0s | T04_galpoes | `assets/park/vias-galpao.jpg` | escala **104→118**, deriva X −40 px | **989.642 m²** de lotes · módulos de **40.000 m²** |
-| 0:16.0 | 2,0s | T05_doca | `assets/park/vias-caminhoes.jpg` | escala **106→116**, deriva X −40 px (mesmo eixo do T04) | — |
-| 0:18.0 | 2,0s | B03_galpao_interior | *slate* | — | — |
-| 0:20.0 | 3,0s | T06_fabrica | `assets/park/fabrica-bracerum.jpg` | escala **116→104** | **Built-to-Suit** · Steel Frame próprio |
-| 0:23.0 | 4,0s | T07_aerodromo | `assets/video/voo-passaro-01.mp4` · trecho 2,6–4,8 s · time-stretch **181,82%** | nenhum | **Pista de 1.480 m** · hangares **7.686 m²** · **heliponto** junto aos hangares |
-| 0:27.0 | 1,0s | (cartela) | — | máscara vertical revelando o texto em 12 frames | **Apoio e bem-estar** |
-| 0:28.0 | 2,0s | T08_enfermaria | *slate* | — | **Enfermaria** no perímetro |
-| 0:30.0 | 2,0s | T09_creche | *slate* | — | **Creche** |
-| 0:32.0 | 2,0s | T10_bombeiros | *slate* | — | **Bombeiros civis** próprios |
-| 0:34.0 | 1,0s | (cartela) | — | idem | **Bracerum Select** |
-| 0:35.0 | 2,0s | T11_comercial | `assets/park/select-shopping-lago.jpg` | escala **104→115** | **Shopping** e lojas |
-| 0:37.0 | 2,0s | T12_academia | *slate* | — | **Academia** |
-| 0:39.0 | 2,0s | T13_posto | `assets/park/select-posto-noturno.jpg` | escala **115→104** | **Posto · market · banco · praça de alimentação** |
-| 0:41.0 | 1,0s | (cartela) | — | idem | **Bracerum Hotel** |
-| 0:42.0 | 3,0s | T14_hotel | `assets/park/hotel-noturno.jpg` | escala **110→120**, deriva X **−150 px** (ver nota na seção 11) | **384 studios** de 35 m² |
-| 0:45.0 | 2,0s | T15_auditorio | `assets/park/hotel-auditorio.jpg` | escala **106→116** | **Auditório para 1.200 pessoas** |
-| 0:47.0 | 1,0s | T16_convencoes | `assets/renders/pavilhao-eventos-1.jpg` | escala **110→116** | **Centro de convenções · 13.500 m²** |
-| 0:48.0 | 1,0s | (cartela) | — | idem | **Bracerum Resort** |
-| 0:49.0 | 3,0s | T17_resort_lago | `assets/park/resort-lago-aereo.jpg` | escala **116→104** | **141 lotes** · **142.067 m²** |
-| 0:52.0 | 2,0s | T18_beira_lago | `assets/park/resort-lago-fonte.jpg` | escala **104→112** | — |
-| 0:54.0 | 1,0s | T19_quadras | `assets/park/amen-quadras.jpg` | escala **112→106** | Lago · quadras · clubhouse |
-| 0:55.0 | 3,0s | T20_saida | `assets/video/voo-passaro-01.mp4` · trecho 0,0–1,6 s · **Time-Reverse Layer** + time-stretch **187,5%** | nenhum | `PARK · SELECT · HOTEL · RESORT` |
-| 0:58.0 | 2,0s | (assinatura) | `docs/ae/build/logo-stacked-wide-cream.png` | logo entra por máscara vertical em 10 frames | **bracerumpark.com · Villeta · Paraguai** |
+| 0:00.0 | 3,0s | `G01_abertura` | Fundo `--ink`. Logo **Bracerum Park** revelado por máscara vertical em 14 frames, segura 1 s. Nada mais em quadro. | `docs/ae/build/logo-stacked-wide-cream.png`, 900 px de largura, centrado | gradient wipe |
+| 0:03.0 | 6,0s | `TAKE_A_aerea` | Aérea drone do parque. **O plano mais longo do filme — deixe respirar.** Sobre ele, o número gigante (ver 6.1). | `assets/video/voo-passaro-01.mp4`, trecho 0,0–3,6 s, stretch **166,67%**, Pixel Motion | **match cut** |
+| 0:09.0 | 3,0s | `TAKE_B_planta` | Vista 90º: a câmera continua subindo e a aérea vira planta. | `assets/web/vista-aerea-park-02.jpg`, escala **135→100**, sem deriva | contínuo |
+| 0:12.0 | 8,0s | `G02_mapa` | **Zoom out estilo Google Earth + traçado de rotas.** Ver 6.2 — é o trecho mais importante do filme. | idem acima, continuando o recuo | corte |
+| 0:20.0 | 3,0s | `G03_chamada` | Mapa recuado, escurecido a 55% com sólido `--ink`. Chamada entra **palavra por palavra**, 3 frames entre palavras, em 3 linhas centradas: `A SUA` / `CIDADE INDUSTRIAL` / `NO PARAGUAI`. `CIDADE INDUSTRIAL` em Noto Serif Italic 96 px `--paper`; o resto em Helvetica Bold 72 px `--sand`, tracking 80. | — | **glitch 0,4s** |
+| 0:23.0 | 7,0s | `TAKE_F_pista` | Pista de pouso, descida contínua sobre o eixo. | `assets/park/aero-pista.jpg`, escala **104→122**, deriva Y +40 px | reveal |
+| 0:30.0 | 1,0s | `G04_logo_hotel` | Logo **Bracerum Hotel** abre e revela o take C atrás. | `docs/ae/build/hotel-cream.png`, 760 px | contínuo |
+| 0:31.0 | 5,0s | `TAKE_C_hotel` | Hotel: fachada noturna subindo para a aérea do conjunto. | `assets/park/hotel-noturno.jpg`, escala **110→120**, deriva X **−150 px** (ver 11) | gradient wipe |
+| 0:36.0 | 4,0s | `TAKE_D_convencoes` | Centro de convenções: auditório ocupado, push-in para o palco. | `assets/park/hotel-auditorio.jpg`, escala **106→118** | reveal |
+| 0:40.0 | 1,0s | `G05_logo_resort` | Logo **Bracerum Resort** abre e revela o take E. | `docs/ae/build/resort-cream.png`, 760 px | contínuo |
+| 0:41.0 | 5,0s | `TAKE_E_resort` | Resort: aérea baixa passando pórtico e clubhouse. | `assets/park/resort-lago-aereo.jpg`, escala **118→104** | gradient wipe |
+| 0:46.0 | 4,0s | `G06_select` | **Sem take.** Fundo `--ink` com degradê `--brown` na diagonal a 100°. Logo **Bracerum Select** entra centrado, segura 1 s, sobe para o terço superior; as palavras entram em cascata (4 frames entre elas), alinhadas à coluna de 110 px: `SHOPPING` `ACADEMIA` `BANCO` `POSTO` `MARKET`, Helvetica Bold 64 px `--paper`, tracking 60. | `docs/ae/build/select-cream.png`, 700 px | corte |
+| 0:50.0 | 5,0s | `G07_tributo` | Fundo `--ink`. **1%** ocupando quase a tela (altura ~640 px), com gradiente e paralaxe lenta (escala 100→106). Abaixo, Helvetica 36 px `--paper` a 85%: *de tributo único sobre o valor agregado, no regime de Maquila*. | — | **match cut** |
+| 0:55.0 | 5,0s | `G08_fecho` | **Take A de volta**, em recuo. Aos 0:56 as quatro marcas acendem sobre suas regiões da planta e apagam em 1 s. Aos 0:57.5 entra o logo **Bracerum Park** por cima, com `bracerumpark.com · Villeta · Paraguai` em Helvetica 30 px. Faixa `#1c4d9d` de 10 px na base nos últimos 12 frames. | `assets/video/voo-passaro-01.mp4`, trecho 0,0–2,7 s **Time-Reverse** + stretch 185% | — |
 
-**Fecha exatamente em 60,0 s.** Se sua soma der diferente, você errou em algum plano — confira antes
-de seguir.
+**Fecha em 60,0 s exatos.** Soma: 3+6+3+8+3+7+1+5+4+1+5+4+5+5. Se a sua der diferente, você errou.
 
-### Como montar cada elemento
+### 6.1 O número gigante sobre a aérea (0:04–0:09)
 
-- **Ken Burns:** a imagem entra no precomp em escala uniforme, centralizada, com os dois keyframes
-  da tabela no primeiro e no último frame **do precomp**. Nunca deixe a borda da imagem aparecer:
-  escala mínima 104%. Easy Ease nos dois keyframes, influência 45.
-- **Legendas:** camada `docs/ae/build/veil-bottom.png` (véu já pronto, degradê ink) por baixo do
-  texto, sempre — sem ela o texto claro some na aérea dourada. Texto alinhado à esquerda, a
-  **110 px da borda esquerda** (é a coluna do site), bloco terminando a ~190 px da base.
-  Estrutura do bloco: *eyebrow* em Helvetica Bold 22 px `--sand` com **tracking 120**, caixa alta →
-  número/título em Helvetica Bold 86 px `--paper` → ênfase em Noto Serif Italic 72 px `--paper` →
-  linha de apoio em Helvetica 34 px `--paper` a 88%.
-  Entrada: opacidade 0→100 em 8 frames + posição Y +18 px → 0, Easy Ease. Saída: corta com o plano.
-- **Números:** os que aparecem em negrito na coluna "Texto na tela" contam de 0 até o valor em
-  **0,4 s** com Easy Ease (expressão ou keyframes, tanto faz), mantendo separador de milhar com
-  ponto. **Nunca invente número** — use exatamente o que está na tabela.
-- **Cartelas de marca:** fundo `--ink` cheio, nome em Noto Serif Italic 104 px `--paper` centrado,
-  filete `--sand` de 240×1 px abaixo, descritor em Helvetica Bold 24 px `--sand` com tracking 130,
-  caixa alta. Revelação por máscara retangular subindo em 12 frames, Easy Ease.
-- **Assinatura:** fundo `--ink`, logo PNG centralizado com ~620 px de largura, revelado por máscara
-  vertical em 10 frames; endereço em Helvetica 30 px `--paper` a 80% abaixo; faixa `#1c4d9d` de
-  10 px colada na base entrando nos últimos 12 frames.
-- **Marcadores de locução:** na master, um **marcador de comp** no IN de cada plano com a fala
-  correspondente da seção 7 no comentário. É o guia para gravar o VO depois.
+O momento de tipografia mais importante do filme.
 
-## 7. Locução — só marcadores, não gere áudio
+- Texto: **1.819.856 m²**, Helvetica Bold, **altura de caixa ~420 px**, centrado, tracking −20.
+- **Gradiente:** não use "gradient overlay". Crie um sólido com **Gradient Ramp**
+  (`--sand #cbb88f` → `--paper #f7f3ea`, ângulo 100°) e aplique a camada de texto como **Alpha Matte**.
+- **Entrada:** máscara de degradê varrendo da esquerda para a direita em 16 frames, acompanhando o
+  movimento da câmera do take — o número **nasce junto com o movimento**, não aparece em cima dele.
+- **Contagem:** os dígitos contam de 0 até o valor em 0,6 s, com desaceleração, mantendo o ponto de
+  milhar. Expressão com Slider Control; **não** anime escala nem opacidade do bloco todo.
+- Abaixo, Helvetica 34 px `--paper` a 85%: *planejados como uma cidade industrial completa*,
+  entrando 6 frames depois.
+- **Saída:** o número sai junto com o match cut, deslocando para cima com o movimento da câmera.
 
-Não sintetize voz nem trilha. O VO é gravado depois; a trilha é licenciada. Os textos para os
-marcadores (o TC é o do início do plano correspondente):
+Mesma receita, menor, para: `1.480 m` (0:24), `384` (0:32), `1.200` (0:37), `141 lotes` e
+`142.067 m²` (0:42, em sequência e **não** juntos), `1%` (0:50, o maior de todos).
+
+### 6.2 O bloco do mapa (0:12–0:20)
+
+É o trecho que mais vende o projeto e o mais fácil de errar.
+
+1. **0:12–0:14** — continua o recuo da vista 90º até o parque virar um ponto. Entra a malha do mapa
+   na paleta do site: fundo `--ink`, água `#1b4a6e`, vias em tons de areia, rótulos claros.
+   **Zero vermelho, inclusive nas rotas.**
+2. **0:14–0:16** — **rota 1**, Park → Assunção. Shape layer com **Trim Paths** `End 0→100`, traçando
+   **pela via real** (nunca em reta). Um ponto acompanha a ponta da linha; o contador `0 → 65 km`
+   corre junto e trava no fim. Rótulo: `ASSUNÇÃO · 65 km · 1 h 10`.
+3. **0:16–0:18** — **rota 2**, Park → fronteira com o Brasil (Ciudad del Este / Foz do Iguaçu),
+   mesma mecânica: `FRONTEIRA BR · 360 km · 5 h`.
+4. **0:18–0:20** — **rota 3**, Park → São Paulo. Essa é **aérea**: desenhe em **arco**, não por via,
+   e o rótulo diz `SÃO PAULO · 1.130 km · ~2 h de voo`. Não confundir com estrada.
+5. As três linhas **ficam acesas** no último frame, formando o leque. É a imagem que fica na cabeça.
+
+**O traçado real já existe:** `assets/routes.json`, pré-calculado com OSRM. Use esse arquivo para
+desenhar as rotas 1 e 2 em vez de traçar à mão. (Regerável por `docs/build_routes.py`.)
+
+## 7. Estrutura do projeto
+
+```
+01_MASTER/     BP_60s_MASTER   1920×1080 · 30 fps · 60 s · 16 bpc · sRGB
+02_TAKES/      TAKE_A_aerea, TAKE_B_planta, TAKE_C_hotel,
+               TAKE_D_convencoes, TAKE_E_resort, TAKE_F_pista
+03_GRAFISMO/   G01_abertura, G02_mapa, G03_chamada, G04_logo_hotel,
+               G05_logo_resort, G06_select, G07_tributo, G08_fecho
+04_ASSETS/     imagens, clipe e PNGs importados
+05_TRANSICOES/ as rampas e mattes reutilizados
+```
+
+Cada precomp tem exatamente a duração da tabela e o tamanho da master. **Um plano = um precomp**,
+sempre — é o que permite trocar o stand-in pelo take 3D sem tocar na timeline.
+
+## 8. Locução — só marcadores, não gere áudio
+
+Não sintetize voz nem trilha. Crie um **marcador de comp** na master em cada TC abaixo, com a fala
+no comentário:
 
 | TC | Fala |
 |---|---|
-| 0:01 | Villeta, Paraguai. Sessenta e cinco quilômetros de Assunção, minutos da Hidrovia. |
-| 0:09 | Um milhão, oitocentos e dezenove mil metros quadrados planejados como uma cidade industrial completa. |
-| 0:15 | Quase um milhão de metros quadrados de lotes, em módulos de quarenta mil. Galpão pronto, em Steel Frame próprio. |
-| 0:23 | Mil quatrocentos e oitenta metros de pista, hangares e heliponto dentro do perímetro: o investidor desce no parque. |
-| 0:28 | Enfermaria, creche e bombeiros próprios. O que uma cidade precisa para funcionar. |
-| 0:35 | Bracerum Select: shopping, academia, banco e posto. A rotina resolvida sem sair do parque. |
-| 0:42 | Bracerum Hotel: trezentos e oitenta e quatro studios e um auditório para mil e duzentas pessoas. |
-| 0:49 | Bracerum Resort: cento e quarenta e um lotes à beira do lago, a cinco minutos da operação. |
-| 0:56 | Bracerum Park. A porta de entrada industrial do Mercosul. |
+| 0:04 | Um milhão, oitocentos e dezenove mil metros quadrados em Villeta, Paraguai. |
+| 0:13 | Sessenta e cinco quilômetros de Assunção. Trezentos e sessenta da fronteira. Duas horas de voo de São Paulo. |
+| 0:24 | Pista própria de mil quatrocentos e oitenta metros: o investidor desce dentro do parque. |
+| 0:31 | Hotel, centro de convenções e auditório para mil e duzentas pessoas. |
+| 0:42 | Resort de cento e quarenta e um lotes à beira do lago, a cinco minutos da operação. |
+| 0:47 | Shopping, academia, banco e posto, sem sair do perímetro. |
+| 0:51 | E um por cento de tributo único, no regime de Maquila. |
+| 0:56 | Bracerum Park. A sua cidade industrial no Mercosul. |
 
-## 8. Entrega no Git
+## 9. Entrega no Git
 
-Trabalhe na branch **`claude/park-v5-paginas-projetos`**, commit com mensagem descritiva em
-português. Commitar: o `.jsx`, o `LEIA-ME.md` e, se tiver rodado, o `.aep` e o preview.
-**Não commitar** cache de disco do AE, pastas de render intermediário nem nada em `Adobe After
-Effects Auto-Save/`.
+Branch **`claude/park-v5-paginas-projetos`**, commit em português, descritivo. Commitar o `.jsx`, o
+`LEIA-ME.md` e, se rodou, o `.aep` e o preview. **Não commitar** cache do AE nem
+`Adobe After Effects Auto-Save/`.
 
-## 9. Critérios de aceite
+## 10. Critérios de aceite
 
-- [ ] O `.jsx` roda numa instalação limpa do AE sem erro e sem diálogo, e rodar duas vezes não duplica nada.
-- [ ] A master fecha em **60,0 s** exatos, sem frame vazio nem sobreposição entre planos.
-- [ ] Os 23 precomps existem, com os nomes exatos da seção 5, cada um com a duração da tabela.
-- [ ] Nenhum pixel vermelho em elemento gráfico, em nenhum frame.
-- [ ] Todo texto na tela bate **literalmente** com a coluna "Texto na tela" — inclusive os números.
-- [ ] Toda legenda tem o véu por baixo e começa a 110 px da borda esquerda.
-- [ ] Os três planos do clipe estão com Pixel Motion ligado e o time-stretch da tabela.
-- [ ] Os 9 marcadores de locução estão na master, nos TCs certos.
-- [ ] Nenhum caminho absoluto dentro do `.jsx`.
+- [ ] Roda numa instalação limpa sem erro nem diálogo; rodar duas vezes não duplica nada.
+- [ ] Master fecha em **60,0 s**, sem frame vazio nem sobreposição.
+- [ ] **No máximo 15 cortes no filme inteiro.** Mais que isso é o erro da v1 de novo.
+- [ ] Os 14 precomps existem com os nomes exatos da seção 7 e a duração da tabela.
+- [ ] **Nenhum pixel vermelho em nenhum frame** — confira especialmente o glitch e o mapa.
+- [ ] O glitch aparece **uma vez só**, em 0:23, e é de deslocamento, não de canal.
+- [ ] As três rotas do mapa traçam com Trim Paths, com contador acompanhando, e ficam acesas no fim.
+- [ ] Todo número grande entra contando de 0, com o gradiente por Alpha Matte.
+- [ ] Os três logos de sub-projeto viram matte e o take aparece de dentro das letras.
+- [ ] Os 8 marcadores de locução estão nos TCs certos.
+- [ ] Nenhum caminho absoluto no `.jsx`.
 
-## 10. O que NÃO fazer
+## 11. O que NÃO fazer
 
-- Não invente dado, número, metragem ou nome de ambiente que não esteja neste arquivo.
-- Não use imagem, vídeo, trilha ou fonte de fora do repositório e da lista da seção 3.
-- Não mude a duração total, a ordem dos planos nem o texto das legendas "para ficar melhor".
-  Se achar que algo está errado, **monte como está e anote no LEIA-ME** — quem decide é o cliente.
-- Não aplique efeito de template (glitch, light leak, lens flare artificial, partícula, zoom-blur).
-  O filme é sóbrio: corte seco, Ken Burns discreto e tipografia.
-- Não adicione marca d'água, assinatura própria, nem crédito de ferramenta em nenhum frame.
+- Não invente dado, número, metragem, distância ou nome que não esteja neste arquivo.
+- Não use imagem, vídeo, trilha ou fonte fora do repositório.
+- **Não use `assets/web/hero-hotel-noturno.jpg`.** Esse render tem iluminação cênica **vermelha**
+  dominante e viola a regra de marca. Use `assets/park/hotel-noturno.jpg`, o mesmo conjunto em azul —
+  e mesmo nele sobra vermelho na borda direita, por isso o enquadramento leva deriva de −150 px.
+- Não acrescente corte para "dar dinamismo". O filme tem 14 planos e é assim de propósito.
+- Não mude duração, ordem ou texto "para ficar melhor". Se achar que algo está errado, **monte como
+  está e anote no LEIA-ME** — quem decide é o cliente.
+- Não adicione marca d'água, assinatura própria ou crédito de ferramenta em nenhum frame.
 
-## 11. Estado conhecido do material
+## 12. Estado do material
 
-- O **clipe aéreo** (`assets/video/voo-passaro-01.mp4`, 5 s, 1284×716, 24 fps) é o único material
-  filmado que existe. É preview — abaixo de HD. Ele entra como stand-in em T01, T07 e T20 e será
-  substituído pelos takes 3D em 4K. Numa comp 1080p ele sobe 1,5×: **é esperado que apareça
-  suave**, não tente corrigir com sharpen.
-- **T08, T09, T10 e T12** não têm render nem projeto arquitetônico definido — por isso são slates.
-- **T09 (creche)** ainda depende de confirmação do cliente; mantenha o slate e a nota.
-- **Não use `assets/web/hero-hotel-noturno.jpg` no T14.** Esse render tem iluminação cênica
-  **vermelha** dominante e viola a regra de marca. Use `assets/park/hotel-noturno.jpg`, que é o
-  mesmo conjunto em azul. Ainda sobra um resto de vermelho na borda direita: é por isso que o
-  enquadramento leva deriva de −150 px, para deixá-lo fora do quadro. Confira o frame em 0:43
-  do animatic antes de dar por pronto.
-- **Há um animatic de referência** em `docs/ae/preview/bracerum-60s-animatic.mp4`: 60 s com o
-  corte e as legendas já montados em ffmpeg. Não é o alvo de qualidade — é a conferência de
-  tempo, ordem e texto. Se o seu resultado divergir dele em duração ou ordem, o errado é o seu.
-- Os `B0x` são os planos que serão **filmagem de banco licenciada**, não 3D — ficam como slate até a
-  licença ser comprada. Há ainda um insert de 0,5 s de maquininha de cartão previsto **dentro** do
-  T13, que entra junto com essa licença: não monte agora, só deixe anotado no LEIA-ME.
+- **Os 6 takes 3D não existem** — tudo é stand-in. O clipe `assets/video/voo-passaro-01.mp4` (5 s,
+  1284×716, 24 fps) é o único material filmado; numa comp 1080p ele sobe 1,5× e **vai aparecer
+  suave**. É esperado. Não corrija com sharpen.
+- **Bracerum Select não tem take** e é resolvido com logo e tipografia — é assim de propósito.
+- Referência da v1, só para comparar tempo e ordem: `docs/ae/preview/bracerum-60s-animatic.mp4`.
+  **Não é o alvo visual** — é justamente o resultado que o cliente achou pouco cinematográfico.

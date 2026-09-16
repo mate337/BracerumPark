@@ -1,297 +1,138 @@
 # Bracerum Park — Roteiro de vídeo institucional (60s)
 
-**Versão:** v4 — 2026-09-16
-**Para que serve:** roteiro-base do filme **e** brief de produção dos takes 3D. A equipe de 3D
-produz os **20 takes** especificados na seção *Brief dos takes 3D*; os 4 takes de banco e o mograph
-entram na montagem.
-**Duração:** 0:60 exatos · **Master:** 1920×1080, 30 fps (renders em 3840×2160, ver *Entrega*)
-**Idiomas:** locução PT-BR; legendas EN/ES na mesma base de tempo
-**Ritmo:** alternância **A/B** — take do parque → take de banco (detalhe humano) → volta ao parque.
-Nenhum take de banco passa de 2s.
+**Versão:** v5 — 2026-09-16 · tratamento cinematográfico, 6 takes
+**Duração:** 0:60 exatos · **Master:** 1920×1080, 30 fps
+**Comando de execução no After Effects:** `docs/ae/PROMPT-ASTRA-AE.md`
 
----
+## O que mudou da v4 para a v5
 
-## Lista rápida — o que cada plano mostra
+A v4 tinha 28 planos curtos — ritmo de apresentação, não de filme. A v5 troca isso por **poucos
+planos longos, tipografia grande e transições desenhadas**. São **6 takes 3D** (um deles usado duas
+vezes), e o que preenche o tempo entre eles é motion design, não mais imagem.
 
-| TC | Take | O que aparece |
+**Os 6 takes, e só eles:**
+
+| ID | Take | Onde aparece |
 |---|---|---|
-| 0:00 | T01 | Drone do parque, vista geral em hora dourada |
-| 0:03 | banco | Mão de engenheiro sobre a planta impressa |
-| 0:05 | T02 + mograph | Zoom out 90º: parque → Villeta → Paraguai → Mercosul |
-| 0:09 | T03 | Aérea alta com a planta inteira |
-| 0:12 | banco | Barcaças no rio |
-| 0:14 | T04 | Rasante sobre as fileiras de galpões |
-| 0:16 | T05 | Caminhão encostando na doca |
-| 0:18 | banco | Interior de galpão com empilhadeira |
-| 0:20 | T06 | Fábrica Bracerum em operação |
-| 0:23 | T07 | Aeródromo: pista, heliponto e hangares com jatos |
-| 0:27 | cartela | APOIO E BEM-ESTAR |
-| 0:28 | T08 | Enfermaria |
-| 0:30 | T09 | Creche |
-| 0:32 | T10 | Bombeiros civis, viatura saindo do abrigo |
-| 0:34 | cartela | BRACERUM SELECT |
-| 0:35 | T11 | Setor comercial junto ao lago, vitrines acesas |
-| 0:37 | T12 | Academia |
-| 0:39 | T13 | Posto e market (insert de maquininha) |
-| 0:41 | cartela | BRACERUM HOTEL |
-| 0:42 | T14 | Fachada do hotel à noite, subindo para a aérea do conjunto |
-| 0:45 | T15 | Auditório cheio |
-| 0:47 | T16 | Foyer do centro de convenções |
-| 0:48 | cartela | BRACERUM RESORT |
-| 0:49 | T17 | Lago e clubhouse |
-| 0:52 | T18 | Família à beira do lago |
-| 0:54 | T19 | Quadras e campo society |
-| 0:55 | T20 | Recuo aéreo do parque no poente, marcas acendendo |
-| 0:58 | assinatura | Logo Bracerum Park |
+| **A** | Aérea drone do parque | abertura (0:03) e fecho (0:55) |
+| **B** | Vista 90º / planta | 0:09, e é dele que nasce o mapa |
+| **F** | Pista de pouso | 0:24 |
+| **C** | Hotel | 0:31 |
+| **D** | Centro de convenções | 0:36 |
+| **E** | Resort | 0:41 |
 
-**Só os 20 takes 3D, por ambiente:** parque geral (T01, T02, T03, T20) · galpões e lotes (T04, T05) ·
-fábrica (T06) · aeródromo (T07) · apoio (T08, T09, T10) · Select (T11, T12, T13) ·
-Hotel (T14, T15, T16) · Resort (T17, T18, T19).
+**Bracerum Select não tem take** — é resolvido com o logo e tipografia cinética. Os blocos de apoio
+(enfermaria, creche, bombeiros) saíram do filme de 60 s: sem take e sem projeto, eram 7 segundos de
+nada. Voltam numa versão longa.
 
----
+## Gramática de transição
 
-## Referência visual — o clipe "Voo de Pássaro 01"
+Quatro transições, cada uma com função — **nenhuma entra "porque ficou bonito"**:
 
-O clipe existente (5s, aérea do parque) **é o padrão de look de todos os takes 3D**: hora dourada,
-sol baixo à direita com flare suave, pasto verde saturado em volta, movimento lento e contínuo,
-sem giro e sem corte dentro do take. Ele já entrega o enquadramento certo do bloco do aeródromo —
-pista no primeiro plano, heliponto, pátio dos hangares com aeronaves, fileiras de galpões, torre do
-hotel no horizonte. **Quem for produzir T01, T03, T04 e T20 deve abrir esse arquivo antes**: é a
-continuidade de luz e de altitude que amarra o filme.
-
-## Entrega dos takes 3D
-
-- **Resolução:** 3840×2160 (o master é 1080p; a folga é para reenquadrar em 9:16 e 1:1 sem perda).
-- **Frame rate:** 30 fps, obturador 180° (motion blur ligado — take de arquitetura sem blur denuncia CG).
-- **Codec:** ProRes 422 HQ ou sequência PNG/EXR. Nada de H.264 na entrega.
-- **Sobra:** **+12 frames em cada ponta** de cada take, além da duração pedida. É o que permite
-  ajustar o corte na montagem sem voltar para o render.
-- **Continuidade obrigatória entre os exteriores:** mesmo HDRI, mesma posição de sol (elevação baixa,
-  **azimute à direita do quadro**, como no clipe), mesma estação de vegetação. Um take com sol do
-  outro lado quebra a sequência inteira.
-- **Sem vermelho.** Regra de marca do projeto, vale também no 3D: veículos, sinalização, toldos e
-  fachadas na paleta preto / branco / bege-marrom. Atenção ao **T10 (bombeiros)** — a viatura
-  vermelha é a exceção que mais salta; especificar livrea branca com faixa `--ink`, ou enquadrar
-  de forma que o vermelho não domine o quadro.
-- **Nomear os arquivos pelo ID do take** (`T07_aerodromo_v01.mov`), que é como o roteiro se refere
-  a eles.
-
----
+- **Match cut** — corta no meio do mesmo movimento. Liga a aérea à vista 90º (0:09) e o fecho de
+  volta à aérea (0:55). É a transição que sustenta o filme.
+- **Masking / reveal** — o logo do sub-projeto abre e revela o take atrás dele (0:30, 0:40, 0:46).
+  É o que dá identidade aos capítulos.
+- **Gradient wipe** — máscara de degradê desfocado. Troca de bloco quando não há movimento em comum
+  (0:03, 0:36, 0:50).
+- **Glitch** — **uma vez só**, em 0:23, na virada da chamada para a pista. A referência Spider-Verse
+  é enérgica e o público aqui é investidor industrial: usada uma vez, é acento; usada a cada corte,
+  o filme vira peça de varejo. Se o cliente pedir mais, o segundo lugar é 0:50.
 
 ## Linha do tempo
 
-`3D` = take a produzir (ver brief) · `STOCK` = banco de imagens · `MOGRAPH` = animação de dados/mapa
-
-### Bloco 1 — BRACERUM PARK (0:00 – 0:27)
-
-| TC | Dur | Take | Imagem | Texto na tela |
+| IN | Dur | Conteúdo | Tipografia / motion | Saída |
 |---|---|---|---|---|
-| 0:00 | 3s | **3D · T01** | Voo de pássaro em hora dourada, avanço lento sobre o parque — a pista entra no quadro, o flare à direita. Entra já em movimento, sem fade. | — (tela limpa) |
-| 0:03 | 2s | **STOCK** | Close de mão de engenheiro sobre planta impressa apoiada no capô; vento move o papel. Hora dourada. `engineer blueprint hands golden hour close` | **VILLETA · PARAGUAI** |
-| 0:05 | 4s | **3D · T02 + MOGRAPH** | **Zoom out 90º.** T02 sobe do parque à vertical (2s); daí o mograph assume e continua: satélite → Villeta → Rio Paraguai → Departamento Central → Paraguai → Mercosul. Pinos acendem: Hidrovia, Terport, Assunção, São Paulo. Paleta do mapa do site (`--ink`, água `#1b4a6e`, vias em areia). | `65 km de Assunção` · `Hidrovia Paraná–Paraguai` · `Ruta PY19 · Acceso Sur` |
-| 0:09 | 3s | **3D · T03** | Volta da vertical para a aérea alta com a **planta inteira** em quadro: os 12 setores lidos de uma vez. | **1.819.856 m²** *planejados* |
-| 0:12 | 2s | **STOCK** | Barcaças no rio, plano aéreo **fechado** no convés/carga — não abrir a paisagem. `barge convoy cargo deck aerial close` | — |
-| 0:14 | 4s | **3D · T04 + T05** | 2s rasante sobre as fileiras de galpões (T04) → 2s no pátio, caminhão encostando na doca (T05). Mesmo eixo de movimento nos dois, para ler como continuidade. | **989.642 m²** de lotes · módulos de **40.000 m²** |
-| 0:18 | 2s | **STOCK** | Interior de galpão: empilhadeira cruza o plano, pé-direito alto. `warehouse interior forklift high bay` | — |
-| 0:20 | 3s | **3D · T06** | Fábrica Bracerum em operação, fim de tarde: caminhão carregando, movimento no pátio. | **Built-to-Suit** · Steel Frame próprio |
-| 0:23 | 4s | **3D · T07** | **O plano mais forte do filme.** Descida contínua sobre a pista → heliponto → pátio dos hangares com jatos. **Sem corte dentro do take** — a descida ininterrupta é o que dá a sensação de pouso. | **Pista de 1.480 m** · hangares **7.686 m²** · **heliponto** junto aos hangares |
+| 0:00 | 3s | **Abertura.** Fundo `--ink`. Logo **Bracerum Park** revelado por máscara vertical, letra por letra. Nada mais em quadro. | logo `logo-stacked-wide-cream` | gradient wipe |
+| 0:03 | 6s | **TAKE A — aérea drone.** O plano mais longo do filme; deixa respirar. | **1.819.856 m²** entra gigante (~420 px de altura), preenchendo a tela, revelado por máscara de degradê que acompanha o movimento da câmera. Embaixo, miúdo: *planejados como uma cidade industrial completa* | **match cut** |
+| 0:09 | 3s | **TAKE B — vista 90º.** A câmera continua subindo; a aérea vira planta. O corte acontece **no meio do movimento**, não no fim. | — | contínuo |
+| 0:12 | 8s | **MAPA — zoom out estilo Google Earth.** Segue subindo da planta até o continente. Três rotas se traçam em sequência, cada uma com contador de km subindo junto com a linha. | `ASSUNÇÃO · 65 km · 1 h 10` → `FRONTEIRA BR · 360 km · 5 h` → `SÃO PAULO · 1.130 km · ~2 h de voo` | corte |
+| 0:20 | 3s | **CHAMADA.** Sobre o mapa já recuado, escurecido. | **A SUA CIDADE INDUSTRIAL NO PARAGUAI** entra palavra por palavra, em 3 linhas, Noto Serif itálico em *cidade industrial* | **glitch** (0,4s) |
+| 0:23 | 7s | **TAKE F — pista de pouso.** | **1.480 m** gigante com gradiente `--sand`→`--paper`, contando de 0. Abaixo: *de pista · hangares · heliponto no próprio parque* | reveal |
+| 0:30 | 1s | **Logo Bracerum Hotel** abre em máscara e revela o take atrás. | `hotel-cream` | contínuo |
+| 0:31 | 5s | **TAKE C — hotel.** | **384** conta de 0 · *studios de 35 m²* | gradient wipe |
+| 0:36 | 4s | **TAKE D — centro de convenções.** | **1.200** conta de 0 · *lugares no auditório · 13.500 m²* | reveal |
+| 0:40 | 1s | **Logo Bracerum Resort** abre e revela. | `resort-cream` | contínuo |
+| 0:41 | 5s | **TAKE E — resort.** | **141 lotes** · **142.067 m²** entram em sequência, não juntos | gradient wipe |
+| 0:46 | 4s | **BRACERUM SELECT — sem take.** Fundo `--ink` com degradê `--brown` na diagonal. Logo entra e sobe; as palavras entram em cascata, uma por vez, alinhadas à coluna. | `select-cream` + **SHOPPING · ACADEMIA · BANCO · POSTO · MARKET** | corte |
+| 0:50 | 5s | **DADO FINAL.** Fundo `--ink`. | **1%** ocupando quase a tela inteira, com gradiente e leve paralaxe; abaixo: *de tributo único sobre o valor agregado, no regime de Maquila* | **match cut** |
+| 0:55 | 5s | **FECHO — TAKE A de volta**, agora em recuo (ou o fim do mesmo take). As quatro marcas acendem sobre suas regiões e apagam. Logo **Bracerum Park** fecha por cima. | `PARK · SELECT · HOTEL · RESORT` → logo + `bracerumpark.com · Villeta · Paraguai` | — |
 
-### Bloco 2 — APOIO E BEM-ESTAR (0:27 – 0:34)
+**Fecha em 60,0 s.** Soma: 3+6+3+8+3+7+1+5+4+1+5+4+5+5.
 
-> Não é marca: é a camada de serviço que faz o parque funcionar como cidade.
+## O bloco do mapa (0:12–0:20) em detalhe
 
-| TC | Dur | Take | Imagem | Texto na tela |
-|---|---|---|---|---|
-| 0:27 | 1s | **MOGRAPH** | Cartela: fundo `--ink`, letreiro em Noto Serif itálico entrando por máscara. | **APOIO E BEM-ESTAR** |
-| 0:28 | 2s | **3D · T08** | Enfermaria/ambulatório: recepção e sala de atendimento, luz natural, figurante de jaleco cruzando o plano. | **Enfermaria** no perímetro |
-| 0:30 | 2s | **3D · T09** | Creche: pátio coberto e sala de atividades, mobiliário baixo, brinquedos. Sem rosto em primeiro plano. | **Creche** |
-| 0:32 | 2s | **3D · T10** | Bombeiros civis: viatura saindo do abrigo, plano baixo e curto. **Ver a regra do vermelho acima.** | **Bombeiros civis** próprios |
+É o trecho que mais vende o projeto e o mais fácil de errar. Sequência:
 
-### Bloco 3 — BRACERUM SELECT (0:34 – 0:41)
+1. **0:12–0:14** — continua o recuo da vista 90º. O parque some no meio do verde; entra a malha do
+   basemap na paleta do site (fundo `--ink`, água `#1b4a6e`, vias em areia, **zero vermelho**).
+2. **0:14–0:16** — rota 1. A linha sai do Park e corre até Assunção **traçando pela via real**, não
+   em reta. Contador `0 → 65 km` acompanha a ponta da linha. Rótulo fixa no fim.
+3. **0:16–0:18** — rota 2, mesma mecânica, até a fronteira com o Brasil (Ciudad del Este / Foz do
+   Iguaçu): `0 → 360 km`.
+4. **0:18–0:20** — rota 3 até São Paulo. Essa é **aérea**, então desenha em arco e o rótulo diz
+   `~2 h de voo` — não confundir com estrada.
+5. As três linhas permanecem acesas no último frame, formando o leque. É a imagem que fica.
 
-| TC | Dur | Take | Imagem | Texto na tela |
-|---|---|---|---|---|
-| 0:34 | 1s | **MOGRAPH** | Cartela, mesma gramática. | **BRACERUM SELECT** |
-| 0:35 | 2s | **3D · T11** | Setor comercial junto ao lago na hora azul, vitrines acesas, gente circulando na galeria. | **Shopping** e lojas |
-| 0:37 | 2s | **3D · T12** | Academia: interior em contraluz, esteiras e peso livre, movimento em primeiro plano. | **Academia** |
-| 0:39 | 2s | **3D · T13** | Posto sob a cobertura + market. Insert de 0,5s STOCK de cartão em maquininha (`contactless payment terminal close`) para cobrir "banco". | **Posto · market · banco · praça de alimentação** |
-
-### Bloco 4 — BRACERUM HOTEL (0:41 – 0:48)
-
-| TC | Dur | Take | Imagem | Texto na tela |
-|---|---|---|---|---|
-| 0:41 | 1s | **MOGRAPH** | Cartela. | **BRACERUM HOTEL** |
-| 0:42 | 3s | **3D · T14** | Fachada noturna com a iluminação cênica azul (único azul permitido no filme, fora do mapa e da assinatura), subindo até a aérea do conjunto hotel + convenções. | **384 studios** de 35 m² |
-| 0:45 | 2s | **3D · T15** | Auditório cheio visto de trás, palco iluminado ao fundo. **Take mais caro do lote** (multidão) — se não couber, banco: `conference auditorium audience stage`. | **Auditório para 1.200 pessoas** |
-| 0:47 | 1s | **3D · T16** | Foyer/pavilhão do centro de convenções em dia de evento. | **Centro de convenções · 13.500 m²** |
-
-### Bloco 5 — BRACERUM RESORT (0:48 – 0:55)
-
-| TC | Dur | Take | Imagem | Texto na tela |
-|---|---|---|---|---|
-| 0:48 | 1s | **MOGRAPH** | Cartela. | **BRACERUM RESORT** |
-| 0:49 | 3s | **3D · T17** | Aérea baixa sobre o lago ao entardecer, passando o clubhouse e o pórtico. | **141 lotes** · **142.067 m²** |
-| 0:52 | 2s | **3D · T18** | Beira do lago: família caminhando em contraluz, silhueta. Se a multidão/figurante não couber, banco: `family walking lakeside sunset silhouette`. | — |
-| 0:54 | 1s | **3D · T19** | Quadras e campo society em uso, luz baixa. | Lago · quadras · clubhouse |
-
-### Bloco 6 — FECHAMENTO (0:55 – 1:00)
-
-| TC | Dur | Take | Imagem | Texto na tela |
-|---|---|---|---|---|
-| 0:55 | 3s | **3D · T20** | Fecha como abriu, invertido: recuo aéreo afastando-se do parque no poente, a planta inteira entrando em quadro. As marcas acendem sobre suas regiões. | `PARK · SELECT · HOTEL · RESORT` |
-| 0:58 | 2s | **MOGRAPH** | Fundo `--ink`, logo Bracerum Park (`assets/logo/logo-stacked-wide-cream.svg`) em máscara vertical. Faixa Bracerum (`--brc-blue`) só na última meia-volta. | **bracerumpark.com** · Villeta · Paraguai |
-
----
-
-## Brief dos takes 3D
-
-Duração = tempo na tela; render com +12 frames em cada ponta. Lentes em equivalente 35 mm.
-"Referência" aponta o render já existente no repositório que define o ambiente.
-
-### Exteriores aéreos — hora dourada, sol baixo à direita
-
-| ID | Dur | Ambiente | Câmera e movimento | Tem que estar em quadro | Referência |
-|---|---|---|---|---|---|
-| **T01** | 3s | Parque, vista geral | Aérea a ~200 m, lente 28 mm, avanço lento para a frente com descida suave. Sem giro. | Pista entrando pela base, fileiras de galpões, torre do hotel ao fundo à direita, pasto em volta | `Voo de Pássaro 01` |
-| **T02** | 2s | Parque → vertical | Sobe de ~200 m para ~1.200 m inclinando a câmera até **90º (zenital)**. Termina com o parque centrado e nivelado ao norte — o mograph continua daí. | Perímetro inteiro legível no último frame, para casar com o mapa | `assets/web/vista-aerea-park-02.jpg` |
-| **T03** | 3s | Parque, planta inteira | Aérea alta a ~800 m, 35 mm, recuo lento com leve paralaxe. | Os 12 setores de uma vez: industrial, aeródromo, resort, hotel, comercial, ETE/ETA | `assets/web/vista-aerea-park-02.jpg` |
-| **T04** | 2s | Faixa industrial | Rasante a 25–30 m sobre as coberturas, 24 mm, avanço rápido paralelo às fileiras. | Fileiras regulares de galpão, ruas internas, caminhões nas ruas | `assets/park/vias-galpao.jpg` |
-| **T05** | 2s | Doca de galpão | Nível do solo, 35 mm, travelling lateral lento. | Caminhão encostando na doca, operação em curso, portão aberto | `assets/park/vias-caminhoes.jpg` |
-| **T06** | 3s | Fábrica Bracerum | Aérea baixa a ~60 m, 35 mm, órbita curta (máx. 20º) no fim de tarde. | Pátio em operação, carga, iluminação acendendo | `assets/park/fabrica-bracerum.jpg` |
-| **T07** | 4s | **Aeródromo** | Descida contínua de ~150 m para ~40 m, 28 mm, avanço. Um movimento só, sem corte. | Pista no primeiro plano → heliponto circular → pátio com aeronaves executivas → fileira de hangares | `Voo de Pássaro 01` · `assets/park/aero-pista.jpg` |
-| **T20** | 3s | Parque, saída | O inverso de T01: recuo aéreo subindo, 28 mm, poente mais avançado que T01 (âmbar mais forte, sombras longas). | A planta inteira entrando em quadro, com espaço vazio para as marcas acenderem | `Voo de Pássaro 01` |
-
-### Apoio e bem-estar — luz de dia, interiores
-
-| ID | Dur | Ambiente | Câmera e movimento | Tem que estar em quadro |
-|---|---|---|---|---|
-| **T08** | 2s | Enfermaria | Interior, 35 mm, travelling curto à altura do peito. | Recepção, sala de atendimento, figurante de jaleco cruzando o plano, luz natural |
-| **T09** | 2s | Creche | Interior/pátio coberto, 28 mm, push-in lento. | Mobiliário baixo, área de atividades, pátio protegido. Sem rosto em primeiro plano |
-| **T10** | 2s | Bombeiros civis | Exterior, 24 mm, plano baixo, viatura saindo do abrigo em direção à câmera. | Abrigo, viatura em movimento, equipe com EPI. **Livrea sem vermelho dominante** |
-
-### Bracerum Select — hora azul e interiores
-
-| ID | Dur | Ambiente | Câmera e movimento | Tem que estar em quadro | Referência |
-|---|---|---|---|---|---|
-| **T11** | 2s | Setor comercial | Exterior na hora azul, 28 mm, travelling lateral pela galeria. | Vitrines acesas, lago ao fundo, gente circulando | `assets/park/select-shopping-lago.jpg` |
-| **T12** | 2s | Academia | Interior em contraluz, 35 mm, plano curto e enérgico. | Esteiras, peso livre, movimento em primeiro plano | `assets/park/select-comercial-noite.jpg` |
-| **T13** | 2s | Posto e market | Exterior noturno sob a cobertura, 24 mm, push-in. | Cobertura iluminada, bombas, entrada do market | `assets/park/select-posto-noturno.jpg` · `select-market-interior.jpg` |
-
-### Bracerum Hotel
-
-| ID | Dur | Ambiente | Câmera e movimento | Tem que estar em quadro | Referência |
-|---|---|---|---|---|---|
-| **T14** | 3s | Hotel + convenções | Começa na fachada noturna ao nível da entrada e sobe para a aérea do conjunto, 28 mm. | Iluminação cênica azul da fachada, volume do hotel e o centro de convenções ao lado | `assets/web/hero-hotel-noturno.jpg` · `assets/park/hotel-aereo.jpg` |
-| **T15** | 2s | Auditório | Interior, 35 mm, da última fila, push-in lento para o palco. | Plateia ocupada, palco iluminado, escala das 1.200 poltronas | `assets/park/hotel-auditorio.jpg` |
-| **T16** | 1s | Centro de convenções | Foyer/pavilhão em dia de evento, 24 mm, travelling curto. | Pé-direito, circulação, montagem de evento | `assets/renders/pavilhao-eventos-1.jpg` |
-
-### Bracerum Resort
-
-| ID | Dur | Ambiente | Câmera e movimento | Tem que estar em quadro | Referência |
-|---|---|---|---|---|---|
-| **T17** | 3s | Lago e clubhouse | Aérea baixa a ~40 m ao entardecer, 28 mm, avanço passando o pórtico e o clubhouse. | Lago, clubhouse, pórtico de entrada, lotes ao redor | `assets/park/resort-lago-aereo.jpg` · `resort-clubhouse.jpg` |
-| **T18** | 2s | Beira do lago | Nível do solo, 50 mm, contraluz, câmera parada. | Família em silhueta caminhando, reflexo do sol na água | `assets/park/resort-lago-fonte.jpg` |
-| **T19** | 1s | Quadras | Exterior, 35 mm, plano fixo curto com luz baixa. | Quadras e campo society em uso | `assets/park/amen-quadras.jpg` |
-
-**Resumo do lote:** 20 takes, **46 s** de render no total (com as sobras, ~54 s). Oito são exteriores
-aéreos que compartilham a mesma cena e o mesmo sol — se produzidos na mesma sessão, o custo real é
-bem menor que 20 setups. **Prioridade se o lote precisar ser cortado:** T07, T01, T20, T03 (os quatro
-que sustentam o filme) → T04, T14, T17 → o resto.
-
----
+O traçado real das rotas já existe no repositório: `assets/routes.json`, pré-calculado com OSRM
+(regerável por `docs/build_routes.py`). **Use esse arquivo** em vez de desenhar à mão.
 
 ## Locução (PT-BR)
 
-> Tom grave e pausado, sem euforia de comercial — o público é investidor industrial.
-> ~120 palavras para 60s; há respiro entre as frases, **não acelerar para caber mais texto**.
+Reescrita para o novo corte — mais curta, mais espaçada. ~95 palavras.
 
 | TC | Fala |
 |---|---|
-| 0:01 | Villeta, Paraguai. Sessenta e cinco quilômetros de Assunção, minutos da Hidrovia. |
-| 0:09 | Um milhão, oitocentos e dezenove mil metros quadrados planejados como uma cidade industrial completa. |
-| 0:15 | Quase um milhão de metros quadrados de lotes, em módulos de quarenta mil. Galpão pronto, em Steel Frame próprio. |
-| 0:23 | Mil quatrocentos e oitenta metros de pista, hangares e heliponto dentro do perímetro: o investidor desce no parque. |
-| 0:28 | Enfermaria, creche e bombeiros próprios. O que uma cidade precisa para funcionar. |
-| 0:35 | Bracerum Select: shopping, academia, banco e posto. A rotina resolvida sem sair do parque. |
-| 0:42 | Bracerum Hotel: trezentos e oitenta e quatro studios e um auditório para mil e duzentas pessoas. |
-| 0:49 | Bracerum Resort: cento e quarenta e um lotes à beira do lago, a cinco minutos da operação. |
-| 0:56 | Bracerum Park. A porta de entrada industrial do Mercosul. |
+| 0:04 | Um milhão, oitocentos e dezenove mil metros quadrados em Villeta, Paraguai. |
+| 0:13 | Sessenta e cinco quilômetros de Assunção. Trezentos e sessenta da fronteira. Duas horas de voo de São Paulo. |
+| 0:24 | Pista própria de mil quatrocentos e oitenta metros: o investidor desce dentro do parque. |
+| 0:31 | Hotel, centro de convenções e auditório para mil e duzentas pessoas. |
+| 0:42 | Resort de cento e quarenta e um lotes à beira do lago, a cinco minutos da operação. |
+| 0:47 | Shopping, academia, banco e posto, sem sair do perímetro. |
+| 0:51 | E um por cento de tributo único, no regime de Maquila. |
+| 0:56 | Bracerum Park. A sua cidade industrial no Mercosul. |
 
-**EN/ES:** mesma base de tempo. As linhas 0:09, 0:15, 0:23 e 0:42 são as mais longas — em ES ganham
-~8%; encurtar `0:15` para "Casi un millón de metros cuadrados de lotes, en módulos de cuarenta mil"
-(cortar "propio" em Steel Frame) e `0:23` para "Mil cuatrocientos ochenta metros de pista, hangares
-y helipuerto".
+## Tipografia e motion
 
----
+- **Noto Serif** nos nomes de marca e nas ênfases em itálico; **Helvetica/Arial** nos números e dados.
+- **Os números são o motion principal.** Todo número grande entra contando de 0 em 0,5 s com
+  desaceleração, e o dígito de milhar entra por último. Não usar escala pulsante nem bounce.
+- **Gradiente:** `--sand #cbb88f` → `--paper #f7f3ea` a 100°, só em número grande. Nunca em texto
+  corrido, nunca em logo.
+- **Coluna:** todo texto alinhado a 110 px da borda esquerda, exceto os números gigantes e as
+  cartelas de logo, que são centrados.
+- **Véu:** legenda sobre take sempre com o degradê `docs/ae/build/veil-bottom.png` por baixo.
+- **Zero vermelho** em qualquer frame — inclusive nos rótulos do mapa e nas rotas.
 
 ## Áudio
 
-- **Trilha:** peça única, sem trocas. Piano/cordas em construção lenta até 0:27, percussão grave
-  entrando no bloco de apoio, ápice em 0:55, resolve em 0:58. Textura tipo *oryzo.ai* — nada de EDM
-  corporativo.
-- **Sound design:** ar/drone na abertura; um *whoosh* só, no zoom out de 0:05; turbina ao longe
-  entrando em 0:23 (o take do aeródromo pede e aguenta); clique discreto em cada cartela; 0,3s de
-  silêncio antes do logo.
-- Os takes 3D entram **mudos** — o som todo é construído na pós.
-- **Mix:** locução −6 LUFS acima da trilha; master −14 LUFS.
-
-## Grafismo
-
-- **Noto Serif** (marcas, itálico como ênfase) + Helvetica/stack de sistema (números e legendas).
-  Cantos quadrados, sem sombra.
-- Paleta `--ink #0e0d0b`, `--paper #f7f3ea`, `--sand #cbb88f`, `--brown #473315`. **Zero vermelho.**
-  Azul só na fachada noturna do hotel (T14), na água do mapa e na assinatura Bracerum do fim.
-- Sobre a aérea dourada o texto claro some: véu inferior em `--ink` a 45%, como o degradê do
-  `.masterplan__head` no site.
-- Números com *count-up* de 0,4s, mesma lógica das cifras da home.
-- Legendas queimadas no 9:16 (autoplay mudo é a regra em social).
-
-## Cortes derivados
-
-- **9:16 (Reels/Shorts):** mesmos TCs; é para isso que os takes vêm em 4K — reenquadrar dentro do
-  quadro em vez de ampliar. Nas aéreas horizontais, recentrar no pátio dos hangares (T07) e no
-  bloco de galpões (T04), não na pista. Cartelas de marca no terço superior, fora da área da UI.
-- **1:1:** cortar o bloco de apoio para 4s (T08 e T09) e fechar em 0:50.
-- **15s (paid):** T01, T02+mograph, T04, T07, T20 e a assinatura — sem nenhum take de banco.
-
----
-
-## Takes de banco a licenciar (4)
-
-São os planos de gente e detalhe que saem caro em 3D e convincentes em filmagem. **Todos fechados** —
-plano aberto de banco inventa um segundo lugar e o filme vira estoque com participação do parque.
-
-| TC | Busca | Observação |
-|---|---|---|
-| 0:03 | `engineer blueprint hands golden hour close` | Só mãos e planta; casar a luz com T01 |
-| 0:12 | `barge convoy cargo deck aerial close` | Fechado no convés — não abrir a paisagem do rio |
-| 0:18 | `warehouse interior forklift high bay` | Interior genérico, sem marca visível |
-| 0:39 | `contactless payment terminal close` | Insert de 0,5s dentro de T13, para cobrir "banco" |
-
-Licença comercial com direito a mídia paga. Não usar imagem de busca comum (mesma regra dos POIs do
-mapa, em `assets/pois/CREDITOS.md`). Se T15 e T18 saírem do lote 3D por causa dos figurantes, entram
-mais dois takes de banco: `conference auditorium audience stage` e
-`family walking lakeside sunset silhouette` — com *model release* no pacote.
-
----
+Uma peça só, construção lenta, ápice em 0:50 e resolução em 0:55. Sound design: ar na abertura,
+um *whoosh* grave no match cut de 0:09, ruído digital curto no glitch de 0:23, turbina ao longe em
+0:24, silêncio de 0,3 s antes do logo final. Locução −6 LUFS acima da trilha; master −14 LUFS.
 
 ## Pendências
 
-1. **Creche (T09)** — enfermaria e bombeiros civis constam do masterplan; creche não aparece no R04
-   nem no site. É a única palavra do VO sem lastro no projeto: confirmar com o cliente, ou trocar por
-   "ambulatório" e cair para 19 takes.
-2. **Enfermaria e bombeiros (T08, T10)** — previstos no masterplan como programa (ver `select.html`),
-   mas **sem projeto arquitetônico no R04**. A equipe 3D precisa de definição volumétrica antes de
-   modelar, ou os três takes do bloco 2 viram banco de imagens.
-3. **Tipologias do Resort** — segue pendente no projeto; não afeta este roteiro (T17–T19 são áreas
-   comuns), mas afeta qualquer versão longa que mostre casas.
+1. **Os 6 takes 3D não existem** — todos a produzir. Brief de câmera de cada um na seção
+   *Brief dos takes* abaixo.
+2. **`assets/web/hero-hotel-noturno.jpg` tem iluminação cênica vermelha dominante** e não serve como
+   referência para o TAKE C. Usar `assets/park/hotel-noturno.jpg`, que é o mesmo conjunto em azul.
+   Vale checar com o cliente se o render vermelho deve sair também do hero do site.
+3. **Bracerum Select sem take** — resolvido com logo e tipografia. Se o cliente quiser imagem, é um
+   sétimo take (setor comercial junto ao lago, hora azul).
 
-4. **O render do hero do hotel tem vermelho.** `assets/web/hero-hotel-noturno.jpg` usa iluminação
-   cênica vermelha dominante, que contraria a regra de marca. Onde o hotel aparecer em vídeo, usar
-   `assets/park/hotel-noturno.jpg` (mesmo conjunto, em azul). Vale checar com o cliente se o render
-   vermelho deve sair também do hero do site.
+## Brief dos takes
 
-### Decidido
-- **Pista: 1.480 m** (o catálogo V15 vale sobre os 1.280 m do R04) e **heliponto no pátio dos
-  hangares**, não na cabeceira da pista — é o que a filmagem de referência mostra.
-- O bloco "Bracerum City" virou **Apoio e bem-estar** e deixou de ser tratado como marca.
+Entrega: **3840×2160, 30 fps, obturador 180°** (motion blur ligado), ProRes 422 HQ ou EXR,
+**+12 frames de sobra em cada ponta**. Mesmo HDRI e mesma posição de sol em todos os exteriores —
+hora dourada, sol baixo **à direita**, como no clipe de referência `assets/video/voo-passaro-01.mp4`.
+
+| ID | Dur na tela | Câmera e movimento | Tem que estar em quadro |
+|---|---|---|---|
+| **A** | 6s + 5s no fecho | Aérea a ~200 m, 28 mm, avanço lento com descida suave. Renderizar **12 s corridos** — o fecho usa o trecho final, ou o mesmo trecho invertido. | Pista entrando pela base, fileiras de galpões, torre do hotel ao fundo à direita |
+| **B** | 3s | **Continua o movimento de A**: sobe de ~200 m para ~1.200 m inclinando até 90º zenital. Termina nivelado ao norte. O primeiro frame de B tem que casar com o último de A — é o match cut. | Perímetro inteiro legível no último frame, para o mapa assumir daí |
+| **F** | 7s | Descida contínua de ~150 m para ~40 m, 28 mm, avanço sobre o eixo da pista. Um movimento só. | Pista no primeiro plano, heliponto, pátio dos hangares com aeronaves executivas |
+| **C** | 5s | Começa na fachada ao nível da entrada e sobe para a aérea do conjunto, 28 mm. Noturno. | Iluminação cênica **azul** da fachada (o azul é autorizado aqui), volume do hotel, convenções ao lado |
+| **D** | 4s | Interior, 35 mm, da última fila, push-in lento para o palco. Auditório ocupado. | Plateia, palco iluminado, escala das 1.200 poltronas |
+| **E** | 5s | Aérea baixa a ~40 m ao entardecer, 28 mm, avanço passando o pórtico e o clubhouse. | Lago, clubhouse, pórtico, lotes ao redor |
+
+**Prioridade se o lote encolher:** A e B (abrem, fecham e geram o mapa) → F → C → E → D.
