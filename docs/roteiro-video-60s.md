@@ -11,6 +11,45 @@ Nenhum take de banco passa de 2s.
 
 ---
 
+## Lista rápida — o que cada plano mostra
+
+| TC | Take | O que aparece |
+|---|---|---|
+| 0:00 | T01 | Drone do parque, vista geral em hora dourada |
+| 0:03 | banco | Mão de engenheiro sobre a planta impressa |
+| 0:05 | T02 + mograph | Zoom out 90º: parque → Villeta → Paraguai → Mercosul |
+| 0:09 | T03 | Aérea alta com a planta inteira |
+| 0:12 | banco | Barcaças no rio |
+| 0:14 | T04 | Rasante sobre as fileiras de galpões |
+| 0:16 | T05 | Caminhão encostando na doca |
+| 0:18 | banco | Interior de galpão com empilhadeira |
+| 0:20 | T06 | Fábrica Bracerum em operação |
+| 0:23 | T07 | Aeródromo: pista, heliponto e hangares com jatos |
+| 0:27 | cartela | APOIO E BEM-ESTAR |
+| 0:28 | T08 | Enfermaria |
+| 0:30 | T09 | Creche |
+| 0:32 | T10 | Bombeiros civis, viatura saindo do abrigo |
+| 0:34 | cartela | BRACERUM SELECT |
+| 0:35 | T11 | Setor comercial junto ao lago, vitrines acesas |
+| 0:37 | T12 | Academia |
+| 0:39 | T13 | Posto e market (insert de maquininha) |
+| 0:41 | cartela | BRACERUM HOTEL |
+| 0:42 | T14 | Fachada do hotel à noite, subindo para a aérea do conjunto |
+| 0:45 | T15 | Auditório cheio |
+| 0:47 | T16 | Foyer do centro de convenções |
+| 0:48 | cartela | BRACERUM RESORT |
+| 0:49 | T17 | Lago e clubhouse |
+| 0:52 | T18 | Família à beira do lago |
+| 0:54 | T19 | Quadras e campo society |
+| 0:55 | T20 | Recuo aéreo do parque no poente, marcas acendendo |
+| 0:58 | assinatura | Logo Bracerum Park |
+
+**Só os 20 takes 3D, por ambiente:** parque geral (T01, T02, T03, T20) · galpões e lotes (T04, T05) ·
+fábrica (T06) · aeródromo (T07) · apoio (T08, T09, T10) · Select (T11, T12, T13) ·
+Hotel (T14, T15, T16) · Resort (T17, T18, T19).
+
+---
+
 ## Referência visual — o clipe "Voo de Pássaro 01"
 
 O clipe existente (5s, aérea do parque) **é o padrão de look de todos os takes 3D**: hora dourada,
