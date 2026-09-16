@@ -182,8 +182,10 @@ perguntar**. O site entregue tem 2,05 MB na home.
 **Dados oficiais do R04** (usar estes, não os do catálogo V15 quando divergirem):
 terreno +1.800.000 m² · Resort 142.067 m² · parcelas industriais 987.304 m² · pista de 1.280 m ·
 auditório 1.200 pessoas · 12 setores principais.
-**Conflito conhecido:** o catálogo V15 dizia pista de **1.480 m**, o R04 diz **1.280 m**. O site ainda
-exibe 1.480 m no masterplan — confirmar com o cliente qual vale.
+**Resolvido (2026-09-16):** o cliente confirmou **1.480 m de pista** (o catálogo V15 vale sobre os
+1.280 m do R04) e que o **heliponto fica no pátio dos hangares**, não na cabeceira da pista — é o que
+mostra a filmagem aérea enviada. O pino "Hangares" do masterplan passou a citar o heliponto e o pino
+"Pista de pouso" deixou de citá-lo.
 
 ### Mapa
 **Basemap:** mapa **vetorial do OpenFreeMap** (estilo `dark`) via `maplibre-gl` + `maplibre-gl-leaflet`,
