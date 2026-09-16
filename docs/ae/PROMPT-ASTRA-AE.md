@@ -106,7 +106,7 @@ em Helvetica `--paper` a 65% embaixo. **Texto de verdade, editável** — não u
 | 0:37.0 | 2,0s | T12_academia | *slate* | — | **Academia** |
 | 0:39.0 | 2,0s | T13_posto | `assets/park/select-posto-noturno.jpg` | escala **115→104** | **Posto · market · banco · praça de alimentação** |
 | 0:41.0 | 1,0s | (cartela) | — | idem | **Bracerum Hotel** |
-| 0:42.0 | 3,0s | T14_hotel | `assets/web/hero-hotel-noturno.jpg` | escala **104→116**, deriva Y −30 px | **384 studios** de 35 m² |
+| 0:42.0 | 3,0s | T14_hotel | `assets/park/hotel-noturno.jpg` | escala **110→120**, deriva X **−150 px** (ver nota na seção 11) | **384 studios** de 35 m² |
 | 0:45.0 | 2,0s | T15_auditorio | `assets/park/hotel-auditorio.jpg` | escala **106→116** | **Auditório para 1.200 pessoas** |
 | 0:47.0 | 1,0s | T16_convencoes | `assets/renders/pavilhao-eventos-1.jpg` | escala **110→116** | **Centro de convenções · 13.500 m²** |
 | 0:48.0 | 1,0s | (cartela) | — | idem | **Bracerum Resort** |
@@ -197,6 +197,14 @@ Effects Auto-Save/`.
   suave**, não tente corrigir com sharpen.
 - **T08, T09, T10 e T12** não têm render nem projeto arquitetônico definido — por isso são slates.
 - **T09 (creche)** ainda depende de confirmação do cliente; mantenha o slate e a nota.
+- **Não use `assets/web/hero-hotel-noturno.jpg` no T14.** Esse render tem iluminação cênica
+  **vermelha** dominante e viola a regra de marca. Use `assets/park/hotel-noturno.jpg`, que é o
+  mesmo conjunto em azul. Ainda sobra um resto de vermelho na borda direita: é por isso que o
+  enquadramento leva deriva de −150 px, para deixá-lo fora do quadro. Confira o frame em 0:43
+  do animatic antes de dar por pronto.
+- **Há um animatic de referência** em `docs/ae/preview/bracerum-60s-animatic.mp4`: 60 s com o
+  corte e as legendas já montados em ffmpeg. Não é o alvo de qualidade — é a conferência de
+  tempo, ordem e texto. Se o seu resultado divergir dele em duração ou ordem, o errado é o seu.
 - Os `B0x` são os planos que serão **filmagem de banco licenciada**, não 3D — ficam como slate até a
   licença ser comprada. Há ainda um insert de 0,5 s de maquininha de cartão previsto **dentro** do
   T13, que entra junto com essa licença: não monte agora, só deixe anotado no LEIA-ME.

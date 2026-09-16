@@ -286,6 +286,11 @@ mais dois takes de banco: `conference auditorium audience stage` e
 3. **Tipologias do Resort** — segue pendente no projeto; não afeta este roteiro (T17–T19 são áreas
    comuns), mas afeta qualquer versão longa que mostre casas.
 
+4. **O render do hero do hotel tem vermelho.** `assets/web/hero-hotel-noturno.jpg` usa iluminação
+   cênica vermelha dominante, que contraria a regra de marca. Onde o hotel aparecer em vídeo, usar
+   `assets/park/hotel-noturno.jpg` (mesmo conjunto, em azul). Vale checar com o cliente se o render
+   vermelho deve sair também do hero do site.
+
 ### Decidido
 - **Pista: 1.480 m** (o catálogo V15 vale sobre os 1.280 m do R04) e **heliponto no pátio dos
   hangares**, não na cabeceira da pista — é o que a filmagem de referência mostra.
