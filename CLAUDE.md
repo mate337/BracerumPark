@@ -10,6 +10,23 @@ O site tem **7 páginas**: `index.html`, `tributacao.html`, `bracerum.html`, `ho
 rotas) que as seis páginas internas baixavam e interpretavam à toa. Ele roda depois do
 `script.js` porque usa `hasGsap`, `reduceMotion` e `tr()`.
 
+### Fotos finalizadas do cliente (v6.3 — 2026-09-28)
+- **Fonte:** pasta do Google Drive "Imagens BracerumPark Finalizadas" (id `1CETdiYdL13Jhh2twQe6kAF10yvMt1YF6`),
+  51 renders PNG 1672×941 com nome genérico ("Imagem do Codex …"), seis deles repetidos. Os originais
+  **não** estão no repositório; as versões web ficam em `assets/web/fotos/` (35 arquivos, 1600 px, JPG 80%,
+  10 MB no total), com nome pelo conteúdo (`hotel-cupula-dia.jpg`, `portaria.jpg` etc.).
+- **Trocado:** heros da home, do hotel, do resort e da qualidade; blocos Hotel/Resort da home; galeria
+  "Fotos do Parque"; imagens do "Como funciona"; galerias do hotel, do resort e da qualidade; bandas de
+  bracerum/tributação; e os passadores de fotos dos pinos do masterplan (`home.js`). Legendas que mudaram
+  de assunto ganharam texto novo nos três idiomas (`gal.7`, `ph.g2/g4/g6/g7`, `pr.g1–g5`, `pq.g4/g5`).
+- **Mantido de propósito (sem equivalente na pasta nova):** a planta do masterplan
+  (`vista-aerea-park-02.jpg` — os pinos estão calibrados nela; as vistas aéreas novas têm outro
+  enquadramento), fábrica Bracerum, ETE/ETA, tudo do Select menos o posto (shopping, market, comercial,
+  apoio ao caminhoneiro), escritórios dos passos 2 e 5, desenhos técnicos da qualidade e a implantação/
+  vista aérea R04 do Resort (o texto cita essas três leituras oficiais).
+- Os arquivos antigos que ficaram sem uso (`assets/park/hotel-*`, `resort-lago-*`, `assets/renders/*`
+  com vermelho/marca d'água OTIFF) continuam no repositório — **apagar só com o ok do cliente**.
+
 ### Logos dos sub-projetos e favicon (v6.2 — 2026-09-14)
 - **Os selos do cliente entraram no ar.** `hotel.html`, `resort.html` e `select.html` trocaram o
   lockup tipográfico provisório (`<p class="sublogo">`, agora removido do CSS) pelo SVG real, e os
