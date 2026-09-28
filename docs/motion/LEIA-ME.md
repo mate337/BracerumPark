@@ -6,16 +6,16 @@ ffmpeg. Os dois dividem o mesmo motor (`motor.js`) e cada um mora num módulo em
 
 | Filme | Duração | Módulo | O que é |
 |---|---|---|---|
-| **park-52s** | 52 s | `filmes/park-52s.js` + `.css` | rápido, no ritmo do primeiro preview, sobre o roteiro do cliente (2026-09-28) |
+| **park-67s** | 67 s | `filmes/park-67s.js` + `.css` | rápido, no ritmo do primeiro preview, sobre o roteiro do cliente (2026-09-28) |
 | **motion-48s** | 48 s | `filmes/motion-48s.js` | a v2: abertura com o parque real, mapa e fotos por mais tempo |
 
 Qual filme renderizar vem de `--filme=` (padrão `motion-48s`). Comando de origem da série:
 [`PROMPT-MOTION-24S.md`](PROMPT-MOTION-24S.md), que pedia 24 s. A v1 de 24 s não foi versionada;
-a v2 e o park-52s saíram do retorno do cliente.
+a v2 e o park-67s saíram do retorno do cliente.
 
 ---
 
-## park-52s — o filme rápido do roteiro do cliente
+## park-67s — o filme rápido do roteiro do cliente
 
 Base: o primeiro preview (v1, 24 s), mais duas referências de motion enviadas pelo cliente e três
 imagens de referência. As referências:
@@ -23,6 +23,13 @@ imagens de referência. As referências:
 - o filme do Studio DADO (editorial, lista com destaque);
 - as três imagens: carrossel de ícones com o do centro em preto e os vizinhos esmaecidos, e medidor
   em meia-lua sobre fundo preto.
+
+Nasceu com 52 s, com o nome `park-52s`. Na **revisão do cliente** (mesmo dia):
+- **números novos** com +1 s de tela cada;
+- **fotos por ambiente mais devagar**, com o som das transições 60 % mais baixo;
+- **10 tópicos** no carrossel.
+
+Com isso foi para **67 s** e mudou de nome.
 
 | # | Cena | Quadros | Tempo | Roteiro do cliente → o que o filme faz |
 |---|---|---|---|---|
@@ -33,27 +40,36 @@ imagens de referência. As referências:
 | s5 | busca | 315–404 | 0:10,5 | **"A melhor localização do PY para sua nova fábrica"** digitada; o cursor clica e o botão abre a tela |
 | s6 | letreiros | 405–479 | 0:13,5 | atributos do parque passando em plano inclinado |
 | s7 | pranchetas | 480–569 | 0:16 | parede de fotos, **pranchas técnicas** (corte viário, infográfico das vias, estudo de clima, implantação do resort) e rótulos |
-| s8 | masterplan | 570–704 | 0:19 | planta com os 10 pontos de interesse e o título do site |
-| s9 | números | 705–839 | 0:23,5 | 1.480 m de pista · 1.200 lugares · 142.067 m² de setor residencial |
-| s10 | ambientes | 840–1079 | 0:28 | 3 fotos por ambiente, **selo à esquerda, título à direita**: Park (lotes + hangares), Hotel + Centro de convenções, Resort (condomínio + clubhouse), Select (shopping, market e posto) |
-| s11 | frase | 1080–1154 | 0:36 | **"A cidade pronta para o *futuro* da sua indústria"** |
-| s12 | ícones | 1155–1274 | 0:38,5 | **"Tudo que você precisa em um só lugar"**: carrossel condomínio de casas → hotel → shopping → pista de pouso |
-| s13 | Brasil × Paraguai | 1275–1394 | 0:42,5 | fundo preto, dois medidores em meia-lua: **"Sua indústria lucrando ainda mais"** |
-| s14 | consultores | 1395–1454 | 0:46,5 | **"Fale com um de nossos consultores"** + botão "Fale conosco" clicado pelo cursor |
-| s15 | assinatura | 1455–1559 | 0:48,5 | construção do símbolo, grade de quadrados, Bracerum Park |
+| s8 | masterplan | 570–704 | 0:19 | planta com os 10 pontos de interesse; título "Planejado como uma *cidade*" |
+| s9 | números | 705–1004 | 0:23,5 | **1.820.000 m²** de área total · **1.480 m** de pista com **8 hangares** · **142.000 m²** no Bracerum Resort · **802.640 m²** de área industrial — 2,5 s cada |
+| s10 | ambientes | 1005–1424 | 0:33,5 | 3 fotos por ambiente (~1,2 s cada), **selo à esquerda, título à direita**: Park (lotes + hangares), Hotel + Centro de convenções, Resort (condomínio + clubhouse), Select (shopping, market e posto) |
+| s11 | frase | 1425–1499 | 0:47,5 | **"A cidade pronta para o *futuro* da sua indústria"** |
+| s12 | ícones | 1500–1724 | 0:50 | **"Tudo que você precisa em um só lugar"**: hotel → condomínio de casas → centro de convenções → creche → ambulatório → pista de pouso → hangares → academia → shopping → lazer |
+| s13 | Brasil × Paraguai | 1725–1844 | 0:57,5 | fundo preto, dois medidores em meia-lua: **"Sua indústria lucrando ainda mais"** |
+| s14 | consultores | 1845–1904 | 1:01,5 | **"Fale com um de nossos consultores"** + botão "Fale conosco" clicado pelo cursor |
+| s15 | assinatura | 1905–2009 | 1:03,5 | construção do símbolo, grade de quadrados, Bracerum Park |
 
-**Dados, todos do site:**
+**Dados:**
+- **Os quatro números da s9 foram definidos pelo cliente para o filme (2026-09-28):** 1.820.000 m²,
+  1.480 m de pista com 8 hangares, 142.000 m² no Bracerum Resort e 802.640 m² de área industrial.
+  Eles substituem, no filme, os do R04 e os do site. **O site ainda mostra outros números:**
+  1.819.856 m² (`mp.title`), 142.067 m² (`pr.s1v`) e 989.642 m² de lotes (`AREAS`). A pista não cita
+  os 8 hangares. Alinhar o site depende do ok do cliente.
 - **Medidores:** comparativo "Brasil × Paraguai" de `tributacao.html` (`tp.b2`/`tp.b3`). A carga
   tributária é 33 % do PIB no Brasil e 10 % no Paraguai; os encargos sobre a folha são 75 % contra
   33 %. A nota "1% de tributo único no regime de Maquila" vem da mesma página. O rosa da imagem de
   referência virou bege (zero vermelho).
 - **Legendas das fotos, letreiros e rótulos:** `AREAS` (`home.js`), `tributacao.html` e os fatos de
-  Villeta (`index.html`).
-- **142.067 m²:** `pr.s1v/s1k` (resort.html).
+  Villeta (`index.html`). Os 10 tópicos do carrossel são a lista do cliente.
 
 **Decisões deste filme:**
 - **Símbolo em 3D:** extrudado por 22 camadas de SVG a 1,3 px, porque CSS não faz sólido de
   triângulo. A câmera das telas pousa nele no último quadro, então o corte para o 3D não tem salto.
+- **Título do mapa sem número:** com o 1.820.000 m² no contador logo depois, repetir o número no
+  mapa ficava redundante.
+- **Ícones desenhados no traço do filme:** 8 px, pontas quadradas, sem curvas. Os 6 novos são centro
+  de convenções (tela no tripé), creche (blocos com o losango do site), ambulatório (cruz), hangares,
+  academia (halter) e lazer (guarda-sol).
 - **Consultores sem dados pessoais:** o rodapé do site tem dois consultores com telefone e e-mail. O
   filme usa só o botão "Fale conosco". Para pôr os contatos na tela, é um ajuste na cena s14.
 - `select-shopping-lago.jpg` ficou de fora (letreiro laranja acusa vermelho) e
@@ -118,11 +134,11 @@ frases iniciais também precisam de tempo para leitura."*
 ## Arquivos
 
 ```
-filme.html          palco 1920×1080 (filme.html?filme=park-52s&t=12.5 para ver um instante; &lang=es|en)
+filme.html          palco 1920×1080 (filme.html?filme=park-67s&t=12.5 para ver um instante; &lang=es|en)
 filme.css           tokens do site e componentes comuns (composição, pinos, contadores, letreiro, parede…)
 motor.js            tempo em batidas, timeline, ganchos, blur direcional, grão, boot; carrega filmes/<id>.js
 filmes/<id>.js      COPY (pt/es/en), CUT (linha do tempo), as cenas, os cues e a lista de QA do filme
-filmes/park-52s.css CSS próprio do filme rápido
+filmes/park-67s.css CSS próprio do filme rápido
 render.js           stills | preview | final | cues | pins | safe  (todos com --filme=)
 audio.py            sound design só com ffmpeg lavfi, a partir do cues-<filme>.csv
 check.py            QA do vídeo (duração, quadros, vermelho, trechos parados, determinismo, folha de contato)
@@ -156,12 +172,12 @@ Tudo a partir da raiz do repositório. O `render.js` sobe o próprio servidor HT
 que o `check.py` e o `audio.py` leem.
 
 ```bash
-F=--filme=park-52s
-node docs/motion/render.js preview $F              # ~4 min · out/preview-park-52s.mp4, para iterar
+F=--filme=park-67s
+node docs/motion/render.js preview $F              # ~5 min · out/preview-park-67s.mp4, para iterar
 node docs/motion/render.js stills $F --frames=0,22,150-240:15 --tag=teste   # quadros avulsos em out/stills/teste/
-node docs/motion/render.js final $F                # ~15 min · out/bracerum-park-52s_mudo.mp4
-node docs/motion/render.js cues $F                 # out/cues-park-52s.csv
-python3 docs/motion/audio.py $F                    # out/audio-park-52s.wav + mux → out/bracerum-park-52s.mp4
+node docs/motion/render.js final $F                # ~20 min · out/bracerum-park-67s_mudo.mp4
+node docs/motion/render.js cues $F                 # out/cues-park-67s.csv
+python3 docs/motion/audio.py $F                    # out/audio-park-67s.wav + mux → out/bracerum-park-67s.mp4
 ```
 
 **Motion blur de verdade:** o modo `final` captura 4 subquadros por quadro, espaçados em 1/240 s
@@ -174,10 +190,10 @@ saídas ganham o sufixo `-es` / `-en`.
 ## QA
 
 ```bash
-python3 docs/motion/check.py docs/motion/out/bracerum-park-52s.mp4 --filme=park-52s --det
-python3 docs/motion/check.py docs/motion/out/bracerum-park-52s.mp4 --filme=park-52s --sheet docs/motion/out/contato-park-52s.jpg
-node docs/motion/render.js pins --filme=park-52s     # losangos do filme × pinos do site
-node docs/motion/render.js safe --filme=park-52s     # texto pequeno e logos na área segura (lista em cada filme)
+python3 docs/motion/check.py docs/motion/out/bracerum-park-67s.mp4 --filme=park-67s --det
+python3 docs/motion/check.py docs/motion/out/bracerum-park-67s.mp4 --filme=park-67s --sheet docs/motion/out/contato-park-67s.jpg
+node docs/motion/render.js pins --filme=park-67s     # losangos do filme × pinos do site
+node docs/motion/render.js safe --filme=park-67s     # texto pequeno e logos na área segura (lista em cada filme)
 ```
 
 - `check.py` reprova se o vídeo não tiver os quadros e a duração do filme, 1920×1080, 30 fps e

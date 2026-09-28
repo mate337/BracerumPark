@@ -271,9 +271,12 @@ Faltam (mencionados no `LEIA-ME.txt` original, ainda não enviados): `tecnologic
 
 `docs/motion/` tem **dois filmes** feitos em código sobre o mesmo motor (`motor.js`; cada filme é um
 módulo em `docs/motion/filmes/`, escolhido com `--filme=`):
-- **park-52s** (52 s): filme rápido montado sobre o **roteiro do cliente**. Segue a linguagem do
+- **park-67s** (67 s): filme rápido montado sobre o **roteiro do cliente**. Segue a linguagem do
   primeiro preview e as referências dele (carrossel de ícones, medidor em meia-lua Brasil × Paraguai
-  com os números de `tributacao.html`).
+  com os números de `tributacao.html`). Nasceu com 52 s; a revisão do cliente o levou a 67 s.
+- **Números que o cliente definiu para o filme (2026-09-28):** 1.820.000 m² de área total · 1.480 m
+  de pista com 8 hangares · 142.000 m² no Bracerum Resort · 802.640 m² de área industrial. **O site
+  ainda mostra** 1.819.856 m², 142.067 m² e 989.642 m² de lotes — alinhar o site só com o ok dele.
 - **motion-48s** (48 s): a v2, descrita abaixo.
 Linhas do tempo, dados e decisões dos dois em `docs/motion/LEIA-ME.md`.
 

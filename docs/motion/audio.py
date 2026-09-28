@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """Sound design sintetizado do filme — só ffmpeg lavfi, sem amostra nem música de terceiros.
 
-    node docs/motion/render.js cues --filme=park-52s      # gera out/cues-park-52s.csv a partir da timeline
-    python3 docs/motion/audio.py --filme=park-52s [--lang=es]   # out/audio-<id>.wav + out/bracerum-<id>.mp4
+    node docs/motion/render.js cues --filme=park-67s      # gera out/cues-park-67s.csv a partir da timeline
+    python3 docs/motion/audio.py --filme=park-67s [--lang=es]   # out/audio-<id>.wav + out/bracerum-<id>.mp4
 
 Lê out/cues-<id>[-lang].csv (os mesmos eventos que o filme declara) e sintetiza:
-  whoosh  ruído rosa filtrado com subida exponencial até o pico do corte
+  whoosh  ruído rosa filtrado com subida exponencial até o pico do corte (vol= no cue ajusta o volume)
   tick    8–14 ms de ruído agudo (cada caractere digitado, cada dígito que assenta)
   hit     senoide grave com decaimento rápido (cortes de fundo da S9–S10 e a assinatura)
   riser   varredura 110→440 Hz + ruído filtrado da S13 até 0,3 s antes da assinatura
@@ -47,7 +47,7 @@ def build(cues):
             src = (f"anoisesrc=d={L:.3f}:c=pink:r={SR}:a=0.9:seed={seed},highpass=f=160,{low}"
                    f"bandpass=f={500 if pr.get('grave') else 1100}:width_type=q:w=0.7,"
                    f"afade=t=in:st=0:d={L * 0.8:.3f}:curve=exp,afade=t=out:st={L * 0.8:.3f}:d={L * 0.2:.3f}:curve=qsin,"
-                   f"volume={4.2 if pr.get('grave') else 3.2},{pan(float(pr.get('pan', 0)))}")
+                   f"volume={(4.2 if pr.get('grave') else 3.2) * float(pr.get('vol', 1)):.3f},{pan(float(pr.get('pan', 0)))}")
         elif kind == 'tick':
             forte = pr.get('forte')
             d = 0.014 if forte else 0.009

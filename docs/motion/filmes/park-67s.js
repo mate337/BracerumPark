@@ -1,4 +1,4 @@
-/* Bracerum Park — filme rápido de 52 s (park-52s), a partir do roteiro do cliente
+/* Bracerum Park — filme rápido de 67 s (park-67s), a partir do roteiro do cliente
  * (2026-09-28) sobre a linguagem do primeiro preview (v1, 24 s) e de duas referências
  * de motion: um showreel de interface (cursor, telas, cortes rápidos) e o filme do
  * Studio DADO (editorial, lista com destaque). Carrossel de ícones e medidor em
@@ -14,9 +14,11 @@
 const M = window.MOTOR;
 const { q, T, IMG, h, sv, css, clamp, lerp, EZ, mulberry32, win, fq, vis, hook, scene, init, tw, at, cue, dirBlur } = M;
 
-// Início de cada cena, em q (15 q = 1 batida de 120 BPM). 1560 q = 52 s.
-const CUT = { s1: 0, s2: 75, s3: 150, s4: 240, s5: 315, s6: 405, s7: 480, s8: 570, s9: 705, s10: 840,
-              s11: 1080, s12: 1155, s13: 1275, s14: 1395, s15: 1455, END: 1560 };
+// Início de cada cena, em q (15 q = 1 batida de 120 BPM). 2010 q = 67 s.
+// Revisão do cliente (2026-09-28): números com +1 s de tela, fotos por ambiente mais
+// devagar e 10 tópicos no carrossel — o filme passou de 52 s para 67 s.
+const CUT = { s1: 0, s2: 75, s3: 150, s4: 240, s5: 315, s6: 405, s7: 480, s8: 570, s9: 705, s10: 1005,
+              s11: 1425, s12: 1500, s13: 1725, s14: 1845, s15: 1905, END: 2010 };
 
 /* ---------------------------------------------------------------- textos */
 const COPY = {
@@ -44,16 +46,20 @@ const COPY = {
   ],
   wallExtra: [{ pt: 'Bracerum Select', es: 'Bracerum Select', en: 'Bracerum Select' }],
   map: { pt: 'O Masterplan', es: 'El Masterplan', en: 'The Masterplan' },
-  mapTitle: { pt: ['1.819.856 m² planejados', 'como uma <em>cidade</em>'],
-              es: ['1.819.856 m² planificados', 'como una <em>ciudad</em>'],
-              en: ['1,819,856 m² planned', 'as a <em>city</em>'] },
+  // sem número: o 1.820.000 m² aparece no contador logo depois
+  mapTitle: { pt: ['Planejado como', 'uma <em>cidade</em>'],
+              es: ['Planificado como', 'una <em>ciudad</em>'],
+              en: ['Planned', 'as a <em>city</em>'] },
+  // números definidos pelo cliente para o filme (2026-09-28), na ordem que ele passou
   counters: [
+    { n: { pt: '1.820.000', es: '1.820.000', en: '1,820,000' }, u: 'm²',
+      l: { pt: 'de área<br><em>total</em>', es: 'de área<br><em>total</em>', en: 'total<br><em>area</em>' } },
     { n: { pt: '1.480', es: '1.480', en: '1,480' }, u: 'm',
-      l: { pt: 'de pista<br><em>própria</em>', es: 'de pista<br><em>propia</em>', en: '<em>private</em><br>airstrip' } },
-    { n: { pt: '1.200', es: '1.200', en: '1,200' }, u: '',
-      l: { pt: 'lugares no<br><em>auditório</em>', es: 'lugares en el<br><em>auditorio</em>', en: 'seats in the<br><em>auditorium</em>' } },
-    { n: { pt: '142.067', es: '142.067', en: '142,067' }, u: 'm²',
-      l: { pt: 'de setor residencial<br>e <em>recreativo</em>', es: 'de sector residencial<br>y <em>recreativo</em>', en: 'residential and<br><em>recreational</em> sector' } },
+      l: { pt: 'de pista de pouso<br>com <em>8 hangares</em>', es: 'de pista de aterrizaje<br>con <em>8 hangares</em>', en: 'airstrip<br>with <em>8 hangars</em>' } },
+    { n: { pt: '142.000', es: '142.000', en: '142,000' }, u: 'm²',
+      l: { pt: 'no Bracerum<br><em>Resort</em>', es: 'en el Bracerum<br><em>Resort</em>', en: 'at Bracerum<br><em>Resort</em>' } },
+    { n: { pt: '802.640', es: '802.640', en: '802,640' }, u: 'm²',
+      l: { pt: 'de área<br><em>industrial</em>', es: 'de área<br><em>industrial</em>', en: 'of industrial<br><em>area</em>' } },
   ],
   amb: [
     { logo: 'logo-horizontal-cream', hgt: 84, k: { pt: 'Bracerum Park', es: 'Bracerum Park', en: 'Bracerum Park' },
@@ -75,11 +81,18 @@ const COPY = {
   all: { pt: ['Tudo que você precisa', 'em <em>um só lugar</em>'],
          es: ['Todo lo que necesita', 'en <em>un solo lugar</em>'],
          en: ['Everything you need', 'in <em>one place</em>'] },
+  // os 10 tópicos do cliente, na ordem dele
   icons: [
-    { k: 'casa', l: { pt: 'Condomínio de casas', es: 'Condominio de casas', en: 'Gated homes' } },
     { k: 'hotel', l: { pt: 'Hotel', es: 'Hotel', en: 'Hotel' } },
-    { k: 'shop', l: { pt: 'Shopping', es: 'Shopping', en: 'Shopping' } },
+    { k: 'casa', l: { pt: 'Condomínio de casas', es: 'Condominio de casas', en: 'Gated homes' } },
+    { k: 'conv', l: { pt: 'Centro de convenções', es: 'Centro de convenciones', en: 'Convention centre' } },
+    { k: 'creche', l: { pt: 'Creche', es: 'Guardería', en: 'Daycare' } },
+    { k: 'ambul', l: { pt: 'Ambulatório', es: 'Ambulatorio', en: 'Clinic' } },
     { k: 'aviao', l: { pt: 'Pista de pouso', es: 'Pista de aterrizaje', en: 'Airstrip' } },
+    { k: 'hangar', l: { pt: 'Hangares', es: 'Hangares', en: 'Hangars' } },
+    { k: 'academia', l: { pt: 'Academia', es: 'Gimnasio', en: 'Gym' } },
+    { k: 'shop', l: { pt: 'Shopping', es: 'Shopping', en: 'Shopping' } },
+    { k: 'lazer', l: { pt: 'Lazer', es: 'Recreación', en: 'Leisure' } },
   ],
   chart: {
     title: { pt: ['Sua indústria lucrando', '<em>ainda mais</em>'], es: ['Su industria ganando', '<em>todavía más</em>'],
@@ -491,16 +504,17 @@ function S8(areas) {
 
 /* ======================================================= 9 · números do parque */
 function S9() {
-  const L = 45;
+  const L = 75;                               // 2,5 s por número (pedido: +1 s de tela)
   const SPEC = [
-    { bg: 'var(--paper)', fg: 'var(--ink)', num: 'var(--ink)', fs: 300, us: 0.42, top: 330 },
+    { bg: 'var(--paper)', fg: 'var(--ink)', num: 'var(--ink)', fs: 250, us: 0.42, top: 364 },
     { bg: 'var(--ink)', fg: 'var(--cream)', num: 'var(--sand)', fs: 300, us: 0.42, top: 330 },
-    { bg: 'var(--sand)', fg: 'var(--ink)', num: 'var(--ink)', fs: 250, us: 0.42, top: 360 },
+    { bg: 'var(--sand)', fg: 'var(--ink)', num: 'var(--ink)', fs: 280, us: 0.42, top: 344 },
+    { bg: 'var(--brown)', fg: 'var(--cream)', num: 'var(--sand)', fs: 280, us: 0.42, top: 344 },
   ];
   const R = mulberry32(9);
   COPY.counters.forEach((c, k) => {
     const sp = SPEC[k], a = CUT.s9 + k * L;
-    const s = scene('s9' + 'abc'[k], a, a + L, sp.bg);
+    const s = scene('s9' + 'abcd'[k], a, a + L, sp.bg);
     cue(a, 'hit', 's9');
     const block = css(h('div', 'cnt', s), { top: sp.top + 'px', color: sp.fg });
     const num = css(h('div', 'cnt__num', block), { fontSize: sp.fs + 'px', color: sp.num });
@@ -544,7 +558,7 @@ function S9() {
    Três fotos por ambiente, selo à esquerda e título à direita. A foto seguinte
    entra por cortina; na troca de ambiente a cortina leva a linha de areia. */
 function S10() {
-  const A = CUT.s10, L = 60, P = 20, WIPE = 8;
+  const A = CUT.s10, L = 105, P = 35, WIPE = 12;   // ~1,2 s por foto, cortina mais lenta
   COPY.amb.forEach((amb, k) => {
     const a0 = A + k * L;
     amb.photos.forEach((ph, j) => {
@@ -561,7 +575,7 @@ function S10() {
       const edge = j === 0 ? h('div', 'amb-edge', s) : null;
       const w = { p: 0 };
       tw(w, { p: 0 }, { p: 1 }, a - WIPE, WIPE, 'expo.inOut');
-      cue(a - 1, 'whoosh', 's10', { dur: j === 0 ? 14 : 8, pan: -0.3 });
+      cue(a - 1, 'whoosh', 's10', { dur: j === 0 ? 16 : 12, pan: -0.3, vol: 0.4 });   // 60% mais baixo (pedido)
       hook(t => {
         if (!vis(t, a - WIPE, end)) return;
         const x = (1 - w.p) * 1920;
@@ -606,6 +620,12 @@ const ICONS = {
   hotel: '<path d="M12 20 V86"/><path d="M12 66 H88 V86"/><path d="M20 48 H40 V66"/><path d="M40 52 H88 V66"/>',
   shop: '<path d="M18 36 H82 L78 88 H22 Z"/><path d="M36 50 V22 H64 V50"/>',
   aviao: '<path d="M50 8 V92"/><path d="M12 58 L50 40 L88 58"/><path d="M32 90 L50 80 L68 90"/>',
+  conv: '<path d="M12 14 H88 V56 H12 Z"/><path d="M50 56 V74"/><path d="M28 90 L50 74 L72 90"/>',
+  creche: '<path d="M12 58 H44 V88 H12 Z"/><path d="M56 58 H88 V88 H56 Z"/><path d="M50 12 L68 30 L50 48 L32 30 Z"/>',
+  ambul: '<path d="M38 12 H62 V38 H88 V62 H62 V88 H38 V62 H12 V38 H38 Z"/>',
+  hangar: '<path d="M6 88 V52 L24 30 H76 L94 52 V88"/><path d="M28 88 V58 H72 V88"/><path d="M50 58 V88"/>',
+  academia: '<path d="M16 32 H30 V68 H16 Z"/><path d="M70 32 H84 V68 H70 Z"/><path d="M30 50 H70"/><path d="M6 50 H16"/><path d="M84 50 H94"/>',
+  lazer: '<path d="M10 46 L50 14 L90 46 Z"/><path d="M50 46 V88"/><path d="M28 88 H72"/>',
 };
 function S12() {
   const A = CUT.s12, B = CUT.s13;
@@ -626,7 +646,7 @@ function S12() {
   const labels = items.map(it => h('div', 'ico-label', s, T(it.l)));
   const car = { i: 0, intro: 0 };
   tw(car, { intro: 0 }, { intro: 1 }, A + 4, 16, 'expo.out');
-  const STEP = 25, T0 = A + 34;
+  const STEP = 20, T0 = A + 30;
   for (let k = 1; k < n; k++) {
     tw(car, { i: k - 1 }, { i: k }, T0 + (k - 1) * STEP, 11, 'expo.inOut');
     cue(T0 + (k - 1) * STEP + 5, 'tick', 's12', { forte: 1 });
@@ -646,8 +666,10 @@ function S12() {
     }
     labels.forEach((l, k) => {
       const d = k - car.i, ad = Math.abs(d);
-      l.style.opacity = (clamp(1 - ad * 2.2, 0, 1) * car.intro).toFixed(3);
-      l.style.transform = `translate(-50%,${(d * 34).toFixed(1)}px)`;
+      const op = clamp(1 - ad * 2.2, 0, 1) * car.intro;
+      l.style.opacity = op.toFixed(3);
+      l.style.visibility = op > 0 ? 'visible' : 'hidden';
+      l.style.transform = `translate(-50%,${(clamp(d, -1, 1) * 34).toFixed(1)}px)`;
     });
   });
 }
@@ -829,7 +851,7 @@ async function S15() {
 }
 
 M.film({
-  id: 'park-52s',
+  id: 'park-67s',
   css: true,
   total: CUT.END,
   pulseUntil: CUT.s15,
@@ -839,11 +861,11 @@ M.film({
     await S15();
   },
   safe: [[60, '#s1 .comp__meta, #s1 .comp__idx, #s1 .comp__brand'], [140, '#s2 .sub-c'], [370, '.srch-field, .srch-eyebrow'],
-    [690, '#s8 .eyebrow, #s8 .map-title, #s8 .pin__tag'], [740, '#s9a .cnt'], [785, '#s9b .cnt'], [830, '#s9c .cnt'],
-    [890, '#s10ao .amb-logo, #s10ao .amb-title'], [950, '#s10bo .amb-logo, #s10bo .amb-title'],
-    [1010, '#s10co .amb-logo, #s10co .amb-title'], [1070, '#s10do .amb-logo, #s10do .amb-title'],
-    [1140, '.fut'], [1260, '.ico-title, .ico-label'], [1380, '.chart-title, .chart-note, .gauge-lab, .gauge-leg'],
-    [1450, '.cta, .cta-btn'], [1559, '#s15 .fim-svg']],
+    [690, '#s8 .eyebrow, #s8 .map-title, #s8 .pin__tag'], [770, '#s9a .cnt'], [845, '#s9b .cnt'], [920, '#s9c .cnt'],
+    [995, '#s9d .cnt'], [1070, '#s10ao .amb-logo, #s10ao .amb-title'], [1175, '#s10bo .amb-logo, #s10bo .amb-title'],
+    [1280, '#s10co .amb-logo, #s10co .amb-title'], [1385, '#s10do .amb-logo, #s10do .amb-title'],
+    [1490, '.fut'], [1600, '.ico-title, .ico-label'], [1830, '.chart-title, .chart-note, .gauge-lab, .gauge-leg'],
+    [1900, '.cta, .cta-btn'], [2009, '#s15 .fim-svg']],
   pins: { frame: 690, img: '#s8 .map-plan img', dots: '#s8 .pin__dot' },
 });
 })();

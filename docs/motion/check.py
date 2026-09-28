@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """QA automático de um filme (duração e cenas lidas de out/filme-<id>.json, gravado pelo render.js).
 
-    python3 docs/motion/check.py docs/motion/out/preview-park-52s.mp4 --filme=park-52s [--det]
+    python3 docs/motion/check.py docs/motion/out/preview-park-67s.mp4 --filme=park-67s [--det]
     python3 docs/motion/check.py docs/motion/out/preview.mp4 --sheet docs/motion/out/contato.jpg
 
 Reprova (código de saída 1) se:

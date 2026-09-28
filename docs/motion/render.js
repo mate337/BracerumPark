@@ -6,7 +6,7 @@
  *   node docs/motion/render.js final                  4 subquadros (obturador 180°), CRF 18
  *   node docs/motion/render.js cues | pins | safe     eventos de som (cues-<filme>.csv) e QA
  *
- * Opções: --filme=motion-48s|park-52s  --lang=pt|es|en  --from=N --to=N (quadros)
+ * Opções: --filme=motion-48s|park-67s  --lang=pt|es|en  --from=N --to=N (quadros)
  *         --out=arquivo.mp4  --port=8765
  * ffmpeg: BP_FFMPEG, ou o binário do pacote pip imageio-ffmpeg.
  */
@@ -123,7 +123,10 @@ function frameList(spec, total) {
       let bad = 0;
       for (const [f, sel] of CHECK) {
         await seek(f / info.FPS);
-        const rs = await page.evaluate(s => [...document.querySelectorAll(s)].map(e => {
+        const rs = await page.evaluate(s => [...document.querySelectorAll(s)].filter(e => {
+          const cs = getComputedStyle(e);            // só o que aparece na tela
+          return cs.visibility !== 'hidden' && +cs.opacity > 0.01;
+        }).map(e => {
           const r = e.getBoundingClientRect();
           return [e.className.baseVal ?? e.className, Math.round(r.left), Math.round(r.top), Math.round(r.right), Math.round(r.bottom)];
         }), sel);
