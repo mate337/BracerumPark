@@ -1,11 +1,67 @@
-# Filme de motion design do Bracerum Park — como foi feito e como refazer
+# Filmes de motion design do Bracerum Park — como foram feitos e como refazer
 
-Filme de marca de **48 s** feito **inteiramente em código**: HTML + CSS + GSAP, com uma timeline
-única pausada que o `render.js` posiciona quadro a quadro no Chromium headless (Playwright) e entrega
-ao ffmpeg. Comando de origem: [`PROMPT-MOTION-24S.md`](PROMPT-MOTION-24S.md). Ele pedia 24 s; a
-**v2 (48 s)** saiu do retorno do cliente, ver abaixo.
+Dois filmes de marca feitos **inteiramente em código**: HTML + CSS + GSAP, com uma timeline única
+pausada que o `render.js` posiciona quadro a quadro no Chromium headless (Playwright) e entrega ao
+ffmpeg. Os dois dividem o mesmo motor (`motor.js`) e cada um mora num módulo em `filmes/`:
 
-## v2 — o que mudou e por quê
+| Filme | Duração | Módulo | O que é |
+|---|---|---|---|
+| **park-52s** | 52 s | `filmes/park-52s.js` + `.css` | rápido, no ritmo do primeiro preview, sobre o roteiro do cliente (2026-09-28) |
+| **motion-48s** | 48 s | `filmes/motion-48s.js` | a v2: abertura com o parque real, mapa e fotos por mais tempo |
+
+Qual filme renderizar vem de `--filme=` (padrão `motion-48s`). Comando de origem da série:
+[`PROMPT-MOTION-24S.md`](PROMPT-MOTION-24S.md), que pedia 24 s. A v1 de 24 s não foi versionada;
+a v2 e o park-52s saíram do retorno do cliente.
+
+---
+
+## park-52s — o filme rápido do roteiro do cliente
+
+Base: o primeiro preview (v1, 24 s), mais duas referências de motion enviadas pelo cliente e três
+imagens de referência. As referências:
+- um showreel de interface (cursor clicando, telas, cortes rápidos);
+- o filme do Studio DADO (editorial, lista com destaque);
+- as três imagens: carrossel de ícones com o do centro em preto e os vizinhos esmaecidos, e medidor
+  em meia-lua sobre fundo preto.
+
+| # | Cena | Quadros | Tempo | Roteiro do cliente → o que o filme faz |
+|---|---|---|---|---|
+| s1 | Bracerum Park | 0–74 | 0:00 | "Bracerum" cresce, estoura e vira a composição **Bracerum / Park** |
+| s2 | subtítulo | 75–149 | 0:02,5 | **Cidade *industrial* em Villeta, [PY]** — letras saltando, selo PY |
+| s3 | telas | 150–239 | 0:05 | *zoom out em várias telas do parque*: 15 janelas com fotos reais + a do símbolo |
+| s4 | símbolo 3D | 240–314 | 0:08 | *elemento do preview com o ícone do logo no meio*: os 6 triângulos extrudados, girando entre órbitas, voam para a câmera |
+| s5 | busca | 315–404 | 0:10,5 | **"A melhor localização do PY para sua nova fábrica"** digitada; o cursor clica e o botão abre a tela |
+| s6 | letreiros | 405–479 | 0:13,5 | atributos do parque passando em plano inclinado |
+| s7 | pranchetas | 480–569 | 0:16 | parede de fotos, **pranchas técnicas** (corte viário, infográfico das vias, estudo de clima, implantação do resort) e rótulos |
+| s8 | masterplan | 570–704 | 0:19 | planta com os 10 pontos de interesse e o título do site |
+| s9 | números | 705–839 | 0:23,5 | 1.480 m de pista · 1.200 lugares · 142.067 m² de setor residencial |
+| s10 | ambientes | 840–1079 | 0:28 | 3 fotos por ambiente, **selo à esquerda, título à direita**: Park (lotes + hangares), Hotel + Centro de convenções, Resort (condomínio + clubhouse), Select (shopping, market e posto) |
+| s11 | frase | 1080–1154 | 0:36 | **"A cidade pronta para o *futuro* da sua indústria"** |
+| s12 | ícones | 1155–1274 | 0:38,5 | **"Tudo que você precisa em um só lugar"**: carrossel condomínio de casas → hotel → shopping → pista de pouso |
+| s13 | Brasil × Paraguai | 1275–1394 | 0:42,5 | fundo preto, dois medidores em meia-lua: **"Sua indústria lucrando ainda mais"** |
+| s14 | consultores | 1395–1454 | 0:46,5 | **"Fale com um de nossos consultores"** + botão "Fale conosco" clicado pelo cursor |
+| s15 | assinatura | 1455–1559 | 0:48,5 | construção do símbolo, grade de quadrados, Bracerum Park |
+
+**Dados, todos do site:**
+- **Medidores:** comparativo "Brasil × Paraguai" de `tributacao.html` (`tp.b2`/`tp.b3`). A carga
+  tributária é 33 % do PIB no Brasil e 10 % no Paraguai; os encargos sobre a folha são 75 % contra
+  33 %. A nota "1% de tributo único no regime de Maquila" vem da mesma página. O rosa da imagem de
+  referência virou bege (zero vermelho).
+- **Legendas das fotos, letreiros e rótulos:** `AREAS` (`home.js`), `tributacao.html` e os fatos de
+  Villeta (`index.html`).
+- **142.067 m²:** `pr.s1v/s1k` (resort.html).
+
+**Decisões deste filme:**
+- **Símbolo em 3D:** extrudado por 22 camadas de SVG a 1,3 px, porque CSS não faz sólido de
+  triângulo. A câmera das telas pousa nele no último quadro, então o corte para o 3D não tem salto.
+- **Consultores sem dados pessoais:** o rodapé do site tem dois consultores com telefone e e-mail. O
+  filme usa só o botão "Fale conosco". Para pôr os contatos na tela, é um ajuste na cena s14.
+- `select-shopping-lago.jpg` ficou de fora (letreiro laranja acusa vermelho) e
+  `select-market-interior.jpg` também (0,05 % de vermelho, no limite do QA).
+
+---
+
+## motion-48s — a v2
 
 Retorno sobre a v1 (24 s): *"deixar a primeira parte mais autêntica; as imagens podem aparecer por mais
 tempo, o mapa do parque também; as imagens do meio com mais respiro entre elas, mais tempo de tela; as
@@ -19,20 +75,9 @@ frases iniciais também precisam de tempo para leitura."*
   3. a câmera recua para um **mosaico de 16 lugares do parque** e mergulha no losango do pino;
   4. vem a pergunta "Onde instalar a sua próxima fábrica?";
   5. o botão da pergunta **abre em círculo e revela o masterplan** — o mapa é a resposta.
-- **Masterplan:** de 1,5 s para ~7 s, com o título do próprio site ("1.819.856 m² planejados como uma
-  cidade"), os 10 pinos acendendo um a um e o anel de cada pino pulsando como no site.
-- **Fotos do meio:** de 0,5 s para 2 s cada. Entram por cortina com uma linha de areia na borda, e a
-  legenda vem do texto das áreas no site (`AREAS` em `home.js`).
-- **Leitura:** título de abertura, pergunta, contadores (1,5 s cada), palavras (1 s cada), frase final e
-  tagline (~1,5 s) ganharam pausa. Toda pausa tem uma deriva lenta de câmera.
-- **Dado divergente fora do filme.** O R04 (`CLAUDE.md`) registra **987.304 m² de parcelas
-  industriais**; o site mostra **989.642 m² de lotes** (`AREAS`, "Lotes industriais"). Até o cliente
-  conciliar os dois, nenhum entra no filme. O primeiro contador passou a ser **1.200 lugares no
-  auditório** (dado do site).
-
-## Linha do tempo (v2)
-
-Grade de **120 BPM** (1 batida = 15 quadros a 30 fps). Início de cada cena em `CUT`, no topo do `filme.js`.
+- **Masterplan:** de 1,5 s para ~7 s, com o título do site e os 10 pinos acendendo um a um.
+- **Fotos do meio:** de 0,5 s para 2 s cada, por cortina com a linha de areia; legenda vinda de `AREAS`.
+- **Leitura:** título, pergunta, contadores, palavras, frase e tagline com pausa e deriva lenta.
 
 | Cena | Quadros | Tempo | O que acontece |
 |---|---|---|---|
@@ -48,31 +93,45 @@ Grade de **120 BPM** (1 batida = 15 quadros a 30 fps). Início de cada cena em `
 | s10 frase | 1185–1259 | 0:39,5–0:42 | "Um parque." → "Uma cidade *inteira*." |
 | s11 símbolo | 1260–1439 | 0:42–0:48 | construção do símbolo, quadrados, tagline, assinatura |
 
+---
+
+## Nos dois filmes
+
+- **Dado divergente fora dos filmes.** O R04 (`CLAUDE.md`) registra **987.304 m² de parcelas
+  industriais** e o site mostra **989.642 m² de lotes** (`AREAS`, "Lotes industriais"). Nenhum dos dois
+  entra até o cliente conciliar.
+- **Formas:** partículas, pontos e separadores são **losangos e quadrados**. A exceção à regra dos
+  cantos quadrados é o botão circular da busca/pergunta, que vira a revelação circular.
+- **Assinatura:** 1000 px de largura, o tamanho em que o "Paraguay 2026" do próprio logo fica com
+  ~20 px. A construção usa as peças do logo horizontal, então o símbolo construído **é** o da assinatura.
+
 ## Entregas em `out/`
 
 | Arquivo | O que é | Versionado |
 |---|---|---|
-| `bracerum-motion-48s.mp4` | master 1920×1080, 30 fps, H.264, com sound design, −14 LUFS | não (ver abaixo) |
-| `bracerum-motion-48s_mudo.mp4` | o mesmo master sem áudio, para montar com trilha licenciada | não |
-| `bracerum-motion-48s-720p.mp4` | versão leve com som, para enviar e revisar | sim |
-| `cues.csv` | eventos de corte e de som (quadro, TC, cena, tipo) | sim |
-| `contato.jpg` | folha de contato do QA: meio de cada cena e os quadros de corte | sim |
-
-Os masters em 1080p passam de 20 MB por causa do grão (ruído que muda a cada quadro custa caro ao
-H.264), então não vão para o git. Regenere com os comandos abaixo, em ~16 min.
+| `bracerum-<filme>.mp4` | master 1920×1080, 30 fps, H.264, com sound design, −14 LUFS | não (grão: 80+ MB) |
+| `bracerum-<filme>_mudo.mp4` | o mesmo master sem áudio, para montar com trilha licenciada | não |
+| `bracerum-<filme>-720p.mp4` | versão leve com som, para enviar e revisar | sim |
+| `cues-<filme>.csv` | eventos de corte e de som (quadro, TC, cena, tipo) | sim |
+| `contato-<filme>.jpg` | folha de contato do QA: meio de cada cena e os quadros de corte | sim |
 
 ## Arquivos
 
 ```
-filme.html   palco 1920×1080 (abra com ?t=12.5 para ver um instante; ?lang=es|en)
-filme.css    tokens do site, zero vermelho, cantos quadrados
-filme.js     COPY (pt/es/en), CUT (linha do tempo), as cenas, os ganchos e os cues de som
-render.js    stills | preview | final | cues | pins | safe
-audio.py     sound design só com ffmpeg lavfi, a partir do cues.csv
-check.py     QA do vídeo (duração, quadros, vermelho, trechos parados, determinismo, folha de contato)
-vendor/      gsap.min.js 3.15 (todos os plugins do GSAP são gratuitos desde a 3.13)
-fonts/       Noto Serif variável — não versionada, baixar como abaixo
+filme.html          palco 1920×1080 (filme.html?filme=park-52s&t=12.5 para ver um instante; &lang=es|en)
+filme.css           tokens do site e componentes comuns (composição, pinos, contadores, letreiro, parede…)
+motor.js            tempo em batidas, timeline, ganchos, blur direcional, grão, boot; carrega filmes/<id>.js
+filmes/<id>.js      COPY (pt/es/en), CUT (linha do tempo), as cenas, os cues e a lista de QA do filme
+filmes/park-52s.css CSS próprio do filme rápido
+render.js           stills | preview | final | cues | pins | safe  (todos com --filme=)
+audio.py            sound design só com ffmpeg lavfi, a partir do cues-<filme>.csv
+check.py            QA do vídeo (duração, quadros, vermelho, trechos parados, determinismo, folha de contato)
+vendor/             gsap.min.js 3.15 (todos os plugins do GSAP são gratuitos desde a 3.13)
+fonts/              Noto Serif variável — não versionada, baixar como abaixo
 ```
+
+A separação do motor foi conferida: a v2 renderiza **idêntica byte a byte** antes e depois (MD5 de
+quatro quadros).
 
 ## Preparar o container
 
@@ -93,32 +152,32 @@ carregar, o filme **para com erro** em vez de renderizar com fonte de reserva.
 ## Renderizar
 
 Tudo a partir da raiz do repositório. O `render.js` sobe o próprio servidor HTTP na porta 8765
-(`--port=` para rodar dois ao mesmo tempo) e grava `out/filme.json` com a duração e as cenas, que o
-`check.py` e o `audio.py` leem.
+(`--port=` para rodar dois ao mesmo tempo) e grava `out/filme-<filme>.json` com a duração e as cenas,
+que o `check.py` e o `audio.py` leem.
 
 ```bash
-node docs/motion/render.js preview                 # ~3,5 min · out/preview.mp4, para iterar
-node docs/motion/render.js stills --frames=0,22,150-240:15 --tag=teste   # quadros avulsos em out/stills/teste/
-node docs/motion/render.js final                   # ~14 min · out/bracerum-motion-48s_mudo.mp4
-node docs/motion/render.js cues                    # out/cues.csv
-python3 docs/motion/audio.py                       # out/audio.wav + mux → out/bracerum-motion-48s.mp4
+F=--filme=park-52s
+node docs/motion/render.js preview $F              # ~4 min · out/preview-park-52s.mp4, para iterar
+node docs/motion/render.js stills $F --frames=0,22,150-240:15 --tag=teste   # quadros avulsos em out/stills/teste/
+node docs/motion/render.js final $F                # ~15 min · out/bracerum-park-52s_mudo.mp4
+node docs/motion/render.js cues $F                 # out/cues-park-52s.csv
+python3 docs/motion/audio.py $F                    # out/audio-park-52s.wav + mux → out/bracerum-park-52s.mp4
 ```
 
 **Motion blur de verdade:** o modo `final` captura 4 subquadros por quadro, espaçados em 1/240 s
 (obturador de 180°), e o ffmpeg tira a média (`tmix`) e fica com um a cada quatro. Os movimentos mais
-rápidos (a palavra que estoura na abertura, os dígitos dos contadores, a entrada das palavras) levam
-também blur direcional em SVG, proporcional à velocidade.
+rápidos levam também blur direcional em SVG, proporcional à velocidade.
 
-**Espanhol e inglês:** `--lang=es` / `--lang=en` em `preview`, `final`, `cues`, `safe`, no `audio.py` e
-no `check.py`. As saídas ganham o sufixo `-es` / `-en`.
+**Espanhol e inglês:** `--lang=es` / `--lang=en` em todos os modos, no `audio.py` e no `check.py`. As
+saídas ganham o sufixo `-es` / `-en`.
 
 ## QA
 
 ```bash
-python3 docs/motion/check.py docs/motion/out/bracerum-motion-48s.mp4 --det   # vídeo + determinismo
-python3 docs/motion/check.py docs/motion/out/bracerum-motion-48s.mp4 --sheet docs/motion/out/contato.jpg
-node docs/motion/render.js pins                     # losangos do filme × pinos do site
-node docs/motion/render.js safe [--lang=es]         # texto pequeno e logos na área segura
+python3 docs/motion/check.py docs/motion/out/bracerum-park-52s.mp4 --filme=park-52s --det
+python3 docs/motion/check.py docs/motion/out/bracerum-park-52s.mp4 --filme=park-52s --sheet docs/motion/out/contato-park-52s.jpg
+node docs/motion/render.js pins --filme=park-52s     # losangos do filme × pinos do site
+node docs/motion/render.js safe --filme=park-52s     # texto pequeno e logos na área segura (lista em cada filme)
 ```
 
 - `check.py` reprova se o vídeo não tiver os quadros e a duração do filme, 1920×1080, 30 fps e
@@ -129,60 +188,56 @@ node docs/motion/render.js safe [--lang=es]         # texto pequeno e logos na �
 - `--det` renderiza três quadros em duas sessões separadas do Chromium e compara o MD5. Tem que dar
   idêntico: é o que garante que nada no filme depende do relógio.
 - `pins` compara o centro de cada losango do masterplan com o do site (`index.html#masterplan`), em
-  % da planta. Resultado atual: desvio máximo de 0,001 %.
+  % da planta. Nos dois filmes: desvio máximo de 0,001 %.
 
 ## Trocar a trilha
 
-A timeline inteira é escrita em batidas de **120 BPM** (`const BPM` no topo do `filme.js`). Com uma
+As timelines são escritas em batidas de **120 BPM** (`const BPM` no topo do `motor.js`). Com uma
 trilha licenciada de outro andamento: mude `BPM`, rode `final` e `cues`, e monte a música sobre o
-`_mudo.mp4` usando o `cues.csv` como mapa dos cortes. **Não use música baixada da internet**: o site é
-comercial.
+`_mudo.mp4` usando o `cues-<filme>.csv` como mapa dos cortes. **Não use música baixada da
+internet**: o site é comercial.
 
-O sound design sintetizado tem cinco camadas, todas lidas do `cues.csv`:
+O sound design sintetizado tem cinco camadas, todas lidas do `cues-<filme>.csv`:
 - **whoosh:** no pico dos cortes com movimento e em cada cortina das fotos;
-- **tick:** cada caractere digitado, cada pino que acende, cada dígito que assenta;
-- **hit grave:** cada contador, cada palavra, a frase e a assinatura;
+- **tick:** cada caractere digitado, cada pino que acende, cada dígito que assenta, cada clique e
+  cada passo do carrossel;
+- **hit grave:** contadores, palavras, frases e a assinatura;
 - **riser:** na construção do símbolo, terminando 0,3 s antes do hit final;
 - **pulso:** suave, na grade de 120 BPM até o símbolo.
 
-Para usar só os efeitos, sem o pulso, filtre as linhas `pulso` do `cues.csv` antes de rodar o
-`audio.py`.
+Para usar só os efeitos, sem o pulso, filtre as linhas `pulso` do csv antes de rodar o `audio.py`.
 
 ## Textos em espanhol e inglês — conferir com o cliente
 
-Já existiam no site e foram reaproveitados: o título do masterplan (`mp.title`), `mp.eyebrow`, as
-`tag` e os `val` de `AREAS` (`home.js`) e "1.200 lugares no auditório" (`ph.s1v/s1k`). **Traduzidos
-nesta sessão, a conferir:**
+Já existiam no site e foram reaproveitados:
+- `mp.title` e `mp.eyebrow`;
+- as `tag` e os `val` de `AREAS`;
+- `ph.s1v/s1k` e `pr.s1k`;
+- `tp.b2`/`tp.b3` e `nav.cta`.
+
+**Traduzidos nesta sessão, a conferir:**
 
 | PT | ES | EN |
 |---|---|---|
-| cidade industrial | ciudad industrial | industrial city |
+| Cidade industrial em Villeta, PY | Ciudad industrial en Villeta, PY | Industrial city in Villeta, PY |
+| A melhor localização do PY para sua nova fábrica | La mejor ubicación de PY para su nueva fábrica | The best location in PY for your new plant |
 | Onde instalar a sua próxima fábrica? | ¿Dónde instalar su próxima fábrica? | Where will your next plant be? |
-| de pista própria | de pista propia | private runway |
+| de pista própria | de pista propia | private runway / private airstrip |
+| Lotes industriais + hangares | Lotes industriales + hangares | Industrial lots + hangars |
+| Hotel + Centro de convenções | Hotel + Centro de convenciones | Hotel + Convention centre |
+| Condomínio fechado + clubhouse | Condominio cerrado + clubhouse | Gated community + clubhouse |
+| Shopping, market e posto | Shopping, market y estación | Shopping, market and fuel |
+| A cidade pronta para o futuro da sua indústria | La ciudad lista para el futuro de su industria | The city ready for the future of your industry |
+| Tudo que você precisa em um só lugar | Todo lo que necesita en un solo lugar | Everything you need in one place |
+| Condomínio de casas / Pista de pouso | Condominio de casas / Pista de aterrizaje | Gated homes / Airstrip |
+| Sua indústria lucrando ainda mais | Su industria ganando todavía más | Your industry earning even more |
+| Fale com um de nossos consultores | Hable con uno de nuestros consultores | Talk to one of our consultants |
 | de tributo único, regime de Maquila | de tributo único, régimen de Maquila | single tax, Maquila regime |
-| Rodovia. · PY02 duplicada | Ruta. · PY02 duplicada | Highway. · PY02 dual carriageway |
-| Hidrovia. · Atlântico e Pacífico | Hidrovía. · Atlántico y Pacífico | Waterway. · Atlantic and Pacific |
-| Mercosul. · Villeta · Paraguai | Mercosur. · Villeta · Paraguay | Mercosur. · Villeta · Paraguay |
-| Auditório · 1.200 lugares | Auditorio · 1.200 lugares | Auditorium · 1,200 seats |
+| Rodovia. · Hidrovia. · Mercosul. | Ruta. · Hidrovía. · Mercosur. | Highway. · Waterway. · Mercosur. |
 | Um parque. / Uma cidade inteira. | Un parque. / Una ciudad entera. | A park. / A whole city. |
 | Construímos o futuro industrial | Construimos el futuro industrial | Building the industrial future |
 
 O "Construimos el futuro Industrial" do ES é a tagline do próprio logo (`logo-tagline-*.svg`).
-
-## Decisões tomadas fora do comando
-
-Além da v2 (acima):
-
-- **Formas:** partículas, pontos e separadores são **losangos e quadrados**, nunca círculos. A regra
-  dos cantos quadrados só abre exceção para o botão da pergunta, que vira a revelação circular.
-- **Pergunta:** campo de 1040×100 px com texto de 34 px, para ler no celular.
-- **Letreiro:** 12 linhas, para o plano inclinado cobrir os cantos do quadro.
-- **Assinatura:** 1000 px de largura, o tamanho em que o "Paraguay 2026" do próprio logo fica com
-  ~20 px. A construção usa as peças do logo horizontal, então o símbolo construído **é** o da
-  assinatura, sem troca.
-- **Sound design:** o pulso de 120 BPM foi acrescentado, para os cortes terem chão rítmico sem música.
-- **Render:** os modos `stills`, `pins` e `safe` foram acrescentados ao `render.js`. O critério de
-  "parado" do `check.py` foi redefinido (ver QA).
 
 ## Limites conhecidos
 

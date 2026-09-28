@@ -2,11 +2,12 @@
 /* Render do filme — captura quadro a quadro no Chromium e codifica com ffmpeg.
  *
  *   node docs/motion/render.js stills  --frames=0,22,59-90:10 [--tag=nome]   quadros avulsos em out/stills/<tag>/
- *   node docs/motion/render.js preview [--lang=es]                1 captura por quadro, CRF 23
- *   node docs/motion/render.js final   [--lang=es]                4 subquadros (obturador 180°), CRF 18
- *   node docs/motion/render.js cues | pins | safe                  eventos de som (cues.csv) e QA
+ *   node docs/motion/render.js preview                1 captura por quadro, CRF 23
+ *   node docs/motion/render.js final                  4 subquadros (obturador 180°), CRF 18
+ *   node docs/motion/render.js cues | pins | safe     eventos de som (cues-<filme>.csv) e QA
  *
- * Opções: --lang=pt|es|en  --from=N --to=N (quadros)  --out=arquivo.mp4  --port=8765
+ * Opções: --filme=motion-48s|park-52s  --lang=pt|es|en  --from=N --to=N (quadros)
+ *         --out=arquivo.mp4  --port=8765
  * ffmpeg: BP_FFMPEG, ou o binário do pacote pip imageio-ffmpeg.
  */
 const { execSync, spawn } = require('child_process');
@@ -23,6 +24,7 @@ const args = Object.fromEntries(process.argv.slice(3).map(a => {
   return m ? [m[1], m[2] === '' ? true : m[2]] : [a, true];
 }));
 const LANG = args.lang || 'pt';
+const FILM = String(args.filme || 'motion-48s');
 const PORT = +(args.port || 8765);
 const pw = require(path.join(execSync('npm root -g').toString().trim(), 'playwright'));
 const FFMPEG = process.env.BP_FFMPEG ||
@@ -57,15 +59,16 @@ function frameList(spec, total) {
     const page = await browser.newPage({ viewport: { width: 1920, height: 1080 }, deviceScaleFactor: 1 });
     page.on('console', m => { if (['error', 'warning'].includes(m.type())) console.log('[página]', m.text()); });
     page.on('pageerror', e => console.error('[página] erro:', e.message));
-    await page.goto(`http://127.0.0.1:${PORT}/docs/motion/filme.html?lang=${LANG}`);
+    await page.goto(`http://127.0.0.1:${PORT}/docs/motion/filme.html?filme=${FILM}&lang=${LANG}`);
     await page.waitForFunction(() => window.FILME_READY || window.FILME_ERROR, null, { timeout: 120000 });
     const err = await page.evaluate(() => window.FILME_ERROR);
     if (err) throw new Error(err);
     const info = await page.evaluate(() => window.FILME);
     // duração e cenas para o check.py e o audio.py
-    fs.writeFileSync(path.join(OUT, LANG === 'pt' ? 'filme.json' : `filme-${LANG}.json`), JSON.stringify(
-      { FPS: info.FPS, BPM: info.BPM, DURATION: info.DURATION, FRAMES: info.FRAMES, SCENES: info.SCENES }, null, 1));
-    const BASE = `bracerum-motion-${Math.round(info.DURATION)}s`;
+    const sfx = LANG === 'pt' ? '' : '-' + LANG;
+    fs.writeFileSync(path.join(OUT, `filme-${info.ID}${sfx}.json`), JSON.stringify(
+      { ID: info.ID, FPS: info.FPS, BPM: info.BPM, DURATION: info.DURATION, FRAMES: info.FRAMES, SCENES: info.SCENES }, null, 1));
+    const BASE = `bracerum-${info.ID}`;
     const cdp = await page.context().newCDPSession(page);
     const shot = async () => Buffer.from((await cdp.send('Page.captureScreenshot',
       { format: 'jpeg', quality: 95, optimizeForSpeed: true })).data, 'base64');
@@ -79,7 +82,7 @@ function frameList(spec, total) {
         const extra = Object.entries(c).filter(([k]) => !['q', 't', 'type', 'scene'].includes(k)).map(([k, v]) => `${k}=${v}`).join(' ');
         rows.push([f.toFixed(2), `00:00:${String(s).padStart(2, '0')}:${fr}`, c.t, c.scene, c.type, extra].join(','));
       }
-      const name = args.out || `cues${LANG === 'pt' ? '' : '-' + LANG}.csv`;
+      const name = args.out || `cues-${info.ID}${sfx}.csv`;
       fs.writeFileSync(path.join(OUT, name), rows.join('\n') + '\n');
       console.log(`${info.CUES.length} eventos →`, path.join(OUT, name));
       return;
@@ -94,8 +97,9 @@ function frameList(spec, total) {
           return [((b.left + b.width / 2) - r.left) / r.width * 100, ((b.top + b.height / 2) - r.top) / r.height * 100];
         });
       };
-      await seek(500 / info.FPS);
-      const film = await page.evaluate(measure, ['.map-plan img', '#s4 .pin__dot']);
+      if (!info.PINS) { console.log('este filme não tem masterplan com pinos'); return; }
+      await seek(info.PINS.frame / info.FPS);
+      const film = await page.evaluate(measure, [info.PINS.img, info.PINS.dots]);
       const site = await browser.newPage({ viewport: { width: 1920, height: 1080 } });
       await site.goto(`http://127.0.0.1:${PORT}/index.html`);
       await site.waitForFunction(() => document.querySelectorAll('#mpPins .pin').length === 10, null, { timeout: 30000 });
@@ -115,11 +119,7 @@ function frameList(spec, total) {
 
     if (MODE === 'safe') {
       // QA: texto pequeno e logos dentro da área segura (96 px nas laterais, 54 px em cima/embaixo)
-      const CHECK = [[100, '#s1 .comp__meta, #s1 .comp__idx, #s1 .comp__brand'], [296, '.ask-field, .ask-eyebrow'],
-        [500, '#s4 .eyebrow, #s4 .map-title, #s4 .pin__tag'], [700, '#s7a .cnt'], [745, '#s7b .cnt'], [790, '#s7c .cnt'],
-        [820, '#s8a .word-w, #s8a .word-k'], [850, '#s8b .word-w, #s8b .word-k'], [880, '#s8c .word-w, #s8c .word-k'],
-        [935, '#s9a .shot-cap'], [995, '#s9b .shot-cap'], [1055, '#s9c .shot-logo'], [1115, '#s9d .shot-logo'],
-        [1175, '#s9e .shot-logo'], [1210, '.phr-a'], [1370, '.fim-tx'], [1439, '.fim-svg']];
+      const CHECK = info.SAFE;             // [quadro, seletores], declarado por cada filme
       let bad = 0;
       for (const [f, sel] of CHECK) {
         await seek(f / info.FPS);
@@ -143,7 +143,7 @@ function frameList(spec, total) {
       fs.mkdirSync(dir, { recursive: true });
       for (const f of frameList(args.frames || '0', info.FRAMES)) {
         await seek(f / info.FPS);
-        fs.writeFileSync(path.join(dir, `${LANG}_f${String(f).padStart(3, '0')}.jpg`), await shot());
+        fs.writeFileSync(path.join(dir, `${info.ID}_${LANG}_f${String(f).padStart(4, '0')}.jpg`), await shot());
       }
       console.log('stills em', dir);
       return;
@@ -151,8 +151,7 @@ function frameList(spec, total) {
 
     const SUB = MODE === 'final' ? 4 : 1;
     const from = +(args.from || 0), to = +(args.to || info.FRAMES);
-    const sfx = LANG === 'pt' ? '' : '-' + LANG;
-    const name = args.out || (MODE === 'final' ? `${BASE}${sfx}_mudo.mp4` : `preview${sfx}.mp4`);
+    const name = args.out || (MODE === 'final' ? `${BASE}${sfx}_mudo.mp4` : `preview-${info.ID}${sfx}.mp4`);
     // 180°: os 4 subquadros cobrem meio intervalo de quadro; tmix tira a média e select fica com 1 a cada 4
     const vf = SUB > 1
       ? ['-vf', `tmix=frames=${SUB},select='eq(mod(n\\,${SUB})\\,${SUB - 1})',setpts=N/(${info.FPS}*TB)`]

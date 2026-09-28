@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""QA automático do filme (duração e cenas lidas de out/filme.json, gravado pelo render.js).
+"""QA automático de um filme (duração e cenas lidas de out/filme-<id>.json, gravado pelo render.js).
 
-    python3 docs/motion/check.py docs/motion/out/preview.mp4 [--det]
+    python3 docs/motion/check.py docs/motion/out/preview-park-52s.mp4 --filme=park-52s [--det]
     python3 docs/motion/check.py docs/motion/out/preview.mp4 --sheet docs/motion/out/contato.jpg
 
 Reprova (código de saída 1) se:
@@ -21,7 +21,8 @@ FF = os.environ.get('BP_FFMPEG') or __import__('imageio_ffmpeg').get_ffmpeg_exe(
 W, H = 320, 180                       # resolução de análise
 import json
 _lang = next((a.split('=')[1] for a in sys.argv if a.startswith('--lang=')), 'pt')
-FILME = json.load(open(os.path.join(HERE, 'out', 'filme.json' if _lang == 'pt' else f'filme-{_lang}.json')))
+_film = next((a.split('=')[1] for a in sys.argv if a.startswith('--filme=')), 'motion-48s')
+FILME = json.load(open(os.path.join(HERE, 'out', f"filme-{_film}{'' if _lang == 'pt' else '-' + _lang}.json")))
 SC = {}
 for sc in FILME['SCENES']: SC.setdefault(sc['a'], sc['id'])
 FRAMES, DURATION = FILME['FRAMES'], FILME['DURATION']
@@ -145,7 +146,8 @@ def main():
     if '--det' in sys.argv:
         hashes = []
         for tag in ('det1', 'det2'):
-            subprocess.run(['node', os.path.join(HERE, 'render.js'), 'stills', f'--tag={tag}', '--frames=100,700,1300'], check=True, capture_output=True)
+            fr = ','.join(str(int(FRAMES * k)) for k in (0.1, 0.5, 0.9))
+            subprocess.run(['node', os.path.join(HERE, 'render.js'), 'stills', f'--filme={_film}', f'--tag={tag}', f'--frames={fr}'], check=True, capture_output=True)
             d = os.path.join(HERE, 'out', 'stills', tag)
             hashes.append([hashlib.md5(open(os.path.join(d, f), 'rb').read()).hexdigest() for f in sorted(os.listdir(d))])
         same = hashes[0] == hashes[1]

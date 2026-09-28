@@ -267,7 +267,17 @@ Imagens reais do projeto (renders): `masterplan.jpg`, `Hotel.jpg`, `Fabrica.jpg`
 
 Faltam (mencionados no `LEIA-ME.txt` original, ainda não enviados): `tecnologico.jpg`, `comercial.jpg`.
 
-## Filme de motion design de 48 s (v2 — 2026-09-28)
+## Filmes de motion design (2026-09-28)
+
+`docs/motion/` tem **dois filmes** feitos em código sobre o mesmo motor (`motor.js`; cada filme é um
+módulo em `docs/motion/filmes/`, escolhido com `--filme=`):
+- **park-52s** (52 s): filme rápido montado sobre o **roteiro do cliente**. Segue a linguagem do
+  primeiro preview e as referências dele (carrossel de ícones, medidor em meia-lua Brasil × Paraguai
+  com os números de `tributacao.html`).
+- **motion-48s** (48 s): a v2, descrita abaixo.
+Linhas do tempo, dados e decisões dos dois em `docs/motion/LEIA-ME.md`.
+
+### motion-48s (v2)
 
 `docs/motion/` tem um filme de marca feito **em código, neste container** (HTML + GSAP, capturado
 quadro a quadro no Chromium e codificado com ffmpeg), na linguagem de um vídeo de referência de motion
@@ -277,7 +287,7 @@ não o filme de 60 s de `docs/roteiro-video-60s.md`, que depende de takes 3D.
 - O comando original (`PROMPT-MOTION-24S.md`) pedia 24 s. **O cliente pediu uma abertura mais autêntica
   e mais tempo de tela para imagens, mapa e frases**, e o filme virou a v2, de 48 s. **A linha do tempo
   vigente e as decisões estão em `docs/motion/LEIA-ME.md`.**
-- Tudo corta numa grade de 120 BPM (`BPM` e `CUT` no topo do `filme.js`). O texto alinha na coluna de
+- Tudo corta numa grade de 120 BPM (`BPM` no `motor.js`, `CUT` no topo de cada filme). O texto alinha na coluna de
   110 px, como no roteiro de 60 s.
 - **Divergência para o cliente resolver:** R04 = 987.304 m² de parcelas industriais; o site (`AREAS`,
   "Lotes industriais") = 989.642 m² de lotes. Nenhum dos dois entra no filme até ele conciliar.

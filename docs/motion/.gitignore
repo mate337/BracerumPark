@@ -7,6 +7,6 @@ out/audio-*
 out/filme*.json
 out/preview*.mp4
 # masters em 1080p passam de 20 MB (grão): regenerar pelo LEIA-ME; a versão 720p é versionada
-out/bracerum-motion-*.mp4
-!out/bracerum-motion-*-720p.mp4
+out/bracerum-*.mp4
+!out/bracerum-*-720p.mp4
 __pycache__/

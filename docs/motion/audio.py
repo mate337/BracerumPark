@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """Sound design sintetizado do filme — só ffmpeg lavfi, sem amostra nem música de terceiros.
 
-    node docs/motion/render.js cues                 # gera out/cues.csv a partir da timeline
-    python3 docs/motion/audio.py [--lang=es]        # out/audio.wav + out/bracerum-motion-<N>s.mp4
+    node docs/motion/render.js cues --filme=park-52s      # gera out/cues-park-52s.csv a partir da timeline
+    python3 docs/motion/audio.py --filme=park-52s [--lang=es]   # out/audio-<id>.wav + out/bracerum-<id>.mp4
 
-Lê out/cues[-lang].csv (os mesmos eventos que o filme declara) e sintetiza:
+Lê out/cues-<id>[-lang].csv (os mesmos eventos que o filme declara) e sintetiza:
   whoosh  ruído rosa filtrado com subida exponencial até o pico do corte
   tick    8–14 ms de ruído agudo (cada caractere digitado, cada dígito que assenta)
   hit     senoide grave com decaimento rápido (cortes de fundo da S9–S10 e a assinatura)
@@ -20,7 +20,8 @@ FF = os.environ.get('BP_FFMPEG') or __import__('imageio_ffmpeg').get_ffmpeg_exe(
 LANG = next((a.split('=')[1] for a in sys.argv if a.startswith('--lang=')), 'pt')
 SFX = '' if LANG == 'pt' else '-' + LANG
 SR, FPS = 48000, 30
-DUR = json.load(open(os.path.join(OUT, 'filme.json' if LANG == 'pt' else f'filme-{LANG}.json')))['DURATION']
+FILM = next((a.split('=')[1] for a in sys.argv if a.startswith('--filme=')), 'motion-48s')
+DUR = json.load(open(os.path.join(OUT, f'filme-{FILM}{SFX}.json')))['DURATION']
 
 
 def params(s):
@@ -91,9 +92,9 @@ def run(args):
 
 
 def main():
-    cues_path = os.path.join(OUT, f'cues{SFX}.csv')
+    cues_path = os.path.join(OUT, f'cues-{FILM}{SFX}.csv')
     if not os.path.exists(cues_path):
-        sys.exit(f'falta {cues_path} — rode antes: node docs/motion/render.js cues' + (f' --lang={LANG}' if SFX else ''))
+        sys.exit(f'falta {cues_path} — rode antes: node docs/motion/render.js cues --filme={FILM}' + (f' --lang={LANG}' if SFX else ''))
     cues = list(csv.DictReader(open(cues_path)))
     graph, n = build(cues)
     gfile = os.path.join(OUT, 'audio-graph.txt')
@@ -103,7 +104,7 @@ def main():
     # loudnorm em duas passadas: mede, depois aplica linear
     err = run(['-i', raw, '-af', 'loudnorm=I=-14:TP=-1.5:LRA=11:print_format=json', '-f', 'null', '-'])
     m = json.loads(re.search(r'\{[^{}]*"input_i"[^{}]*\}', err, re.S).group(0))
-    wav = os.path.join(OUT, f'audio{SFX}.wav')
+    wav = os.path.join(OUT, f'audio-{FILM}{SFX}.wav')
     run(['-i', raw, '-af', (f"loudnorm=I=-14:TP=-1.5:LRA=11:measured_I={m['input_i']}:measured_TP={m['input_tp']}:"
                             f"measured_LRA={m['input_lra']}:measured_thresh={m['input_thresh']}:offset={m['target_offset']}:linear=true"),
          '-ar', str(SR), '-c:a', 'pcm_s24le', '-t', str(DUR), wav])
@@ -121,7 +122,7 @@ def main():
         os.remove(tmp)
         got = measure(wav)
     print(f"{n} eventos · loudness integrado {got['input_i']} LUFS · pico {got['input_tp']} dBTP")
-    base = f'bracerum-motion-{round(DUR)}s{SFX}'
+    base = f'bracerum-{FILM}{SFX}'
     mudo = os.path.join(OUT, base + '_mudo.mp4')
     final = os.path.join(OUT, base + '.mp4')
     if os.path.exists(mudo):

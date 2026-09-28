@@ -1,34 +1,16 @@
-/* Bracerum Park — filme de motion (v2, 48 s) em HTML + GSAP.
- *
- * Uma timeline mestre pausada (TL) mais ganchos (HOOKS) para o que é procedural:
- * revelação circular, letreiro, digitação, contadores, pulsos dos pinos, grade de
- * quadrados e grão. Tudo é função do tempo t. Nada de relógio, Math.random(),
- * setTimeout ou animação CSS: o render.js chama window.seek(t) quadro a quadro.
- *
- * Tempo: a timeline é escrita em "quadros de referência" (q) de uma grade de
- * 120 BPM — 1 batida = 15 q, 1 q = 1/30 s. Mudar BPM reescala o filme inteiro.
- *
- * v2 (pedido do cliente): abertura com o parque de verdade (vista aérea, mosaico
- * de fotos, pergunta que abre o masterplan), mapa e fotos por mais tempo, e tempo
- * de leitura para as frases. De 24 s para 48 s.
+/* Bracerum Park — filme de motion v2, 48 s (pedido do cliente em 2026-09-28):
+ * abertura com o parque de verdade (vista aérea, mosaico de fotos, pergunta que abre
+ * o masterplan), mapa e fotos por mais tempo e tempo de leitura para as frases.
+ * Linha do tempo e decisões: docs/motion/LEIA-ME.md.
  */
 (() => {
 'use strict';
-
-const FPS = 30;
-const BPM = 120;
-const BEAT = 60 / BPM;
-const q = n => n * BEAT / 15;            // n quadros de referência → segundos
+const M = window.MOTOR;
+const { q, T, IMG, h, sv, css, clamp, lerp, EZ, mulberry32, win, fq, vis, hook, lateHook, scene, init, tw, at, cue, dirBlur } = M;
 
 // Início de cada cena, em q. A cena vai até o início da seguinte (o mapa começa
 // antes do fim da pergunta: é revelado de dentro do botão).
 const CUT = { s1: 0, s2: 150, s3: 240, s4: 302, s5: 510, s6: 570, s7: 660, s8: 795, s9: 885, s10: 1185, s11: 1260, END: 1440 };
-const TOTAL_Q = CUT.END;                  // 96 batidas
-const DURATION = q(TOTAL_Q);
-
-const PARAMS = new URLSearchParams(location.search);
-const LANG = ['pt', 'es', 'en'].includes(PARAMS.get('lang')) ? PARAMS.get('lang') : 'pt';
-const T = v => (v == null ? '' : typeof v === 'string' ? v : v[LANG]);
 
 /* ---------------------------------------------------------------- textos */
 const COPY = {
@@ -68,90 +50,6 @@ const COPY = {
          b: { pt: 'o futuro <em>industrial</em>', es: 'el futuro <em>industrial</em>', en: 'the <em>industrial</em> future' } },
 };
 
-const IMG = f => `/assets/web/fotos/${f}.jpg`;
-
-/* ------------------------------------------------------------- utilidades */
-const STAGE = document.getElementById('stage');
-const FXDEFS = document.querySelector('#fx defs');
-const SVGNS = 'http://www.w3.org/2000/svg';
-
-function h(tag, cls, parent, html) {
-  const e = document.createElement(tag);
-  if (cls) e.className = cls;
-  if (html != null) e.innerHTML = html;
-  if (parent) parent.appendChild(e);
-  return e;
-}
-function sv(tag, attrs, parent) {
-  const e = document.createElementNS(SVGNS, tag);
-  for (const k in attrs) e.setAttribute(k, attrs[k]);
-  if (parent) parent.appendChild(e);
-  return e;
-}
-const css = (e, o) => (Object.assign(e.style, o), e);
-const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
-const lerp = (a, b, p) => a + (b - a) * p;
-const EASES = {};
-const EZ = name => EASES[name] || (EASES[name] = gsap.parseEase(name));
-function mulberry32(a) {
-  return function () {
-    a |= 0; a = a + 0x6D2B79F5 | 0;
-    let t = Math.imul(a ^ a >>> 15, 1 | a);
-    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
-    return ((t ^ t >>> 14) >>> 0) / 4294967296;
-  };
-}
-// progresso de uma janela [a,b] (em q) no instante t (s), com easing opcional
-const win = (t, a, b, ease) => {
-  const p = clamp((t - q(a)) / (q(b) - q(a)), 0, 1);
-  return ease ? EZ(ease)(p) : p;
-};
-const fq = t => t / q(1);                 // instante t → quadro de referência (fracionário)
-const vis = (t, a, b) => t + 1e-6 >= q(a) && t + 1e-6 < q(b);
-
-/* timeline + ganchos */
-gsap.config({ force3D: false });
-const TL = gsap.timeline({ paused: true });
-const HOOKS = [], LATE = [];
-const hook = fn => HOOKS.push(fn);
-const lateHook = fn => LATE.push(fn);      // roda depois de todos os ganchos (ex.: aplicar blur calculado)
-const SCENES = [];
-// eventos de som e de corte — exportados para cues.csv (render.js cues) e lidos pelo audio.py
-const CUES = [];
-const cue = (qf, type, scene, extra) => CUES.push(Object.assign({ q: +qf.toFixed(3), type, scene }, extra || {}));
-
-function scene(id, a, b, bg) {
-  const s = h('section', 'sc', STAGE);
-  s.id = id;
-  if (bg) s.style.background = bg;
-  SCENES.push({ el: s, a, b });
-  return s;
-}
-// estado inicial (aplicado no build) e tween com início/fim explícitos
-const init = (target, vars) => gsap.set(target, vars);
-function tw(target, from, to, at, dur, ease) {
-  TL.fromTo(target, from, Object.assign({ duration: q(dur), ease: ease || 'expo.out', immediateRender: false, lazy: false }, to), q(at));
-}
-const at = (target, vars, when) => TL.set(target, Object.assign({ immediateRender: false, lazy: false }, vars), q(when));
-
-/* blur direcional (SVG) — devolve um proxy {v}; o gancho aplica o filtro */
-let FXN = 0;
-function dirBlur(el, axis) {
-  const id = 'fx' + (FXN++);
-  const f = sv('filter', { id, x: '-15%', y: '-15%', width: '130%', height: '130%', 'color-interpolation-filters': 'sRGB' }, FXDEFS);
-  const g = sv('feGaussianBlur', { stdDeviation: '0 0', edgeMode: 'none' }, f);
-  const p = { v: 0 };
-  let last = -1;
-  lateHook(() => {
-    const v = Math.round(p.v * 10) / 10;
-    if (v === last) return;
-    last = v;
-    if (v < 0.35) { el.style.filter = 'none'; return; }
-    g.setAttribute('stdDeviation', axis === 'x' ? `${v} 0` : `0 ${v}`);
-    el.style.filter = `url(#${id})`;
-  });
-  return p;
-}
 
 /* ------------------------------------------------------------ componentes */
 // Composição editorial da abertura: três linhas em escada, metadados miúdos.
@@ -705,62 +603,21 @@ async function S11() {
   });
 }
 
-/* ------------------------------------------------------------------ grão */
-function GRAIN() {
-  const c = h('canvas', '', STAGE); c.id = 'grain';
-  const W = 960, H = 540;
-  c.width = W; c.height = H;
-  const ctx = c.getContext('2d');
-  const img = ctx.createImageData(W, H);
-  hook(t => {
-    const R = mulberry32(Math.round(t * 240) + 1);
-    const d = img.data;
-    for (let i = 0; i < d.length; i += 4) { const v = (R() * 255) | 0; d[i] = d[i + 1] = d[i + 2] = v; d[i + 3] = 255; }
-    ctx.putImageData(img, 0, 0);
-  });
-}
-
-/* ------------------------------------------------------------------ boot */
-async function loadAreas() {
-  const src = await (await fetch('/home.js')).text();
-  const m = src.match(/const AREAS = (\[[\s\S]*?\n\]);/);
-  if (!m) throw new Error('AREAS não encontrado em home.js');
-  return new Function('return ' + m[1])();
-}
-
-window.seek = async t => {
-  t = clamp(t, 0, DURATION - 1e-6);
-  for (const sc of SCENES) sc.el.style.visibility = vis(t, sc.a, sc.b) ? 'visible' : 'hidden';
-  TL.seek(t, false);
-  for (const fn of HOOKS) fn(t);
-  for (const fn of LATE) fn(t);
-  await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
-};
-
-async function boot() {
-  const fonts = ['500 100px NSF', 'italic 500 100px NSF', '700 100px "Liberation Sans"', '400 100px "Liberation Sans"'];
-  await Promise.all(fonts.map(f => document.fonts.load(f)));
-  if (!document.fonts.check('500 100px NSF') || !document.fonts.check('italic 500 100px NSF')) {
-    throw new Error('Noto Serif (NSF) não carregou — confira docs/motion/fonts/');
-  }
-  const areas = await loadAreas();
-  S1(); S2(); S3(); S4(areas); S5(areas); S6(areas); S7(); S8(); S9(areas); S10();
-  await S11();
-  GRAIN();
-  await Promise.all([...document.images].map(i => i.decode().catch(() => { throw new Error('imagem não carregou: ' + i.src); })));
-  // cortes de cena (para a edição) e o pulso da grade de 120 BPM até o símbolo
-  SCENES.forEach(sc => cue(sc.a, 'corte', sc.el.id));
-  for (let b = 0; b < CUT.s11 / 15; b++) cue(b * 15, 'pulso', '', { tempo: b % 4 === 0 ? 1 : 0 });
-  CUES.sort((a, b) => a.q - b.q);
-  TL.seek(0);
-  const tq = parseFloat(PARAMS.get('t'));
-  await window.seek(isFinite(tq) ? tq : 0);
-  window.FILME = {
-    FPS, BPM, DURATION, FRAMES: Math.round(DURATION * FPS), LANG,
-    SCENES: SCENES.map(sc => ({ id: sc.el.id, a: Math.round(q(sc.a) * FPS), b: Math.round(q(sc.b) * FPS) })),
-    CUES: CUES.map(c => Object.assign({ t: +q(c.q).toFixed(4) }, c)),
-  };
-  window.FILME_READY = true;
-}
-boot().catch(e => { console.error(e); window.FILME_ERROR = String(e && e.stack || e); });
+M.film({
+  id: 'motion-48s',
+  total: CUT.END,
+  pulseUntil: CUT.s11,
+  build: async areas => {
+    S1(); S2(); S3(); S4(areas); S5(areas); S6(areas); S7(); S8(); S9(areas); S10();
+    await S11();
+  },
+  // QA de área segura: [quadro, seletores]
+  safe: [[100, '#s1 .comp__meta, #s1 .comp__idx, #s1 .comp__brand'], [296, '.ask-field, .ask-eyebrow'],
+    [500, '#s4 .eyebrow, #s4 .map-title, #s4 .pin__tag'], [700, '#s7a .cnt'], [745, '#s7b .cnt'], [790, '#s7c .cnt'],
+    [820, '#s8a .word-w, #s8a .word-k'], [850, '#s8b .word-w, #s8b .word-k'], [880, '#s8c .word-w, #s8c .word-k'],
+    [935, '#s9a .shot-cap'], [995, '#s9b .shot-cap'], [1055, '#s9c .shot-logo'], [1115, '#s9d .shot-logo'],
+    [1175, '#s9e .shot-logo'], [1210, '.phr-a'], [1370, '.fim-tx'], [1439, '.fim-svg']],
+  // QA dos pinos contra o site
+  pins: { frame: 500, img: '.map-plan img', dots: '#s4 .pin__dot' },
+});
 })();
