@@ -267,6 +267,15 @@ Imagens reais do projeto (renders): `masterplan.jpg`, `Hotel.jpg`, `Fabrica.jpg`
 
 Faltam (mencionados no `LEIA-ME.txt` original, ainda não enviados): `tecnologico.jpg`, `comercial.jpg`.
 
+## Filme de motion design de 24 s (2026-09-28)
+
+`docs/motion/PROMPT-MOTION-24S.md` é o comando para gerar **em código, neste container**, um filme
+de marca de 24 s (HTML + GSAP, capturado quadro a quadro no Chromium e codificado com ffmpeg),
+na linguagem de um vídeo de referência de motion enviado pelo usuário: tipografia cinética, cortes
+em 120 BPM, contadores, mockups e a construção do símbolo. Usa só o que já existe no repositório. É
+**outra peça**, não o filme de 60 s de `docs/roteiro-video-60s.md`, que depende de takes 3D. Ainda não
+foi executado.
+
 ## Próximo passo
 
 Aguardando o usuário: (1) fotos próprias dos terminais privados, para substituir as ilustrativas; (2) o dado de anos de história da Bracerum como importadora de aço.
