@@ -267,14 +267,22 @@ Imagens reais do projeto (renders): `masterplan.jpg`, `Hotel.jpg`, `Fabrica.jpg`
 
 Faltam (mencionados no `LEIA-ME.txt` original, ainda não enviados): `tecnologico.jpg`, `comercial.jpg`.
 
-## Filme de motion design de 24 s (2026-09-28)
+## Filme de motion design de 48 s (v2 — 2026-09-28)
 
-`docs/motion/PROMPT-MOTION-24S.md` é o comando para gerar **em código, neste container**, um filme
-de marca de 24 s (HTML + GSAP, capturado quadro a quadro no Chromium e codificado com ffmpeg),
-na linguagem de um vídeo de referência de motion enviado pelo usuário: tipografia cinética, cortes
-em 120 BPM, contadores, mockups e a construção do símbolo. Usa só o que já existe no repositório. É
-**outra peça**, não o filme de 60 s de `docs/roteiro-video-60s.md`, que depende de takes 3D. Ainda não
-foi executado.
+`docs/motion/` tem um filme de marca feito **em código, neste container** (HTML + GSAP, capturado
+quadro a quadro no Chromium e codificado com ffmpeg), na linguagem de um vídeo de referência de motion
+enviado pelo usuário. Usa só o que já existe no repositório: fotos finalizadas, a planta do masterplan
+(pinos lidos de `AREAS` no `home.js`, conferidos contra o site), logos e textos do site. É **outra peça**,
+não o filme de 60 s de `docs/roteiro-video-60s.md`, que depende de takes 3D.
+- O comando original (`PROMPT-MOTION-24S.md`) pedia 24 s. **O cliente pediu uma abertura mais autêntica
+  e mais tempo de tela para imagens, mapa e frases**, e o filme virou a v2, de 48 s. **A linha do tempo
+  vigente e as decisões estão em `docs/motion/LEIA-ME.md`.**
+- Tudo corta numa grade de 120 BPM (`BPM` e `CUT` no topo do `filme.js`). O texto alinha na coluna de
+  110 px, como no roteiro de 60 s.
+- **Divergência para o cliente resolver:** R04 = 987.304 m² de parcelas industriais; o site (`AREAS`,
+  "Lotes industriais") = 989.642 m² de lotes. Nenhum dos dois entra no filme até ele conciliar.
+- Sound design sintetizado (ffmpeg lavfi), sem música de terceiros; `cues.csv` serve de mapa para
+  montar uma trilha licenciada. O áudio não foi ouvido, só medido.
 
 ## Próximo passo
 

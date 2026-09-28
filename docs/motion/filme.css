@@ -1,0 +1,133 @@
+/* Bracerum Park — filme de motion (v2, 48 s).
+   Tokens iguais aos do site (style.css). Zero vermelho, cantos quadrados. */
+:root{
+  --ink:#0e0d0b; --paper:#f7f3ea; --sand:#cbb88f; --brown:#473315; --cream:#fff8ef;
+  --serif:"NSF","Noto Serif",Georgia,serif;
+  --sans:"Helvetica Neue",Helvetica,Arial,"Liberation Sans",sans-serif;
+}
+@font-face{font-family:"NSF";src:url("fonts/NotoSerif-VF.ttf") format("truetype");
+  font-weight:100 900;font-stretch:62.5% 100%;font-style:normal}
+@font-face{font-family:"NSF";src:url("fonts/NotoSerif-Italic-VF.ttf") format("truetype");
+  font-weight:100 900;font-stretch:62.5% 100%;font-style:italic}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1920px;height:1080px;overflow:hidden;background:var(--ink)}
+#stage{position:relative;width:1920px;height:1080px;overflow:hidden;background:var(--ink);
+  font-family:var(--sans);-webkit-font-smoothing:antialiased;text-rendering:geometricPrecision}
+.sc{position:absolute;inset:0;overflow:hidden;visibility:hidden}
+.fill{position:absolute;inset:0}
+em{font-style:italic}
+canvas{display:block;position:absolute;left:0;top:0}
+#grain{width:1920px;height:1080px;opacity:.035;z-index:50;image-rendering:pixelated;pointer-events:none}
+.photo{position:absolute;left:0;top:0;width:1920px;height:1080px;object-fit:cover;display:block}
+
+/* ---------- abertura: palavra que cresce, vista aérea e composição editorial ---------- */
+.open-word{position:absolute;left:960px;top:540px;font:500 700px/1 var(--serif);
+  letter-spacing:-.03em;color:var(--ink);white-space:nowrap}
+.open-veil{position:absolute;inset:0;
+  background:linear-gradient(90deg,rgba(14,13,11,.8) 0%,rgba(14,13,11,.56) 52%,rgba(14,13,11,.44) 100%)}
+.comp{position:absolute;left:0;top:0;width:1920px;height:1080px;overflow:hidden}
+.comp__l{position:absolute;overflow:hidden;white-space:nowrap;padding-right:.14em}
+.comp__l span{display:block;font:500 190px/1.14 var(--serif);letter-spacing:-.025em}
+.comp__rule{position:absolute;left:110px;right:110px;top:112px;height:1px;background:currentColor;opacity:.28}
+.comp__meta{position:absolute;top:62px;right:110px;font:400 18px/1 var(--sans);letter-spacing:.16em;text-transform:uppercase}
+.comp__brand{position:absolute;top:62px;left:110px;font:700 18px/1 var(--sans);letter-spacing:.16em;text-transform:uppercase}
+.comp__arrow{position:absolute;right:104px;top:222px;font:400 76px/1 var(--sans)}
+.comp__idx{position:absolute;right:110px;bottom:74px;font:700 46px/1 var(--sans);letter-spacing:-.02em}
+
+/* ---------- mosaico de fotos ---------- */
+.mos-cell{position:absolute;width:1920px;height:1080px;overflow:hidden;background:var(--ink)}
+.mos-dia{position:absolute;left:915px;top:495px;width:90px;height:90px;background:var(--sand);transform:rotate(45deg)}
+
+/* ---------- pergunta ---------- */
+.ask-eyebrow{position:absolute;left:440px;top:444px;font:700 18px/1 var(--sans);letter-spacing:.2em;
+  text-transform:uppercase;color:var(--sand);display:flex;align-items:center;gap:14px}
+.ask-eyebrow i{width:10px;height:10px;background:var(--sand);transform:rotate(45deg)}
+.ask-field{position:absolute;left:440px;top:490px;width:1040px;height:100px;
+  border:1px solid rgba(255,248,239,.18);display:flex;align-items:center;padding-left:38px;
+  font:400 34px/1 var(--sans);color:var(--cream);white-space:pre}
+.ask-cur{display:inline-block;width:3px;height:40px;background:var(--cream);margin-left:3px}
+.ask-btn{position:absolute;left:1400px;top:510px;width:60px;height:60px;border-radius:50%;background:var(--sand)}
+.ask-arrow{position:absolute;left:1430px;top:540px;font:700 30px/1 var(--sans);color:var(--ink)}
+
+/* ---------- masterplan ---------- */
+.map-plan{position:absolute;left:0;top:-19.4px;width:1920px;height:1118.8px}
+.map-plan img{position:absolute;inset:0;width:100%;height:100%;display:block}
+.pin{position:absolute;display:flex;align-items:center;gap:10px;transform:translate(-8px,-50%)}
+.pin--left{transform:translate(calc(-100% + 8px),-50%)}
+.pin__dot{width:16px;height:16px;flex:none;position:relative}
+.pin__dot i{position:absolute;inset:0;background:var(--paper);border:2px solid var(--ink);transform:rotate(45deg)}
+.pin__ring{position:absolute;inset:-10px;border:1px solid rgba(247,243,234,.75);transform:rotate(45deg)}
+.pin__tag{font:700 17px/1.2 var(--sans);letter-spacing:.1em;text-transform:uppercase;color:var(--cream);
+  background:rgba(14,13,11,.76);padding:9px 12px;white-space:nowrap;border:1px solid rgba(255,248,239,.16)}
+.map-veil{position:absolute;inset:0;
+  background:radial-gradient(ellipse 1400px 640px at 0 0,rgba(14,13,11,.88) 0%,rgba(14,13,11,.55) 45%,rgba(14,13,11,0) 100%)}
+.eyebrow{position:absolute;left:110px;top:84px;font:700 18px/1 var(--sans);letter-spacing:.2em;
+  text-transform:uppercase;color:var(--cream);display:flex;align-items:center;gap:16px}
+.eyebrow i{width:10px;height:10px;background:var(--sand);transform:rotate(45deg)}
+.map-title{position:absolute;left:106px;top:122px}
+.map-title .ln{display:block;overflow:hidden;padding-right:.14em}
+.map-title .ln span{display:block;font:500 58px/1.16 var(--serif);color:var(--cream);letter-spacing:-.015em}
+
+/* ---------- letreiro ---------- */
+.marq-persp{position:absolute;inset:0;perspective:1600px;perspective-origin:960px 540px}
+.marq-plane{position:absolute;left:-760px;top:-700px;width:3440px;height:2480px;
+  display:flex;flex-direction:column;justify-content:center;overflow:hidden}
+.marq-row{height:172px;flex:none;white-space:nowrap;font:500 124px/172px var(--serif);letter-spacing:-.02em}
+.marq-track{display:inline-block;white-space:nowrap}
+.marq-unit{display:inline-block}
+.marq-dia{display:inline-block;width:22px;height:22px;background:currentColor;transform:rotate(45deg);
+  margin:0 46px;vertical-align:middle;position:relative;top:-10px}
+
+/* ---------- parede de cartões ---------- */
+.wall-persp{position:absolute;inset:0;perspective:1800px;perspective-origin:960px 540px}
+.wall{position:absolute;left:-95px;top:79px;width:2110px;height:922px;transform-style:preserve-3d}
+.card{position:absolute;width:340px;height:220px;overflow:hidden}
+.card img{width:100%;height:100%;object-fit:cover;display:block}
+.card--lab{padding:24px 26px 24px;display:flex;flex-direction:column;justify-content:space-between}
+.card__top{display:flex;justify-content:space-between;align-items:center;font:400 18px/1 var(--sans);letter-spacing:.12em}
+.card__dia{width:12px;height:12px;background:currentColor;transform:rotate(45deg);margin-left:3px}
+.card__t{font:700 24px/1.15 var(--sans);letter-spacing:-.005em}
+
+/* ---------- contadores ---------- */
+.cnt{position:absolute;left:110px;display:flex;align-items:flex-end;white-space:nowrap}
+.cnt__num{display:flex;align-items:flex-end;font-family:var(--sans);font-weight:700;line-height:1;
+  letter-spacing:-.045em;font-variant-numeric:tabular-nums}
+.dg{display:block;height:1em;overflow:hidden}
+.dg__s{display:block}
+.dg__s b{display:block;height:1em;font-weight:700}
+.sep{display:block;height:1em}
+.cnt__mask{overflow:hidden;display:block}
+.cnt__mask > span{display:block}
+.cnt__unit{font-family:var(--sans);font-weight:700;line-height:1;letter-spacing:-.03em}
+.cnt__leg{font:500 40px/1.16 var(--serif);letter-spacing:-.005em}
+
+/* ---------- palavras ---------- */
+.word-w{position:absolute;left:110px;top:436px;font:500 230px/1.1 var(--serif);letter-spacing:-.025em;white-space:nowrap}
+.word-k{position:absolute;left:112px;top:392px;font:700 18px/1 var(--sans);letter-spacing:.2em;text-transform:uppercase;
+  display:flex;align-items:center;gap:14px}
+.word-k i{width:10px;height:10px;background:currentColor;transform:rotate(45deg)}
+
+/* ---------- fotos com as marcas ---------- */
+.shot-band{position:absolute;top:-500px;left:0;width:760px;height:2100px;mix-blend-mode:soft-light;
+  background:linear-gradient(90deg,rgba(247,243,234,0),rgba(247,243,234,.7),rgba(247,243,234,0))}
+.shot-vig{position:absolute;inset:0;background:radial-gradient(ellipse 80% 75% at 50% 45%,rgba(14,13,11,0) 45%,rgba(14,13,11,.35) 100%)}
+.shot-veil{position:absolute;left:0;right:0;bottom:0;height:50%;background:linear-gradient(0deg,rgba(14,13,11,.76),rgba(14,13,11,0))}
+.shot-logo{position:absolute;left:110px;bottom:90px;display:block}
+.shot-cap{position:absolute;left:110px;bottom:90px;color:var(--cream);white-space:nowrap}
+.shot-cap b{display:flex;align-items:center;gap:16px;font:700 18px/1 var(--sans);letter-spacing:.2em;text-transform:uppercase;margin-bottom:18px}
+.shot-cap b i{width:11px;height:11px;background:var(--sand);transform:rotate(45deg)}
+.shot-cap span{display:block;font:500 52px/1.1 var(--serif);letter-spacing:-.015em}
+.shot-edge{position:absolute;left:0;top:0;width:8px;height:1080px;background:var(--sand)}
+
+/* ---------- frase ---------- */
+.phr-a{position:absolute;left:110px;top:430px;overflow:hidden;padding-right:.14em}
+.phr-a span{display:block;font:500 156px/1.12 var(--serif);color:var(--sand);letter-spacing:-.02em}
+.phr-b{position:absolute;left:0;top:356px;font:500 310px/1.1 var(--serif);letter-spacing:-.03em;white-space:nowrap;color:var(--ink)}
+
+/* ---------- símbolo e assinatura ---------- */
+.fim-svg{position:absolute;left:0;top:0;transform-origin:0 0;overflow:visible}
+.fim-tx{position:absolute;top:518px;height:46px;overflow:hidden;white-space:nowrap;
+  font:400 32px/46px var(--sans);color:var(--cream);letter-spacing:.005em}
+.fim-tx > span{display:block}
+.fim-tx em{font:italic 500 36px/46px var(--serif)}

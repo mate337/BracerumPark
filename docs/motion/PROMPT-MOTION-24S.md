@@ -1,5 +1,9 @@
 # Comando de execução — filme de motion design do Bracerum Park (24 s, feito em código)
 
+> **Executado em 2026-09-28. Depois do retorno do cliente o filme virou a v2, de 48 s:** abertura com o
+> parque real, masterplan e fotos por mais tempo, pausas de leitura. A linha do tempo da §5 abaixo é a
+> da v1. **A v2 vigente está em [`LEIA-ME.md`](LEIA-ME.md)** — não "corrija" o filme de volta para 24 s.
+
 > **Como usar:** abra uma sessão do Claude Code neste repositório, anexe o vídeo de referência se
 > ainda o tiver, e mande: *"Leia `docs/motion/PROMPT-MOTION-24S.md` inteiro e execute."*
 >
