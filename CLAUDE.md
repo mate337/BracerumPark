@@ -12,7 +12,9 @@ rotas) que as seis páginas internas baixavam e interpretavam à toa. Ele roda d
 
 ### Fotos finalizadas do cliente (v6.3 — 2026-09-28)
 - **Fonte:** pasta do Google Drive "Imagens BracerumPark Finalizadas" (id `1CETdiYdL13Jhh2twQe6kAF10yvMt1YF6`),
-  51 renders PNG 1672×941 com nome genérico ("Imagem do Codex …"), seis deles repetidos. Os originais
+  55 renders PNG (a maioria 1672×941), seis deles repetidos. Em 2026-09-29 os arquivos do Drive foram
+  renomeados pelo lugar (`Hotel - Recepção (noite).png`, `Resort - Lago e casas do condomínio.png`…);
+  os repetidos levam "(cópia)" no fim — apagar só com o ok do cliente. Os originais
   **não** estão no repositório; as versões web ficam em `assets/web/fotos/` (35 arquivos, 1600 px, JPG 80%,
   10 MB no total), com nome pelo conteúdo (`hotel-cupula-dia.jpg`, `portaria.jpg` etc.).
 - **Trocado:** heros da home, do hotel, do resort e da qualidade; blocos Hotel/Resort da home; galeria
@@ -26,6 +28,16 @@ rotas) que as seis páginas internas baixavam e interpretavam à toa. Ele roda d
   vista aérea R04 do Resort (o texto cita essas três leituras oficiais).
 - Os arquivos antigos que ficaram sem uso (`assets/park/hotel-*`, `resort-lago-*`, `assets/renders/*`
   com vermelho/marca d'água OTIFF) continuam no repositório — **apagar só com o ok do cliente**.
+
+### Desenho em linhas do Centro de Convenções + Hotel (2026-10-14)
+- `assets/linhas/convencoes-hotel-{ink,cream}.svg` (completo: torre com pavimentos, cobertura em
+  gridshell, fachada de vidro) e `convencoes-hotel-contorno-{ink,cream}.svg` (só silhueta + beirais,
+  para uso pequeno). **Ainda não usado em nenhuma página.**
+- Gerado por `docs/build_silhueta.py` a partir do render noturno do conjunto (634×460, enviado na
+  conversa — não está no repositório). Os pontos estão em pixels dessa foto; a torre segue a
+  perspectiva medida (horizonte y=204, fugas em x=-581 e x=442). Para ajustar, mexer nos pontos do
+  script e rodar de novo — `--sobre FOTO.png saida.html` desenha o traço por cima da foto para conferir.
+  Não editar o SVG gerado à mão.
 
 ### Logos dos sub-projetos e favicon (v6.2 — 2026-09-14)
 - **Os selos do cliente entraram no ar.** `hotel.html`, `resort.html` e `select.html` trocaram o
