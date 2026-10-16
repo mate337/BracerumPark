@@ -42,7 +42,8 @@ pdftoppm -r $R -x $((W*80/100)) -y $((H*8/100)) -W $((W*15/100)) -H $((H*14/100)
   oeste) e com a vista aérea `assets/web/fotos/park-aereo-rio.jpg` (rio além da rodovia).
 - **Cores do desenho.** Verde-claro = lote industrial · cinza = via/pátio pavimentado · verde forte =
   área verde/paisagismo · branco = área construída de uso coletivo · laranja = Hotel e quadras ·
-  azul = água · linhas vermelhas no quadro de áreas = **itens ainda "VALIDAR"**.
+  azul = água · linhas vermelhas no quadro de áreas = itens marcados "VALIDAR" — **o cliente validou todos em
+  2026-10-16**.
 - **Leitura macro.** Um polígono alongado com ~2,1 km de frente para a PY-19, em cinco faixas:
   1. **Frente da rodovia (oeste):** a entrada no meio da frente e o Outlet ao lado dela.
   2. **Miolo:** a grade industrial — 6 colunas × 7 linhas de quadras de 200 × 100 m.
@@ -75,19 +76,19 @@ pdftoppm -r $R -x $((W*80/100)) -y $((H*8/100)) -W $((W*15/100)) -H $((H*14/100)
 | Espaço Business / Centro Tecnológico | 2.340 m² (por piso) | era 1.140 m² |
 | Creche | 2.083 m² | era 3.780 m² |
 | Refeitório / Espaço Zen | 4.639 m² | era 5.907 m² |
-| Ambulatório / Resgate / Brigadistas | 2.377 m² | era 1.964 m² |
+| Ambulatório / Resgate / Brigadistas | 2.377 m² | era 1.964 m²; na planta está escrito "Hospital" — o nome oficial é **Ambulatório** |
 | E.T.E. / Subestação de energia | 14.557 m² | juntas agora |
 | E.T.A. | 2.665 m² | **separada da ETE** |
 | Administração | 1.150 m² | |
 | Área dos galpões de manutenção do Park | 4.125 m² | |
 | Gate / acesso indústria | 680 m² | |
 | Grêmio Recreativo | 2.975 m² | **novo** |
-| Quadras/campos | 5.000 m² — **VALIDAR** | posição não indicada na planta |
-| Quadras esportivas / quiosques + Posto / salão / restaurante | 7.250 m² (os dois juntos) — **VALIDAR** | |
-| Clube do Caminhoneiro | 40.065 m² — **VALIDAR** | |
+| Quadras/campos | 5.000 m² | "VALIDAR" no desenho — **validado** (16/10); posição não indicada na planta |
+| Quadras esportivas / quiosques + Posto / salão / restaurante | 7.250 m² (os dois juntos) | "VALIDAR" no desenho — **validado** (16/10) |
+| Clube do Caminhoneiro | 40.065 m² | "VALIDAR" no desenho — **validado** (16/10) |
 
 Medidas escritas no próprio desenho: **frente para a rodovia 2.100 m** · **Via Costeira L = 13,00 m** ·
-**pista de pouso 1.280 m · comprimento total 1.460 m** · faixa verde de 16 m entre ETE e subestação ·
+**pista de pouso 1.280 m · comprimento total 1.460 m** (o número público é **1.460 m**) · faixa verde de 16 m entre ETE e subestação ·
 lote frontal de 433 × 50 m · aeroporto de cargas 42.060 m².
 
 ---
@@ -111,7 +112,7 @@ Costeira bem em frente à entrada — é o único acesso desenhado da rodovia pa
 **3 · Clube do Caminhoneiro / pátio de caminhões** — (46,5, 13,5). **A entrada mudou de lugar:**
 no V15 ficava no canto superior esquerdo da prancha; no V12 está **no meio da
 frente da rodovia, na coluna 4 da grade**. Quadra de ≈ 243 × 119 m (≈ 29.000 m²; os 40.065 m² do
-quadro devem incluir a alça e o verde da frente — está "VALIDAR"). Dentro: uma **rotatória** logo
+quadro devem incluir a alça e o verde da frente — validados pelo cliente em 16/10). Dentro: uma **rotatória** logo
 depois da Via Costeira, três fileiras de **vagas de caminhão em espinha de peixe** (~40, contagem
 visual) e uma fileira de vagas menores junto à via de saída.
 Fotos: `assets/web/fotos/posto-caminhoes.jpg`, `assets/park/select-apoio-caminhoes.jpg`,
@@ -121,7 +122,7 @@ Fotos: `assets/web/fotos/posto-caminhoes.jpg`, `assets/park/select-apoio-caminho
 do pátio: uma **quadra poliesportiva** (laranja, futsal) e, logo abaixo dela, o **edifício em L**
 (dois blocos em L encaixados, com contorno tracejado vermelho por dentro — provavelmente a cobertura
 das bombas). É o "Posto / salão / restaurante" do quadro (7.250 m² junto com quadras/quiosques,
-VALIDAR). À esquerda do L há um bloco branco que encosta na via da coluna 3.
+validado). À esquerda do L há um bloco branco que encosta na via da coluna 3.
 Fotos: `assets/park/select-posto-cobertura.jpg`, `assets/park/select-posto-noturno.jpg`,
 `assets/web/fotos/posto-caminhoes.jpg`, `assets/park/select-market-interior.jpg` (conveniência).
 
@@ -246,7 +247,8 @@ do condomínio: **"SL FESTAS"**, **campo society** (verde-petróleo), **quadra p
 
 **22 · Lotes industriais — 41 lotes, 781.777 m²** — (38, 50,2). A grade: quadras de **200 × 100 m =
 20.000 m²**, separadas por vias com rotatórias quadradas nos cruzamentos. **Cada quadra de 20.000 m²
-está riscada em 16 módulos de 25 × 50 m (1.250 m²)** — 8 × 2. Os lotes da borda são trapézios
+está riscada em 16 módulos de 25 × 50 m (1.250 m²)** — 8 × 2. **O cliente confirmou (16/10): os
+lotes são vendidos, e a venda pode ser fracionada a partir de um módulo de 1.250 m².** Os lotes da borda são trapézios
 cortados pela diagonal do terreno ou da pista. Tabela completa em §4.
 Fotos: `assets/web/fotos/galpao-docas.jpg`, `galpao-portico-azul.jpg`, `galpao-via.jpg`,
 `park-boulevard-aereo.jpg`, `park-boulevard-aereo-2.jpg`, `vias-boulevard.jpg`, `vias-rotatoria.jpg`;
@@ -285,7 +287,9 @@ entre os hangares e a pista, com a ilha verde da taxiway. Área total do conjunt
 escape + manobra: 73.750 m²; hangar + lounge + abastecimento: 7.686 m².
 Foto: `assets/web/fotos/aero-pista-aerea.jpg` (pátio e hangares ao lado da pista).
 
-**30 · Pista de pouso — 1.280 m úteis, 1.460 m de comprimento total** — (33, 84,2). Pista em
+**30 · Pista de pouso — 1.460 m** — (33, 84,2). O desenho escreve "pista de pouso 1.280 m ·
+comprimento total 1.460 m"; **o número público, confirmado pelo cliente em 16/10, é 1.460 m** (substitui
+os 1.480 m de setembro). Pista em
 diagonal ao longo de toda a borda de baixo, com faixa verde dos dois lados e as duas cabeceiras
 marcadas **"30"** (as duas com o mesmo número — erro do desenho; deveria ser 12/30).
 Fotos: `assets/web/fotos/aero-pista-aerea.jpg`, `aero-cabeceira.jpg`; `assets/park/aero-pista.jpg`
@@ -295,7 +299,8 @@ Fotos: `assets/web/fotos/aero-pista-aerea.jpg`, `aero-cabeceira.jpg`; `assets/pa
 
 **31 · Bloco de serviços (7.748 m²)** — (53,5, 86,6). Na coluna 5, no fim do boulevard central,
 entre os lotes e a pista. Três partes, da esquerda para a direita: **Refeitório** (a maior) ·
-**Creche / Espaço Kids** · **Resgate / Hospital / Bombeiros civis** (cruz vermelha). **A creche
+**Creche / Espaço Kids** · **Ambulatório / Resgate / Bombeiros civis** (cruz vermelha — a planta
+escreve "Hospital", mas **o nome oficial é Ambulatório**, em tudo). **A creche
 mudou:** no V15 ficava na coluna da direita, abaixo do Resort; agora está aqui, no bloco de serviços.
 Fotos: `assets/park/amen-comedor.jpg` (refeitório), `assets/renders/eventos-gastronomia-2/3.jpg`.
 Creche e resgate: nenhuma.
@@ -334,7 +339,7 @@ Mais o lote de borda **6.965 m²** (à esquerda de C1, altura L4) — e o lotinh
 - Soma dos 41: **780.590 m²**. Com o lote da Administração: **781.728 m²** — a 49 m² do quadro
   (781.777 m²). O quadro parece contar a Administração junto.
 - O maior lote é o de **25.943 m²** (C4/L7); o lote-padrão é **200 × 100 m**, divisível em módulos de
-  **25 × 50 m (1.250 m²)**.
+  **25 × 50 m (1.250 m²)**. **Venda** (não locação), fracionável a partir de um módulo.
 
 ---
 
@@ -372,7 +377,7 @@ Referência anterior: `assets/renders/masterplan-implantacao.jpg` (planta do Cat
 | **Lotes** | Quadras de **40.000 m² (200 × 200)**, total **989.642 m²**, com marcação VENDIDO/RESERVADO | Quadras de **20.000 m² (200 × 100)**, total **781.777 m²**, **sem** marcação de venda |
 | **Creche** | 3.780 m², na coluna da direita junto ao Refeitório e ao Espaço Zen | **2.083 m², no bloco de serviços** junto à pista (com Refeitório e Resgate) |
 | **Refeitório / Espaço Zen** | 5.907 m² (coluna da direita) | 4.639 m² (bloco de serviços) |
-| **Ambulatório/Resgate** | 1.964 m² (coluna da direita) | 2.377 m², rotulado "Resgate / Hospital / Bomb. civis" |
+| **Ambulatório/Resgate** | 1.964 m² (coluna da direita) | 2.377 m² (a planta escreve "Hospital"; o nome é Ambulatório) |
 | **Hub de serviços** | Duas quadras (3.360 + 7.470 m²) | Uma quadra de 12.180 m² |
 | **Grêmio Recreativo** | — | **Novo**, 2.975 m² |
 | **Condomínio Vertical** | — (eram lotes de 24.710, 28.325 e 16.067 m²) | **Novo**, 38 torres, 608 aptos, 49.704 m² |
@@ -383,7 +388,7 @@ Referência anterior: `assets/renders/masterplan-implantacao.jpg` (planta do Cat
 | **Estacionamento** | 1.700 vagas, com lagos no meio | **2.036 vagas**, sem lagos ("Lagos 3.000 m²" saiu do quadro) |
 | **Canal + ponte** | — | **Novo**, entre as colunas 1 e 2 |
 | **Resort** | 141 lotes, 142.067 m² | Igual |
-| **Aeroporto** | 42.060 m²; pista 1.280 m / total 1.460 m; heliponto junto ao abastecimento | Igual |
+| **Aeroporto** | 42.060 m²; pista 1.280 m / total 1.460 m; heliponto junto ao abastecimento | Igual; número público da pista: **1.460 m** |
 
 A planta ainda mais antiga, `assets/masterplan.jpg`, tinha "Data Center" e um bloco "Bracerum
 Vendido" — já não vale para nada.
@@ -414,7 +419,7 @@ Vendido" — já não vale para nada.
 
 ### Setores do V12 sem nenhuma foto
 Escola (14) · Condomínio Vertical (20) · Salão de festas do condomínio (21) · Canal/ponte (23) ·
-Administração (24) · Galpões de manutenção (26) · Creche e Resgate/Hospital (31) · Hub de serviços
+Administração (24) · Galpões de manutenção (26) · Creche e Ambulatório/Resgate (31) · Hub de serviços
 (32) · Grêmio Recreativo (33) · Estacionamento (10).
 
 ### Fotos sem setor no V12
@@ -434,7 +439,8 @@ Administração (24) · Galpões de manutenção (26) · Creche e Resgate/Hospit
 
 ## 8. O que no site está desatualizado em relação ao V12
 
-**Nada disto foi alterado ainda** — é a lista para quando o cliente der o ok.
+**Nada disto foi alterado ainda — o usuário pediu (2026-10-16) para não mexer no site por enquanto.**
+É a lista para quando ele der o ok. Já incorpora as respostas do §9.
 
 **A vista do masterplan da home.** `assets/web/vista-aerea-park-02.jpg` é um render do **layout do
 V15**: entrada e Clube do Caminhoneiro no canto superior esquerdo, sem Outlet na frente da rodovia,
@@ -444,12 +450,13 @@ entrada nova — **precisa de uma vista aérea nova do V12** (ou trocar o fundo 
 Pinos e textos em `home.js` (array `AREAS`):
 | Linha | Hoje | V12 |
 |---|---|---|
-| `home.js:17` Clube do Caminhoneiro | pino no canto superior esquerdo (33/30) | entrada no meio da frente da rodovia; área ainda "VALIDAR" |
+| `home.js:17` Clube do Caminhoneiro | pino no canto superior esquerdo (33/30) | entrada no meio da frente da rodovia; 40.065 m² validado |
 | `home.js:35` Portaria | "Administração · acessos indústria · 3.510 m²" | Gate de **680 m²**; Administração (1.150 m²) fica em outro lugar |
-| `home.js:45` Fábricas Bracerum | pino na área industrial | o V12 não marca fábricas Bracerum |
-| `home.js:61` Lotes | "989.642 m² de lotes · módulos de 40.000 m²" | **781.777 m²**, quadras de **20.000 m²** (módulos de 1.250 m²) |
+| `home.js:45` Fábricas Bracerum | pino na área industrial | **sai** — o cliente não vai mais colocar as fábricas (16/10) |
+| `home.js:61` Lotes | "989.642 m² de lotes · módulos de 40.000 m²" | **781.777 m²**, quadras de **20.000 m²**, **venda a partir de 1.250 m²** |
+| `home.js:64` Lotes (descrição) | "Galpões sob medida, venda ou locação, erguidos com o Steel Frame do próprio grupo" | lotes são de **venda**; o "Steel Frame do grupo" depende das fábricas (ver abaixo) |
 | `home.js:76` ETE/ETA | "10.650 m² · subestação 11.375 m²" | ETE + subestação **14.557 m²**; ETA **2.665 m²**, separada, junto à Escola |
-| `home.js:101` e `home.js:559` Pista | "1.480 m" | desenho: **1.280 m de pista, 1.460 m total** (ver §9) |
+| `home.js:101` e `home.js:559` Pista | "1.480 m" | **1.460 m** (EN "1,460 m", ES "1.460 m") |
 | `home.js:129` Hotel | "384 studios de 35 m² · 1.700 vagas" | 384 studios, 30.000 m², **2.036 vagas** (35 m² não está no V12) |
 
 Textos de página:
@@ -458,7 +465,15 @@ Textos de página:
 - `select.html:118` — "caixa bancário no bloco de portaria e administração": Gate e Administração
   agora são lugares diferentes.
 - `qualidade.html:137` — o pátio do caminhoneiro "com refeitório, vestiários e enfermaria": no V12 o
-  refeitório e o resgate estão no bloco de serviços da borda de baixo, junto à pista, não no pátio.
+  refeitório e o ambulatório estão no bloco de serviços da borda de baixo, junto à pista, não no pátio.
+- `select.html:163/164` — "Enfermaria e bombeiros civis" / "Enfermaria no bloco de apoio": o nome é
+  **Ambulatório** (regra do cliente: "ambulatório" em tudo, nunca "hospital"; a "enfermaria" é o mesmo espaço e
+  troca junto). Ajustar as chaves EN/ES junto.
+- **Fábricas Bracerum** — o cliente não vai mais colocá-las. Sai com certeza o pino do masterplan
+  (`home.js:45–55`). Os demais textos que falam das fábricas do grupo ficam para **confirmar com o
+  cliente antes de mexer**, porque podem descrever a capacidade do grupo e não um setor do parque:
+  `bracerum.html:7/66/134/140–152` ("três fábricas próprias em Villeta", "fabrica a própria obra"),
+  `index.html:200` (foto da fábrica), `index.html:332` e `tributacao.html:243` ("Steel Frame do grupo").
 - `resort.html:71` — Resort "separado da área fabril pelo lago e pelo cinturão verde": no V12 o lago
   fica **dentro** do Resort; quem separa o Resort da indústria é a faixa do Outlet e a via de acesso.
 - `bracerum.html:154` — "+1.000.000 m² de área fabril": o V12 tem 781.777 m² de lotes industriais
@@ -471,25 +486,25 @@ Textos de página:
 
 ## 9. Divergências e perguntas para o cliente
 
-1. **Pista.** O desenho diz **1.280 m de pista de pouso e 1.460 m de comprimento total**. O site diz
-   1.480 m (confirmado pelo cliente em 16/09 com base no catálogo V15). Os 1.480 m não aparecem em
-   nenhuma planta. Perguntar: o número público é 1.280 m (pista útil), 1.460 m (total) ou 1.480 m?
-2. **Cabeceiras.** As duas pontas da pista estão marcadas "30" (deveria ser 12/30). O render
-   `aero-pista.jpg` mostra "01".
-3. **Bloco de serviços.** Refeitório (4.639) + Creche (2.083) + Resgate (2.377) = 9.099 m², mas o
-   lote do bloco tem 7.748 m². As áreas do quadro devem ser construídas (com pavimento superior) —
-   confirmar.
-4. **"Hospital".** A planta escreve "Resgate / Hospital / Bomb. civis"; o quadro diz "Ambulatório /
-   Resgate / Brigadistas". Não chamar de hospital no site sem confirmação.
-5. **Outlet:** 57.750 m² (quadro) ou 58.000 m² (rótulo)? E o lote de 21.650 m² na frente é mesmo
-   industrial (é o que fecha a soma) ou é do Outlet?
-6. **Itens "VALIDAR":** Clube do Caminhoneiro (40.065 m²), Quadras/campos (5.000 m² — onde ficam?),
-   Quadras/quiosques + Posto/salão/restaurante (7.250 m²).
-7. **Fábricas Bracerum:** o site diz que três fábricas próprias constroem o parque e põe um pino
-   "Fábricas Bracerum" no masterplan. O V12 não as marca. Ficam dentro do parque? Em qual lote?
-8. **Lotes de 1.250 m²:** as quadras de 20.000 m² estão riscadas em módulos de 25 × 50 m. O parque
-   vai vender/alugar fração de quadra? Se sim, é argumento comercial forte ("a partir de 1.250 m²").
-9. **VENDIDO/RESERVADO:** o V15 marcava lotes vendidos e reservados; o V12 não. O status comercial
-   mudou ou só não está nesta prancha?
-10. **Torre de controle, academia, Clube Bracerum:** existem renders, mas o V12 não tem esses
-    programas. Saíram do projeto?
+### Respondidas pelo cliente (2026-10-16)
+
+| # | Pergunta | Resposta |
+|---|---|---|
+| 1 | Pista: 1.280 m (útil), 1.460 m (total) ou 1.480 m (site)? | **1.460 m.** É o número público; substitui os 1.480 m de 16/09. |
+| 2 | Fábricas Bracerum: ficam dentro do parque? Em qual lote? | **"Não colocaremos mais."** Sai o pino do masterplan; os outros textos sobre as fábricas do grupo ficam para confirmar (§8). |
+| 3 | Lotes em módulos de 1.250 m²: vender ou alugar? | **Vender.** Venda fracionável a partir de um módulo de 25 × 50 m (1.250 m²). |
+| 4 | "Hospital" (planta) ou "ambulatório" (quadro)? | **Ambulatório, em tudo.** Nunca "hospital". As "enfermarias" que o site cita são o mesmo espaço — viram ambulatório também. |
+| 5 | Itens "VALIDAR" do quadro | **Validados:** Clube do Caminhoneiro 40.065 m² · Quadras/campos 5.000 m² · Quadras/quiosques + Posto/salão/restaurante 7.250 m². |
+
+### Ainda em aberto (menores, não bloqueiam nada)
+
+1. **Cabeceiras.** As duas pontas da pista estão marcadas "30" (deveria ser 12/30). O render
+   `aero-pista.jpg` mostra "01". Só importa se algum texto ou imagem citar a numeração.
+2. **Bloco de serviços.** Refeitório (4.639) + Creche (2.083) + Ambulatório (2.377) = 9.099 m², mas o
+   lote do bloco tem 7.748 m². As áreas do quadro devem ser construídas (com pavimento superior).
+3. **Outlet:** 57.750 m² (quadro) ou 58.000 m² (rótulo)? Na dúvida, usar o do quadro. O lote de
+   21.650 m² na frente é industrial (é o que fecha a soma de 781.777 m²).
+4. **Quadras/campos (5.000 m²):** área validada, mas a planta não mostra onde ficam.
+5. **VENDIDO/RESERVADO:** o V15 marcava lotes vendidos e reservados; o V12 não.
+6. **Torre de controle, academia, Clube Bracerum:** existem renders, mas o V12 não tem esses
+   programas — não usar essas imagens como se fossem setores do parque.

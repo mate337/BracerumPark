@@ -37,9 +37,19 @@ rotas) que as seis páginas internas baixavam e interpretavam à toa. Ele roda d
   linha, está no §8 do documento. O ponto mais grave: o render de fundo do masterplan da home
   (`assets/web/vista-aerea-park-02.jpg`) mostra o **layout do V15** (entrada no canto) — pino nenhum
   conserta isso; precisa de vista aérea nova ou trocar o fundo.
-- **Perguntas abertas ao cliente** (§9 do documento): pista (o V12 diz 1.280 m úteis / 1.460 m
-  totais; o site diz 1.480 m), itens "VALIDAR" do quadro, onde ficam as Fábricas Bracerum (o V12 não
-  as marca), se os lotes vendem fracionados em 1.250 m², e o "Hospital" (o quadro diz ambulatório).
+- **Respostas do cliente (2026-10-16)** — valem sobre qualquer dado anterior:
+  - **Pista: 1.460 m.** É o número público (substitui os 1.480 m de 16/09).
+  - **Fábricas Bracerum: "não colocaremos mais".** Sai o pino "Fábricas Bracerum" do masterplan. Os
+    outros textos sobre as fábricas do grupo (`bracerum.html`, "Steel Frame do grupo") ficam para
+    confirmar com o cliente antes de mexer — lista no §8 do documento.
+  - **Lotes: venda** (não locação), fracionável a partir de um módulo de 25 × 50 m (**1.250 m²**).
+  - **"Ambulatório" em tudo** — nunca "hospital" (a planta escreve hospital). As "enfermarias" que
+    o site cita são o mesmo espaço e trocam junto.
+  - **Itens "VALIDAR" do quadro estão validados:** Clube do Caminhoneiro 40.065 m², quadras/campos
+    5.000 m², quadras/quiosques + posto/salão/restaurante 7.250 m².
+- **🚫 Não mexer no site até o usuário liberar** (pedido dele em 2026-10-16). O V12 e as respostas
+  ficam só registrados em `docs/` e aqui; nenhuma página, `home.js`, `i18n.js` ou asset publicado
+  muda por enquanto.
 
 ### Fotos finalizadas do cliente (v6.3 — 2026-09-28)
 - **Fonte:** pasta do Google Drive "Imagens BracerumPark Finalizadas" (id `1CETdiYdL13Jhh2twQe6kAF10yvMt1YF6`),
@@ -231,6 +241,7 @@ perguntar**. O site entregue tem 2,05 MB na home.
 **Dados oficiais do R04** (usar estes, não os do catálogo V15 quando divergirem):
 terreno +1.800.000 m² · Resort 142.067 m² · parcelas industriais 987.304 m² · pista de 1.280 m ·
 auditório 1.200 pessoas · 12 setores principais.
+**Superado (2026-10-16): a pista é de 1.460 m** — ver Masterplan V12.
 **Resolvido (2026-09-16):** o cliente confirmou **1.480 m de pista** (o catálogo V15 vale sobre os
 1.280 m do R04) e que o **heliponto fica no pátio dos hangares**, não na cabeceira da pista — é o que
 mostra a filmagem aérea enviada. O pino "Hangares" do masterplan passou a citar o heliponto e o pino
@@ -301,6 +312,6 @@ Faltam (mencionados no `LEIA-ME.txt` original, ainda não enviados): `tecnologic
 
 ## Próximo passo
 
-Aguardando o usuário: (1) ok para levar o Masterplan V12 ao site (lista no §8 de
-`docs/masterplan-v12.md`) e as respostas do §9; (2) fotos próprias dos terminais privados, para
+Aguardando o usuário: (1) **ok para levar o Masterplan V12 ao site** — a lista do que muda, já com
+as respostas de 16/10, está no §8 de `docs/masterplan-v12.md`; até lá, não mexer no site; (2) fotos próprias dos terminais privados, para
 substituir as ilustrativas; (3) o dado de anos de história da Bracerum como importadora de aço.
