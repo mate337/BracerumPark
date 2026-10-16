@@ -7,13 +7,15 @@
 Escreve em docs/prompt-aerea-v12/:
   ref-A-camera-volumes.png   câmera exata + maquete de volumes sobre a planta e o entorno real
   ref-A90-zenital-volumes.png  a mesma maquete vista de cima (variação 90°), na mesma orientação
+  ref-A90-zenital-volumes-4k.png        a mesma vista de cima em 3840 x 2560 (3:2), 300 dpi
+  ref-A90-zenital-volumes-4k-16x9.png   em 3840 x 2160 (4K UHD, 16:9), 300 dpi
   ref-B-planta-v12.png       a planta V12 vista de cima, sem nenhum texto
   ref-C-situacao.jpg         o terreno no entorno real (PY-19, rios, matas), vista de cima
   ref-D-estilo.jpg … ref-H-servicos.jpg   renders do cliente, com o vermelho neutralizado
 
 PRECISA RODAR DE NOVO SE:
   - o cliente mandar outra versão da planta (trocar PDF e conferir DOBRA_PLANTA);
-  - mudar a câmera (CAMERA, CAMERA90) ou a escolha de fotos (COLAGENS).
+  - mudar a câmera (CAMERA, CAMERA90…) ou a escolha de fotos (COLAGENS).
 
 POR QUE ELE EXISTE
 Gerador de imagem não segue uma planta de 33 setores só com texto. O que segura a
@@ -53,7 +55,14 @@ DOBRA_PLANTA = (0.908, 0.0738)          # vértice da dobra da rodovia no V12 (f
 CAMERA = dict(Xc=880, Yc=2160, Zc=1650, yaw=6, pitch=36.3, hfov=66, w=1536, h=1024, ss=2)
 LUZ = (-0.55, 0.45, 0.70)               # só dá volume à guia; a luz da imagem final vem do prompt
 CAMERA90 = dict(cx=1289, cy=606, largura=2790, w=1536, h=1024, ss=2)   # vista de cima, metros da prancha
+CAMERA90_4K = dict(CAMERA90, w=3840, h=2560)                            # 4K em 3:2 (mesmo quadro)
+CAMERA90_4K_169 = dict(CAMERA90, w=3840, h=2160)                        # 4K UHD 16:9 (mesma largura)
 LUZ90 = (-0.62, -0.50, 0.60)            # do canto superior esquerdo, ~37° — a luz da aérea aprovada
+RES90 = 0.5                             # grade de alturas da vista de cima (m): bordas sem degrau em 4K
+DPI_4K = 300
+# larguras das linhas do entorno, em metros (na grade de 2,5 m/px dão os mesmos pixels de antes)
+LARGURAS = {'river': 25, 'stream': 7.5, 'canal': 7.5, 'agua': 5, 'via': 15, 'tertiary': 10, 'unclassified': 7.5, 'estrada': 5}
+LARGURAS_HD = {'river': 25, 'stream': 3.5, 'canal': 4, 'agua': 2.5, 'via': 9, 'tertiary': 6, 'unclassified': 5, 'estrada': 3.5}
 CTX_BOX = (-3000, -6500, 7000, 3000)    # entorno desenhado, em metros no referencial da planta
 MPP = 2.5                               # metros por pixel do entorno
 BBOX = '-25.86,-57.85,-25.68,-57.62'    # sul, oeste, norte, leste
@@ -218,14 +227,16 @@ CORES = {'fundo': (214, 216, 182), 'meadow': (206, 213, 170), 'farmland': (222, 
          'estrada': (180, 168, 140)}
 
 
-def entorno(data, geo, plano_guia):
-    x0, y0, x1, y1 = CTX_BOX
-    img = Image.new('RGB', (int((x1 - x0) / MPP), int((y1 - y0) / MPP)), CORES['fundo'])
+def entorno(data, geo, plano_guia, box=CTX_BOX, mpp=MPP, larguras=LARGURAS):
+    """Entorno real (OSM) desenhado em `box` (metros da prancha) a `mpp` m/px, com a planta por cima."""
+    x0, y0, x1, y1 = box
+    img = Image.new('RGB', (int((x1 - x0) / mpp), int((y1 - y0) / mpp)), CORES['fundo'])
     dr = ImageDraw.Draw(img)
+    px = lambda metros: max(1, round(metros / mpp))
 
     def tp(lat, lon):
         X, Y = geo.para_planta(*enu(lat, lon))
-        return (X - x0) / MPP, (Y - y0) / MPP
+        return (X - x0) / mpp, (Y - y0) / mpp
 
     def aneis(e, papel):
         segs = [[(g['lat'], g['lon']) for g in m['geometry']] for m in e['members']
@@ -270,37 +281,41 @@ def entorno(data, geo, plano_guia):
     for e in els:
         t = e.get('tags', {})
         if e['type'] == 'way' and 'waterway' in t and t.get('natural') != 'water':
-            w = {'river': 10, 'stream': 3, 'canal': 3}.get(t['waterway'], 2)
+            w = px(larguras.get(t['waterway'], larguras['agua']))
             dr.line([tp(g['lat'], g['lon']) for g in e['geometry']], fill=CORES['water'], width=w, joint='curve')
     for nivel in ('estrada', 'via'):
         for e in els:
             hw = e.get('tags', {}).get('highway')
             if e['type'] != 'way' or not hw or (hw in ('trunk', 'primary')) != (nivel == 'via'):
                 continue
-            w = 6 if nivel == 'via' else {'tertiary': 4, 'unclassified': 3}.get(hw, 2)
+            w = px(larguras['via'] if nivel == 'via' else larguras.get(hw, larguras['estrada']))
             dr.line([tp(g['lat'], g['lon']) for g in e['geometry']], fill=CORES[nivel], width=w, joint='curve')
     base = img.convert('RGBA')
     p = Image.fromarray(plano_guia, 'RGBA')
-    s = 1 / (K * MPP)
+    s = 1 / (K * mpp)
     base.alpha_composite(p.resize((int(p.size[0] * s), int(p.size[1] * s)), Image.LANCZOS),
-                         (int(-x0 / MPP), int(-y0 / MPP)))
+                         (int(-x0 / mpp), int(-y0 / mpp)))
     return base.convert('RGB')
 
 
-# --------------------------------------------------------------------------- volumes (campo de alturas de 1 m)
+# --------------------------------------------------------------------------- volumes (campo de alturas)
 class Maquete:
+    """Campo de alturas com os volumes lidos da planta. `res` = metros por célula (1 m para a guia
+    oblíqua; 0,5 m para a vista de cima em 4K, senão as bordas saem em degrau)."""
     MATS = {'galpão': 1, 'hotel': 2, 'casca': 3}
 
-    def __init__(self, rgba, sheet):
+    def __init__(self, rgba, sheet, res=1.0):
         self.rgb = rgba[..., :3].astype(int)
         self.dentro = rgba[..., 3] > 0
         self.sheet = sheet
-        self.GW, self.GH = int(math.ceil(sheet[0])), int(math.ceil(sheet[1]))
+        self.res = res
+        self.GW, self.GH = int(math.ceil(sheet[0] / res)), int(math.ceil(sheet[1] / res))
         self.HF = np.zeros((self.GH, self.GW), np.float32)
         self.ID = np.zeros((self.GH, self.GW), np.int32)
         self.MAT = np.zeros((self.GH, self.GW), np.uint8)
         self.n = 0
         self.conta = {}
+        self.cache = {}
 
     def pc(self, x, y):
         return x / 100 * self.sheet[0], y / 100 * self.sheet[1]
@@ -315,8 +330,9 @@ class Maquete:
         self.conta[tag] = self.conta.get(tag, 0) + 1
 
     def poligono(self, pts, h, tag):
+        """`pts` em metros da prancha."""
         img = Image.new('L', (self.GW, self.GH), 0)
-        ImageDraw.Draw(img).polygon([tuple(p) for p in pts], fill=1)
+        ImageDraw.Draw(img).polygon([(x / self.res, y / self.res) for x, y in pts], fill=1)
         gy, gx = np.nonzero(np.array(img))
         if len(gx):
             self.mascara(gy, gx, h, tag)
@@ -345,9 +361,10 @@ class Maquete:
         return out
 
     def grade(self, c):
+        """Células da grade (linha, coluna) ocupadas por um componente da planta."""
         ys, xs = np.nonzero(c['lab'][c['sl']] == c['i'])
-        ys = ((ys + c['sl'][0].start) / K).astype(int)
-        xs = ((xs + c['sl'][1].start) / K).astype(int)
+        ys = ((ys + c['sl'][0].start) / (K * self.res)).astype(int)
+        xs = ((xs + c['sl'][1].start) / (K * self.res)).astype(int)
         ok = (ys >= 0) & (ys < self.GH) & (xs >= 0) & (xs < self.GW)
         return ys[ok], xs[ok]
 
@@ -374,8 +391,9 @@ class Maquete:
         return melhor[1]
 
     def montar(self):
-        rgb, dentro = self.rgb, self.dentro
+        rgb, dentro, res = self.rgb, self.dentro, self.res
         caixa = lambda c, x0, y0, x1, y1: x0 <= c['cx'] <= x1 and y0 <= c['cy'] <= y1
+        celulas = lambda metros: max(1, round(metros / res))
 
         # 41 lotes -> galpões (pátio de caminhões alterna de lado; alguns lotes divididos)
         lotes = (np.abs(rgb - np.array([165, 221, 110])).max(-1) <= 14) & dentro
@@ -384,8 +402,8 @@ class Maquete:
             gy, gx = self.grade(c)
             M = np.zeros((gy.max() - gy.min() + 1, gx.max() - gx.min() + 1), bool)
             M[gy - gy.min(), gx - gx.min()] = True
-            r0, c0, r1, c1 = self.maior_retangulo(ndi.binary_erosion(M, iterations=2))
-            X0, Y0, X1, Y1 = gx.min() + c0, gy.min() + r0, gx.min() + c1, gy.min() + r1
+            r0, c0, r1, c1 = self.maior_retangulo(ndi.binary_erosion(M, iterations=celulas(2)))
+            X0, Y0, X1, Y1 = [v * res for v in (gx.min() + c0, gy.min() + r0, gx.min() + c1, gy.min() + r1)]
             w, d = X1 - X0, Y1 - Y0
             if w < 40 or d < 22:
                 continue
@@ -415,8 +433,9 @@ class Maquete:
             if c['cx'] > 81.5 and c['cy'] < 26.6:                    # estacionamento do hotel
                 continue
             gy, gx = self.grade(c)
-            if len(gx) < 50:
+            if len(gx) * res * res < 50:
                 continue
+            gy, gx = gy * res, gx * res                                # em metros
             cy, cx = gy.mean(), gx.mean()
             ev, vec = np.linalg.eigh(np.cov(np.vstack([gx - cx, gy - cy])))
             L, S = 3.4 * math.sqrt(ev[1]), 3.4 * math.sqrt(ev[0])
@@ -442,7 +461,8 @@ class Maquete:
         hub = sel(59, 84.5, 61.5, 86.5, 8000, 10000)
         if hub:
             gy, gx = self.grade(hub[0])
-            self.retangulo(gx.mean() - 55, gy.mean() - 22, gx.mean() + 55, gy.mean() + 22, 10, 'hub de serviços')
+            mx_, my_ = gx.mean() * res, gy.mean() * res
+            self.retangulo(mx_ - 55, my_ - 22, mx_ + 55, my_ + 22, 10, 'hub de serviços')
         # hotel (era laranja no desenho), conector e a casca do centro de convenções
         hotel = self.componentes((np.abs(rgb - 190).max(-1) <= 3) & dentro, 1500, 4000)
         self.extrudar([c for c in hotel if caixa(c, 83, 15, 89, 20)], 36, 'hotel')
@@ -452,7 +472,7 @@ class Maquete:
             gy, gx = self.grade(c)
             M = np.zeros((gy.max() - gy.min() + 1, gx.max() - gx.min() + 1), bool)
             M[gy - gy.min(), gx - gx.min()] = True
-            M = ndi.binary_closing(M, iterations=3)
+            M = ndi.binary_closing(M, iterations=celulas(3))
             dist = ndi.distance_transform_edt(M)
             yy, xx = np.nonzero(M)
             hs = (21 * np.sqrt(np.clip(dist / max(dist.max(), 1), 0, 1)))[yy, xx].astype(np.float32)
@@ -466,23 +486,32 @@ class Maquete:
 
 
 # --------------------------------------------------------------------------- render por marcha de raios
+ALBEDO = np.array([[0, 0, 0], [222, 224, 226], [232, 220, 200], [234, 238, 243], [241, 239, 235]], np.float32)
+
+
+def normais(maquete):
+    """Normais dos telhados pelo gradiente (cúpula lisa; caixas planas)."""
+    gy_, gx_ = np.gradient(maquete.HF, maquete.res)
+    NR = np.dstack([-gx_, -gy_, np.ones_like(maquete.HF)])
+    return NR / np.linalg.norm(NR, axis=-1, keepdims=True)
+
+
 def render(maquete, chao, Xc, Yc, Zc, yaw, pitch, hfov, w, h, ss, N=170, M=48):
-    HF, ID, MAT = maquete.HF, maquete.ID, maquete.MAT
+    HF, ID, MAT, res = maquete.HF, maquete.ID, maquete.MAT, maquete.res
     GH, GW = HF.shape
+    EW, EH = GW * res, GH * res                       # extensão da grade em metros
     CTX = np.array(chao).astype(np.float32)
     CH, CW = CTX.shape[:2]
     x0, y0 = CTX_BOX[0], CTX_BOX[1]
     hmax = float(HF.max()) + 0.5
-    gy_, gx_ = np.gradient(HF)
-    NR = np.dstack([-gx_, -gy_, np.ones_like(HF)])
-    NR /= np.linalg.norm(NR, axis=-1, keepdims=True)
-    ALB = np.array([[0, 0, 0], [222, 224, 226], [232, 220, 200], [234, 238, 243], [241, 239, 235]], np.float32)
+    NR = normais(maquete)
+    ALB = ALBEDO
     FUNDO = np.array(CORES['fundo'], np.float32)
     CEU0, CEU1 = np.array([236, 232, 218], np.float32), np.array([170, 196, 222], np.float32)
     L = np.array(LUZ, float); L /= np.linalg.norm(L)
 
     def altura(X, Y):
-        gx, gy = np.floor(X).astype(np.int32), np.floor(Y).astype(np.int32)
+        gx, gy = np.floor(X / res).astype(np.int32), np.floor(Y / res).astype(np.int32)
         ok = (gx >= 0) & (gx < GW) & (gy >= 0) & (gy < GH)
         H = np.zeros(X.shape, np.float32)
         H[ok] = HF[gy[ok], gx[ok]]
@@ -515,7 +544,7 @@ def render(maquete, chao, Xc, Yc, Zc, yaw, pitch, hfov, w, h, ss, N=170, M=48):
         nrm = np.zeros(d.shape, np.float32); nrm[..., 2] = 1
         tt = np.where(g, (Zc - hmax) / np.where(g, -dz, 1), 0)
         Xa, Ya = Xc + tt * d[..., 0], Yc + tt * d[..., 1]
-        cand = g & ~(((Xa < 0) & (Xg < 0)) | ((Xa >= GW) & (Xg >= GW)) | ((Ya < 0) & (Yg < 0)) | ((Ya >= GH) & (Yg >= GH)))
+        cand = g & ~(((Xa < 0) & (Xg < 0)) | ((Xa >= EW) & (Xg >= EW)) | ((Ya < 0) & (Yg < 0)) | ((Ya >= EH) & (Yg >= EH)))
         ci = np.nonzero(cand)
         if len(ci[0]):
             dd, t0, t1 = d[ci], tt[ci], tg[ci]
@@ -539,7 +568,7 @@ def render(maquete, chao, Xc, Yc, Zc, yaw, pitch, hfov, w, h, ss, N=170, M=48):
             q = (ci[0][rows], ci[1][rows])
             kind[q] = np.where(teto, 2, 3); ids[q] = ID[gyk, gxk]; col[q] = ALB[MAT[gyk, gxk]]; nrm[q] = n
             HX[q], HY[q], HZ[q] = X[rows, k], Y[rows, k], np.minimum(Z[rows, k], Hk)
-        perto = g & (HX >= -50) & (HX < GW + 50) & (HY >= -50) & (HY < GH + 50)
+        perto = g & (HX >= -50) & (HX < EW + 50) & (HY >= -50) & (HY < EH + 50)
         si = np.nonzero(perto)
         sombra = np.zeros(g.shape, bool)
         if len(si[0]):
@@ -565,62 +594,96 @@ def render(maquete, chao, Xc, Yc, Zc, yaw, pitch, hfov, w, h, ss, N=170, M=48):
     return im.resize((w, h), Image.LANCZOS) if ss > 1 else im
 
 
-def render_zenital(maquete, chao, guia, sheet, cx, cy, largura, w, h, ss, M=56):
-    """Vista de cima (variação 90°): ortográfica, mesma orientação da prancha, com sombras."""
-    HF, ID, MAT = maquete.HF, maquete.ID, maquete.MAT
+def mapas_luz(maquete, luz):
+    """Sombra (0 a 1, suavizada), oclusão no pé dos prédios e distância à beira do telhado, calculadas
+    uma vez na grade de alturas — a vista de cima só amostra."""
+    if luz in maquete.cache:
+        return maquete.cache[luz]
+    HF, res = maquete.HF, maquete.res
+    GH, GW = HF.shape
+    L = np.array(luz, float); L /= np.linalg.norm(L)
+    hmax = float(HF.max()) + 0.5
+    alcance = hmax / L[2] * math.hypot(L[0], L[1])              # sombra mais longa, em metros no chão
+    passos = np.linspace(0.02, 1, int(math.ceil(alcance / res)) + 1, dtype=np.float32)
+    sombra = np.zeros((GH, GW), np.float32)
+    xs = (np.arange(GW) + 0.5) * res
+    bloco = 24
+    for j0 in range(0, GH, bloco):
+        XX, YY = np.meshgrid(xs, (np.arange(j0, min(GH, j0 + bloco)) + 0.5) * res)
+        h = HF[j0:j0 + bloco]
+        S = ((hmax - h - 0.2) / L[2])[..., None] * passos
+        qx = np.floor((XX[..., None] + S * L[0]) / res).astype(np.int32)
+        qy = np.floor((YY[..., None] + S * L[1]) / res).astype(np.int32)
+        ok = (qx >= 0) & (qx < GW) & (qy >= 0) & (qy < GH)
+        Hq = np.zeros(qx.shape, np.float32)
+        Hq[ok] = HF[qy[ok], qx[ok]]
+        sombra[j0:j0 + bloco] = ((h + 0.2)[..., None] + S * L[2] < Hq).any(-1)
+    predio = HF > 0
+    sombra = ndi.gaussian_filter(sombra, 0.7 / res)
+    ocl = 1 - 0.22 * np.clip(ndi.gaussian_filter(predio.astype(np.float32), 2.5 / res), 0, 1)
+    ocl[predio] = 1
+    beira = ndi.distance_transform_edt(predio) * res
+    n = int(maquete.ID.max())
+    x0_id = np.zeros(n + 1, np.float32)
+    x0_id[1:] = ndi.minimum(np.broadcast_to(np.arange(GW, dtype=np.float32), HF.shape), labels=maquete.ID,
+                            index=np.arange(1, n + 1)) * res
+    maquete.cache[luz] = (sombra, ocl, beira, x0_id)
+    return maquete.cache[luz]
+
+
+def render_zenital(maquete, data, geo, guia, sheet, cx, cy, largura, w, h, ss):
+    """Vista de cima (variação 90°): ortográfica, na orientação da prancha. O entorno é redesenhado na
+    resolução final (nada é ampliado), com sombra suave, oclusão no pé dos prédios e as faixas de
+    iluminação zenital dos galpões."""
+    HF, ID, MAT, res = maquete.HF, maquete.ID, maquete.MAT, maquete.res
     GH, GW = HF.shape
     W2, H2 = w * ss, h * ss
     mpp = largura / W2
     fx0, fy0 = cx - largura / 2, cy - H2 * mpp / 2
-    fx1, fy1 = fx0 + W2 * mpp, fy0 + H2 * mpp
-    bx, by = CTX_BOX[0], CTX_BOX[1]
-    base = chao.resize((W2, H2), Image.LANCZOS,
-                       box=((fx0 - bx) / MPP, (fy0 - by) / MPP, (fx1 - bx) / MPP, (fy1 - by) / MPP)).convert('RGBA')
-    sx0, sy0, sx1, sy1 = max(fx0, 0), max(fy0, 0), min(fx1, sheet[0]), min(fy1, sheet[1])
-    planta_alta = Image.fromarray(guia, 'RGBA').resize(
-        (round((sx1 - sx0) / mpp), round((sy1 - sy0) / mpp)), Image.LANCZOS, box=(sx0 * K, sy0 * K, sx1 * K, sy1 * K))
-    base.alpha_composite(planta_alta, (round((sx0 - fx0) / mpp), round((sy0 - fy0) / mpp)))
-    img = np.array(base.convert('RGB')).astype(np.float32)
-    hmax = float(HF.max()) + 0.5
-    gy_, gx_ = np.gradient(HF)
-    NR = np.dstack([-gx_, -gy_, np.ones_like(HF)])
-    NR /= np.linalg.norm(NR, axis=-1, keepdims=True)
-    ALB = np.array([[0, 0, 0], [222, 224, 226], [232, 220, 200], [234, 238, 243], [241, 239, 235]], np.float32)
+    chao = entorno(data, geo, guia, box=(fx0, fy0, fx0 + W2 * mpp, fy0 + H2 * mpp), mpp=mpp, larguras=LARGURAS_HD)
+    if chao.size != (W2, H2):
+        chao = chao.resize((W2, H2), Image.LANCZOS)
+    img = np.array(chao)
+    sombra, ocl, beira, x0_id = mapas_luz(maquete, LUZ90)
+    NR = normais(maquete)
     L = np.array(LUZ90, float); L /= np.linalg.norm(L)
-
-    def amostra(X, Y):
-        gx, gy = np.floor(X).astype(np.int32), np.floor(Y).astype(np.int32)
-        ok = (gx >= 0) & (gx < GW) & (gy >= 0) & (gy < GH)
-        H = np.zeros(X.shape, np.float32)
-        H[ok] = HF[gy[ok], gx[ok]]
-        return H, gx, gy, ok
-
     X = fx0 + (np.arange(W2) + 0.5) * mpp
+    gxs = np.floor(X / res).astype(np.int32)
+    okx = (gxs >= 0) & (gxs < GW)
     idb = np.zeros((H2, W2), np.int32)
-    passo = 16
+    passo = 64
     for j0 in range(0, H2, passo):
         Y = fy0 + (np.arange(j0, min(H2, j0 + passo)) + 0.5) * mpp
-        XX, YY = np.meshgrid(X, Y)
-        Hh, gx, gy, ok = amostra(XX, YY)
-        teto = Hh > 0
-        col = img[j0:j0 + passo]
-        ids = np.zeros(teto.shape, np.int32)
-        q = np.nonzero(teto)
-        n = NR[gy[q], gx[q]]
-        col[q] = ALB[MAT[gy[q], gx[q]]] * (0.55 + 0.5 * np.clip(n @ L, 0, 1))[:, None]
-        ids[q] = ID[gy[q], gx[q]]
-        S = ((hmax - Hh - 0.3) / L[2])[..., None] * np.linspace(0.02, 1, M, dtype=np.float32)
-        Hq, _, _, _ = amostra(XX[..., None] + S * L[0], YY[..., None] + S * L[1])
-        sombra = ((Hh + 0.3)[..., None] + S * L[2] < Hq).any(-1)
-        col *= np.where(sombra, np.where(teto, 0.80, 0.62), 1.0)[..., None]
-        img[j0:j0 + passo] = col
+        gys = np.floor(Y / res).astype(np.int32)
+        GX, GY = np.meshgrid(gxs, gys)
+        q = np.nonzero(okx[None, :] & ((gys >= 0) & (gys < GH))[:, None])
+        if not len(q[0]):
+            continue
+        gx, gy = GX[q], GY[q]
+        col = img[j0:j0 + passo].astype(np.float32)
+        c = col[q]
+        sh = sombra[gy, gx]
+        teto = HF[gy, gx] > 0
+        fator = np.where(teto, 1 - 0.22 * sh, (1 - 0.40 * sh) * ocl[gy, gx])
+        t = np.nonzero(teto)[0]
+        mat, ids_t = MAT[gy[t], gx[t]], ID[gy[t], gx[t]]
+        ct = ALBEDO[mat] * (0.55 + 0.5 * np.clip(NR[gy[t], gx[t]] @ L, 0, 1))[:, None]
+        # faixas de iluminação zenital: a cada 12 m a partir da beira de cada galpão, longe das bordas
+        xr = X[q[1][t]] - x0_id[ids_t]
+        faixa = (mat == 1) & (beira[gy[t], gx[t]] > 3.5) & (((xr - 6) % 12) < 1.2)
+        ct[faixa] *= 0.92
+        c[t] = ct
+        col[q] = c * fator[:, None]
+        ids = np.zeros(col.shape[:2], np.int32)
+        ids[q[0][t], q[1][t]] = ids_t
+        img[j0:j0 + passo] = np.clip(col, 0, 255).astype(np.uint8)
         idb[j0:j0 + passo] = ids
     borda = np.zeros((H2, W2), bool)
     for a, b in (((slice(None), slice(1, None)), (slice(None), slice(None, -1))),
                  ((slice(1, None), slice(None)), (slice(None, -1), slice(None)))):
         borda[a] |= (idb[a] != idb[b]) & ((idb[a] > 0) | (idb[b] > 0))
-    img[borda] *= 0.80
-    im = Image.fromarray(np.clip(img, 0, 255).astype(np.uint8))
+    img[borda] = (img[borda] * 0.80).astype(np.uint8)
+    im = Image.fromarray(img)
     return im.resize((w, h), Image.LANCZOS) if ss > 1 else im
 
 
@@ -682,8 +745,12 @@ def main():
         print(f'  {k:32s} {v}')
     print('render da câmera…')
     render(maq, chao, **CAMERA).save(os.path.join(HERE, 'ref-A-camera-volumes.png'), optimize=True)
-    print('render da vista de cima…')
-    render_zenital(maq, chao, guia, sheet, **CAMERA90).save(os.path.join(HERE, 'ref-A90-zenital-volumes.png'), optimize=True)
+    print('vista de cima (grade de 0,5 m, sombras)…')
+    maq90 = Maquete(plano, sheet, res=RES90).montar()
+    render_zenital(maq90, data, geo, guia, sheet, **CAMERA90).save(os.path.join(HERE, 'ref-A90-zenital-volumes.png'), optimize=True)
+    for nome, cam in (('ref-A90-zenital-volumes-4k.png', CAMERA90_4K), ('ref-A90-zenital-volumes-4k-16x9.png', CAMERA90_4K_169)):
+        print('  ' + nome)
+        render_zenital(maq90, data, geo, guia, sheet, **cam).save(os.path.join(HERE, nome), dpi=(DPI_4K, DPI_4K), optimize=True)
 
     print('fotos do cliente…')
     sem_vermelho(Image.open(os.path.join(ROOT, 'assets/web/fotos/park-aereo-rio.jpg'))).save(

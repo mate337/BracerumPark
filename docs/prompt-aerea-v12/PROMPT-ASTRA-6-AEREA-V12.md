@@ -40,7 +40,7 @@ primeiro plano, o conjunto hotel + cobertura à direita, o resort com o lago, as
 | **F** | `ref-F-industrial-vias.jpg` | Galpões com o pórtico azul, boulevard, rotatória, portaria. | — |
 | **G** | `ref-G-resort.jpg` | Casas, clube, lago e piscina do resort. | — |
 | **H** | `ref-H-servicos.jpg` | Pista e pátio, hangar, posto, comércio, centro tecnológico, estação de tratamento. | — |
-| **A90** | `ref-A90-zenital-volumes.png` | Guia da variação 90° (seção 6): a mesma maquete, vista de cima, na mesma orientação. | O aspecto de maquete e as cores chapadas. |
+| **A90** | `ref-A90-zenital-volumes.png` | Guia da variação 90° (seção 6): a mesma maquete, vista de cima, na mesma orientação. Também em 4K, 300 dpi: `ref-A90-zenital-volumes-4k.png` (3840 × 2560, 3:2) e `ref-A90-zenital-volumes-4k-16x9.png` (3840 × 2160). | O aspecto de maquete e as cores chapadas. |
 | — | `gerada-v1-obliqua.webp` | A primeira aérea gerada pelo Astra-6 (16/10): referência de estilo da variação 90° numa conversa nova. | — |
 
 As referências **não têm texto de propósito**: gerador de imagem copia rótulo de referência para a
@@ -250,12 +250,23 @@ A primeira aérea gerada (`gerada-v1-obliqua.webp`, 2026-10-16) ficou boa. A var
 filme (`docs/ae/`), em que a aérea vira planta. Mantém a **mesma orientação** da oblíqua (rodovia em
 cima, pista embaixo, hotel à direita), para as duas imagens se encaixarem uma na outra.
 
-A guia é a **A90** (`ref-A90-zenital-volumes.png`): a mesma maquete da guia A, vista de cima, com as
-sombras vindo do canto superior esquerdo, como a luz da imagem gerada.
+A guia é a **A90**: a mesma maquete da guia A, vista de cima, com as sombras vindo do canto superior
+esquerdo, como a luz da imagem gerada. Há três tamanhos, todos com o mesmo quadro:
+
+| Arquivo | Tamanho | Para quê |
+|---|---|---|
+| `ref-A90-zenital-volumes-4k.png` | 3840 × 2560 (3:2), 300 dpi | **A que anexar** — mais detalhe para o gerador; impressão até 32,5 × 21,7 cm |
+| `ref-A90-zenital-volumes-4k-16x9.png` | 3840 × 2160 (4K UHD, 16:9), 300 dpi | Tela, vídeo e o fundo do masterplan; com ela, troque "Formato paisagem 3:2" por "Formato 16:9" no prompt |
+| `ref-A90-zenital-volumes.png` | 1536 × 1024 (3:2) | Versão leve, para anexar rápido |
+
+A versão de 2026-10-16 tarde melhorou a guia: o entorno é desenhado direto na resolução final (antes
+era ampliado de uma base de 2,5 m por pixel e borrava), os volumes saem de uma grade de 0,5 m (sem
+degrau nas bordas), as sombras são suaves, há uma leve oclusão no pé dos prédios e os galpões
+mostram as faixas de iluminação zenital, como na imagem gerada.
 
 ### Na mesma conversa
 
-Na conversa em que a oblíqua foi gerada, anexe só a **A90** e cole:
+Na conversa em que a oblíqua foi gerada, anexe só a **A90** (de preferência a 4K) e cole:
 
 ```text
 Agora faça uma variação 90° desta imagem: exatamente a mesma cidade industrial, com a mesma arquitetura, os mesmos materiais, a mesma vegetação e a mesma luz dourada, mas vista de cima, com a câmera apontada reto para baixo (vista zenital, 90°), como uma foto de drone a grande altura ou de satélite de altíssima resolução. Formato paisagem 3:2.
