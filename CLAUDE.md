@@ -47,6 +47,14 @@ rotas) que as seis páginas internas baixavam e interpretavam à toa. Ele roda d
     o site cita são o mesmo espaço e trocam junto.
   - **Itens "VALIDAR" do quadro estão validados:** Clube do Caminhoneiro 40.065 m², quadras/campos
     5.000 m², quadras/quiosques + posto/salão/restaurante 7.250 m².
+- **Prompt da vista aérea do V12** (2026-10-16): `docs/prompt-aerea-v12/PROMPT-ASTRA-6-AEREA-V12.md`,
+  para o ChatGPT Astra-6 gerar a aérea nova (sem legenda, no lugar real), com 8 referências sem
+  texto. A principal é a **A**, câmera exata com os volumes lidos da planta, gerada por
+  `docs/prompt-aerea-v12/build_refs.py`. **Localização:** a planta só encaixa na única curva da PY-19
+  nesse trecho (−25,7715 / −57,7333, o mesmo ponto do `PARK` do site), com o parque a leste da
+  rodovia e ao sul da curva. Pelo OpenStreetMap essa curva é o km ~36,8 contado do início da PY-19
+  em Villeta; o cliente fala em km 35 (deve ser a origem da quilometragem — confirmar se ele souber
+  o marco). Torres do condomínio vertical: planta em H com 16 vagas → 4 pavimentos.
 - **🚫 Não mexer no site até o usuário liberar** (pedido dele em 2026-10-16). O V12 e as respostas
   ficam só registrados em `docs/` e aqui; nenhuma página, `home.js`, `i18n.js` ou asset publicado
   muda por enquanto.
@@ -313,5 +321,7 @@ Faltam (mencionados no `LEIA-ME.txt` original, ainda não enviados): `tecnologic
 ## Próximo passo
 
 Aguardando o usuário: (1) **ok para levar o Masterplan V12 ao site** — a lista do que muda, já com
-as respostas de 16/10, está no §8 de `docs/masterplan-v12.md`; até lá, não mexer no site; (2) fotos próprias dos terminais privados, para
-substituir as ilustrativas; (3) o dado de anos de história da Bracerum como importadora de aço.
+as respostas de 16/10, está no §8 de `docs/masterplan-v12.md`; até lá, não mexer no site; (2) a
+vista aérea do V12 gerada pelo Astra-6 com `docs/prompt-aerea-v12/` (quando chegar, ela pode
+substituir a `vista-aerea-park-02.jpg` do masterplan — e os pinos precisam ser remarcados); (3) fotos próprias dos terminais privados, para
+substituir as ilustrativas; (4) o dado de anos de história da Bracerum como importadora de aço.
