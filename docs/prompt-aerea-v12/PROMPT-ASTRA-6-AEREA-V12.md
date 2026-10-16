@@ -7,7 +7,8 @@ Bracerum**, lotes **vendidos a partir de 1.250 m²**, **ambulatório** (nunca "h
 "VALIDAR" do quadro de áreas **validados**. O registro completo da planta está em
 `docs/masterplan-v12.md`.
 
-Tudo o que é preciso está nesta pasta: este prompt e as 8 imagens de referência (A–H).
+Tudo o que é preciso está nesta pasta: este prompt e as 8 imagens de referência (A–H), mais a guia
+A90 e a primeira aérea gerada, para a **variação 90°** (seção 6).
 
 ## Como usar
 
@@ -39,6 +40,8 @@ primeiro plano, o conjunto hotel + cobertura à direita, o resort com o lago, as
 | **F** | `ref-F-industrial-vias.jpg` | Galpões com o pórtico azul, boulevard, rotatória, portaria. | — |
 | **G** | `ref-G-resort.jpg` | Casas, clube, lago e piscina do resort. | — |
 | **H** | `ref-H-servicos.jpg` | Pista e pátio, hangar, posto, comércio, centro tecnológico, estação de tratamento. | — |
+| **A90** | `ref-A90-zenital-volumes.png` | Guia da variação 90° (seção 6): a mesma maquete, vista de cima, na mesma orientação. | O aspecto de maquete e as cores chapadas. |
+| — | `gerada-v1-obliqua.webp` | A primeira aérea gerada pelo Astra-6 (16/10): referência de estilo da variação 90° numa conversa nova. | — |
 
 As referências **não têm texto de propósito**: gerador de imagem copia rótulo de referência para a
 imagem final. Nas fotos D–H o vermelho saturado (lanterna, cruz, flor) foi dessaturado, pela regra
@@ -239,3 +242,110 @@ resort, hotel, casca, hangares…) e renderiza a guia A na câmera `CAMERA`. Num
 `DOBRA_PLANTA` (o vértice da dobra da rodovia, em fração da prancha).
 
 Entorno das referências A e C: © colaboradores do OpenStreetMap (ODbL).
+
+## 6. Variação 90° (vista de cima)
+
+A primeira aérea gerada (`gerada-v1-obliqua.webp`, 2026-10-16) ficou boa. A variação 90° é a
+**mesma imagem vista de cima**, com a câmera apontada reto para baixo — o "Vista 90º" do roteiro do
+filme (`docs/ae/`), em que a aérea vira planta. Mantém a **mesma orientação** da oblíqua (rodovia em
+cima, pista embaixo, hotel à direita), para as duas imagens se encaixarem uma na outra.
+
+A guia é a **A90** (`ref-A90-zenital-volumes.png`): a mesma maquete da guia A, vista de cima, com as
+sombras vindo do canto superior esquerdo, como a luz da imagem gerada.
+
+### Na mesma conversa
+
+Na conversa em que a oblíqua foi gerada, anexe só a **A90** e cole:
+
+```text
+Agora faça uma variação 90° desta imagem: exatamente a mesma cidade industrial, com a mesma arquitetura, os mesmos materiais, a mesma vegetação e a mesma luz dourada, mas vista de cima, com a câmera apontada reto para baixo (vista zenital, 90°), como uma foto de drone a grande altura ou de satélite de altíssima resolução. Formato paisagem 3:2.
+
+Use a imagem anexada (guia A90) como base: ela mostra o enquadramento, a orientação e a posição de cada volume, quadra, via, lago e da pista vistos de cima. Os blocos cinza e brancos são volumes provisórios e as sombras indicam a altura; não copie as cores chapadas nem o entorno simplificado. Para o desenho exato, siga a planta B que já está na conversa. Onde a imagem anterior divergir da planta, vale a planta: 6 colunas de lotes, o canal de drenagem entre a primeira e a segunda coluna, o lago do resort alongado com o coreto na ilhota da ponta esquerda e os 38 prédios do condomínio vertical em planta H, de 4 pavimentos.
+
+Orientação: a mesma da imagem anterior, como se a câmera tivesse subido até apontar para baixo. A Ruta PY-19 cruza o alto da imagem e faz uma curva suave no canto superior direito; a pista de pouso fica embaixo; hotel, centro de convenções, resort, condomínio e escola ficam à direita; o aeroporto de cargas e a estação de esgoto ficam à esquerda. Não gire a imagem para o norte ficar em cima.
+
+Sem perspectiva aparente: quadras retangulares, ruas paralelas, sem horizonte e sem céu, quase nenhuma fachada. Vê-se telhados com as faixas de iluminação zenital, pátios de caminhões, carros, copas de árvores, piscinas e sombras. O parque inteiro ocupa quase toda a largura, com uma margem do entorno real em volta: acima da rodovia, pasto com palmeiras, uma estrada de terra e os silos da agroindústria vizinha junto à curva; abaixo da pista, o banhado com um córrego sinuoso e ilhas de mata.
+
+Luz: a mesma luz dourada, vinda do canto superior esquerdo, com o sol a uns 35°. Sombras suaves, projetadas para baixo e para a direita, que mostram a altura dos prédios sem esconder ruas e pátios.
+
+Continua valendo tudo o que era proibido: nenhum texto, número, legenda, logotipo, rosa dos ventos, escala, moldura ou ícone; nada vermelho, laranja ou rosa. Não é mapa nem desenho: é uma fotografia aérea.
+```
+
+### Em conversa nova
+
+Anexe, nesta ordem: a **oblíqua gerada** (`gerada-v1-obliqua.webp`), a **A90** e a **B**
+(e, se couber, E a H). Cole:
+
+```text
+Crie uma única imagem fotorrealista: a vista de cima, com a câmera apontada reto para baixo (vista zenital, 90°), de uma cidade industrial planejada, completa e em operação, em Villeta, Paraguai, à margem leste da Ruta PY-19 (km 35), numa planície totalmente plana. É uma variação 90° da imagem 1: a mesma arquitetura, os mesmos materiais, a mesma vegetação e a mesma luz, só que vista de cima, como uma foto de drone a grande altura ou de satélite de altíssima resolução. Formato paisagem 3:2, no maior tamanho disponível. Sem nenhum texto, legenda ou sobreposição.
+
+IMAGENS
+- Imagem 1, a vista oblíqua aprovada: referência de estilo (materiais, cores, vegetação, densidade de detalhe e luz). Mantenha o mesmo padrão de render.
+- Imagem 2, a guia de cima: enquadramento, orientação e posição de cada volume, quadra, via, lago e da pista. Repita exatamente. Os blocos cinza e brancos são volumes provisórios e as sombras indicam a altura; não copie as cores chapadas nem o entorno simplificado.
+- Imagem 3, a planta oficial: o desenho exato de vias, quadras, lagos, quadras esportivas e prédios. Onde a imagem 1 divergir da planta, vale a planta.
+- Demais imagens: a arquitetura aprovada de cada tipo de prédio.
+
+ORIENTAÇÃO E ENQUADRAMENTO, iguais aos da imagem 2
+- A mesma orientação da imagem 1, como se a câmera tivesse subido até apontar para baixo: a Ruta PY-19 cruza o alto da imagem de ponta a ponta e, no canto superior direito, faz uma curva suave e sai pela borda direita; a pista de pouso fica embaixo; hotel, centro de convenções, resort, condomínio e escola ficam à direita; o aeroporto de cargas e a estação de esgoto ficam à esquerda. Não gire a imagem para o norte ficar em cima.
+- Sem perspectiva aparente: quadras retangulares, ruas paralelas, sem horizonte e sem céu, quase nenhuma fachada. Vê-se telhados, pátios, copas de árvores e sombras.
+- O parque inteiro, centralizado, ocupa quase toda a largura. Em volta, uma margem do entorno real: acima da rodovia, pasto e campo nativo com palmeiras, uma estrada de terra e, junto à curva, a pequena unidade agroindustrial existente com silos redondos; abaixo da pista, o banhado com um córrego sinuoso e ilhas de mata nativa; dos lados, campo úmido com palmeiras karanda'y.
+
+O QUE APARECE DE CIMA, sempre como na planta
+- O contorno do parque: borda de cima reta ao longo da rodovia, ponta direita aguda, borda direita em diagonal, borda de baixo ao longo da pista, borda esquerda em diagonal.
+- Ao longo da rodovia: a faixa verde e a via de serviço. No meio da frente, a alça e a rotatória da entrada, o pátio de caminhões com as vagas em espinha de peixe e as carretas, o posto com a cobertura em L e uma quadra pequena, e a portaria. À direita da entrada, o telhado longo do outlet, que vira em L e desce até o supermercado; e o centro tecnológico, dois prédios trapezoidais espelhados.
+- No centro: a grade regular de 6 colunas por 7 fileiras de lotes de 200 x 100 m, com os telhados brancos e cinza-claros dos galpões e suas faixas de iluminação zenital, os pátios de caminhões com as docas, ruas com calçadas e árvores, pequenas rotatórias quadradas nos cruzamentos, os dois boulevards com palmeiras e o canal de drenagem retilíneo, de margens gramadas, entre a primeira e a segunda coluna.
+- À direita: os estacionamentos em pentes com palmeiras; o salão de eventos; a cobertura orgânica e ondulada de malha branca e vidro do centro de convenções, com a lâmina do hotel encostada à esquerda; na ponta, a escola em arco, com a quadra e o parquinho, e a pequena estação de água; o resort, com as ruas curvas, as casas com piscinas, o lago alongado com o coreto na ilhota da ponta esquerda e o clube com campo, quadras de areia e piscinas; abaixo dele, os 38 prédios em H do condomínio vertical, de 4 pavimentos, em quatro grupos, com espelhos d'água e o quarteirão de lazer.
+- À esquerda: a estação de esgoto com os tanques redondos, a subestação e o galpão de manutenção; os 7 hangares, o pátio com os jatos executivos, o heliponto e o ponto de abastecimento.
+- Embaixo: a pista de 1.460 m, de asfalto escuro, com faixa central tracejada branca, zebras de cabeceira e faixas de grama dos dois lados; entre a grade e o fim da pista, o bloco de serviços, o centro de serviços para indústrias e o clube dos funcionários.
+
+LUZ E ESTILO
+- A mesma luz dourada da imagem 1, vinda do canto superior esquerdo, com o sol a uns 35°: sombras médias e suaves, projetadas para baixo e para a direita, que mostram a altura de cada prédio sem esconder nada.
+- O mesmo fotorrealismo e as mesmas cores: telhados brancos e cinza-claros, asfalto escuro, vegetação verde e palha, água verde-azulada, veículos brancos, prata e cinza. Zero vermelho, laranja ou rosa.
+
+PROIBIDO
+Nenhum texto, número, legenda, rótulo, título, logotipo, rosa dos ventos, escala gráfica, moldura, pino ou ícone: nada sobreposto. Não é mapa, planta técnica nem desenho: é uma fotografia. Não gire a orientação. Não invente prédios que não estão na planta.
+```
+
+### Ajustes da vista de cima
+
+Os ajustes da seção 3 (texto, vermelho, morros) continuam valendo. Estes são os próprios da vista de cima:
+
+**Saiu inclinada (aparece céu, horizonte ou fachada)**
+```text
+A câmera tem que estar exatamente a 90°, apontada reto para baixo: sem horizonte, sem céu e sem fachadas visíveis — só telhados, pátios, copas e sombras. Mantenha todo o resto.
+```
+
+**A orientação girou**
+```text
+A orientação tem que ser a da guia A90: a rodovia no alto da imagem, a pista embaixo, o hotel e o resort à direita, o aeroporto à esquerda. Corrija só a orientação; o resto fica igual.
+```
+
+**Ficou com cara de mapa ou de planta ilustrada**
+```text
+Isto tem que ser uma fotografia aérea fotorrealista, não um mapa nem uma planta ilustrada: textura real de telhado metálico, asfalto, grama, copas de árvores e água, com sombras naturais. Mantenha a implantação e o enquadramento.
+```
+
+**As sombras estão escondendo ruas e pátios**
+```text
+Deixe as sombras mais curtas e mais suaves, com o sol mais alto (uns 45°), para não esconder ruas e pátios. O resto fica igual.
+```
+
+### Checklist da vista de cima
+
+- [ ] Câmera reta para baixo: sem céu, sem horizonte, sem fachadas.
+- [ ] Mesma orientação da oblíqua: rodovia em cima, pista embaixo, hotel e resort à direita, aeroporto à esquerda.
+- [ ] Quadras retangulares e ruas paralelas, sem perspectiva.
+- [ ] Grade de 6 colunas, com o canal entre a 1ª e a 2ª coluna e os dois boulevards.
+- [ ] Entrada no meio da frente; outlet em L até o supermercado.
+- [ ] Lago do resort alongado, com o coreto na ilhota da ponta esquerda.
+- [ ] Os 38 prédios em H do condomínio vertical, em quatro grupos.
+- [ ] Nada escrito, nada vermelho.
+
+### Para que serve
+
+- **Fundo do masterplan da home.** É a imagem que falta para tirar o layout do V15 do site
+  (`assets/web/vista-aerea-park-02.jpg`). Vista de cima, os pinos marcam a planta sem distorção
+  de perspectiva — mas precisam ser **remarcados** sobre a imagem nova, e só quando o usuário liberar
+  mexer no site.
+- **Take B do filme de 60 s** (`docs/ae/`): a oblíqua e a vista de cima, na mesma orientação, são
+  o começo e o fim do movimento em que a câmera sobe e a aérea vira planta.

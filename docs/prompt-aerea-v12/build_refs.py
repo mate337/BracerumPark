@@ -6,13 +6,14 @@
 
 Escreve em docs/prompt-aerea-v12/:
   ref-A-camera-volumes.png   câmera exata + maquete de volumes sobre a planta e o entorno real
+  ref-A90-zenital-volumes.png  a mesma maquete vista de cima (variação 90°), na mesma orientação
   ref-B-planta-v12.png       a planta V12 vista de cima, sem nenhum texto
   ref-C-situacao.jpg         o terreno no entorno real (PY-19, rios, matas), vista de cima
   ref-D-estilo.jpg … ref-H-servicos.jpg   renders do cliente, com o vermelho neutralizado
 
 PRECISA RODAR DE NOVO SE:
   - o cliente mandar outra versão da planta (trocar PDF e conferir DOBRA_PLANTA);
-  - mudar a câmera (CAMERA) ou a escolha de fotos (COLAGENS).
+  - mudar a câmera (CAMERA, CAMERA90) ou a escolha de fotos (COLAGENS).
 
 POR QUE ELE EXISTE
 Gerador de imagem não segue uma planta de 33 setores só com texto. O que segura a
@@ -51,6 +52,8 @@ PARK = (-25.771694, -57.732389)         # ponto do parque no site = a curva da P
 DOBRA_PLANTA = (0.908, 0.0738)          # vértice da dobra da rodovia no V12 (fração da prancha)
 CAMERA = dict(Xc=880, Yc=2160, Zc=1650, yaw=6, pitch=36.3, hfov=66, w=1536, h=1024, ss=2)
 LUZ = (-0.55, 0.45, 0.70)               # só dá volume à guia; a luz da imagem final vem do prompt
+CAMERA90 = dict(cx=1289, cy=606, largura=2790, w=1536, h=1024, ss=2)   # vista de cima, metros da prancha
+LUZ90 = (-0.62, -0.50, 0.60)            # do canto superior esquerdo, ~37° — a luz da aérea aprovada
 CTX_BOX = (-3000, -6500, 7000, 3000)    # entorno desenhado, em metros no referencial da planta
 MPP = 2.5                               # metros por pixel do entorno
 BBOX = '-25.86,-57.85,-25.68,-57.62'    # sul, oeste, norte, leste
@@ -562,6 +565,65 @@ def render(maquete, chao, Xc, Yc, Zc, yaw, pitch, hfov, w, h, ss, N=170, M=48):
     return im.resize((w, h), Image.LANCZOS) if ss > 1 else im
 
 
+def render_zenital(maquete, chao, guia, sheet, cx, cy, largura, w, h, ss, M=56):
+    """Vista de cima (variação 90°): ortográfica, mesma orientação da prancha, com sombras."""
+    HF, ID, MAT = maquete.HF, maquete.ID, maquete.MAT
+    GH, GW = HF.shape
+    W2, H2 = w * ss, h * ss
+    mpp = largura / W2
+    fx0, fy0 = cx - largura / 2, cy - H2 * mpp / 2
+    fx1, fy1 = fx0 + W2 * mpp, fy0 + H2 * mpp
+    bx, by = CTX_BOX[0], CTX_BOX[1]
+    base = chao.resize((W2, H2), Image.LANCZOS,
+                       box=((fx0 - bx) / MPP, (fy0 - by) / MPP, (fx1 - bx) / MPP, (fy1 - by) / MPP)).convert('RGBA')
+    sx0, sy0, sx1, sy1 = max(fx0, 0), max(fy0, 0), min(fx1, sheet[0]), min(fy1, sheet[1])
+    planta_alta = Image.fromarray(guia, 'RGBA').resize(
+        (round((sx1 - sx0) / mpp), round((sy1 - sy0) / mpp)), Image.LANCZOS, box=(sx0 * K, sy0 * K, sx1 * K, sy1 * K))
+    base.alpha_composite(planta_alta, (round((sx0 - fx0) / mpp), round((sy0 - fy0) / mpp)))
+    img = np.array(base.convert('RGB')).astype(np.float32)
+    hmax = float(HF.max()) + 0.5
+    gy_, gx_ = np.gradient(HF)
+    NR = np.dstack([-gx_, -gy_, np.ones_like(HF)])
+    NR /= np.linalg.norm(NR, axis=-1, keepdims=True)
+    ALB = np.array([[0, 0, 0], [222, 224, 226], [232, 220, 200], [234, 238, 243], [241, 239, 235]], np.float32)
+    L = np.array(LUZ90, float); L /= np.linalg.norm(L)
+
+    def amostra(X, Y):
+        gx, gy = np.floor(X).astype(np.int32), np.floor(Y).astype(np.int32)
+        ok = (gx >= 0) & (gx < GW) & (gy >= 0) & (gy < GH)
+        H = np.zeros(X.shape, np.float32)
+        H[ok] = HF[gy[ok], gx[ok]]
+        return H, gx, gy, ok
+
+    X = fx0 + (np.arange(W2) + 0.5) * mpp
+    idb = np.zeros((H2, W2), np.int32)
+    passo = 16
+    for j0 in range(0, H2, passo):
+        Y = fy0 + (np.arange(j0, min(H2, j0 + passo)) + 0.5) * mpp
+        XX, YY = np.meshgrid(X, Y)
+        Hh, gx, gy, ok = amostra(XX, YY)
+        teto = Hh > 0
+        col = img[j0:j0 + passo]
+        ids = np.zeros(teto.shape, np.int32)
+        q = np.nonzero(teto)
+        n = NR[gy[q], gx[q]]
+        col[q] = ALB[MAT[gy[q], gx[q]]] * (0.55 + 0.5 * np.clip(n @ L, 0, 1))[:, None]
+        ids[q] = ID[gy[q], gx[q]]
+        S = ((hmax - Hh - 0.3) / L[2])[..., None] * np.linspace(0.02, 1, M, dtype=np.float32)
+        Hq, _, _, _ = amostra(XX[..., None] + S * L[0], YY[..., None] + S * L[1])
+        sombra = ((Hh + 0.3)[..., None] + S * L[2] < Hq).any(-1)
+        col *= np.where(sombra, np.where(teto, 0.80, 0.62), 1.0)[..., None]
+        img[j0:j0 + passo] = col
+        idb[j0:j0 + passo] = ids
+    borda = np.zeros((H2, W2), bool)
+    for a, b in (((slice(None), slice(1, None)), (slice(None), slice(None, -1))),
+                 ((slice(1, None), slice(None)), (slice(None, -1), slice(None)))):
+        borda[a] |= (idb[a] != idb[b]) & ((idb[a] > 0) | (idb[b] > 0))
+    img[borda] *= 0.80
+    im = Image.fromarray(np.clip(img, 0, 255).astype(np.uint8))
+    return im.resize((w, h), Image.LANCZOS) if ss > 1 else im
+
+
 # --------------------------------------------------------------------------- fotos do cliente
 def sem_vermelho(im):
     """Dessatura vermelho puro (lanterna, cruz, flor) — regra da marca: zero vermelho."""
@@ -620,6 +682,8 @@ def main():
         print(f'  {k:32s} {v}')
     print('render da câmera…')
     render(maq, chao, **CAMERA).save(os.path.join(HERE, 'ref-A-camera-volumes.png'), optimize=True)
+    print('render da vista de cima…')
+    render_zenital(maq, chao, guia, sheet, **CAMERA90).save(os.path.join(HERE, 'ref-A90-zenital-volumes.png'), optimize=True)
 
     print('fotos do cliente…')
     sem_vermelho(Image.open(os.path.join(ROOT, 'assets/web/fotos/park-aereo-rio.jpg'))).save(

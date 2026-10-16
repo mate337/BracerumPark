@@ -55,6 +55,11 @@ rotas) que as seis páginas internas baixavam e interpretavam à toa. Ele roda d
   rodovia e ao sul da curva. Pelo OpenStreetMap essa curva é o km ~36,8 contado do início da PY-19
   em Villeta; o cliente fala em km 35 (deve ser a origem da quilometragem — confirmar se ele souber
   o marco). Torres do condomínio vertical: planta em H com 16 vagas → 4 pavimentos.
+- **Primeira aérea gerada pelo Astra-6** (2026-10-16, `docs/prompt-aerea-v12/gerada-v1-obliqua.webp`):
+  aprovada como base de estilo. A **variação 90°** (vista de cima, na mesma orientação — rodovia em
+  cima, pista embaixo) tem prompt próprio na seção 6 do mesmo documento e guia própria, a **A90**
+  (`ref-A90-zenital-volumes.png`, também gerada pelo `build_refs.py`). É a candidata a fundo novo do
+  masterplan da home (pinos remarcados, quando o site for liberado) e o take B do filme.
 - **🚫 Não mexer no site até o usuário liberar** (pedido dele em 2026-10-16). O V12 e as respostas
   ficam só registrados em `docs/` e aqui; nenhuma página, `home.js`, `i18n.js` ou asset publicado
   muda por enquanto.
