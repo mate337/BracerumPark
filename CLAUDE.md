@@ -10,6 +10,37 @@ O site tem **7 páginas**: `index.html`, `tributacao.html`, `bracerum.html`, `ho
 rotas) que as seis páginas internas baixavam e interpretavam à toa. Ele roda depois do
 `script.js` porque usa `hasGsap`, `reduceMotion` e `tr()`.
 
+### Masterplan V12 — fonte de verdade da implantação (2026-10-16)
+- **O cliente enviou a planta "BRACERUM PARK — VERSÃO 12 — 01-10-26"** (AutoCAD, vetorial, escala
+  1:1000). Registro completo, setor por setor, em **`docs/masterplan-v12.md`**; o PDF original, a
+  prancha renderizada, o mapa com os 33 setores numerados e a tabela de rótulos estão em
+  `docs/masterplan-v12/`. **Ler esse documento antes de mexer em qualquer número, pino ou texto que
+  fale de onde as coisas ficam no parque.** Onde diverge do Catálogo V15
+  (`assets/renders/masterplan-implantacao.jpg`, de onde saíram os números atuais do site) ou do R04,
+  vale o V12.
+- **Orientação:** o norte da prancha aponta para a **direita**. Topo = PY-19 (oeste) · direita =
+  Hotel/Convenções/Escola/Resort · baixo = pista · esquerda = aeroporto/ETE. O documento usa
+  acima/abaixo/esquerda/direita da prancha, que é como o cliente lê a planta.
+- **O que mudou desde o V15:** a **entrada** (Clube do Caminhoneiro + pátio de caminhões + posto em L
+  + quadra + Gate de 680 m²) saiu do canto superior esquerdo para o **meio da frente da PY-19**; entrou
+  o **Outlet** (57.750 m², em L, ao lado da entrada) e o **Supermercado** (4.334 m²); o shopping/
+  academia saiu; o **Centro Tecnológico + Espaço Business** (2.340 m²/piso) fica na esquina da Via
+  Costeira com o acesso do Resort; a **creche** (2.083 m²) foi para o bloco de serviços junto à pista,
+  com Refeitório e Resgate (7.748 m²); entraram **Escola** (2.775 m²/piso), **Condomínio Vertical**
+  (38 torres, 608 aptos, 49.704 m²), **Grêmio Recreativo** (2.975 m²) e um **canal de drenagem** com
+  ponte; a **ETA** separou-se da ETE (foi para junto da Escola); os lotes viraram quadras de
+  **20.000 m² (200 × 100 m)**, total **781.777 m²** (era 989.642 m² em quadras de 40.000 m²), riscadas
+  em módulos de 25 × 50 m; estacionamento cidade/hotel **2.036 vagas** (era 1.700). Hotel (384 studios,
+  30.000 m²), Convenções (13.500 m², 1.200 lugares), Resort (141 lotes, 142.067 m²) e aeroporto não
+  mudaram.
+- **O site ainda não foi atualizado para o V12** — a lista do que está desatualizado, com arquivo e
+  linha, está no §8 do documento. O ponto mais grave: o render de fundo do masterplan da home
+  (`assets/web/vista-aerea-park-02.jpg`) mostra o **layout do V15** (entrada no canto) — pino nenhum
+  conserta isso; precisa de vista aérea nova ou trocar o fundo.
+- **Perguntas abertas ao cliente** (§9 do documento): pista (o V12 diz 1.280 m úteis / 1.460 m
+  totais; o site diz 1.480 m), itens "VALIDAR" do quadro, onde ficam as Fábricas Bracerum (o V12 não
+  as marca), se os lotes vendem fracionados em 1.250 m², e o "Hospital" (o quadro diz ambulatório).
+
 ### Fotos finalizadas do cliente (v6.3 — 2026-09-28)
 - **Fonte:** pasta do Google Drive "Imagens BracerumPark Finalizadas" (id `1CETdiYdL13Jhh2twQe6kAF10yvMt1YF6`),
   51 renders PNG 1672×941 com nome genérico ("Imagem do Codex …"), seis deles repetidos. Os originais
@@ -196,6 +227,7 @@ noutra) — o decodificador está em `/tmp/pdf/dec.py` no histórico da sessão,
 web estão em `assets/web/` e `assets/park/`. São material-fonte do cliente: **não apagar sem
 perguntar**. O site entregue tem 2,05 MB na home.
 
+**Superado pelo Masterplan V12 (2026-10-16)** naquilo que diverge — ver `docs/masterplan-v12.md`.
 **Dados oficiais do R04** (usar estes, não os do catálogo V15 quando divergirem):
 terreno +1.800.000 m² · Resort 142.067 m² · parcelas industriais 987.304 m² · pista de 1.280 m ·
 auditório 1.200 pessoas · 12 setores principais.
@@ -269,4 +301,6 @@ Faltam (mencionados no `LEIA-ME.txt` original, ainda não enviados): `tecnologic
 
 ## Próximo passo
 
-Aguardando o usuário: (1) fotos próprias dos terminais privados, para substituir as ilustrativas; (2) o dado de anos de história da Bracerum como importadora de aço.
+Aguardando o usuário: (1) ok para levar o Masterplan V12 ao site (lista no §8 de
+`docs/masterplan-v12.md`) e as respostas do §9; (2) fotos próprias dos terminais privados, para
+substituir as ilustrativas; (3) o dado de anos de história da Bracerum como importadora de aço.
