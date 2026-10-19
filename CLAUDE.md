@@ -66,6 +66,21 @@ rotas) que as seis páginas internas baixavam e interpretavam à toa. Ele roda d
   ficam só registrados em `docs/` e aqui; nenhuma página, `home.js`, `i18n.js` ou asset publicado
   muda por enquanto.
 
+### Masterplan 3D — aplicação fora do site (2026-10-19)
+- **`3dmasterplan/`** é uma maquete 3D interativa do V12 (three.js 0.169.0 vendorizado, sem CDN):
+  gira/aproxima/move, clique em área (12, com cartão de números do V12, fotos do site e link para a
+  página) ou em **lote** (os 41, com a metragem escrita na planta e a regra de venda), vista geral, de
+  cima, tour, régua, rótulos, hora do sol com sombra real, PT/EN/ES pela mesma chave `bp-lang` do site
+  e links por área (`#hotel`, `#lote-C3-L4`). Documentação completa em **`docs/3dmasterplan/README.md`**.
+- **Não está ligada ao site** (pedido de "aplicação fora do site" + a regra de não mexer no site).
+  Publicada junto, abre em `bracerumpark.com/3dmasterplan/` — **em minúsculas** (o cliente sugeriu
+  "/3DMasterplan"; com maiúsculas só por redirecionamento na hospedagem).
+- **Dados gerados** por `docs/3dmasterplan/build_data.py`, que reaproveita o `build_refs.py` da
+  vista aérea (mesmas alturas). As **alturas e a arquitetura são estimativas** — o V12 não define
+  altura; a interface avisa. Textos e números dos cartões ficam em `AREAS` no `3dmasterplan/app.js`.
+- Usa imagens do site por `../assets/` — não mover a pasta para outro nível sem trocar a meta
+  `bp-assets`.
+
 ### Fotos finalizadas do cliente (v6.3 — 2026-09-28)
 - **Fonte:** pasta do Google Drive "Imagens BracerumPark Finalizadas" (id `1CETdiYdL13Jhh2twQe6kAF10yvMt1YF6`),
   51 renders PNG 1672×941 com nome genérico ("Imagem do Codex …"), seis deles repetidos. Os originais
@@ -327,7 +342,8 @@ Faltam (mencionados no `LEIA-ME.txt` original, ainda não enviados): `tecnologic
 
 ## Próximo passo
 
-Aguardando o usuário: (1) **ok para levar o Masterplan V12 ao site** — a lista do que muda, já com
+Aguardando o usuário: (0) retorno sobre o **Masterplan 3D** (`3dmasterplan/`) e se ele entra
+linkado no site; (1) **ok para levar o Masterplan V12 ao site** — a lista do que muda, já com
 as respostas de 16/10, está no §8 de `docs/masterplan-v12.md`; até lá, não mexer no site; (2) a
 vista aérea do V12 gerada pelo Astra-6 com `docs/prompt-aerea-v12/` (quando chegar, ela pode
 substituir a `vista-aerea-park-02.jpg` do masterplan — e os pinos precisam ser remarcados); (3) fotos próprias dos terminais privados, para

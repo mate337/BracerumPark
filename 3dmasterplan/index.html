@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Masterplan 3D — Bracerum Park</title>
+<meta name="description" content="Maquete 3D interativa do Bracerum Park, cidade industrial multiuso em Villeta, Paraguai: gire, aproxime e clique nas áreas e nos lotes." />
+<meta name="bp-assets" content="../assets/" />
+<meta name="bp-site" content="../" />
+<meta name="theme-color" content="#0e0d0b" />
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml" />
+<link rel="apple-touch-icon" href="../assets/apple-touch-icon.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="app.css?v=1" />
+<script type="importmap">{"imports":{"three":"./vendor/three.module.min.js"}}</script>
+</head>
+<body>
+
+<div id="stage" class="stage" aria-label="Maquete 3D do Bracerum Park" data-i18n-aria="ui.stage"></div>
+<div id="pins" class="pins" aria-hidden="false"></div>
+<div id="measure" class="measure" hidden></div>
+<div id="tip" class="tip" role="status" aria-live="polite" hidden></div>
+
+<!-- carregamento -->
+<div id="loader" class="loader">
+  <img class="loader__mark" src="../assets/logo/logo-tagline-cream.svg" alt="Bracerum Park" />
+  <div class="loader__bar"><i id="loaderBar"></i></div>
+  <p class="loader__label" data-i18n="ui.loading">Montando a maquete…</p>
+</div>
+
+<!-- sem WebGL -->
+<div id="fallback" class="fallback" hidden>
+  <img src="data/poster.jpg" alt="" />
+  <div class="fallback__box">
+    <p class="eyebrow" data-i18n="ui.eyebrow">Bracerum Park · Villeta, Paraguai</p>
+    <h1 data-i18n="ui.noWebgl">Este navegador não abriu a maquete 3D.</h1>
+    <p data-i18n="ui.noWebglText">A visualização precisa de WebGL. Tente outro navegador ou um computador — enquanto isso, a imagem acima mostra o masterplan.</p>
+    <a class="btn" data-site="index.html#masterplan" href="../index.html#masterplan" data-i18n="ui.toSiteMp">Ver o masterplan no site</a>
+  </div>
+</div>
+
+<!-- barra de cima -->
+<header class="top">
+  <a class="top__brand" data-site="" href="../" aria-label="Bracerum Park — voltar ao site" data-i18n-aria="ui.backAria">
+    <img src="../assets/logo/logo-horizontal-black.svg" alt="Bracerum Park" />
+  </a>
+  <p class="top__title"><span data-i18n="ui.title">Masterplan</span> <em>3D</em></p>
+  <span class="top__ver" data-i18n="ui.version">Planta V12 · 01/10/2026</span>
+  <div class="top__right">
+    <div class="lang" role="group" aria-label="Idioma">
+      <button type="button" data-lang="pt">PT</button><button type="button" data-lang="en">EN</button><button type="button" data-lang="es">ES</button>
+    </div>
+    <a class="top__back" data-site="" href="../"><span aria-hidden="true">←</span> <span data-i18n="ui.back">Voltar ao site</span></a>
+  </div>
+</header>
+
+<!-- índice das áreas -->
+<aside id="index" class="index" aria-labelledby="indexTitle">
+  <div class="index__head">
+    <p class="eyebrow" data-i18n="ui.eyebrow">Bracerum Park · Villeta, Paraguai</p>
+    <h1 id="indexTitle" class="index__title"><span data-i18n="ui.h1a">A cidade industrial</span> <em data-i18n="ui.h1b">em volume</em></h1>
+    <dl class="facts">
+      <div><dt data-i18n="f.area">área total</dt><dd data-n="1819856" data-u="m²">1.819.856 m²</dd></div>
+      <div><dt data-i18n="f.front">de frente para a PY-19</dt><dd data-n="2100" data-u="m">2.100 m</dd></div>
+      <div><dt data-i18n="f.lots">lotes industriais</dt><dd data-n="41">41</dd></div>
+      <div><dt data-i18n="f.runway">pista de pouso</dt><dd data-n="1460" data-u="m">1.460 m</dd></div>
+    </dl>
+    <button type="button" class="index__toggle" id="indexToggle" aria-expanded="true" aria-controls="areaList">
+      <span data-i18n="ui.areas">Áreas do parque</span><i aria-hidden="true"></i>
+    </button>
+  </div>
+  <ol id="areaList" class="arealist"></ol>
+  <p class="index__note" data-i18n="ui.note">Maquete ilustrativa. Posições e metragens da planta V12; alturas e arquitetura são estimativas — o projeto não define altura dos prédios.</p>
+</aside>
+
+<!-- cartão da área / do lote -->
+<section id="card" class="card" aria-live="polite" hidden>
+  <button type="button" class="card__close" id="cardClose" aria-label="Fechar" data-i18n-aria="ui.close">×</button>
+  <div class="card__grip" aria-hidden="true"></div>
+  <div class="card__scroll">
+    <div class="card__media" id="cardMedia"></div>
+    <div class="card__body">
+      <p class="eyebrow" id="cardEyebrow"></p>
+      <h2 class="card__title" id="cardTitle"></h2>
+      <dl class="kpis" id="cardKpis"></dl>
+      <p class="card__text" id="cardText"></p>
+      <p class="card__note" id="cardNote"></p>
+      <div class="card__actions" id="cardActions"></div>
+    </div>
+  </div>
+  <nav class="card__nav" id="cardNav">
+    <button type="button" id="cardPrev"><span aria-hidden="true">‹</span> <span data-i18n="ui.prev">Anterior</span></button>
+    <span id="cardCount"></span>
+    <button type="button" id="cardNext"><span data-i18n="ui.next">Próxima</span> <span aria-hidden="true">›</span></button>
+  </nav>
+</section>
+
+<!-- ferramentas -->
+<nav class="tools" aria-label="Ferramentas da maquete" data-i18n-aria="ui.toolsAria">
+  <button type="button" class="tool tool--areas" id="tAreas" aria-expanded="false" aria-controls="index">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg><span data-i18n="t.areas">Áreas</span>
+  </button>
+  <button type="button" class="tool" id="tHome">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17l9-6 9 6M5 15.7V20h14v-4.3"/><path d="M12 11V4"/></svg><span data-i18n="t.home">Vista geral</span>
+  </button>
+  <button type="button" class="tool" id="tTop">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16"/><path d="M4 12h16M12 4v16"/></svg><span data-i18n="t.top">De cima</span>
+  </button>
+  <button type="button" class="tool" id="tRotate" aria-pressed="false">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M20 4v5h-5"/></svg><span data-i18n="t.rotate">Girar</span>
+  </button>
+  <button type="button" class="tool" id="tTour" aria-pressed="false">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5l11 7-11 7z"/></svg><span data-i18n="t.tour">Tour</span>
+  </button>
+  <button type="button" class="tool" id="tMeasure" aria-pressed="false">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 16L16 3l5 5L8 21z"/><path d="M7 12l2 2M10 9l2 2M13 6l2 2"/></svg><span data-i18n="t.measure">Medir</span>
+  </button>
+  <button type="button" class="tool" id="tLabels" aria-pressed="true">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l4 4-4 4-4-4z"/><path d="M12 11v10"/></svg><span data-i18n="t.labels">Rótulos</span>
+  </button>
+  <label class="tool tool--sun" for="tSun">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg>
+    <span class="sr" data-i18n="t.sun">Hora do sol</span>
+    <input type="range" id="tSun" min="6.5" max="17.5" step="0.25" value="15.5" />
+    <output id="tSunOut">15h30</output>
+  </label>
+  <button type="button" class="tool" id="tFull">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg><span data-i18n="t.full">Tela cheia</span>
+  </button>
+</nav>
+
+<button type="button" class="compass" id="compass" aria-label="Norte para cima" data-i18n-aria="ui.north">
+  <svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="22.5"/><g id="compassNeedle"><path d="M24 12l4 12h-8z" class="n"/><path d="M24 36l4-12h-8z"/></g><text x="24" y="9.4" id="compassN">N</text></svg>
+</button>
+
+<p class="hint is-off" id="hint"></p>
+<p class="credit"><span data-i18n="ui.credit">Planta V12 (01/10/2026) · alturas estimadas · entorno</span> © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a></p>
+
+<noscript><div class="fallback"><div class="fallback__box"><h1>Masterplan 3D</h1><p>Esta maquete precisa de JavaScript.</p><a class="btn" href="../">Bracerum Park</a></div></div></noscript>
+
+<script type="module" src="app.js?v=1"></script>
+</body>
+</html>
