@@ -735,6 +735,7 @@ function posicionaPinos() {
   const bate = (r) => r[0] < 4 || r[2] > w - 4 || r[1] < topo || feitos.some((o) => r[0] < o[2] && r[2] > o[0] && r[1] < o[3] && r[3] > o[1]);
   for (const o of lista) {
     const { p, x, y } = o, w2 = p.w + 30;
+    if (y < topo - 4) { p.el.style.opacity = 0; p.el.style.pointerEvents = 'none'; continue; }   // sob a barra de cima
     let lado = 'r', r = [x - 8, y - 13, x + w2, y + 13];
     if (bate(r)) { const r2 = [x - w2, y - 13, x + 8, y + 13]; if (!bate(r2)) { lado = 'l'; r = r2; } else { lado = 'm'; r = [x - 9, y - 9, x + 9, y + 9]; } }
     if (o.i === sel && lado === 'm') { lado = x > w / 2 ? 'l' : 'r'; }
