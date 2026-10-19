@@ -1,0 +1,596 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Bracerum Park — Livro de Produtos</title>
+<link rel="stylesheet" href="book.css">
+</head>
+<body>
+
+<!-- ======================= CAPA ======================= -->
+<section class="pg dark onphoto" data-norun>
+  <figure class="ph full"><img src="img/cc-cupula-tarde.jpg" style="object-position:62% 50%"></figure>
+  <div class="veil-l"></div><div class="veil-b"></div>
+  <img class="abs" src="assets/sig-dark.svg" style="left:var(--m);top:88px;height:138px">
+  <div class="abs" style="left:var(--m);bottom:150px;width:880px">
+    <p class="eyebrow">Livro de Produtos · Edição 2026</p>
+    <h1 class="disp d-l" style="margin-top:24px">Uma cidade industrial <em>completa</em> no coração do Mercosul.</h1>
+  </div>
+  <div class="run run--bot"><b>Villeta Industrial City · Paraguay</b><b>Ruta PY19 · Acceso Sur</b></div>
+</section>
+
+<!-- ======================= APRESENTAÇÃO ======================= -->
+<section class="pg" data-ch="Apresentação" style="--run-r:648px">
+  <div class="col" style="left:var(--m);top:150px;width:770px;height:600px;justify-content:space-between">
+    <div>
+      <p class="eyebrow">O empreendimento</p>
+      <h2 class="disp d-m mt24">Tudo o que uma operação industrial precisa, <em>num só endereço.</em></h2>
+      <p class="lede mt28" style="width:700px">Cidade industrial multiuso em Villeta, sobre a rodovia que serve os portos do Rio Paraguai. Galpões, hotel, centro de convenções, condomínio, comércio e pista de pouso no mesmo perímetro — planejados juntos, entregues juntos.</p>
+    </div>
+    <div class="stats" style="--n:4">
+      <div><p class="num" style="font-size:56px">1.819.856<small>m²</small></p><p class="cap">Terreno total</p></div>
+      <div style="padding-left:28px"><p class="num" style="font-size:56px">US$ 800<small>mi</small></p><p class="cap">Masterplan</p></div>
+      <div style="padding-left:20px"><p class="num" style="font-size:56px">12</p><p class="cap">Setores</p></div>
+      <div><p class="num" style="font-size:56px">65<small>km</small></p><p class="cap">De Assunção</p></div>
+    </div>
+  </div>
+  <figure class="ph" style="right:0;top:0;width:560px;height:900px"><img src="img/vias-galpoes-v.jpg"><figcaption>Boulevard, galpões e hotel</figcaption></figure>
+</section>
+
+<!-- ======================= SUMÁRIO ======================= -->
+<section class="pg dark" data-ch="Sumário" style="--run-l:720px">
+  <figure class="ph" style="left:0;top:0;width:620px;height:900px"><img src="img/cc-atrio-2.jpg" style="object-position:38% 50%"><figcaption>Átrio sob a cúpula</figcaption></figure>
+  <div class="abs" style="left:720px;top:130px;width:792px">
+    <p class="eyebrow">Sumário</p>
+    <h2 class="disp d-s mt16">Doze setores, <em>um só endereço.</em></h2>
+    <ol class="toc mt32">
+      <li><i>01</i><b>O masterplan</b><span data-toc="mp"></span></li>
+      <li><i>02</i><b>Acesso, vias e infraestrutura</b><span data-toc="c2"></span></li>
+      <li><i>03</i><b>Lotes industriais e galpões</b><span data-toc="c3"></span></li>
+      <li><i>04</i><b>Aviação executiva</b><span data-toc="c4"></span></li>
+      <li><i>05</i><b>Bracerum Park <em>Hotel</em></b><span data-toc="c5"></span></li>
+      <li><i>06</i><b>Centro de Convenções</b><span data-toc="c6"></span></li>
+      <li><i>07</i><b>Bracerum <em>Resort</em></b><span data-toc="c7"></span></li>
+      <li><i>08</i><b>Bracerum Park <em>Select</em></b><span data-toc="c8"></span></li>
+      <li><i>09</i><b>Por que Villeta</b><span data-toc="c9"></span></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ======================= 01 MASTERPLAN ======================= -->
+<section class="pg dark onphoto" data-ch="01 · Masterplan" data-id="mp">
+  <div class="mp" style="left:0;top:0;width:1100px;height:900px">
+    <div id="mpwrap" style="position:absolute;left:-190px;top:0;width:1544px;height:900px"><img src="../../assets/web/vista-aerea-park-02.jpg"></div>
+  </div>
+  <div class="veil-t" style="width:1100px;height:330px;background:linear-gradient(180deg,rgba(14,15,18,.82),rgba(14,15,18,.45) 55%,rgba(14,15,18,0))"></div>
+  <div class="abs" style="left:var(--m);top:122px;width:760px">
+    <p class="eyebrow">01 — O masterplan</p>
+    <h2 class="disp d-s mt16">1.819.856 m² planejados <em>como uma cidade.</em></h2>
+  </div>
+  <div class="abs" style="left:1100px;top:0;width:500px;height:900px;background:var(--ink)"></div>
+  <div class="abs" style="left:1160px;top:122px;width:352px">
+    <p class="eyebrow">Os setores</p>
+    <ol class="feat xt mt20" id="mplegend"></ol>
+  </div>
+</section>
+
+<section class="pg dark onphoto" data-ch="01 · Masterplan">
+  <figure class="ph full"><img src="img/park-aereo-masterplan.jpg" style="object-position:50% 45%"></figure>
+  <div class="veil-b" style="background:linear-gradient(0deg,rgba(14,15,18,.96) 0%,rgba(14,15,18,.84) 30%,rgba(14,15,18,.4) 48%,rgba(14,15,18,0) 64%)"></div>
+  <div class="veil-t"></div>
+  <div class="abs" style="left:var(--m);bottom:130px;width:700px">
+    <p class="eyebrow">Do alto</p>
+    <h2 class="disp d-m mt20">Indústria, serviço e moradia <em>no mesmo traçado.</em></h2>
+    <p class="body mt20" style="width:620px">Os lotes industriais ocupam o miolo do terreno. Hotel, centro de convenções e resort formam um setor próprio, separado da área fabril pelo lago e pelo cinturão verde; a pista corre na borda do parque, longe da rotina das docas.</p>
+  </div>
+  <div class="abs stats s-sm" style="right:var(--m);bottom:130px;width:640px;--n:3">
+    <div><p class="num">987.304<small>m²</small></p><p class="cap">Parcelas industriais</p></div>
+    <div style="padding-left:24px"><p class="num">142.067<small>m²</small></p><p class="cap">Resort</p></div>
+    <div style="padding-left:24px"><p class="num">1.480<small>m</small></p><p class="cap">Pista de pouso</p></div>
+  </div>
+</section>
+
+<section class="pg dark onphoto" data-ch="01 · Masterplan">
+  <figure class="ph full"><img src="img/park-aereo-rio.jpg" style="object-position:50% 50%"></figure>
+  <div class="veil-l"></div>
+  <div class="opener" style="top:200px;width:700px">
+    <p class="eyebrow">Localização</p>
+    <h2 class="disp d-l">O rio Paraguai <em>na porta do parque.</em></h2>
+    <p class="lede" style="width:600px">Villeta concentra os terminais privados que movimentam a carga do país. O Park está sobre a PY19, a mesma rodovia que serve o Terport e o Puerto Seguro — a carga sai do galpão para o cais sem travessia urbana.</p>
+  </div>
+  <div class="facts stats" style="--n:3;width:700px">
+    <div><p class="num">2</p><p class="cap">Oceanos pela hidrovia</p></div>
+    <div style="padding-left:24px"><p class="num">65<small>km</small></p><p class="cap">Assunção e aeroporto</p></div>
+    <div style="padding-left:24px"><p class="num">PY19</p><p class="cap">Rodovia dos portos</p></div>
+  </div>
+</section>
+
+<!-- ======================= 02 ACESSO, VIAS, INFRA ======================= -->
+<section class="pg dark onphoto" data-ch="02 · Acesso e vias" data-id="c2">
+  <figure class="ph full"><img src="img/portaria.jpg" style="object-position:60% 50%"></figure>
+  <div class="veil-l"></div>
+  <div class="opener">
+    <p class="eyebrow">Capítulo 02 · Acesso, vias e infraestrutura</p>
+    <h2 class="disp d-l">A operação começa <em>na portaria.</em></h2>
+    <p class="lede">Entrada operacional com administração, estacionamento de caminhões e controle de acesso dedicado para a carga e para quem chega para trabalhar.</p>
+  </div>
+  <div class="facts stats" style="--n:3;width:760px">
+    <div><p class="num">3.510<small>m²</small></p><p class="cap">Administração e acessos</p></div>
+    <div style="padding-left:24px"><p class="num">Bitrem</p><p class="cap">Raios de giro por norma</p></div>
+    <div style="padding-left:24px"><p class="num">30<small>m</small></p><p class="cap">Iluminação a cada</p></div>
+  </div>
+</section>
+
+<section class="pg" data-ch="02 · Acesso e vias" style="--run-r:948px">
+  <div class="col" style="left:var(--m);top:130px;width:540px;height:650px;justify-content:space-between">
+    <div>
+      <p class="eyebrow">Hierarquia viária</p>
+      <h2 class="disp d-m mt20">Quatro tipos de via, <em>cada um com sua função.</em></h2>
+      <p class="body mt24">O sistema viário não é uma malha genérica repetida pelo terreno: cada categoria tem largura, pavimento e raio de giro dimensionados para o veículo que vai usá-la. As faixas técnicas de 0,80 m que acompanham as vias levam a infraestrutura enterrada, a iluminação e a arborização — manutenção sem quebrar pavimento.</p>
+    </div>
+    <div class="stats s-sm" style="--n:2;row-gap:22px">
+      <div><p class="num">25,60<small>m</small></p><p class="cap">Avenida principal</p></div>
+      <div style="padding-left:24px"><p class="num">16,60<small>m</small></p><p class="cap">Via secundária</p></div>
+      <div><p class="num">11,60<small>m</small></p><p class="cap">Via de serviço</p></div>
+      <div style="padding-left:24px"><p class="num">10,60<small>m</small></p><p class="cap">Rua urbana leve</p></div>
+    </div>
+  </div>
+  <figure class="ph" style="left:700px;top:0;width:900px;height:540px"><img src="img/vias-palmeiras.jpg" style="object-position:50% 60%"><figcaption>Avenida principal com palmeiras</figcaption></figure>
+  <figure class="ph" style="left:700px;top:550px;width:445px;height:350px"><img src="img/vias-rotatoria.jpg"><figcaption>Rotatória ajardinada</figcaption></figure>
+  <figure class="ph" style="left:1155px;top:550px;width:445px;height:350px"><img src="img/park-boulevard-hotel.jpg" style="object-position:60% 50%"><figcaption>Boulevard visto do alto</figcaption></figure>
+</section>
+
+<section class="pg paper2" data-ch="02 · Acesso e vias">
+  <div class="abs" style="left:var(--m);top:130px;width:500px">
+    <p class="eyebrow">Engenharia de via</p>
+    <h2 class="disp d-m mt20">O que sustenta a operação <em>é o que ninguém fotografa.</em></h2>
+    <p class="body mt24">Na via secundária, a seção de 15,80 m distribui 8,00 m de pista de caminhões entre duas veredas de 3,90 m, em concreto ou asfalto para trânsito pesado. A declividade transversal leva a água para os cordões — não há poça no meio da pista de manobra.</p>
+    <ol class="feat tight mt28">
+      <li><i>01</i><div><b>Faixas técnicas de 0,80 m</b><span>Redes, iluminação, sinalização e arborização fora do pavimento.</span></div></li>
+      <li><i>02</i><div><b>Drenagem por cordões</b><span>Escoamento pluvial controlado ao longo de toda a via.</span></div></li>
+      <li><i>03</i><div><b>Iluminação a cada 30 m</b><span>Sem trecho escuro entre luminárias.</span></div></li>
+    </ol>
+  </div>
+  <figure class="ph" style="left:660px;top:130px;width:852px;height:640px;background:#fff"><img src="../../assets/park/vias-corte.jpg" style="object-fit:contain"></figure>
+  <p class="abs small" style="left:660px;top:784px">Corte arquitetônico da via secundária · masterplan R04</p>
+</section>
+
+<section class="pg dark" data-ch="02 · Infraestrutura" style="--run-l:820px">
+  <figure class="ph" style="left:0;top:0;width:740px;height:900px"><img src="../../assets/park/ete-eta.jpg" style="object-position:40% 50%"><figcaption>ETE e ETA do parque</figcaption></figure>
+  <div class="abs" style="left:820px;top:130px;width:692px">
+    <p class="eyebrow">Utilidades</p>
+    <h2 class="disp d-s mt16">Energia de duas usinas <em>e água tratada dentro do perímetro.</em></h2>
+    <div class="stats s-sm mt28" style="--n:3">
+      <div><p class="num">10.650<small>m²</small></p><p class="cap">ETE e ETA</p></div>
+      <div style="padding-left:20px"><p class="num">11.375<small>m²</small></p><p class="cap">Subestação</p></div>
+      <div style="padding-left:20px"><p class="num">2</p><p class="cap">Itaipu e Yacyretá</p></div>
+    </div>
+    <ol class="feat xt mt32" style="grid-template-columns:1fr 1fr;column-gap:32px">
+      <li><i>01</i><div><b>Infraestrutura verde e azul</b><span>Menos superfície impermeável, retenção no masterplan.</span></div></li>
+      <li><i>02</i><div><b>Captação de pluviais</b><span>Irrigação, limpeza e usos operativos.</span></div></li>
+      <li><i>03</i><div><b>Implantação na topografia</b><span>Mínimo movimento de solo.</span></div></li>
+      <li><i>04</i><div><b>Vegetação como projeto</b><span>Sombra e microclima nas faixas técnicas.</span></div></li>
+      <li><i>05</i><div><b>LED, sensores e BMS</b><span>Automação energética nas áreas comuns.</span></div></li>
+      <li><i>06</i><div><b>Proteção solar passiva</b><span>Brises e beirais nas fachadas expostas.</span></div></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ======================= 03 LOTES E GALPÕES ======================= -->
+<section class="pg dark onphoto" data-ch="03 · Lotes e galpões" data-id="c3">
+  <figure class="ph full"><img src="img/galpao-portico.jpg" style="object-position:62% 50%"></figure>
+  <div class="veil-l"></div>
+  <div class="opener">
+    <p class="eyebrow">Capítulo 03 · Lotes industriais e galpões</p>
+    <h2 class="disp d-l">Galpões sob medida, <em>erguidos pelo próprio grupo.</em></h2>
+    <p class="lede">Lotes para venda ou locação, com galpão Built-to-Suit levantado no Steel Frame das fábricas Bracerum — o cronograma da obra não depende de fila de fornecedor.</p>
+  </div>
+  <div class="facts stats" style="--n:3;width:760px">
+    <div><p class="num">987.304<small>m²</small></p><p class="cap">Parcelas industriais</p></div>
+    <div style="padding-left:24px"><p class="num">40.000<small>m²</small></p><p class="cap">Módulo de lote</p></div>
+    <div style="padding-left:24px"><p class="num">BTS</p><p class="cap">Venda ou locação</p></div>
+  </div>
+</section>
+
+<section class="pg" data-ch="03 · Lotes e galpões" style="--run-l:940px">
+  <figure class="ph" style="left:0;top:0;width:880px;height:900px"><img src="img/galpao-docas.jpg" style="object-position:40% 50%"><figcaption>Docas de carga</figcaption></figure>
+  <div class="abs" style="left:940px;top:130px;width:572px">
+    <p class="eyebrow">O galpão</p>
+    <h2 class="disp d-s mt16">Da doca à avenida <em>sem travar o pátio.</em></h2>
+    <p class="body mt20">A via secundária tem 11,00 m de pista dupla industrial: o caminhão manobra sem invadir a vereda nem parar o fluxo da avenida principal. É a diferença entre um pátio que funciona e um que trava às seis da tarde.</p>
+    <ol class="feat tight mt24">
+      <li><i>01</i><div><b>Built-to-Suit</b><span>Projeto sob a especificação da sua operação.</span></div></li>
+      <li><i>02</i><div><b>Steel Frame e LSF próprios</b><span>Montagem rápida e precisão dimensional.</span></div></li>
+      <li><i>03</i><div><b>Máquinas sem tributos</b><span>Bens de capital entram pela maquila e pela Ley de Inversiones.</span></div></li>
+    </ol>
+  </div>
+  <figure class="ph" style="left:940px;top:640px;width:660px;height:260px"><img src="img/galpao-via.jpg" style="object-position:50% 60%"><figcaption>Galpão e via interna</figcaption></figure>
+</section>
+
+<section class="pg dark onphoto" data-ch="03 · Lotes e galpões">
+  <figure class="ph full"><img src="img/park-boulevard-doca.jpg" style="object-position:50% 55%"></figure>
+  <div class="veil-b"></div><div class="veil-t"></div>
+  <div class="abs" style="left:var(--m);bottom:130px;width:820px">
+    <p class="eyebrow">Logística interna</p>
+    <h2 class="disp d-m mt20">A carreta encosta na doca, <em>a avenida continua andando.</em></h2>
+  </div>
+  <p class="abs body" style="right:var(--m);bottom:134px;width:420px">Doca, pátio e boulevard desenhados juntos: a manobra acontece na via secundária, e a avenida principal, de 25,60 m, segue livre para o trânsito do parque.</p>
+</section>
+
+<section class="pg dark" data-ch="03 · Execução própria">
+  <figure class="ph" style="left:0;top:0;width:1600px;height:470px"><img src="../../assets/park/fabrica-bracerum.jpg" style="object-position:50% 55%"><figcaption>Fábrica Bracerum em Villeta</figcaption></figure>
+  <div class="abs" style="left:var(--m);top:520px;width:520px">
+    <p class="eyebrow">Execução própria</p>
+    <h2 class="disp d-s mt16">O único parque que <em>fabrica a própria obra.</em></h2>
+    <p class="body mt16">Três unidades fabris do grupo abastecem a construção — do aço da estrutura ao paver da calçada, sem margem de intermediário.</p>
+  </div>
+  <div class="abs tri" style="left:700px;top:520px;width:812px">
+    <div><i>01</i><b>Steel Frame e LSF</b><span>Estruturas de galpões, edifícios e casas. É a fábrica que dá velocidade ao Built-to-Suit.</span></div>
+    <div><i>02</i><b>Usina de concreto</b><span>Fundações, pavimentos e infraestrutura com padrão técnico próprio.</span></div>
+    <div><i>03</i><b>Fábrica de pavers</b><span>Vias internas e calçadas em piso intertravado, produzido no local.</span></div>
+  </div>
+  <p class="abs eyebrow" style="left:700px;top:742px;letter-spacing:.32em">Menos prazo · menos custo · menos risco</p>
+</section>
+
+<!-- ======================= 04 AVIAÇÃO ======================= -->
+<section class="pg dark onphoto" data-ch="04 · Aviação executiva" data-id="c4">
+  <figure class="ph full"><img src="img/pista-aerea.jpg" style="object-position:50% 50%"></figure>
+  <div class="veil-l"></div>
+  <div class="opener">
+    <p class="eyebrow">Capítulo 04 · Aviação executiva</p>
+    <h2 class="disp d-l">A diretoria pousa <em>dentro do parque.</em></h2>
+    <p class="lede">Pista para aviação executiva com hangares, heliponto e abastecimento no mesmo pátio. O visitante desembarca a minutos do galpão, sem depender de Assunção.</p>
+  </div>
+  <div class="facts stats" style="--n:3;width:760px">
+    <div><p class="num">1.480<small>m</small></p><p class="cap">Pista de pouso</p></div>
+    <div style="padding-left:24px"><p class="num">7.686<small>m²</small></p><p class="cap">Hangares</p></div>
+    <div style="padding-left:24px"><p class="num">Heliponto</p><p class="cap">No pátio dos hangares</p></div>
+  </div>
+</section>
+
+<section class="pg dark onphoto" data-ch="04 · Aviação executiva" style="--run-r:688px">
+  <figure class="ph" style="left:0;top:0;width:1000px;height:900px"><img src="img/hangar-bracerum.jpg" style="object-position:42% 50%"></figure>
+  <div class="veil-b" style="width:1000px"></div>
+  <div class="abs" style="left:var(--m);bottom:130px;width:820px">
+    <p class="eyebrow">Hangares</p>
+    <h2 class="disp d-m mt16">Hangaragem, heliponto e abastecimento <em>no mesmo pátio.</em></h2>
+    <p class="body mt16" style="width:700px">A aeronave do investidor fica no próprio parque, junto à pista — pronta para a próxima reunião na matriz.</p>
+  </div>
+  <figure class="ph" style="left:1010px;top:0;width:590px;height:445px"><img src="img/hangar-interior.jpg"><figcaption>Interior do hangar</figcaption></figure>
+  <figure class="ph" style="left:1010px;top:455px;width:590px;height:445px"><img src="img/hangar-patio.jpg"><figcaption>Jato no pátio</figcaption></figure>
+</section>
+
+<section class="pg" data-ch="04 · Aviação executiva">
+  <div class="abs" style="left:var(--m);top:130px;width:1424px;display:grid;grid-template-columns:1fr 520px;column-gap:80px;align-items:end">
+    <div><p class="eyebrow">Pista de pouso</p><h2 class="disp d-m mt16">Cabeceira, pista e pátio: <em>o aeroporto corporativo do Park.</em></h2></div>
+    <p class="body">A pista tem 1.480 m. O heliponto fica no pátio dos hangares, junto ao abastecimento — aeronave e helicóptero entram e saem sem passar pelo aeroporto da capital.</p>
+  </div>
+  <figure class="ph" style="left:var(--m);top:390px;width:702px;height:400px"><img src="img/pista-cabeceira.jpg"><figcaption>Cabeceira da pista</figcaption></figure>
+  <figure class="ph" style="left:810px;top:390px;width:702px;height:400px"><img src="img/pista-cabeceira-2.jpg"><figcaption>Cabeceira, outro ângulo</figcaption></figure>
+</section>
+
+<!-- ======================= 05 HOTEL ======================= -->
+<section class="pg dark onphoto" data-ch="05 · Hotel" data-id="c5">
+  <figure class="ph full"><img src="img/hotel-fachada-cupula.jpg" style="object-position:50% 40%"></figure>
+  <div class="veil-l" style="background:linear-gradient(90deg,rgba(14,15,18,.92) 0%,rgba(14,15,18,.8) 38%,rgba(14,15,18,.25) 64%,rgba(14,15,18,0) 80%)"></div>
+  <div class="opener" style="top:140px">
+    <img class="seal" src="../../assets/logo/hotel-cream.svg" style="height:112px">
+    <p class="eyebrow">Capítulo 05 · Bracerum Park Hotel</p>
+    <h2 class="disp d-m">Hospedar, reunir e fechar negócio <em>sem sair do parque.</em></h2>
+    <p class="lede">A equipe da matriz, o auditor e o cliente em visita técnica dormem a minutos da linha de produção.</p>
+  </div>
+  <div class="facts stats" style="--n:3;width:760px">
+    <div><p class="num">384</p><p class="cap">Studios</p></div>
+    <div style="padding-left:24px"><p class="num">35<small>m²</small></p><p class="cap">Por studio</p></div>
+    <div style="padding-left:24px"><p class="num">1.700</p><p class="cap">Vagas</p></div>
+  </div>
+</section>
+
+<section class="pg" data-ch="05 · Hotel" style="--run-r:860px">
+  <div class="abs" style="left:var(--m);top:130px;width:600px">
+    <p class="eyebrow">Duas operações, um só endereço</p>
+    <h2 class="disp d-s mt16">O participante desce do quarto <em>e já está no salão.</em></h2>
+    <p class="body mt20">O hotel atende a hospedagem executiva do dia a dia — equipes da matriz, fornecedores, auditores e clientes. O centro de convenções, ligado a ele, atende o evento. Não há transfer, não há trânsito de Assunção no meio do dia.</p>
+    <ol class="feat tight mt24">
+      <li><i>01</i><div><b>Quartos e suítes executivas</b><span>Estadia curta e longa permanência para equipes de implantação.</span></div></li>
+      <li><i>02</i><div><b>Serviço de quarto e lavanderia</b><span>O que sustenta semanas no parque sem depender da cidade.</span></div></li>
+      <li><i>03</i><div><b>Restaurante e cafeteria</b><span>Dimensionados para o pico dos dias de evento.</span></div></li>
+      <li><i>04</i><div><b>Salas de reunião e boardroom</b><span>Para a negociação que acontece fora do palco.</span></div></li>
+    </ol>
+  </div>
+  <figure class="ph" style="left:800px;top:0;width:800px;height:900px"><img src="img/hotel-fachada.jpg" style="object-position:50% 50%"><figcaption>Fachada com varandas verdes</figcaption></figure>
+</section>
+
+<section class="pg dark" data-ch="05 · Hotel">
+  <div class="abs" style="left:var(--m);top:130px;width:1424px;display:grid;grid-template-columns:1fr 520px;column-gap:80px;align-items:end">
+    <div><p class="eyebrow">Recepção</p><h2 class="disp d-m mt16">Do check-in da manhã <em>à chegada do último voo.</em></h2></div>
+    <p class="body">Pé-direito duplo, madeira e pedra clara sob a mesma luz natural do conjunto — à noite, a recepção vira o ponto de encontro de quem chega de longe.</p>
+  </div>
+  <figure class="ph" style="left:var(--m);top:400px;width:702px;height:395px"><img src="img/hotel-recepcao-dia.jpg"></figure>
+  <figure class="ph" style="left:810px;top:400px;width:702px;height:395px"><img src="img/hotel-recepcao-noite.jpg"></figure>
+  <div class="seqlab" style="left:var(--m);right:auto;width:702px;top:370px">Dia</div>
+  <div class="seqlab" style="left:810px;right:auto;width:702px;top:370px">Noite</div>
+</section>
+
+<section class="pg" data-ch="05 · Hotel" style="--run-r:1080px">
+  <div class="abs" style="left:var(--m);top:130px;width:400px">
+    <p class="eyebrow">Apartamentos</p>
+    <h2 class="disp d-s mt16">Quartos para quem <em>vem trabalhar.</em></h2>
+    <p class="body mt20">Estadia curta de equipe técnica, permanência longa de expatriado e o pico de ocupação dos dias de evento: o programa do hotel foi desenhado para esses três hóspedes.</p>
+  </div>
+  <div class="abs stats s-sm" style="left:var(--m);bottom:130px;width:400px;--n:2">
+    <div><p class="num">384</p><p class="cap">Studios</p></div>
+    <div style="padding-left:20px"><p class="num">35<small>m²</small></p><p class="cap">Cada</p></div>
+  </div>
+  <figure class="ph" style="left:550px;top:0;width:520px;height:445px"><img src="img/hotel-apartamento.jpg"><figcaption>Apartamento</figcaption></figure>
+  <figure class="ph" style="left:1080px;top:0;width:520px;height:445px"><img src="img/hotel-suite.jpg"><figcaption>Suíte com vista para o parque</figcaption></figure>
+  <figure class="ph" style="left:550px;top:455px;width:520px;height:445px"><img src="img/hotel-quarto-dia.jpg" style="object-position:40% 50%"><figcaption>Quarto com varanda · dia</figcaption></figure>
+  <figure class="ph" style="left:1080px;top:455px;width:520px;height:445px"><img src="img/hotel-quarto-tarde.jpg" style="object-position:40% 50%"><figcaption>Quarto com varanda · entardecer</figcaption></figure>
+</section>
+
+<section class="pg dark" data-ch="05 · Hotel" style="--run-l:640px;--run-r:560px">
+  <figure class="ph" style="left:0;top:0;width:560px;height:900px"><img src="img/hotel-poltrona-v.jpg"><figcaption>Detalhe da varanda</figcaption></figure>
+  <div class="abs" style="left:640px;top:130px;width:400px">
+    <p class="eyebrow">Varandas</p>
+    <h2 class="disp d-m mt16">A varanda <em>é parte do quarto.</em></h2>
+    <p class="body mt24">Varandas verdes ao longo de toda a fachada, com vista para a cúpula do centro de convenções. Para quem passa semanas na implantação de uma fábrica, é o que separa estadia de alojamento.</p>
+  </div>
+  <figure class="ph" style="left:1100px;top:0;width:500px;height:445px"><img src="img/hotel-varanda-daybed.jpg"><figcaption>Daybed e vista para a cúpula</figcaption></figure>
+  <figure class="ph" style="left:1100px;top:455px;width:500px;height:445px"><img src="img/hotel-varanda-jantar.jpg"><figcaption>Jantar ao entardecer</figcaption></figure>
+</section>
+
+<!-- ======================= 06 CONVENÇÕES ======================= -->
+<section class="pg dark onphoto" data-ch="06 · Centro de Convenções" data-id="c6">
+  <figure class="ph full"><img src="img/cc-cupula-dia.jpg" style="object-position:60% 50%"></figure>
+  <div class="veil-l"></div>
+  <div class="opener">
+    <p class="eyebrow">Capítulo 06 · Centro de Convenções</p>
+    <h2 class="disp d-xl">13.500 m² <em>sob a cúpula de vidro.</em></h2>
+    <p class="lede">Feiras setoriais, convenções de vendas, treinamentos e lançamentos de produto no mesmo conjunto do hotel.</p>
+  </div>
+  <div class="facts stats" style="--n:3;width:760px">
+    <div><p class="num">13.500<small>m²</small></p><p class="cap">Centro de Convenções</p></div>
+    <div style="padding-left:24px"><p class="num">1.200</p><p class="cap">Lugares no auditório</p></div>
+    <div style="padding-left:24px"><p class="num">Contíguo</p><p class="cap">Ao hotel</p></div>
+  </div>
+</section>
+
+<section class="pg dark onphoto" data-ch="06 · Centro de Convenções" style="--run-r:600px">
+  <figure class="ph" style="left:0;top:0;width:1060px;height:900px"><img src="img/cc-auditorio.jpg" style="object-position:50% 50%"></figure>
+  <div class="veil-b" style="width:1060px"></div>
+  <div class="abs" style="left:var(--m);bottom:130px;width:820px">
+    <p class="num" style="font-size:170px">1.200</p>
+    <p class="cap" style="margin-top:6px">Lugares no auditório</p>
+  </div>
+  <figure class="ph" style="left:1070px;top:0;width:530px;height:420px"><img src="img/cc-auditorio-lateral.jpg"><figcaption>Vista lateral com telão</figcaption></figure>
+  <div class="abs" style="left:1130px;top:480px;width:382px">
+    <p class="eyebrow">Auditório</p>
+    <h2 class="disp d-xs mt16">Plateia em leque, <em>telão e palco de evento.</em></h2>
+    <p class="body mt16">Contíguo ao centro de convenções, com foyer, credenciamento e área de exposição — o lançamento acontece a poucos passos da fábrica.</p>
+  </div>
+</section>
+
+<section class="pg" data-ch="06 · Centro de Convenções" data-notop style="--run-l:670px;--run-r:490px">
+  <figure class="ph" style="left:0;top:0;width:600px;height:900px"><img src="img/cc-foyer-v.jpg" style="object-position:50% 40%"><figcaption>Foyer</figcaption></figure>
+  <figure class="ph" style="left:610px;top:0;width:990px;height:500px"><img src="img/cc-atrio-arcos.jpg" style="object-position:50% 45%"><figcaption>Átrio com arcos brancos</figcaption></figure>
+  <div class="abs" style="left:670px;top:556px;width:440px">
+    <p class="eyebrow">Foyer e átrio</p>
+    <h2 class="disp d-xs mt12">Credenciamento, exposição e café <em>sob a mesma luz.</em></h2>
+    <p class="body mt12" style="font-size:15.5px">O foyer recebe o fluxo do evento antes do auditório e serve de vitrine para os patrocinadores.</p>
+  </div>
+  <figure class="ph" style="left:1150px;top:510px;width:450px;height:390px"><img src="img/cc-foyer.jpg"><figcaption>Foyer em evento</figcaption></figure>
+</section>
+
+<section class="pg dark onphoto" data-ch="06 · Centro de Convenções">
+  <figure class="ph full"><img src="img/cc-atrio.jpg" style="object-position:40% 50%"></figure>
+  <div class="veil-r"></div>
+  <div class="abs" style="right:var(--m);top:200px;width:560px">
+    <p class="eyebrow">Galeria central</p>
+    <h2 class="disp d-l mt20">O átrio é <em>a rua do conjunto.</em></h2>
+    <p class="lede mt28">Galeria coberta ligando hotel e centro de convenções: recepção, circulação e convivência sob a mesma estrutura de vidro, com paisagismo tropical o ano inteiro.</p>
+  </div>
+</section>
+
+<section class="pg dark" data-ch="06 · Gastronomia">
+  <div class="abs" style="left:var(--m);top:130px;width:1424px;display:grid;grid-template-columns:1fr 520px;column-gap:80px;align-items:end">
+    <div><p class="eyebrow">Gastronomia sob a cúpula</p><h2 class="disp d-m mt16">O almoço de negócio <em>e o jantar de fechamento.</em></h2></div>
+    <p class="body">Restaurante e bar sob a treliça de vidro, com espelho d'água no salão — o mesmo espaço muda de tom ao longo do dia.</p>
+  </div>
+  <figure class="ph" style="left:var(--m);top:410px;width:464px;height:390px"><img src="img/cc-rest-dia.jpg"></figure>
+  <figure class="ph" style="left:568px;top:410px;width:464px;height:390px"><img src="img/cc-rest-tarde.jpg"></figure>
+  <figure class="ph" style="left:1048px;top:410px;width:464px;height:390px"><img src="img/cc-rest-noite.jpg"></figure>
+  <div class="seqlab" style="left:var(--m);right:auto;width:464px;top:380px">Dia</div>
+  <div class="seqlab" style="left:568px;right:auto;width:464px;top:380px">Anoitecer</div>
+  <div class="seqlab" style="left:1048px;right:auto;width:464px;top:380px">Noite</div>
+</section>
+
+<!-- ======================= 07 RESORT ======================= -->
+<section class="pg dark onphoto" data-ch="07 · Resort" data-id="c7">
+  <figure class="ph full"><img src="img/resort-lago.jpg" style="object-position:50% 50%"></figure>
+  <div class="veil-l"></div>
+  <div class="opener" style="top:150px">
+    <img class="seal" src="../../assets/logo/resort-cream.svg" style="height:96px">
+    <p class="eyebrow">Capítulo 07 · Bracerum Resort</p>
+    <h2 class="disp d-l">Morar a minutos <em>da própria operação.</em></h2>
+    <p class="lede">Condomínio fechado de casas com portaria própria, lago central e clubhouse. Quem dirige a fábrica não precisa morar a uma hora dela.</p>
+  </div>
+  <div class="facts stats" style="--n:3;width:760px">
+    <div><p class="num">141</p><p class="cap">Lotes</p></div>
+    <div style="padding-left:24px"><p class="num">142.067<small>m²</small></p><p class="cap">Setor residencial</p></div>
+    <div style="padding-left:24px"><p class="num">Lago</p><p class="cap">Eixo do condomínio</p></div>
+  </div>
+</section>
+
+<section class="pg" data-ch="07 · Resort" style="--run-l:1060px">
+  <figure class="ph" style="left:0;top:0;width:980px;height:900px"><img src="../../assets/park/resort-implantacao.jpg" style="object-position:50% 50%"><figcaption>Implantação · masterplan R04</figcaption></figure>
+  <div class="abs" style="left:1060px;top:130px;width:452px">
+    <p class="eyebrow">Implantação</p>
+    <h2 class="disp d-s mt16">Um condomínio <em>dentro da cidade industrial.</em></h2>
+    <p class="body mt20">O Resort fica separado da área fabril pelo lago e pelo cinturão verde, com ruas de calçada urbana e paisagismo desenhado como parte da drenagem do parque.</p>
+    <ol class="feat tight mt24">
+      <li><i>01</i><div><b>Condomínio fechado</b><span>Portaria e acesso controlado.</span></div></li>
+      <li><i>02</i><div><b>Lago central</b><span>Percurso de caminhada no entorno.</span></div></li>
+      <li><i>03</i><div><b>Clubhouse</b><span>Piscina, quincho e quadras.</span></div></li>
+      <li><i>04</i><div><b>Ruas de 10,60 m</b><span>Calçada de 1,50 m dos dois lados.</span></div></li>
+    </ol>
+  </div>
+</section>
+
+<section class="pg dark onphoto" data-ch="07 · Resort">
+  <figure class="ph" style="left:0;top:0;width:795px;height:900px"><img src="img/resort-casa-dia.jpg" style="object-position:62% 50%"></figure>
+  <figure class="ph" style="left:805px;top:0;width:795px;height:900px"><img src="img/resort-casa-tarde.jpg" style="object-position:62% 50%"></figure>
+  <div class="veil-b"></div>
+  <div class="abs" style="left:var(--m);bottom:130px;width:900px">
+    <p class="eyebrow">As casas</p>
+    <h2 class="disp d-l mt16">A mesma casa, <em>do dia ao pôr do sol.</em></h2>
+  </div>
+  <p class="abs body" style="right:var(--m);bottom:134px;width:380px">Concreto aparente, madeira e garagem coberta, em lotes voltados para ruas arborizadas.</p>
+  <div class="abs tag" style="left:var(--m);top:122px">Dia</div>
+  <div class="abs tag" style="left:893px;top:122px">Pôr do sol</div>
+</section>
+
+<section class="pg" data-ch="07 · Resort" style="--run-r:860px">
+  <div class="abs" style="left:var(--m);top:130px;width:600px">
+    <p class="eyebrow">Ruas do condomínio</p>
+    <h2 class="disp d-m mt16">Calçada, sombra <em>e vizinho conhecido.</em></h2>
+    <p class="body mt24">Ruas residenciais de 10,60 m com calçada de 1,50 m dos dois lados e paisagismo de sombra. O deslocamento entre casa e fábrica acontece dentro do mesmo perímetro fechado.</p>
+  </div>
+  <figure class="ph" style="left:var(--m);top:446px;width:620px;height:340px"><img src="img/resort-rua.jpg" style="object-position:50% 60%"><figcaption>Rua residencial arborizada</figcaption></figure>
+  <figure class="ph" style="left:800px;top:0;width:800px;height:900px"><img src="img/resort-casas-rua.jpg" style="object-position:55% 50%"><figcaption>Casas na rua de calçamento</figcaption></figure>
+</section>
+
+<section class="pg dark" data-ch="07 · Resort" style="--run-r:960px">
+  <figure class="ph" style="left:0;top:0;width:1600px;height:520px"><img src="img/resort-piscina.jpg" style="object-position:50% 60%"><figcaption>Piscina e quincho</figcaption></figure>
+  <div class="abs" style="left:var(--m);top:574px;width:520px">
+    <p class="eyebrow">Clubhouse</p>
+    <h2 class="disp d-s mt16">O lazer do Resort <em>é um programa próprio.</em></h2>
+    <p class="body mt16">Piscina com deck, quincho, praça de convivência e quadras iluminadas para uso noturno.</p>
+  </div>
+  <figure class="ph" style="left:690px;top:530px;width:450px;height:370px"><img src="img/resort-quincho.jpg"><figcaption>Quincho e praça</figcaption></figure>
+  <figure class="ph" style="left:1150px;top:530px;width:450px;height:370px"><img src="img/resort-quadra.jpg"><figcaption>Quadra poliesportiva</figcaption></figure>
+</section>
+
+<!-- ======================= 08 SELECT ======================= -->
+<section class="pg dark onphoto" data-ch="08 · Select" data-id="c8">
+  <figure class="ph full"><img src="../../assets/park/select-comercial-noite.jpg" style="object-position:62% 50%"></figure>
+  <div class="veil-l"></div>
+  <div class="opener" style="top:150px">
+    <img class="seal" src="../../assets/logo/select-cream.svg" style="height:96px">
+    <p class="eyebrow">Capítulo 08 · Bracerum Park Select</p>
+    <h2 class="disp d-l">O parque também precisa de <em>padaria, banco e borracheiro.</em></h2>
+    <p class="lede">Curadoria de comércio e serviços dentro do perímetro: quem entra é escolhido, não é quem chega primeiro.</p>
+  </div>
+  </section>
+
+<section class="pg" data-ch="08 · Select" style="--run-r:668px">
+  <div class="abs" style="left:var(--m);top:130px;width:760px">
+    <p class="eyebrow">Curadoria, não sorte</p>
+    <h2 class="disp d-s mt16">Comércio de um lado, <em>serviços do outro.</em></h2>
+  </div>
+  <div class="abs cols2" style="left:var(--m);top:300px;width:760px">
+    <div><p class="eyebrow gold">Comércio</p>
+      <ol class="feat xt mt16">
+        <li><i>01</i><div><b>Shopping e centro comercial</b><span>Lojas e estacionamento próprio.</span></div></li>
+        <li><i>02</i><div><b>Academia</b><span>Aberta a funcionários e moradores.</span></div></li>
+        <li><i>03</i><div><b>Praça de alimentação</b><span>Dimensionada para o almoço industrial.</span></div></li>
+        <li><i>04</i><div><b>Market e posto</b><span>Conveniência, padaria e combustível.</span></div></li>
+        <li><i>05</i><div><b>Atendimento bancário</b><span>Caixa no bloco de portaria.</span></div></li>
+      </ol></div>
+    <div><p class="eyebrow gold">Serviços</p>
+      <ol class="feat xt mt16">
+        <li><i>06</i><div><b>Contabilidade e assessoria</b><span>No bloco administrativo.</span></div></li>
+        <li><i>07</i><div><b>Imobiliária</b><span>Lotes, galpões e casas do Resort.</span></div></li>
+        <li><i>08</i><div><b>Manutenção predial</b><span>Elétrica, hidráulica e industrial.</span></div></li>
+        <li><i>09</i><div><b>Borracharia e mecânica</b><span>Junto ao pátio do caminhoneiro.</span></div></li>
+        <li><i>10</i><div><b>Enfermaria e bombeiros</b><span>Bombeiros civis próprios.</span></div></li>
+      </ol></div>
+  </div>
+  <figure class="ph" style="left:940px;top:0;width:660px;height:445px"><img src="../../assets/park/select-comercial-dia.jpg"><figcaption>Centro comercial</figcaption></figure>
+  <figure class="ph" style="left:940px;top:455px;width:660px;height:445px"><img src="../../assets/park/select-market-interior.jpg"><figcaption>Market de conveniência</figcaption></figure>
+</section>
+
+<section class="pg dark onphoto" data-ch="08 · Clube do Caminhoneiro">
+  <figure class="ph full"><img src="img/posto-noite.jpg" style="object-position:58% 50%"></figure>
+  <div class="veil-l"></div>
+  <div class="opener" style="top:200px;width:700px">
+    <p class="eyebrow">Clube do Caminhoneiro</p>
+    <h2 class="disp d-l">O motorista descansa <em>dentro do parque.</em></h2>
+    <p class="lede" style="width:600px">Pátio dedicado com posto, restaurante e área de descanso: o caminhão espera a janela da doca dentro do perímetro, não no acostamento da rodovia.</p>
+  </div>
+  <div class="facts stats" style="--n:2;width:560px">
+    <div><p class="num">40.065<small>m²</small></p><p class="cap">Setor de apoio</p></div>
+    <div style="padding-left:24px"><p class="num">Leve e pesado</p><p class="cap">Abastecimento no posto</p></div>
+  </div>
+</section>
+
+<!-- ======================= 09 POR QUE VILLETA ======================= -->
+<section class="pg dark" data-ch="09 · Tributação" data-id="c9">
+  <div class="abs" style="left:var(--m);top:150px;width:900px">
+    <p class="eyebrow">Capítulo 09 · Por que Villeta</p>
+    <h2 class="disp d-l mt24">A tributação mais competitiva <em>da América do Sul.</em></h2>
+    <p class="lede mt28" style="width:760px">Regime de Maquila, Ley de Inversiones e Certificado de Origem Mercosul combinados numa única operação — com a equipe jurídica e contábil do Bracerum Park do enquadramento ao primeiro embarque.</p>
+  </div>
+  <div class="abs stats" style="left:var(--m);bottom:130px;width:1424px;--n:4">
+    <div><p class="num" style="font-size:110px">1<em>%</em></p><p class="cap">Tributo único sobre o valor<br>agregado, na Maquila</p></div>
+    <div style="padding-left:28px"><p class="num" style="font-size:110px">100<em>%</em></p><p class="cap">De capital estrangeiro,<br>sem sócio local</p></div>
+    <div style="padding-left:28px"><p class="num" style="font-size:110px">20<small>anos</small></p><p class="cap">De benefícios garantidos,<br>renováveis</p></div>
+    <div style="padding-left:28px"><p class="num" style="font-size:110px">10<small>anos</small></p><p class="cap">De isenção sobre remessa<br>de lucros e dividendos</p></div>
+  </div>
+</section>
+
+<section class="pg" data-ch="09 · Localização">
+  <div class="abs" style="left:var(--m);top:130px;width:470px">
+    <p class="eyebrow">Distâncias rodoviárias</p>
+    <h2 class="disp d-m mt16">Perto o bastante para <em>ir e voltar no mesmo dia.</em></h2>
+    <p class="body mt24">Voos diários de cerca de 2 h entre São Paulo e Assunção, fuso praticamente igual ao de Brasília e fronteira terrestre com o Brasil. Do aeroporto ao Park são 65 km.</p>
+    <p class="small mt24">Distâncias por rodovia a partir do Bracerum Park.</p>
+  </div>
+  <figure class="ph" style="left:var(--m);top:520px;width:470px;height:270px"><img src="img/park-aereo-rio.jpg" style="object-position:50% 12%"><figcaption>Hidrovia Paraná–Paraguai</figcaption></figure>
+  <table class="abs dist" style="left:640px;top:118px;width:400px">
+    <tr class="grp"><td colspan="2">Paraguai</td></tr>
+    <tr><td>Assunção</td><td class="k">65<small>km</small></td></tr>
+    <tr><td>Encarnación</td><td class="k">355<small>km</small></td></tr>
+    <tr><td>Ciudad del Este</td><td class="k">360<small>km</small></td></tr>
+    <tr class="grp"><td colspan="2">Brasil</td></tr>
+    <tr><td>Foz do Iguaçu</td><td class="k">365<small>km</small></td></tr>
+    <tr><td>Curitiba</td><td class="k">1.000<small>km</small></td></tr>
+    <tr><td>Porto Alegre</td><td class="k">1.055<small>km</small></td></tr>
+    <tr><td>Florianópolis</td><td class="k">1.307<small>km</small></td></tr>
+    <tr><td>São Paulo</td><td class="k">1.395<small>km</small></td></tr>
+  </table>
+  <table class="abs dist" style="left:1112px;top:118px;width:400px">
+    <tr class="grp"><td colspan="2">Mercosul e vizinhos</td></tr>
+    <tr><td>Córdoba</td><td class="k">1.100<small>km</small></td></tr>
+    <tr><td>Buenos Aires</td><td class="k">1.280<small>km</small></td></tr>
+    <tr><td>Santa Cruz de la Sierra</td><td class="k">1.360<small>km</small></td></tr>
+    <tr><td>Montevidéu</td><td class="k">1.550<small>km</small></td></tr>
+    <tr class="grp"><td colspan="2">Por via aérea</td></tr>
+    <tr><td>São Paulo → Assunção</td><td class="k">~2<small>h</small></td></tr>
+  </table>
+</section>
+
+<section class="pg dark onphoto" data-ch="Contato">
+  <figure class="ph full"><img src="img/hotel-varanda-jantar.jpg" style="object-position:50% 50%"></figure>
+  <div class="veil-l" style="background:linear-gradient(90deg,rgba(14,15,18,.94) 0%,rgba(14,15,18,.86) 46%,rgba(14,15,18,.3) 70%,rgba(14,15,18,0) 86%)"></div>
+  <div class="abs" style="left:var(--m);top:150px;width:860px">
+    <p class="eyebrow">Próximo passo</p>
+    <h2 class="disp d-l mt24">Vamos construir a porta de entrada <em>industrial do Mercosul?</em></h2>
+  </div>
+  <div class="abs cols2 contact" style="left:var(--m);bottom:130px;width:820px">
+    <div><b>Cleber Pavão</b>
+      <p><span>Paraguai</span>+595 985 516 065<br><span>Brasil</span>+55 11 98651-6065<br><span>E-mail</span>cleber@bracerum.com</p></div>
+    <div><b>Sydney Savi</b>
+      <p><span>Paraguai</span>+595 983 030 200<br><span>Brasil</span>+55 47 98803-0200<br><span>E-mail</span>sydney@bracerum.com</p></div>
+  </div>
+</section>
+
+<section class="pg dark" data-norun>
+  <img class="abs" src="assets/sig-dark.svg" style="left:50%;top:50%;height:190px;transform:translate(-50%,-58%)">
+  <p class="abs eyebrow" style="left:0;right:0;bottom:200px;text-align:center">bracerumpark.com</p>
+  <div class="run run--bot"><b>Acceso Sur · Ruta PY19 — Villeta, Departamento Central, Paraguai</b><b>© 2026 Bracerum Park</b></div>
+  <p class="abs small" style="left:0;right:0;bottom:118px;text-align:center">Imagens ilustrativas. Estruturas, áreas e quantidades conforme o masterplan R04, sujeitas ao projeto executivo.</p>
+</section>
+
+</body>
+<script src="book.js"></script>
+</html>

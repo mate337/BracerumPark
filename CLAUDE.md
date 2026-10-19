@@ -10,6 +10,26 @@ O site tem **7 páginas**: `index.html`, `tributacao.html`, `bracerum.html`, `ho
 rotas) que as seis páginas internas baixavam e interpretavam à toa. Ele roda depois do
 `script.js` porque usa `hasGsap`, `reduceMotion` e `tr()`.
 
+### Livro de Produtos em PDF (2026-10-19)
+- **Fonte:** `docs/livro-produtos/` (`livro.html`, `book.css`, `book.js`). Gerar com
+  `node docs/livro-produtos/build.js` (com `--png` grava `png/pNN.png` para revisar página a página) →
+  `Bracerum_Park_Livro_Produtos_PT.pdf`, 39 páginas 16:9 (1600×900), 9 capítulos. As fontes são
+  baixadas para `fonts/` na primeira execução e não vão para o git.
+- **Linguagem das peças de mídia** (stories "Boletim" na pasta do Drive), não a do site: Noto Serif
+  **Display** em `wdth 62.5`, peso 400 (a Noto Serif de texto fica larga e grossa demais), itálico areia
+  `#d4b483` no escuro e marrom `#8a6a3c` no claro, rótulos em caixa alta com tracking .38em, ink
+  `#15171a`, papel `#ebe4d6`. Corpo em TeX Gyre Heros (clone livre da Helvetica). O `font-stretch`
+  sozinho não chega ao eixo `wdth` da fonte variável no Chromium — por isso o `font-variation-settings`.
+- **Assinatura dourada** (`#b4934f`) da capa e da contracapa: extraída do PDF vetorial "Variações
+  Assinaturas Bracerum Park" (Drive, 15/10), em `docs/livro-produtos/assets/sig-dark.svg`.
+- **Imagens:** as 49 únicas da pasta "Imagens BracerumPark Finalizadas" em `img/` (`img/ORIGEM.json`
+  liga cada arquivo ao nome no Drive), mais 8 do repositório sem equivalente na pasta (Select, fábrica,
+  ETE, corte viário, implantação do Resort, planta do masterplan com os pinos do `home.js`).
+- **Pendente:** o PDF que o usuário pediu para refazer (`Bracerum_Park_Livro_Produtos_PT.pdf`) estava
+  no PC dele e não chegou a esta sessão — o texto saiu do site. Quando ele mandar, conciliar estrutura
+  e textos. Parcelas industriais: o livro usa 987.304 m² (R04); o pino do masterplan no site ainda diz
+  989.642 m².
+
 ### Fotos finalizadas do cliente (v6.3 — 2026-09-28)
 - **Fonte:** pasta do Google Drive "Imagens BracerumPark Finalizadas" (id `1CETdiYdL13Jhh2twQe6kAF10yvMt1YF6`),
   51 renders PNG 1672×941 com nome genérico ("Imagem do Codex …"), seis deles repetidos. Os originais
