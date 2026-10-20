@@ -80,6 +80,18 @@ rotas) que as seis páginas internas baixavam e interpretavam à toa. Ele roda d
   altura; a interface avisa. Textos e números dos cartões ficam em `AREAS` no `3dmasterplan/app.js`.
 - Usa imagens do site por `../assets/` — não mover a pasta para outro nível sem trocar a meta
   `bp-assets`.
+- **Lotes à venda com preço (2026-10-20).** O cliente mandou a Política Comercial P1 (Tabela de Preços
+  v3.1, rev. 14/10/2026, versão pública) e o Mapa de Lotes MP14 do **Masterplan V14-02 (09/10/2026)** —
+  PDFs em `docs/lotes-p1/`. **A unidade de venda é o lote de ~1.250 m² (25 × 50 m), `LTIND.Qxx.Lyyy`:
+  612 lotes, 765.960 m², quadras Q01–Q42** (Q37 = recinto alfandegado, fora da oferta) — isso substitui
+  os "41 lotes" e a referência C?-L? da maquete. Categorias Vitrine/Business/Padrão/Interna (×1,15/1,10/
+  1,00/0,90), três janelas (Expo até 13/11/2026 a US$ 160/m² Padrão; Pós-Expo US$ 185; Fase 1 plena
+  US$ 220 a partir de 01/04/2027), faixas por quantidade e três pagamentos. O modo "Lotes à venda" da
+  maquete calcula o valor de cada lote e de simulações; os dez exemplos da tabela conferem. Preços em
+  `3dmasterplan/data/precos.json` (editar à mão quando sair tabela nova); lotes gerados por
+  `docs/3dmasterplan/build_lotes.py`. 39 lotes irregulares têm área medida no mapa (≈) — pedir ao
+  cliente a lista dos nomes oficiais com a área. Divergências (Vitrine 181.410 × 181.650 m²; Q38.L001
+  verde no mapa) e o que o V14-02 mudou estão em `docs/3dmasterplan/README.md`.
 
 ### Fotos finalizadas do cliente (v6.3 — 2026-09-28)
 - **Fonte:** pasta do Google Drive "Imagens BracerumPark Finalizadas" (id `1CETdiYdL13Jhh2twQe6kAF10yvMt1YF6`),
@@ -343,7 +355,8 @@ Faltam (mencionados no `LEIA-ME.txt` original, ainda não enviados): `tecnologic
 ## Próximo passo
 
 Aguardando o usuário: (0) retorno sobre o **Masterplan 3D** (`3dmasterplan/`) e se ele entra
-linkado no site; (1) **ok para levar o Masterplan V12 ao site** — a lista do que muda, já com
+linkado no site; a lista oficial dos 612 lotes com área (para os 39 irregulares) e as duas
+divergências da tabela de lotes (ver `docs/3dmasterplan/README.md`); (1) **ok para levar o Masterplan V12 ao site** — a lista do que muda, já com
 as respostas de 16/10, está no §8 de `docs/masterplan-v12.md`; até lá, não mexer no site; (2) a
 vista aérea do V12 gerada pelo Astra-6 com `docs/prompt-aerea-v12/` (quando chegar, ela pode
 substituir a `vista-aerea-park-02.jpg` do masterplan — e os pinos precisam ser remarcados); (3) fotos próprias dos terminais privados, para

@@ -1,0 +1,60 @@
+{
+  "fonte": "Tabela de preços — Lotes industriais · Política Comercial P1 v2.0 · Tabela v3.1 · rev. 14/10/2026 · versão pública",
+  "tabela": "v3.1",
+  "revisao": "2026-10-14",
+  "masterplan": "V14-02 (09/10/2026)",
+  "estoque": { "lotes": 612, "area": 765960 },
+  "categorias": {
+    "V": { "nome": { "pt": "Vitrine", "en": "Showcase", "es": "Vitrina" }, "fator": "1,15", "cor": "#b08a48" },
+    "B": { "nome": { "pt": "Business", "en": "Business", "es": "Business" }, "fator": "1,10", "cor": "#6188b6" },
+    "P": { "nome": { "pt": "Padrão", "en": "Standard", "es": "Estándar" }, "fator": "1,00", "cor": "#a3d26f" },
+    "I": { "nome": { "pt": "Interna", "en": "Inner", "es": "Interna" }, "fator": "0,90", "cor": "#d9d0ad" }
+  },
+  "janelas": [
+    { "id": "expo", "ate": "2026-11-13",
+      "nome": { "pt": "Lançamento — Expo Paraguai-Brasil", "en": "Launch — Paraguay-Brazil Expo", "es": "Lanzamiento — Expo Paraguay-Brasil" },
+      "curto": { "pt": "Expo", "en": "Expo", "es": "Expo" },
+      "quando": { "pt": "reservas assinadas até 13/11/2026 · cota de 64 lotes", "en": "reservations signed by 13 Nov 2026 · quota of 64 lots", "es": "reservas firmadas hasta el 13/11/2026 · cupo de 64 lotes" } },
+    { "id": "pos", "de": "2026-11-14", "ate": "2027-03-31",
+      "nome": { "pt": "Pós-Expo", "en": "Post-Expo", "es": "Post-Expo" },
+      "curto": { "pt": "Pós-Expo", "en": "Post-Expo", "es": "Post-Expo" },
+      "quando": { "pt": "de 14/11/2026 a 31/03/2027", "en": "14 Nov 2026 to 31 Mar 2027", "es": "del 14/11/2026 al 31/03/2027" } },
+    { "id": "plena", "de": "2027-04-01",
+      "nome": { "pt": "Fase 1 plena", "en": "Full Phase 1", "es": "Fase 1 plena" },
+      "curto": { "pt": "Fase 1", "en": "Phase 1", "es": "Fase 1" },
+      "quando": { "pt": "a partir de 01/04/2027", "en": "from 1 Apr 2027", "es": "a partir del 01/04/2027" } }
+  ],
+  "faixas": [
+    { "de": 1, "ate": 8 },
+    { "de": 9, "ate": 16 },
+    { "de": 17, "ate": 32 },
+    { "de": 33, "ate": null }
+  ],
+  "pagamentos": [
+    { "id": "vista", "nome": { "pt": "À vista", "en": "Cash", "es": "Al contado" }, "nota": { "pt": "pagamento integral na assinatura (−8%)", "en": "paid in full on signing (−8%)", "es": "pago total a la firma (−8%)" } },
+    { "id": "12x", "nome": { "pt": "20% + 12x", "en": "20% + 12x", "es": "20% + 12x" }, "nota": { "pt": "sinal de 20% + 12 parcelas mensais (preço de tabela)", "en": "20% down + 12 monthly instalments (list price)", "es": "seña del 20% + 12 cuotas mensuales (precio de lista)" } },
+    { "id": "36x", "nome": { "pt": "20% + 36x", "en": "20% + 36x", "es": "20% + 36x" }, "nota": { "pt": "sinal de 20% + 36 parcelas mensais (+8%)", "en": "20% down + 36 monthly instalments (+8%)", "es": "seña del 20% + 36 cuotas mensuales (+8%)" } }
+  ],
+  "_precos": "US$/m² por janela, categoria e faixa de quantidade (1–8, 9–16, 17–32, 33+ lotes); cada par de três: [20% + 12x (tabela), à vista, 20% + 36x]",
+  "precos": {
+    "expo": {
+      "V": [[184, 169, 199], [158, 145, 171], [144, 132, 156], [132, 121, 143]],
+      "B": [[176, 162, 190], [151, 139, 163], [137, 126, 148], [127, 117, 137]],
+      "P": [[160, 147, 173], [138, 127, 149], [125, 115, 135], [115, 106, 124]],
+      "I": [[144, 132, 156], [124, 114, 134], [112, 103, 121], [110, 101, 119]]
+    },
+    "pos": {
+      "V": [[213, 196, 230], [183, 168, 198], [166, 153, 179], [153, 141, 165]],
+      "B": [[204, 188, 220], [175, 161, 189], [159, 146, 172], [147, 135, 159]],
+      "P": [[185, 170, 200], [159, 146, 172], [144, 132, 156], [133, 122, 144]],
+      "I": [[167, 154, 180], [143, 132, 154], [130, 120, 140], [128, 118, 138]]
+    },
+    "plena": {
+      "V": [[253, 233, 273], [218, 201, 235], [197, 181, 213], [182, 167, 197]],
+      "B": [[242, 223, 261], [208, 191, 225], [189, 174, 204], [174, 160, 188]],
+      "P": [[220, 202, 238], [189, 174, 204], [172, 158, 186], [158, 145, 171]],
+      "I": [[198, 182, 214], [170, 156, 184], [154, 142, 166], [150, 138, 162]]
+    }
+  },
+  "contato": { "nomes": "Cleber Pavão e Sydney Savi", "emails": ["cleber@bracerum.com", "sydney@bracerum.com"] }
+}

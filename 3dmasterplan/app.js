@@ -28,12 +28,12 @@ const T = {
     'ui.noWebgl': 'Este navegador não abriu a maquete 3D.',
     'ui.noWebglText': 'A visualização precisa de WebGL. Tente outro navegador ou um computador — enquanto isso, a imagem mostra o masterplan.',
     'ui.toSiteMp': 'Ver o masterplan no site', 'ui.backAria': 'Bracerum Park — voltar ao site', 'ui.title': 'Masterplan',
-    'ui.version': 'Planta V12 · 01/10/2026', 'ui.back': 'Voltar ao site', 'ui.h1a': 'A cidade industrial', 'ui.h1b': 'em volume',
-    'f.area': 'área total', 'f.front': 'de frente para a PY-19', 'f.lots': 'lotes industriais', 'f.runway': 'pista de pouso',
+    'ui.version': 'Planta V12 · lotes V14-02', 'ui.back': 'Voltar ao site', 'ui.h1a': 'A cidade industrial', 'ui.h1b': 'em volume',
+    'f.area': 'área total', 'f.front': 'de frente para a PY-19', 'f.lots': 'lotes à venda', 'f.runway': 'pista de pouso',
     'ui.areas': 'Áreas do parque',
-    'ui.note': 'Maquete ilustrativa. Posições e metragens da planta V12; alturas e arquitetura são estimativas — o projeto não define altura dos prédios.',
+    'ui.note': 'Maquete ilustrativa. Posições e metragens da planta V12; lotes, categorias e preços da Política Comercial P1 (mapa V14-02, Tabela v3.1). Alturas e arquitetura são estimativas — o projeto não define altura dos prédios.',
     'ui.close': 'Fechar', 'ui.prev': 'Anterior', 'ui.next': 'Próxima', 'ui.toolsAria': 'Ferramentas da maquete',
-    'ui.north': 'Norte para cima', 'ui.credit': 'Planta V12 (01/10/2026) · alturas estimadas · entorno', 'ui.stage': 'Maquete 3D do Bracerum Park',
+    'ui.north': 'Norte para cima', 'ui.credit': 'Planta V12 (01/10/2026) · lotes e preços: mapa V14-02 e Tabela v3.1 · alturas estimadas · entorno', 'ui.stage': 'Maquete 3D do Bracerum Park',
     't.areas': 'Áreas', 't.home': 'Vista geral', 't.top': 'De cima', 't.rotate': 'Girar', 't.tour': 'Tour', 't.measure': 'Medir',
     't.labels': 'Rótulos', 't.sun': 'Hora do sol', 't.full': 'Tela cheia',
     'hint.desk': 'Arraste para girar · botão direito para mover · role para aproximar · clique numa área ou num lote',
@@ -43,25 +43,39 @@ const T = {
     'card.area': 'Área', 'card.site': 'Ver no site', 'card.contact': 'Falar com a equipe comercial',
     'card.nophoto': 'Ainda não há imagens desta área — o volume é uma estimativa a partir da planta.',
     'card.photo': 'Foto', 'tip.open': 'clique para ver',
-    'lot.eyebrow': 'Lote industrial', 'lot.title': 'Lote', 'lot.front': 'Lote da frente', 'lot.edge': 'Lote de borda',
-    'lot.area': 'área do lote, pela planta V12', 'lot.std': 'quadra-padrão · 16 módulos de 25 × 50 m',
-    'lot.irreg': 'formato irregular, cortado pela borda do terreno ou pela pista',
-    'lot.frontTxt': 'faixa de 433 × 50 m logo abaixo do Outlet', 'lot.sale': 'venda do lote inteiro ou em partes, a partir de um módulo de 1.250 m²',
-    'lot.text': 'Os lotes industriais são vendidos — inteiros ou fracionados a partir de um módulo de 25 × 50 m. Fale com a equipe comercial para disponibilidade e condições.',
-    'lot.grid': 'Coluna {c}, linha {l} da grade — referência desta maquete, não a numeração oficial dos lotes.',
-    'lot.back': 'Todos os lotes', 'measure.label': 'Medida',
+    't.lots': 'Lotes à venda',
+    'lots.eyebrow': 'Política Comercial P1 · Tabela {v}', 'lots.title': 'Lotes à venda', 'lots.sub': '{n} lotes · {a} m² · Masterplan V14-02',
+    'lots.window': 'Janela de preço', 'lots.pay': 'Pagamento', 'lots.legendHead': 'Preço por m² · 1 a 8 lotes · 20% + 12x', 'lots.lots': 'lotes',
+    'lots.recinto': 'Q37 · recinto alfandegado, fora da oferta', 'lots.see': 'Ver lotes e preços',
+    'lots.howto': 'Clique num lote para ver o valor. Shift + clique soma lotes à simulação; o preço por m² cai a partir de 9 lotes.',
+    'lots.howtoTouch': 'Toque num lote para ver o valor. Para somar lotes, use “Somar lotes” no cartão.',
+    'lot.eyebrow': 'Lote industrial · Quadra {q}', 'lot.quadra': 'Quadra {q}', 'lot.multiEyebrow': 'Simulação · quadras {q}', 'lot.multiTitle': '{n} lotes · {a} m²',
+    'lot.area': 'área nominal do lote ({cod} no nome oficial)', 'lot.areaApprox': 'área aproximada, medida no mapa de lotes',
+    'lot.cat': 'categoria · fator ×{f} sobre o preço Padrão', 'lot.total': 'Valor do lote', 'lot.totalOp': 'Total da operação',
+    'lot.m2': '{p}/m² × {a} m²', 'lot.m2avg': 'média de {p}/m² × {a} m²', 'lot.down': 'Sinal de 20% na assinatura', 'lot.inst': '{n} parcelas mensais de',
+    'lot.cash': 'Pagamento único na assinatura', 'lot.tier': 'Faixa de {de} a {ate} lotes na operação.', 'lot.tierUp': 'Faixa de {de} lotes ou mais na operação.',
+    'lot.next': 'A partir de {n} lotes, {c} cai para {p}/m².', 'lot.add': 'Somar lotes', 'lot.adding': 'Somando: clique nos lotes para incluir ou tirar',
+    'lot.block': 'Quadra {q} inteira ({n} lotes)', 'lot.clear': 'Limpar', 'lot.remove': 'Tirar {id} da simulação', 'lot.propose': 'Pedir proposta',
+    'lot.notes': 'Valor = preço por m² × área do lote, em dólares, IVA não incluído. Vale a tabela vigente na data da assinatura; a disponibilidade de cada lote é confirmada pela Bracerum na proposta.',
+    'lot.expoNote': 'Preço de lançamento para reservas assinadas até 13/11/2026, dentro da cota de 64 lotes.',
+    'lot.approxNote': 'Lote de formato irregular: a área foi medida no mapa de lotes e pode diferir alguns m² da área de contrato, que vem no nome oficial do lote.',
+    'lot.approxNoteN': 'Há {n} lote(s) de formato irregular: área medida no mapa de lotes, pode diferir alguns m² da área de contrato.',
+    'q.recinto': 'Recinto alfandegado', 'q.recintoArea': 'área da quadra Q37', 'q.fora': 'fora da oferta de lotes',
+    'q.recintoTxt': 'A quadra Q37, junto ao Aeroporto de Cargas, é o recinto alfandegado do parque e não integra a oferta de lotes.',
+    'mail.subject': 'Proposta Bracerum Park — {l}', 'mail.hello': 'Olá, gostaria de receber uma proposta para:',
+    'mail.sim': 'Simulação no Masterplan 3D (Tabela {v}):', 'mail.parc': 'sinal {s} + {n} × {p}', 'measure.label': 'Medida',
   },
   en: {
     'ui.loading': 'Building the model…', 'ui.eyebrow': 'Bracerum Park · Villeta, Paraguay',
     'ui.noWebgl': 'This browser could not open the 3D model.',
     'ui.noWebglText': 'The viewer needs WebGL. Try another browser or a computer — meanwhile, the image shows the master plan.',
     'ui.toSiteMp': 'See the master plan on the site', 'ui.backAria': 'Bracerum Park — back to the site', 'ui.title': 'Master plan',
-    'ui.version': 'Plan V12 · 2026-10-01', 'ui.back': 'Back to the site', 'ui.h1a': 'The industrial city', 'ui.h1b': 'in three dimensions',
-    'f.area': 'total area', 'f.front': 'of frontage on the PY-19', 'f.lots': 'industrial lots', 'f.runway': 'airstrip',
+    'ui.version': 'Plan V12 · lots V14-02', 'ui.back': 'Back to the site', 'ui.h1a': 'The industrial city', 'ui.h1b': 'in three dimensions',
+    'f.area': 'total area', 'f.front': 'of frontage on the PY-19', 'f.lots': 'lots for sale', 'f.runway': 'airstrip',
     'ui.areas': 'Areas of the park',
-    'ui.note': 'Illustrative model. Positions and areas from plan V12; heights and architecture are estimates — the project does not define building heights.',
+    'ui.note': 'Illustrative model. Positions and areas from plan V12; lots, categories and prices from Commercial Policy P1 (V14-02 map, price list v3.1). Heights and architecture are estimates — the project does not define building heights.',
     'ui.close': 'Close', 'ui.prev': 'Previous', 'ui.next': 'Next', 'ui.toolsAria': 'Model tools',
-    'ui.north': 'North up', 'ui.credit': 'Plan V12 (2026-10-01) · estimated heights · surroundings', 'ui.stage': 'Bracerum Park 3D model',
+    'ui.north': 'North up', 'ui.credit': 'Plan V12 (2026-10-01) · lots and prices: V14-02 map and price list v3.1 · estimated heights · surroundings', 'ui.stage': 'Bracerum Park 3D model',
     't.areas': 'Areas', 't.home': 'Overview', 't.top': 'Top view', 't.rotate': 'Rotate', 't.tour': 'Tour', 't.measure': 'Measure',
     't.labels': 'Labels', 't.sun': 'Time of day', 't.full': 'Full screen',
     'hint.desk': 'Drag to rotate · right button to pan · scroll to zoom · click an area or a lot',
@@ -71,25 +85,39 @@ const T = {
     'card.area': 'Area', 'card.site': 'See on the site', 'card.contact': 'Talk to the sales team',
     'card.nophoto': 'No images of this area yet — the volume is an estimate based on the plan.',
     'card.photo': 'Photo', 'tip.open': 'click to open',
-    'lot.eyebrow': 'Industrial lot', 'lot.title': 'Lot', 'lot.front': 'Front lot', 'lot.edge': 'Edge lot',
-    'lot.area': 'lot area, from plan V12', 'lot.std': 'standard block · 16 modules of 25 × 50 m',
-    'lot.irreg': 'irregular shape, cut by the site boundary or the runway',
-    'lot.frontTxt': '433 × 50 m strip just below the Outlet', 'lot.sale': 'the whole lot or part of it, from a single 1,250 m² module',
-    'lot.text': 'Industrial lots are for sale — whole or split from a single 25 × 50 m module. Talk to the sales team about availability and terms.',
-    'lot.grid': 'Column {c}, row {l} of the grid — a reference used in this model, not the official lot numbering.',
-    'lot.back': 'All lots', 'measure.label': 'Distance',
+    't.lots': 'Lots for sale',
+    'lots.eyebrow': 'Commercial Policy P1 · Price list {v}', 'lots.title': 'Lots for sale', 'lots.sub': '{n} lots · {a} m² · Master plan V14-02',
+    'lots.window': 'Price window', 'lots.pay': 'Payment', 'lots.legendHead': 'Price per m² · 1 to 8 lots · 20% + 12x', 'lots.lots': 'lots',
+    'lots.recinto': 'Q37 · customs bonded area, not for sale', 'lots.see': 'See lots and prices',
+    'lots.howto': 'Click a lot to see its price. Shift + click adds lots to the quote; the price per m² drops from 9 lots up.',
+    'lots.howtoTouch': 'Tap a lot to see its price. To add lots, use “Add lots” on the card.',
+    'lot.eyebrow': 'Industrial lot · Block {q}', 'lot.quadra': 'Block {q}', 'lot.multiEyebrow': 'Quote · blocks {q}', 'lot.multiTitle': '{n} lots · {a} m²',
+    'lot.area': 'nominal lot area ({cod} in the official name)', 'lot.areaApprox': 'approximate area, measured on the lot map',
+    'lot.cat': 'category · ×{f} on the Standard price', 'lot.total': 'Lot price', 'lot.totalOp': 'Total for the deal',
+    'lot.m2': '{p}/m² × {a} m²', 'lot.m2avg': 'average {p}/m² × {a} m²', 'lot.down': '20% down payment on signing', 'lot.inst': '{n} monthly instalments of',
+    'lot.cash': 'Single payment on signing', 'lot.tier': 'Bracket of {de} to {ate} lots in the deal.', 'lot.tierUp': 'Bracket of {de} lots or more in the deal.',
+    'lot.next': 'From {n} lots, {c} drops to {p}/m².', 'lot.add': 'Add lots', 'lot.adding': 'Adding: click lots to include or remove them',
+    'lot.block': 'Whole block {q} ({n} lots)', 'lot.clear': 'Clear', 'lot.remove': 'Remove {id} from the quote', 'lot.propose': 'Request a proposal',
+    'lot.notes': 'Price = price per m² × lot area, in US dollars, VAT not included. The price list in force on the signing date applies; Bracerum confirms each lot’s availability in the proposal.',
+    'lot.expoNote': 'Launch price for reservations signed by 13 Nov 2026, within the quota of 64 lots.',
+    'lot.approxNote': 'Irregular lot: the area was measured on the lot map and may differ by a few m² from the contract area, which is part of the lot’s official name.',
+    'lot.approxNoteN': '{n} irregular lot(s): area measured on the lot map, may differ by a few m² from the contract area.',
+    'q.recinto': 'Customs bonded area', 'q.recintoArea': 'area of block Q37', 'q.fora': 'not part of the lots for sale',
+    'q.recintoTxt': 'Block Q37, next to the Cargo Airport, is the park’s customs bonded area and is not part of the lots for sale.',
+    'mail.subject': 'Bracerum Park proposal — {l}', 'mail.hello': 'Hello, I would like a proposal for:',
+    'mail.sim': 'Quote from the 3D Master plan (price list {v}):', 'mail.parc': '{s} down + {n} × {p}', 'measure.label': 'Distance',
   },
   es: {
     'ui.loading': 'Armando la maqueta…', 'ui.eyebrow': 'Bracerum Park · Villeta, Paraguay',
     'ui.noWebgl': 'Este navegador no abrió la maqueta 3D.',
     'ui.noWebglText': 'La visualización necesita WebGL. Pruebe otro navegador o una computadora — mientras tanto, la imagen muestra el masterplan.',
     'ui.toSiteMp': 'Ver el masterplan en el sitio', 'ui.backAria': 'Bracerum Park — volver al sitio', 'ui.title': 'Masterplan',
-    'ui.version': 'Plano V12 · 01/10/2026', 'ui.back': 'Volver al sitio', 'ui.h1a': 'La ciudad industrial', 'ui.h1b': 'en volumen',
-    'f.area': 'superficie total', 'f.front': 'de frente sobre la PY-19', 'f.lots': 'lotes industriales', 'f.runway': 'pista de aterrizaje',
+    'ui.version': 'Plano V12 · lotes V14-02', 'ui.back': 'Volver al sitio', 'ui.h1a': 'La ciudad industrial', 'ui.h1b': 'en volumen',
+    'f.area': 'superficie total', 'f.front': 'de frente sobre la PY-19', 'f.lots': 'lotes en venta', 'f.runway': 'pista de aterrizaje',
     'ui.areas': 'Áreas del parque',
-    'ui.note': 'Maqueta ilustrativa. Posiciones y superficies del plano V12; alturas y arquitectura son estimaciones — el proyecto no define la altura de los edificios.',
+    'ui.note': 'Maqueta ilustrativa. Posiciones y superficies del plano V12; lotes, categorías y precios de la Política Comercial P1 (mapa V14-02, lista v3.1). Alturas y arquitectura son estimaciones — el proyecto no define la altura de los edificios.',
     'ui.close': 'Cerrar', 'ui.prev': 'Anterior', 'ui.next': 'Siguiente', 'ui.toolsAria': 'Herramientas de la maqueta',
-    'ui.north': 'Norte arriba', 'ui.credit': 'Plano V12 (01/10/2026) · alturas estimadas · entorno', 'ui.stage': 'Maqueta 3D de Bracerum Park',
+    'ui.north': 'Norte arriba', 'ui.credit': 'Plano V12 (01/10/2026) · lotes y precios: mapa V14-02 y lista v3.1 · alturas estimadas · entorno', 'ui.stage': 'Maqueta 3D de Bracerum Park',
     't.areas': 'Áreas', 't.home': 'Vista general', 't.top': 'Desde arriba', 't.rotate': 'Girar', 't.tour': 'Recorrido', 't.measure': 'Medir',
     't.labels': 'Rótulos', 't.sun': 'Hora del sol', 't.full': 'Pantalla completa',
     'hint.desk': 'Arrastre para girar · botón derecho para mover · rueda para acercar · haga clic en un área o un lote',
@@ -99,13 +127,27 @@ const T = {
     'card.area': 'Área', 'card.site': 'Ver en el sitio', 'card.contact': 'Hablar con el equipo comercial',
     'card.nophoto': 'Todavía no hay imágenes de esta área — el volumen es una estimación a partir del plano.',
     'card.photo': 'Foto', 'tip.open': 'clic para ver',
-    'lot.eyebrow': 'Lote industrial', 'lot.title': 'Lote', 'lot.front': 'Lote del frente', 'lot.edge': 'Lote de borde',
-    'lot.area': 'superficie del lote, según el plano V12', 'lot.std': 'manzana estándar · 16 módulos de 25 × 50 m',
-    'lot.irreg': 'forma irregular, cortada por el borde del terreno o por la pista',
-    'lot.frontTxt': 'franja de 433 × 50 m justo debajo del Outlet', 'lot.sale': 'venta del lote entero o en partes, desde un módulo de 1.250 m²',
-    'lot.text': 'Los lotes industriales se venden — enteros o fraccionados desde un módulo de 25 × 50 m. Hable con el equipo comercial sobre disponibilidad y condiciones.',
-    'lot.grid': 'Columna {c}, fila {l} de la grilla — referencia de esta maqueta, no la numeración oficial de los lotes.',
-    'lot.back': 'Todos los lotes', 'measure.label': 'Medida',
+    't.lots': 'Lotes en venta',
+    'lots.eyebrow': 'Política Comercial P1 · Lista {v}', 'lots.title': 'Lotes en venta', 'lots.sub': '{n} lotes · {a} m² · Masterplan V14-02',
+    'lots.window': 'Ventana de precio', 'lots.pay': 'Pago', 'lots.legendHead': 'Precio por m² · 1 a 8 lotes · 20% + 12x', 'lots.lots': 'lotes',
+    'lots.recinto': 'Q37 · recinto aduanero, fuera de la oferta', 'lots.see': 'Ver lotes y precios',
+    'lots.howto': 'Haga clic en un lote para ver el valor. Shift + clic suma lotes a la simulación; el precio por m² baja desde 9 lotes.',
+    'lots.howtoTouch': 'Toque un lote para ver el valor. Para sumar lotes, use “Sumar lotes” en la tarjeta.',
+    'lot.eyebrow': 'Lote industrial · Manzana {q}', 'lot.quadra': 'Manzana {q}', 'lot.multiEyebrow': 'Simulación · manzanas {q}', 'lot.multiTitle': '{n} lotes · {a} m²',
+    'lot.area': 'superficie nominal del lote ({cod} en el nombre oficial)', 'lot.areaApprox': 'superficie aproximada, medida en el mapa de lotes',
+    'lot.cat': 'categoría · factor ×{f} sobre el precio Estándar', 'lot.total': 'Valor del lote', 'lot.totalOp': 'Total de la operación',
+    'lot.m2': '{p}/m² × {a} m²', 'lot.m2avg': 'promedio de {p}/m² × {a} m²', 'lot.down': 'Seña del 20% a la firma', 'lot.inst': '{n} cuotas mensuales de',
+    'lot.cash': 'Pago único a la firma', 'lot.tier': 'Franja de {de} a {ate} lotes en la operación.', 'lot.tierUp': 'Franja de {de} lotes o más en la operación.',
+    'lot.next': 'Desde {n} lotes, {c} baja a {p}/m².', 'lot.add': 'Sumar lotes', 'lot.adding': 'Sumando: haga clic en los lotes para incluir o quitar',
+    'lot.block': 'Manzana {q} entera ({n} lotes)', 'lot.clear': 'Limpiar', 'lot.remove': 'Quitar {id} de la simulación', 'lot.propose': 'Pedir propuesta',
+    'lot.notes': 'Valor = precio por m² × superficie del lote, en dólares, IVA no incluido. Vale la lista vigente a la fecha de la firma; Bracerum confirma la disponibilidad de cada lote en la propuesta.',
+    'lot.expoNote': 'Precio de lanzamiento para reservas firmadas hasta el 13/11/2026, dentro del cupo de 64 lotes.',
+    'lot.approxNote': 'Lote de forma irregular: la superficie se midió en el mapa de lotes y puede diferir algunos m² de la superficie de contrato, que figura en el nombre oficial del lote.',
+    'lot.approxNoteN': 'Hay {n} lote(s) de forma irregular: superficie medida en el mapa de lotes, puede diferir algunos m² de la de contrato.',
+    'q.recinto': 'Recinto aduanero', 'q.recintoArea': 'superficie de la manzana Q37', 'q.fora': 'fuera de la oferta de lotes',
+    'q.recintoTxt': 'La manzana Q37, junto al Aeropuerto de Cargas, es el recinto aduanero del parque y no integra la oferta de lotes.',
+    'mail.subject': 'Propuesta Bracerum Park — {l}', 'mail.hello': 'Hola, quisiera recibir una propuesta para:',
+    'mail.sim': 'Simulación en el Masterplan 3D (lista {v}):', 'mail.parc': 'seña {s} + {n} × {p}', 'measure.label': 'Medida',
   },
 };
 
@@ -128,8 +170,8 @@ const AREAS = [
     name: { pt: 'Outlet e Supermercado', en: 'Outlet and Supermarket', es: 'Outlet y Supermercado' },
     short: { pt: 'Outlet', en: 'Outlet', es: 'Outlet' },
     kpis: [
-      { n: 57750, u: 'm²', l: { pt: 'Outlet, em L na frente da rodovia', en: 'L-shaped outlet facing the highway', es: 'Outlet en L frente a la ruta' } },
-      { n: 4334, u: 'm²', l: { pt: 'Supermercado', en: 'supermarket', es: 'supermercado' } },
+      { n: 61850, u: 'm²', l: { pt: 'Bracerum Outlet, em L na frente da rodovia', en: 'L-shaped Bracerum Outlet facing the highway', es: 'Bracerum Outlet en L frente a la ruta' } },
+      { n: 4606, u: 'm²', l: { pt: 'Supermercado', en: 'supermarket', es: 'supermercado' } },
       { n: 433, u: 'm', l: { pt: 'de frente para a Via Costeira', en: 'of frontage on the Via Costeira', es: 'de frente sobre la Vía Costera' } }],
     text: { pt: 'Comércio ao lado da entrada: uma faixa ao longo da Via Costeira e outra que desce entre a área industrial e o acesso ao Resort, até o Supermercado. A arquitetura ainda não foi definida — os volumes aqui são ilustrativos.',
       en: 'Retail next to the entrance: one strip along the Via Costeira and another running down between the industrial area and the Resort access road, all the way to the supermarket. The architecture has not been defined yet — these volumes are illustrative.',
@@ -141,12 +183,12 @@ const AREAS = [
     name: { pt: 'Lotes industriais', en: 'Industrial lots', es: 'Lotes industriales' },
     short: { pt: 'Lotes industriais', en: 'Industrial lots', es: 'Lotes industriales' },
     kpis: [
-      { n: 781777, u: 'm²', l: { pt: 'em 41 lotes industriais', en: 'across 41 industrial lots', es: 'en 41 lotes industriales' } },
-      { v: '200 × 100 m', l: { pt: 'quadra-padrão de 20.000 m² — 32 dos 41 lotes', en: 'standard 20,000 m² block — 32 of the 41 lots', es: 'manzana estándar de 20.000 m² — 32 de los 41 lotes' } },
-      { n: 1250, u: 'm²', l: { pt: 'venda a partir de um módulo de 25 × 50 m', en: 'for sale from a single 25 × 50 m module', es: 'venta desde un módulo de 25 × 50 m' } }],
-    text: { pt: 'A grade industrial ocupa o miolo do parque: seis colunas de quadras separadas por vias com rotatórias, um boulevard arborizado em cada sentido e o canal de drenagem. Cada quadra-padrão se divide em 16 módulos e pode ser comprada inteira ou em partes. Clique num lote para ver a metragem.',
-      en: 'The industrial grid fills the core of the park: six columns of blocks separated by streets with roundabouts, a tree-lined boulevard in each direction and the drainage canal. Each standard block splits into 16 modules and can be bought whole or in parts. Click a lot to see its size.',
-      es: 'La grilla industrial ocupa el centro del parque: seis columnas de manzanas separadas por calles con rotondas, un bulevar arbolado en cada sentido y el canal de drenaje. Cada manzana estándar se divide en 16 módulos y puede comprarse entera o en partes. Haga clic en un lote para ver la superficie.' },
+      { n: 612, u: { pt: 'lotes', en: 'lots', es: 'lotes' }, l: { pt: 'à venda, de 1.250 m² (25 × 50 m) cada — 765.960 m² no total', en: 'for sale, 1,250 m² (25 × 50 m) each — 765,960 m² in total', es: 'en venta, de 1.250 m² (25 × 50 m) cada uno — 765.960 m² en total' } },
+      { v: () => `${usd(P.precos[janelaVigente()].P[0][0])}/m²`, l: () => ({ pt: `lote Padrão, 1 a 8 lotes, 20% + 12x — janela ${tr(P.janelas.find((j) => j.id === janelaVigente()).curto)}`, en: `Standard lot, 1 to 8 lots, 20% + 12x — ${tr(P.janelas.find((j) => j.id === janelaVigente()).curto)} window`, es: `lote Estándar, 1 a 8 lotes, 20% + 12x — ventana ${tr(P.janelas.find((j) => j.id === janelaVigente()).curto)}` }) },
+      { t: { pt: 'quadras Q01 a Q42; a quadra-padrão tem 200 × 100 m e 16 lotes (Q37 é o recinto alfandegado, fora da oferta)', en: 'blocks Q01 to Q42; a standard block is 200 × 100 m with 16 lots (Q37 is the customs bonded area, not for sale)', es: 'manzanas Q01 a Q42; la manzana estándar tiene 200 × 100 m y 16 lotes (Q37 es el recinto aduanero, fuera de la oferta)' } }],
+    text: { pt: 'A grade industrial ocupa o miolo do parque: quadras separadas por vias com rotatórias, um boulevard arborizado em cada sentido e o canal de drenagem. A unidade de venda é o lote de 1.250 m² — compre um ou junte vários; a partir de 9 lotes o preço por m² cai. O preço depende da categoria do lote: Vitrine (frente da entrada e da avenida principal), Business, Padrão e Interna.',
+      en: 'The industrial grid fills the core of the park: blocks separated by streets with roundabouts, a tree-lined boulevard in each direction and the drainage canal. The unit of sale is the 1,250 m² lot — buy one or combine several; from 9 lots up the price per m² drops. The price depends on the lot category: Showcase (facing the entrance and the main avenue), Business, Standard and Inner.',
+      es: 'La grilla industrial ocupa el centro del parque: manzanas separadas por calles con rotondas, un bulevar arbolado en cada sentido y el canal de drenaje. La unidad de venta es el lote de 1.250 m² — compre uno o junte varios; desde 9 lotes el precio por m² baja. El precio depende de la categoría del lote: Vitrina (frente a la entrada y a la avenida principal), Business, Estándar e Interna.' },
     photos: ['web/fotos/park-boulevard-aereo-2.jpg', 'web/fotos/galpao-docas.jpg', 'web/fotos/galpao-portico-azul.jpg', 'web/fotos/galpao-via.jpg', 'web/fotos/vias-rotatoria.jpg'],
     link: 'qualidade.html' },
   { id: 'tecnologico', poly: [[69.5, 9.6], [74.8, 9.6], [74.8, 17], [69.5, 17]], at: [71.9, 13.6], ph: 40, dist: 420,
@@ -231,7 +273,8 @@ const AREAS = [
     kpis: [
       { n: 42060, u: 'm²', l: { pt: 'pátio do aeroporto de cargas', en: 'cargo airport apron', es: 'plataforma del aeropuerto de cargas' } },
       { n: 7686, u: 'm²', l: { pt: '7 hangares, lounge e abastecimento', en: '7 hangars, lounge and refueling', es: '7 hangares, lounge y abastecimiento' } },
-      { t: { pt: 'heliponto no pátio dos hangares', en: 'helipad on the hangar apron', es: 'helipuerto en la plataforma de los hangares' } }],
+      { t: { pt: 'heliponto no pátio dos hangares', en: 'helipad on the hangar apron', es: 'helipuerto en la plataforma de los hangares' } },
+      { n: 15619, u: 'm²', l: { pt: 'recinto alfandegado (quadra Q37), ao lado do pátio', en: 'customs bonded area (block Q37), next to the apron', es: 'recinto aduanero (manzana Q37), junto a la plataforma' } }],
     text: { pt: 'Os hangares ficam de frente para o pátio, com o estacionamento do aeródromo atrás e, no fim da fileira, o abastecimento e o heliponto. Carga e executivos chegam de avião direto ao parque.',
       en: 'The hangars face the apron, with the airfield parking behind them and, at the end of the row, the refueling point and the helipad. Cargo and executives fly straight into the park.',
       es: 'Los hangares dan a la plataforma, con el estacionamiento del aeródromo detrás y, al final de la fila, el abastecimiento y el helipuerto. Carga y ejecutivos llegan en avión directo al parque.' },
@@ -291,6 +334,7 @@ const areaIdx = Object.fromEntries(AREAS.map((a, i) => [a.id, i]));
 let selected = null;        // {kind:'area', i} | {kind:'lot', lot}
 let hovered = -1, mixTarget = 0, dirty = true, flight = null, tour = null, measure = null;
 const lotLayer = new THREE.Group();
+const galpoes = [];
 
 const pct = (p) => [p[0] / 100 * W - W / 2, p[1] / 100 * H - H / 2];
 const toWorld = (X, Y) => [X - W / 2, Y - H / 2];
@@ -468,9 +512,10 @@ function volumes() {
     if (area2(pts) < 0) pts.reverse();
     const ai = areaIdx[TAG_AREA[v.t]] ?? -1;
     const [ws, rs, cor] = ESTILO[v.t] || ['w_plain', 'r_flat', [0.99, 0.985, 0.975]];
+    const ind = TAG_AREA[v.t] === 'industrial' ? '|ind' : '';     // galpões: somem no modo "lotes à venda"
     if (v.t === 'casa' && pts.length === 4) { casa(acc(ws), acc(rs), pts, v.h, ai); continue; }
-    paredes(acc(ws), pts, v.h, ai, cor);
-    telhado(acc(rs), pts, v.h, ai, cor);
+    paredes(acc(ws + ind), pts, v.h, ai, cor);
+    telhado(acc(rs + ind), pts, v.h, ai, cor);
   }
   const std = (o) => realcar(new THREE.MeshStandardMaterial({ roughness: 0.9, metalness: 0, vertexColors: true, ...o }));
   const M = {
@@ -480,9 +525,10 @@ function volumes() {
   };
   const g = new THREE.Group();
   for (const [k, a] of Object.entries(accs)) {
-    const mesh = new THREE.Mesh(a.geom(), M[k] || M.w_plain);
+    const mesh = new THREE.Mesh(a.geom(), M[k.split('|')[0]] || M.w_plain);
     mesh.castShadow = true; mesh.receiveShadow = true;
     g.add(mesh); pickables.push(mesh);
+    if (k.endsWith('|ind')) galpoes.push(mesh);
   }
   return g;
 }
@@ -699,7 +745,7 @@ function vistaCima() {
 const pinEls = [];
 function montaPinos() {
   const box = $('#pins');
-  box.innerHTML = '';
+  box.querySelectorAll('.pin3d').forEach((e) => e.remove());   // os rótulos das quadras ficam
   pinEls.length = 0;
   AREAS.forEach((a, i) => {
     const b = document.createElement('button');
@@ -788,31 +834,181 @@ function escolheArea(i, voo = true) {
   try { history.replaceState(null, '', '#' + a.id); } catch (e) { /* file:// */ }
   invalidate();
 }
-function escolheLote(l, voo = true) {
-  const ia = areaIdx.industrial;
-  selected = { kind: 'lot', lot: l, i: ia };
+/* ------------------------------------------------------------------ lotes à venda e preços
+   Lotes, categorias e áreas: data/lotes.json (mapa de lotes MP14, Masterplan V14-02, gerado por
+   docs/3dmasterplan/build_lotes.py). Preços: data/precos.json (Tabela v3.1, editado à mão).
+   Valor = preço por m² (janela × categoria × faixa de quantidade × pagamento) × área de cada lote. */
+let L = null, P = null;
+let escolhidos = [];                   // os lotes da simulação
+let modoLotes = false, somar = false;
+let janela = 'expo', pagto = '12x';
+const IPAG = { '12x': 0, vista: 1, '36x': 2 };
+const camadaLotes = new THREE.Group();
+const qtags = [];
+
+function hojeISO() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+function janelaVigente() {
+  const h = hojeISO();
+  return (P.janelas.find((j) => h <= (j.ate || '9999-12-31')) || P.janelas[P.janelas.length - 1]).id;
+}
+const faixaDe = (n) => P.faixas.findIndex((f) => n >= f.de && (f.ate == null || n <= f.ate));
+const precoM2 = (cat, n, jan = janela, pag = pagto) => P.precos[jan][cat][faixaDe(n)][IPAG[pag]];
+const usd = (v) => `US$${lang === 'en' ? '' : ' '}${fmt(Math.round(v))}`;
+const nomeCat = (c) => tr(P.categorias[c].nome);
+const subst = (s, o) => s.replace(/\{(\w+)\}/g, (_, k) => (o[k] ?? ''));
+function calcula(lista, jan = janela, pag = pagto) {
+  const n = lista.length, f = faixaDe(n);
+  let total = 0, area = 0;
+  const cats = {};
+  for (const l of lista) {
+    const pm = P.precos[jan][l.cat][f][IPAG[pag]];
+    total += pm * l.a; area += l.a;
+    const c = (cats[l.cat] ||= { n: 0, a: 0, pm, v: 0 });
+    c.n++; c.a += l.a; c.v += pm * l.a;
+  }
+  const np = pag === '12x' ? 12 : pag === '36x' ? 36 : 0;
+  const sinal = np ? Math.round(total * 0.2) : total;
+  return { n, f, total, area, cats, np, sinal, parcela: np ? (total - sinal) / np : 0 };
+}
+
+function preparaLotes() {
+  L.porId = new Map();
+  for (const l of L.lotes) {
+    l._pts = pairs(l.p);
+    const xs = l._pts.map((p) => p[0]), ys = l._pts.map((p) => p[1]);
+    l._bb = [Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys)];
+    L.porId.set(l.id, l);
+  }
+  for (const q of L.quadras) {
+    q._pts = pairs(q.p);
+    q._lotes = L.lotes.filter((l) => l.q === q.q);
+    const xs = q._pts.map((p) => p[0]), ys = q._pts.map((p) => p[1]);
+    q._c = toWorld((Math.min(...xs) + Math.max(...xs)) / 2, (Math.min(...ys) + Math.max(...ys)) / 2);
+  }
+}
+function montaCamadaLotes() {
+  const pos = [], col = [];
+  const c = new THREE.Color();
+  const poe = (pts, cor) => {
+    c.set(cor);
+    const w = pts.map((p) => toWorld(p[0], p[1]));
+    for (const tri of THREE.ShapeUtils.triangulateShape(w.map((p) => new THREE.Vector2(p[0], p[1])), [])) {
+      for (const k of tri) { pos.push(w[k][0], 0.16, w[k][1]); col.push(c.r, c.g, c.b); }
+    }
+  };
+  for (const l of L.lotes) poe(l._pts, P.categorias[l.cat].cor);
+  for (const q of L.quadras) if (q.fora) poe(q._pts, '#c9c4b8');
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
+  const m = new THREE.Mesh(g, new THREE.MeshBasicMaterial({ vertexColors: true, transparent: true, opacity: 0.86,
+    depthWrite: false, toneMapped: false, side: THREE.DoubleSide }));
+  m.renderOrder = 1;
+  m.raycast = () => {};
+  camadaLotes.add(m);
+  camadaLotes.visible = false;
+  for (const q of L.quadras) {               // rótulo de cada quadra (Q01…Q42), só no modo lotes
+    const el = document.createElement('span');
+    el.className = 'qtag' + (q.fora ? ' qtag--fora' : '');
+    el.textContent = q.q;
+    el.setAttribute('aria-hidden', 'true');
+    $('#pins').appendChild(el);
+    qtags.push({ el, p: new THREE.Vector3(q._c[0], 4, q._c[1]) });
+  }
+}
+function posicionaQuadras() {
+  if (!modoLotes) return;
+  const w = innerWidth, h = innerHeight, mostra = camera.position.distanceTo(controls.target) < 3800;
+  for (const q of qtags) {
+    vtmp.copy(q.p).project(camera);
+    const ok = mostra && vtmp.z < 1 && Math.abs(vtmp.x) < 1.05 && Math.abs(vtmp.y) < 1.05;
+    q.el.style.opacity = ok ? 1 : 0;
+    if (ok) q.el.style.transform = `translate3d(${((vtmp.x + 1) / 2 * w).toFixed(1)}px,${((1 - vtmp.y) / 2 * h).toFixed(1)}px,0) translate(-50%,-50%)`;
+  }
+}
+function comIndice(A, sph) {                  // centra no espaço à direita do índice (desktop)
+  if (SMALL() || innerWidth <= 1000) return A;
+  const k = (2 * sph.r * Math.tan(THREE.MathUtils.degToRad(camera.fov) / 2)) / innerHeight;
+  return A.clone().addScaledVector(new THREE.Vector3(Math.cos(sph.theta), 0, -Math.sin(sph.theta)), -(350 / 2) * k);
+}
+function modoLotesOn(on, voo = true) {
+  modoLotes = on;
+  document.body.classList.toggle('modo-lotes', on);
+  $('#tLots').setAttribute('aria-pressed', on ? 'true' : 'false');
+  camadaLotes.visible = on;
+  galpoes.forEach((m) => { m.visible = !on; });
+  if (on) {
+    pararTour();
+    if (selected && selected.kind !== 'lot') limpaSelecao();
+    painelLotes();
+    if (voo && !escolhidos.length) {
+      const [x, z] = pct([38.5, 47]);
+      const retrato = camera.aspect < 1;
+      const r = retrato ? caber(H * 0.85, W * 0.6) : caber(W * 0.76, H * 0.95);
+      const fim = { r, phi: 0.42, theta: retrato ? -Math.PI / 2 : 0 };
+      voar(comIndice(new THREE.Vector3(x, 0, z), fim), fim, 1500);
+    }
+    if (!selected) try { history.replaceState(null, '', '#lotes'); } catch (e) { /* file:// */ }
+    dica(COARSE ? 'lots.howtoTouch' : 'lots.howto', 9000);
+  } else {
+    qtags.forEach((q) => { q.el.style.opacity = 0; });
+    if (!selected) try { history.replaceState(null, '', location.pathname + location.search); } catch (e) { /* file:// */ }
+    dica(null);
+  }
+  invalidate();
+}
+function escolheLotes(lista, voo = true) {
+  escolhidos = lista;
+  if (!lista.length) { limpaSelecao(); return; }
+  selected = { kind: 'lot', i: areaIdx.industrial };
   marcaSelecao(-1);
-  U.focus.value.set(0, 0, 1e5, 0);
-  desenhaLote(l);
-  const pts = pairs(l.p).map((p) => toWorld(p[0], p[1]));
-  const cx = pts.reduce((s, p) => s + p[0], 0) / pts.length, cz = pts.reduce((s, p) => s + p[1], 0) / pts.length;
-  U.focus.value.set(cx, cz, 170, 1);
+  limpaLote();
+  lista.forEach((l) => desenhaLote(l));
+  const bb = lista.reduce((b, l) => [Math.min(b[0], l._bb[0]), Math.min(b[1], l._bb[1]), Math.max(b[2], l._bb[2]), Math.max(b[3], l._bb[3])],
+    [Infinity, Infinity, -Infinity, -Infinity]);
+  const [cx, cz] = toWorld((bb[0] + bb[2]) / 2, (bb[1] + bb[3]) / 2);
+  const raio = Math.max(150, Math.hypot(bb[2] - bb[0], bb[3] - bb[1]) * 0.6);
+  U.focus.value.set(cx, cz, raio, 1);
   if (voo) {
     const sph = esfera();
-    const fim = { r: camera.aspect < 1 ? 720 : 560, phi: THREE.MathUtils.clamp(sph.phi, 0.6, 0.95), theta: sph.theta };
-    voar(comCartao(new THREE.Vector3(cx, 0, cz), fim), fim, 1300);
+    if (sph.r > 1300 || lista.length > 1) {
+      const fim = { r: THREE.MathUtils.clamp(raio * 3.4, camera.aspect < 1 ? 720 : 560, 2600), phi: THREE.MathUtils.clamp(sph.phi, 0.45, 0.95), theta: sph.theta };
+      voar(comCartao(new THREE.Vector3(cx, 0, cz), fim), fim, 1300);
+    }
   }
-  mostraCartaoLote(l);
-  try { history.replaceState(null, '', '#lote-' + l.id); } catch (e) { /* file:// */ }
+  try { history.replaceState(null, '', hashLotes(lista)); } catch (e) { /* file:// */ }
+  mostraCartaoLotes();
   invalidate();
+}
+function porQuadra(lista) {                    // [[quadra, lotes, inteira?], ...]
+  const g = new Map();
+  lista.forEach((l) => { if (!g.has(l.q)) g.set(l.q, []); g.get(l.q).push(l); });
+  return [...g].map(([q, ls]) => [q, ls, ls.length > 1 && L.quadras.find((x) => x.q === q)._lotes.length === ls.length]);
+}
+function hashLotes(lista) {
+  if (lista.length === 1) return '#lote-' + lista[0].id;
+  const s = porQuadra(lista).map(([q, ls, inteira]) => (inteira ? q : ls.map((l) => l.id).join('-'))).join('-');
+  return s.length <= 1500 ? '#lotes-' + s : '#lotes';
+}
+function lotesDoHash(h) {
+  return h.replace(/^lotes?-/, '').split('-').flatMap((id) => (/^Q\d\d$/.test(id) ? L.quadras.find((q) => q.q === id)?._lotes || [] : [L.porId.get(id)])).filter(Boolean);
+}
+function cliqueLote(l, juntar) {
+  if (juntar && escolhidos.length) {
+    escolheLotes(escolhidos.includes(l) ? escolhidos.filter((x) => x !== l) : [...escolhidos, l], false);
+  } else escolheLotes([l]);
 }
 function limpaSelecao() {
   selected = null;
+  escolhidos = []; somar = false;
   marcaSelecao(-1);
   limpaLote();
   U.focus.value.w = 0;
   fechaCartao();
-  try { history.replaceState(null, '', location.pathname + location.search); } catch (e) { /* file:// */ }
+  try { history.replaceState(null, '', modoLotes ? '#lotes' : location.pathname + location.search); } catch (e) { /* file:// */ }
   invalidate();
 }
 function limpaLote() {
@@ -820,15 +1016,14 @@ function limpaLote() {
   lotLayer.clear();
 }
 function desenhaLote(l, hover = false) {
-  if (!hover) limpaLote();
   const pts = pairs(l.p).map((p) => toWorld(p[0], p[1]));
   const shape = new THREE.Shape(pts.map((p) => new THREE.Vector2(p[0], -p[1])));
-  const fill = new THREE.Mesh(new THREE.ShapeGeometry(shape), new THREE.MeshBasicMaterial({ color: '#cbb88f', transparent: true,
-    opacity: hover ? 0.28 : 0.5, depthWrite: false, toneMapped: false, side: THREE.DoubleSide }));
-  fill.rotation.x = -Math.PI / 2; fill.position.y = 0.2; fill.renderOrder = 1;
-  const line = new THREE.Mesh(fita(pts, hover ? 1.6 : 2.6, 0.3), new THREE.MeshBasicMaterial({ color: '#473315', depthWrite: false, toneMapped: false,
-    transparent: true, opacity: hover ? 0.6 : 0.95, side: THREE.DoubleSide }));
-  line.renderOrder = 1;
+  const fill = new THREE.Mesh(new THREE.ShapeGeometry(shape), new THREE.MeshBasicMaterial({ color: '#efdcae', transparent: true,
+    opacity: hover ? 0.35 : 0.85, depthWrite: false, toneMapped: false, side: THREE.DoubleSide }));
+  fill.rotation.x = -Math.PI / 2; fill.position.y = 0.22; fill.renderOrder = 2;
+  const line = new THREE.Mesh(fita(pts, hover ? 1.2 : 2.0, 0.32), new THREE.MeshBasicMaterial({ color: '#473315', depthWrite: false, toneMapped: false,
+    transparent: true, opacity: hover ? 0.6 : 1, side: THREE.DoubleSide }));
+  line.renderOrder = 2;
   fill.userData.hover = line.userData.hover = hover;
   lotLayer.add(fill, line);
 }
@@ -880,8 +1075,9 @@ function fotos(lista) {
 function kpis(lista) {
   $('#cardKpis').innerHTML = lista.map((k) => {
     if (k.t) return `<div class="solo"><dd>${esc(tr(k.t))}</dd></div>`;
-    const v = k.v ?? `${fmt(k.n)} ${tr(k.u)}`.trim();
-    return `<div><dt>${esc(v)}</dt><dd>${esc(tr(k.l))}</dd></div>`;
+    const val = (x) => (typeof x === 'function' ? x() : x);
+    const v = val(k.v) ?? `${fmt(k.n)} ${tr(k.u)}`.trim();
+    return `<div><dt>${esc(v)}</dt><dd>${esc(tr(val(k.l)))}</dd></div>`;
   }).join('');
 }
 function mostraCartaoArea(i) {
@@ -892,36 +1088,119 @@ function mostraCartaoArea(i) {
   kpis(a.kpis);
   $('#cardText').textContent = tr(a.text);
   $('#cardNote').textContent = a.photos.length ? '' : t('card.nophoto');
-  $('#cardActions').innerHTML = a.link ? `<a class="btn" href="${SITE}${a.link}">${esc(t('card.site'))} <span aria-hidden="true">→</span></a>` : '';
+  $('#cardCalc').innerHTML = '';
+  $('#cardActions').innerHTML = (a.id === 'industrial' && P ? `<button type="button" class="btn" data-acao="modo-lotes">${esc(t('lots.see'))} <span aria-hidden="true">→</span></button>` : '') +
+    (a.link ? `<a class="${a.id === 'industrial' ? 'linkbtn' : 'btn'}" href="${SITE}${a.link}">${esc(t('card.site'))} <span aria-hidden="true">→</span></a>` : '');
   $('#cardNav').hidden = false;
   $('#cardCount').textContent = `${i + 1} / ${AREAS.length}`;
   abreCartao();
   card.querySelector('.card__scroll').scrollTop = 0;
 }
-function nomeLote(l) {
-  if (l.id === 'frente') return t('lot.front');
-  if (l.id === 'borda') return t('lot.edge');
-  return `${t('lot.title')} ${l.id.replace('-', ' · ')}`;
+function segs(rotulo, opcoes, atual, attr) {
+  return `<div class="seg" role="group" aria-label="${esc(rotulo)}">${opcoes.map((o) =>
+    `<button type="button" data-${attr}="${o.id}" aria-pressed="${o.id === atual}">${esc(o.rot)}</button>`).join('')}</div>`;
 }
-function mostraCartaoLote(l) {
+const segJanela = () => segs(t('lots.window'), P.janelas.map((j) => ({ id: j.id, rot: tr(j.curto) })), janela, 'jan');
+function faixaTxt(c) {
+  const f = P.faixas[c.f];
+  let s = f.ate == null ? subst(t('lot.tierUp'), { de: f.de }) : subst(t('lot.tier'), { de: f.de, ate: f.ate });
+  if (c.f < P.faixas.length - 1) {
+    const cat = Object.entries(c.cats).sort((a, b) => b[1].a - a[1].a)[0][0];
+    s += ' ' + subst(t('lot.next'), { n: P.faixas[c.f + 1].de, c: nomeCat(cat), p: usd(P.precos[janela][cat][c.f + 1][IPAG[pagto]]) });
+  }
+  return s;
+}
+function linkProposta(c) {
+  const jan = P.janelas.find((j) => j.id === janela), pg = P.pagamentos.find((p) => p.id === pagto);
+  const nomes = escolhidos.map((l) => `LTIND.${l.id} — ${nomeCat(l.cat)} — ${l.ex ? '' : '≈ '}${fmt(l.a)} m²`);
+  const cond = c.np ? subst(t('mail.parc'), { s: usd(c.sinal), n: c.np, p: usd(c.parcela) }) : t('lot.cash');
+  const corpo = [t('mail.hello'), '', ...nomes, '', subst(t('mail.sim'), { v: P.tabela }),
+    `${t('lots.window')}: ${tr(jan.nome)} (${tr(jan.quando)})`, `${t('lots.pay')}: ${tr(pg.nome)}`,
+    `${t(escolhidos.length > 1 ? 'lot.totalOp' : 'lot.total')}: ${usd(c.total)} · ${cond}`, '',
+    location.origin + location.pathname + location.hash].join('\n');
+  const assunto = subst(t('mail.subject'), { l: escolhidos.length === 1 ? 'LTIND.' + escolhidos[0].id : `${escolhidos.length} ${t('lots.lots')}` });
+  return `mailto:${P.contato.emails.join(',')}?subject=${encodeURIComponent(assunto)}&body=${encodeURIComponent(corpo)}`;
+}
+function mostraCartaoLotes() {
+  const lista = escolhidos, c = calcula(lista), um = lista.length === 1 ? lista[0] : null;
+  const quadras = [...new Set(lista.map((l) => l.q))];
   $('#cardMedia').innerHTML = '';
-  $('#cardEyebrow').textContent = t('lot.eyebrow');
-  $('#cardTitle').textContent = nomeLote(l);
-  const lista = [{ n: l.a, u: 'm²', l: t('lot.area') }];
-  if (l.a === 20000) lista.push({ v: '200 × 100 m', l: t('lot.std') });
-  else if (l.id === 'frente') lista.push({ v: '433 × 50 m', l: t('lot.frontTxt') });
-  else lista.push({ t: t('lot.irreg') });
-  lista.push({ n: 1250, u: 'm²', l: t('lot.sale') });
-  kpis(lista);
-  const m = /^C(\d)-L(\d)$/.exec(l.id);
-  $('#cardText').textContent = t('lot.text');
-  $('#cardNote').textContent = m ? t('lot.grid').replace('{c}', m[1]).replace('{l}', m[2]) : '';
-  $('#cardActions').innerHTML = `<a class="btn" href="${SITE}index.html#contato">${esc(t('card.contact'))} <span aria-hidden="true">→</span></a>` +
-    `<button type="button" class="linkbtn" id="lotBack">${esc(t('lot.back'))}</button>`;
-  $('#lotBack').addEventListener('click', () => escolheArea(areaIdx.industrial));
+  $('#cardEyebrow').textContent = um ? subst(t('lot.eyebrow'), { q: um.q })
+    : subst(t('lot.multiEyebrow'), { q: quadras.slice(0, 5).join(', ') + (quadras.length > 5 ? '…' : '') });
+  $('#cardTitle').textContent = um ? 'LTIND.' + um.id : subst(t('lot.multiTitle'), { n: fmt(lista.length), a: fmt(c.area) });
+  const sw = (k) => `<i class="sw" style="background:${P.categorias[k].cor}"></i>`;
+  const linhas = um
+    ? [[esc(`${um.ex ? '' : '≈ '}${fmt(um.a)} m²`), esc(um.ex ? subst(t('lot.area'), { cod: 'A' + String(um.a).padStart(5, '0') }) : t('lot.areaApprox'))],
+       [sw(um.cat) + esc(nomeCat(um.cat)), esc(subst(t('lot.cat'), { f: P.categorias[um.cat].fator }))]]
+    : Object.entries(c.cats).sort((a, b) => b[1].a - a[1].a).map(([k, v]) =>
+      [`${sw(k)}${v.n} × ${esc(nomeCat(k))}`, esc(`${fmt(v.a)} m² × ${usd(v.pm)}/m² = ${usd(v.v)}`)]);
+  $('#cardKpis').innerHTML = linhas.map(([dt, dd]) => `<div><dt>${dt}</dt><dd>${dd}</dd></div>`).join('');
+  const jan = P.janelas.find((j) => j.id === janela);
+  const q = L.quadras.find((x) => x.q === (um ? um.q : quadras.length === 1 ? quadras[0] : null));
+  const chip = (attr, id, rot) => `<li><button type="button" data-${attr}="${id}" aria-label="${esc(subst(t('lot.remove'), { id: rot }))}">${esc(rot)}<span aria-hidden="true">×</span></button></li>`;
+  const itens = porQuadra(lista).flatMap(([qq, ls, inteira]) => (inteira ? [chip('tiraq', qq, `${qq} · ${ls.length} ${t('lots.lots')}`)] : ls.map((l) => chip('tira', l.id, l.id))));
+  const chips = lista.length > 1 && itens.length <= 40 ? `<ul class="chips">${itens.join('')}</ul>` : '';
+  $('#cardCalc').innerHTML = `
+    <p class="calc__lab">${esc(t('lots.window'))}</p>${segJanela()}
+    <p class="calc__when">${esc(tr(jan.quando))}</p>
+    <p class="calc__lab">${esc(t('lots.pay'))}</p>${segs(t('lots.pay'), P.pagamentos.map((p) => ({ id: p.id, rot: tr(p.nome) })), pagto, 'pag')}
+    <div class="calc__res" aria-live="polite">
+      <p class="calc__lbl">${esc(t(um ? 'lot.total' : 'lot.totalOp'))}</p>
+      <p class="calc__total">${usd(c.total)}</p>
+      <p class="calc__m2">${esc(um ? subst(t('lot.m2'), { p: usd(precoM2(um.cat, 1)), a: fmt(um.a) }) : subst(t('lot.m2avg'), { p: usd(c.total / c.area), a: fmt(c.area) }))}</p>
+      <dl class="calc__rows">${c.np
+        ? `<div><dt>${esc(t('lot.down'))}</dt><dd>${usd(c.sinal)}</dd></div><div><dt>${esc(subst(t('lot.inst'), { n: c.np }))}</dt><dd>${usd(c.parcela)}</dd></div>`
+        : `<div><dt>${esc(t('lot.cash'))}</dt><dd>${usd(c.total)}</dd></div>`}</dl>
+      <p class="calc__tier">${esc(faixaTxt(c))}</p>
+    </div>
+    <a class="btn calc__cta" href="${linkProposta(c)}">${esc(t('lot.propose'))} <span aria-hidden="true">→</span></a>
+    ${chips}
+    <div class="calc__btns">
+      <button type="button" class="linkbtn" data-acao="somar" aria-pressed="${somar}">${esc(t(somar ? 'lot.adding' : 'lot.add'))}</button>
+      ${q && q._lotes.length > lista.length ? `<button type="button" class="linkbtn" data-acao="quadra" data-q="${q.q}">${esc(subst(t('lot.block'), { q: q.q, n: q._lotes.length }))}</button>` : ''}
+      ${lista.length > 1 ? `<button type="button" class="linkbtn" data-acao="limpar">${esc(t('lot.clear'))}</button>` : ''}
+    </div>`;
+  $('#cardText').textContent = t('lot.notes') + (janela === 'expo' ? ' ' + t('lot.expoNote') : '');
+  const aprox = lista.filter((l) => !l.ex);
+  $('#cardNote').textContent = aprox.length ? (um ? t('lot.approxNote') : subst(t('lot.approxNoteN'), { n: aprox.length })) : '';
+  $('#cardActions').innerHTML = `<p class="contact">${esc(P.contato.nomes)} · ${P.contato.emails.map(esc).join(' · ')}</p>`;
   $('#cardNav').hidden = true;
   abreCartao();
-  card.querySelector('.card__scroll').scrollTop = 0;
+}
+function mostraRecinto(q) {
+  selected = { kind: 'recinto', q };
+  escolhidos = [];
+  marcaSelecao(-1);
+  limpaLote();
+  desenhaLote(q, false);
+  $('#cardMedia').innerHTML = '';
+  $('#cardEyebrow').textContent = subst(t('lot.quadra'), { q: q.q });
+  $('#cardTitle').textContent = t('q.recinto');
+  $('#cardKpis').innerHTML = `<div><dt>${fmt(q.a)} m²</dt><dd>${esc(t('q.recintoArea'))}</dd></div>`;
+  $('#cardCalc').innerHTML = '';
+  $('#cardText').textContent = t('q.recintoTxt');
+  $('#cardNote').textContent = '';
+  $('#cardActions').innerHTML = '';
+  $('#cardNav').hidden = true;
+  abreCartao();
+  invalidate();
+}
+function painelLotes() {
+  if (!P) return;
+  const cont = {};
+  L.lotes.forEach((l) => { cont[l.cat] = (cont[l.cat] || 0) + 1; });
+  $('#lotPanel').innerHTML = `
+    <p class="eyebrow">${esc(subst(t('lots.eyebrow'), { v: P.tabela }))}</p>
+    <h2 class="lotpanel__title">${esc(t('lots.title'))}</h2>
+    <p class="lotpanel__sub">${esc(subst(t('lots.sub'), { n: fmt(P.estoque.lotes), a: fmt(P.estoque.area) }))}</p>
+    ${segJanela()}
+    <p class="calc__when">${esc(tr(P.janelas.find((j) => j.id === janela).quando))}</p>
+    <p class="lotpanel__head">${esc(t('lots.legendHead'))}</p>
+    <ul class="legend">${['V', 'B', 'P', 'I'].map((k) => `<li><i class="sw" style="background:${P.categorias[k].cor}"></i>
+      <span><b>${esc(nomeCat(k))}</b> ×${P.categorias[k].fator}<small>${fmt(cont[k] || 0)} ${esc(t('lots.lots'))}</small></span>
+      <em>${usd(P.precos[janela][k][0][0])}<small>/m²</small></em></li>`).join('')}
+      <li class="legend__fora"><i class="sw"></i><span>${esc(t('lots.recinto'))}</span></li></ul>
+    <p class="lotpanel__how">${esc(t(COARSE ? 'lots.howtoTouch' : 'lots.howto'))}</p>`;
 }
 
 /* ------------------------------------------------------------------ apontar e clicar */
@@ -932,7 +1211,7 @@ function aponta(cx, cy) {
   const r = renderer.domElement.getBoundingClientRect();
   ndc.set(((cx - r.left) / r.width) * 2 - 1, -((cy - r.top) / r.height) * 2 + 1);
   ray.setFromCamera(ndc, camera);
-  const hit = ray.intersectObjects(pickables, false)[0];
+  const hit = ray.intersectObjects(pickables.filter((m) => m.visible), false)[0];
   const p = new THREE.Vector3();
   if (hit) {
     const a = hit.object.geometry.attributes.aArea;
@@ -948,16 +1227,26 @@ function areaNoChao(x, z) {
   return -1;
 }
 function loteEm(p) {
+  if (!L) return null;
   const X = p.x + W / 2, Y = p.z + H / 2;
-  return S.lotes.find((l) => inPoly(X, Y, l._pts ||= pairs(l.p)));
+  return L.lotes.find((l) => X >= l._bb[0] && X <= l._bb[2] && Y >= l._bb[1] && Y <= l._bb[3] && inPoly(X, Y, l._pts)) || null;
+}
+function recintoEm(p) {
+  if (!L) return null;
+  const X = p.x + W / 2, Y = p.z + H / 2;
+  return L.quadras.find((q) => q.fora && inPoly(X, Y, q._pts)) || null;
 }
 function alvoEm(cx, cy) {
   const h = aponta(cx, cy);
   if (!h) return null;
-  if (h.area === areaIdx.industrial || (!h.building && h.area !== -1)) {
+  const chaoOuGalpao = !h.building || h.area === areaIdx.industrial;
+  if (chaoOuGalpao || modoLotes) {
     const l = loteEm(h.point);
     if (l) return { lot: l, point: h.point };
+    const q = recintoEm(h.point);
+    if (q) return { recinto: q, point: h.point };
   }
+  if (modoLotes) return { point: h.point };
   return h.area >= 0 ? { area: h.area, point: h.point } : { point: h.point };
 }
 
@@ -966,13 +1255,17 @@ let lotHover = null;
 function hoverEm(cx, cy) {
   const a = measure ? null : alvoEm(cx, cy);
   const stage = $('#stage');
-  if (!a || (a.area == null && !a.lot)) {
+  if (!a || (a.area == null && !a.lot && !a.recinto)) {
     setHover(-1); tip.hidden = true; stage.classList.remove('is-point'); hoverLote(null); return;
   }
   stage.classList.add('is-point');
   if (a.lot) {
     setHover(-1); hoverLote(a.lot);
-    tip.innerHTML = `<small>${esc(t('lot.eyebrow'))}</small><b>${esc(nomeLote(a.lot))}</b>${fmt(a.lot.a)} m²`;
+    const l = a.lot, pg = P.pagamentos.find((p) => p.id === pagto), jn = P.janelas.find((j) => j.id === janela);
+    tip.innerHTML = `<small>LTIND.${esc(l.id)}</small><b>${esc(nomeCat(l.cat))} · ${l.ex ? '' : '≈ '}${fmt(l.a)} m²</b>${usd(precoM2(l.cat, 1) * l.a)} <span class="tip__m">${esc(tr(jn.curto))} · ${esc(tr(pg.nome))}</span>`;
+  } else if (a.recinto) {
+    setHover(-1); hoverLote(null);
+    tip.innerHTML = `<small>${esc(a.recinto.q)}</small><b>${esc(t('q.recinto'))}</b>${esc(t('q.fora'))}`;
   } else {
     hoverLote(null); setHover(a.area);
     tip.innerHTML = `<small>${String(a.area + 1).padStart(2, '0')} · ${esc(t('tip.open'))}</small><b>${esc(tr(AREAS[a.area].name))}</b>`;
@@ -985,7 +1278,7 @@ function hoverLote(l) {
   if (lotHover === l) return;
   lotHover = l;
   lotLayer.children.filter((m) => m.userData.hover).forEach((m) => { lotLayer.remove(m); m.geometry.dispose(); m.material.dispose(); });
-  if (l && !(selected?.kind === 'lot' && selected.lot === l)) desenhaLote(l, true);
+  if (l && !escolhidos.includes(l)) desenhaLote(l, true);
   invalidate();
 }
 
@@ -1031,6 +1324,7 @@ function posicionaMedida() {
 
 /* ------------------------------------------------------------------ tour */
 function iniciaTour() {
+  if (modoLotes) modoLotesOn(false, false);
   tour = { i: selected?.kind === 'area' ? selected.i : -1, timer: 0 };
   $('#tTour').setAttribute('aria-pressed', 'true');
   dica('hint.tour');
@@ -1075,7 +1369,9 @@ function aplicaIdioma() {
   });
   if (pinEls.length) montaPinos();
   if (selected?.kind === 'area') { marcaSelecao(selected.i); mostraCartaoArea(selected.i); }
-  if (selected?.kind === 'lot') mostraCartaoLote(selected.lot);
+  if (P) painelLotes();
+  if (selected?.kind === 'lot') mostraCartaoLotes();
+  if (selected?.kind === 'recinto') mostraRecinto(selected.q);
   const k = $('#hint').dataset.k;
   if (k && !$('#hint').classList.contains('is-off')) $('#hint').textContent = t(k);
   invalidate();
@@ -1090,6 +1386,22 @@ function ligaInterface() {
   }));
   document.querySelectorAll('[data-site]').forEach((a) => { a.href = SITE + a.dataset.site; });
   $('#cardClose').addEventListener('click', () => { pararTour(); limpaSelecao(); });
+  $('#tLots').addEventListener('click', () => { modoMedir(false); modoLotesOn(!modoLotes); });
+  const controlesLotes = (e) => {
+    const b = e.target.closest('button');
+    if (!b) return;
+    if (b.dataset.jan) { janela = b.dataset.jan; painelLotes(); if (selected?.kind === 'lot') mostraCartaoLotes(); return; }
+    if (b.dataset.pag) { pagto = b.dataset.pag; mostraCartaoLotes(); return; }
+    if (b.dataset.tira) { escolheLotes(escolhidos.filter((l) => l.id !== b.dataset.tira), false); return; }
+    if (b.dataset.tiraq) { escolheLotes(escolhidos.filter((l) => l.q !== b.dataset.tiraq), false); return; }
+    const acao = b.dataset.acao;
+    if (acao === 'somar') { somar = !somar; mostraCartaoLotes(); dica(somar ? 'lot.adding' : null, 6000); }
+    else if (acao === 'quadra') escolheLotes(L.quadras.find((q) => q.q === b.dataset.q)._lotes);
+    else if (acao === 'limpar') limpaSelecao();
+    else if (acao === 'modo-lotes') { limpaSelecao(); modoLotesOn(true); }
+  };
+  card.addEventListener('click', controlesLotes);
+  $('#lotPanel').addEventListener('click', controlesLotes);
   $('#cardPrev').addEventListener('click', () => { pararTour(); escolheArea(((selected?.i ?? 0) - 1 + AREAS.length) % AREAS.length); });
   $('#cardNext').addEventListener('click', () => { pararTour(); escolheArea(((selected?.i ?? -1) + 1) % AREAS.length); });
   $('#indexToggle').addEventListener('click', (e) => {
@@ -1130,7 +1442,11 @@ function ligaInterface() {
     voar(controls.target.clone(), { r: sph.r, phi: sph.phi, theta: Math.atan2(-n[0], -n[1]) }, 900);
   });
   addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') { if (measure) modoMedir(false); else { pararTour(); limpaSelecao(); } }
+    if (e.key === 'Escape') {
+      if (measure) modoMedir(false);
+      else if (selected) { pararTour(); limpaSelecao(); }
+      else if (modoLotes) modoLotesOn(false);
+    }
   });
 
   // clique (sem arrasto) vs. arrasto da câmera
@@ -1148,7 +1464,9 @@ function ligaInterface() {
     if (moved > 6 || dt > 700) return;
     if (measure) { cliqueMedir(e.clientX, e.clientY); return; }
     const a = alvoEm(e.clientX, e.clientY);
-    if (a?.lot) escolheLote(a.lot);
+    if (a?.lot) cliqueLote(a.lot, somar || e.shiftKey || e.ctrlKey || e.metaKey);
+    else if (a?.recinto) mostraRecinto(a.recinto);
+    else if (modoLotes) return;                                  // fora de lote, no modo lotes: não perde a simulação
     else if (a?.area != null) escolheArea(a.area);
     else limpaSelecao();
     tip.hidden = true;
@@ -1205,6 +1523,7 @@ function laco(now) {
   ajustaSombra();
   renderer.render(scene, camera);
   posicionaPinos();
+  posicionaQuadras();
   posicionaMedida();
   bussola();
 }
@@ -1217,8 +1536,9 @@ async function iniciar() {
   aplicaIdioma();
   if (!temWebGL()) { $('#loader').classList.add('is-done'); $('#fallback').hidden = false; return; }
   progresso(0.1);
-  S = await (await fetch('data/scene.json')).json();
+  [S, L, P] = await Promise.all(['scene', 'lotes', 'precos'].map((f) => fetch(`data/${f}.json`).then((r) => r.json())));
   [W, H] = S.sheet;
+  janela = janelaVigente();
   progresso(0.35);
 
   renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
@@ -1269,6 +1589,9 @@ async function iniciar() {
   scene.add(casca());
   scene.add(arvores());
   scene.add(lotLayer);
+  preparaLotes();
+  montaCamadaLotes();
+  scene.add(camadaLotes);
   progresso(0.95);
 
   setHora(+$('#tSun').value);
@@ -1285,12 +1608,14 @@ async function iniciar() {
   setTimeout(() => {
     $('#loader').classList.add('is-done');
     const h = decodeURIComponent(location.hash.slice(1));
-    const lote = h.startsWith('lote-') && S.lotes.find((l) => l.id === h.slice(5));
-    if (lote) { vistaGeral(1); escolheLote(lote); }
+    const lotes = /^lotes?-/.test(h) ? lotesDoHash(h) : [];
+    if (lotes.length) { vistaGeral(1); modoLotesOn(true, false); escolheLotes(lotes); }
+    else if (h === 'lotes') { vistaGeral(1); modoLotesOn(true); }
     else if (areaIdx[h] != null) { vistaGeral(1); escolheArea(areaIdx[h]); }
     else { vistaGeral(2600); dica(COARSE ? 'hint.touch' : 'hint.desk', 9000); }
   }, 250);
-  window.__bp = { scene, camera, controls, renderer, escolheArea, escolheLote, vistaGeral, vistaCima, setHora, S, U };
+  window.__bp = { scene, camera, controls, renderer, escolheArea, escolheLotes, modoLotesOn, calcula, vistaGeral, vistaCima, setHora, S, L, P, U,
+    estado: () => ({ janela, pagto, escolhidos: escolhidos.map((l) => l.id), modoLotes }) };
 }
 
 iniciar().catch((err) => {

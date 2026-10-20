@@ -22,18 +22,23 @@ aplicação **fora do site**: nenhuma página do site aponta para ela ainda (o u
 - **Clica numa área** (no prédio, no chão, no pino ou na lista à esquerda): a câmera voa até lá, a
   área fica em areia, o resto esmaece, e abre o cartão com números do V12, texto, fotos do site e o
   link para a página do site sobre o assunto.
-- **Clica num lote industrial**: o lote é contornado e o cartão mostra a metragem da planta, se é
-  quadra-padrão (200 × 100 m, 16 módulos) e a regra de venda (a partir de 1.250 m²), com o botão
-  para a equipe comercial (`index.html#contato`).
+- **Lotes à venda (com preço):** o botão "Lotes à venda" pinta os 612 lotes pela categoria de preço,
+  esconde os galpões ilustrativos e rotula as quadras Q01–Q42. Clicar num lote (em qualquer modo)
+  mostra o nome oficial (`LTIND.Q07.L014`), a área, a categoria e o **valor final** — preço por m² ×
+  área —, com janela de preço, forma de pagamento, sinal e parcelas. Shift + clique (ou "Somar
+  lotes" no cartão) junta lotes numa simulação; "Quadra Q07 inteira" seleciona a quadra. A faixa de
+  quantidade (1–8, 9–16, 17–32, 33+) muda sozinha e o cartão avisa quanto cai o m² na faixa seguinte.
+  "Pedir proposta" abre um e-mail para a equipe comercial já com os lotes e a simulação. Detalhes na
+  seção "Lotes à venda e preços" abaixo.
 - **Ferramentas:** vista geral, de cima (na orientação da prancha: rodovia em cima, pista embaixo),
   girar sozinho, tour pelas 12 áreas, medir distância no chão, ligar/desligar rótulos, hora do sol
   (as sombras andam; posição solar real para Villeta na data de hoje) e tela cheia. A bússola gira
   com a câmera; clicar nela põe o norte para cima.
 - **Idioma:** PT, EN e ES, com a mesma chave `bp-lang` do `localStorage` do site — quem escolheu
   inglês no site abre a maquete em inglês.
-- **Endereço por área:** `…/3dmasterplan/#hotel`, `#resort`, `#industrial`… e por lote:
-  `#lote-C3-L4`, `#lote-frente`, `#lote-borda`. A barra de endereço acompanha a seleção, então dá
-  para mandar o link de uma área.
+- **Endereço por área:** `…/3dmasterplan/#hotel`, `#resort`, `#industrial`…; `#lotes` abre o modo de
+  lotes; `#lote-Q07.L014` abre um lote e `#lotes-Q22.L012-Q22.L013-Q05` uma simulação (um `Qxx`
+  sozinho = a quadra inteira). A barra de endereço acompanha a seleção, então dá para mandar o link.
 
 ## Arquivos
 
@@ -42,12 +47,16 @@ aplicação **fora do site**: nenhuma página do site aponta para ela ainda (o u
 | `3dmasterplan/index.html` | A página. As imagens do site entram por `../assets/` (meta `bp-assets`) e os links para o site por `../` (meta `bp-site`). |
 | `3dmasterplan/app.js` | A aplicação: cena, volumes, interação, as 12 áreas (polígono, âncora, textos nos três idiomas, fotos, link) e os textos da interface. |
 | `3dmasterplan/app.css` | A interface, com a marca do site (preto/papel/areia/marrom, Noto Serif + Helvetica, cantos retos, zero vermelho). |
-| `3dmasterplan/data/scene.json` | Gerado: volumes, casas, casca, árvores, os 41 lotes e o contorno do parque. |
+| `3dmasterplan/data/scene.json` | Gerado: volumes, casas, casca, árvores, as 41 quadras do V12 e o contorno do parque. |
+| `3dmasterplan/data/lotes.json` | Gerado: os 612 lotes à venda (nome, quadra, categoria, área, contorno) e as quadras, com a Q37 marcada como fora da oferta. |
+| `3dmasterplan/data/precos.json` | **Editado à mão:** a Tabela de Preços (janelas, faixas, pagamentos, US$/m² por categoria), nomes das categorias nos três idiomas, cores e o contato comercial. |
 | `3dmasterplan/data/parque.webp` | Gerado: o chão do parque (a planta V12 sem texto, nas cores da maquete, com sombreado no pé dos prédios). 4096 px. |
 | `3dmasterplan/data/entorno.webp` | Gerado: 10 × 9,5 km de entorno real (OpenStreetMap), esmaecido nas bordas. |
 | `3dmasterplan/data/poster.jpg` | A imagem que aparece se o navegador não tiver WebGL. |
 | `3dmasterplan/vendor/` | three.js 0.169.0 (licença MIT, em `three-LICENSE.txt`) — servido daqui, sem CDN. |
-| `docs/3dmasterplan/build_data.py` | Gera os três arquivos de `data/` (menos o pôster). |
+| `docs/3dmasterplan/build_data.py` | Gera `scene.json`, `parque.webp` e `entorno.webp`. |
+| `docs/3dmasterplan/build_lotes.py` | Gera `lotes.json` a partir do mapa de lotes MP14. |
+| `docs/lotes-p1/` | Os dois PDFs do cliente: Tabela de Preços (versão pública, v3.1) e Mapa de Lotes MP14 (V14-02). |
 
 Tamanho: ~1,5 MB no total, dos quais 690 KB são o three.js.
 
@@ -102,3 +111,51 @@ python3 -m http.server 8000      # na raiz
 - Se as fotos de Escola, Condomínio Vertical, Creche/Ambulatório, Hub e Grêmio chegarem, entram em
   `photos` da área no `app.js`.
 - Se o render aéreo do V12 do Astra-6 for aprovado, ele pode virar o pôster/`og:image`.
+
+## Lotes à venda e preços
+
+**Fontes** (`docs/lotes-p1/`, enviadas pelo cliente em 2026-10-20): *Tabela de preços — Lotes
+industriais*, Política Comercial P1 v2.0, Tabela v3.1 (rev. 14/10/2026, versão pública), e o *Mapa de
+Lotes — Bracerum Park* (MP14), ambos do **Masterplan V14-02 (09/10/2026)**.
+
+**A conta**, como manda a tabela: valor do lote = preço por m² × área do lote. O preço por m² depende
+de quatro coisas, todas no cartão: a **janela** (Expo até 13/11/2026, Pós-Expo até 31/03/2027, Fase 1
+plena depois — o app abre na janela da data de hoje), a **categoria** do lote (Vitrine ×1,15,
+Business ×1,10, Padrão ×1,00, Interna ×0,90), a **faixa de quantidade** da operação (1–8, 9–16, 17–32,
+33+ lotes) e o **pagamento** (à vista −8%, 20% + 12x, 20% + 36x +8%). Os valores por m² vêm prontos da
+tabela (não são recalculados pelos percentuais). Sinal = 20% do total; parcela = saldo ÷ 12 ou 36.
+**Conferido:** os dez exemplos de proposta da própria tabela (Q07.L014, Q22.L012, Q13 L001–L008, Q06
+inteira, Q01.L001 de 801 m², Q02 L001–L004 à vista, Q27 L001–L008, Q03, Q10, Q41 + Q42) dão os mesmos
+totais, sinais e parcelas no app, nas três janelas.
+
+**Quando sair tabela nova:** editar só `3dmasterplan/data/precos.json` (preços, datas das janelas,
+versão). Não precisa regerar nada.
+
+**Os lotes** (`build_lotes.py`): o mapa MP14 é uma imagem (A3, 300 dpi) — cada lote pintado na cor da
+categoria. O script separa os lotes pela cor, encaixa o mapa na planta V12 pelas 32 quadras-padrão
+(erro de ~1 px, 0,4 m: é o mesmo desenho), põe cada lote na quadra e numera como o mapa (faixa de cima
+para baixo, esquerda para a direita — conferido nas quadras irregulares Q01, Q05, Q18, Q38 e Q40). A
+categoria sai da **regra escrita na tabela**; a contagem bate com ela: 145 Vitrine, 64 Business, 256
+Padrão, 147 Interna = 612.
+
+**As áreas:** 571 lotes são o lote-padrão de 1.250 m² (A01250); a Q01.L001 tem os 801 m² que a tabela publica e a Q11 (lote único, junto à Administração) tem os 1.138 m² da quadra. Os **39 lotes irregulares** (borda do
+terreno e da pista: Q01, Q04.L017, Q05, Q18, Q31, Q38, Q39, Q40) não deixam ler a área no mapa — o nome
+oficial traz a área, mas a letra é ilegível na imagem —, então a área foi **medida no mapa** e ajustada
+para a soma bater com a área da quadra escrita no mapa. O método dá **801 m² na Q01.L001**, exatamente
+a área que a tabela publica. Esses lotes aparecem com "≈" e o cartão avisa. **Se o cliente mandar a
+lista dos 612 nomes oficiais** (`LTIND.Qxx.Lyyy.A0xxxx…`), trocar pelas áreas de contrato (dicionário
+`AREA_CONHECIDA` do script) e regerar.
+
+**Divergências encontradas (para confirmar com o cliente):**
+1. A tabela diz Vitrine = 181.410 m², mas a Q04 (frente da entrada) soma 21.650 m² no mapa (16 lotes de
+   1.250 + o L017, mais largo, com ~1.650): daria 181.650 m². O estoque total também fica 236 m² acima
+   dos 765.960 m² do quadro.
+2. No mapa, a Q38.L001 está pintada de verde (Padrão), mas a tabela põe a Q38 inteira como Interna — e
+   só com ela Interna fecha 147 lotes. O app segue a tabela.
+3. O V14-02 mudou coisas que a maquete (V12) ainda desenha do jeito antigo: a Q37 virou **recinto
+   alfandegado** (fora da oferta; a maquete ainda tem galpões ali), a Q31 tem 7.020 m² (era 7.220), a
+   Q38 tem 15.732 m² (era 15.445), o Outlet tem 61.850 m² e o Supermercado 4.606 m² (os cartões já usam
+   esses números). A planta V14-02 completa não veio — só o mapa de lotes.
+
+**Disponibilidade:** a tabela diz que a disponibilidade é confirmada na proposta; o app não marca lote
+vendido ou reservado. Se o cliente quiser, dá para pôr um campo `status` em `lotes.json`.
