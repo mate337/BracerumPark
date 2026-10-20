@@ -2,6 +2,14 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8" />
+<script>
+  /* A hospedagem abre /3dmasterplan sem a barra final; aí app.css, app.js e data/ seriam
+     procurados na raiz do site. Leva para /3dmasterplan/ antes de carregar qualquer coisa. */
+  (function () {
+    var p = location.pathname;
+    if (!/\/$|\.html?$/.test(p)) { document.documentElement.hidden = true; location.replace(p + '/' + location.search + location.hash); }
+  })();
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>Masterplan 3D — Bracerum Park</title>
 <meta name="description" content="Maquete 3D interativa do Bracerum Park, cidade industrial multiuso em Villeta, Paraguai: gire, aproxime e clique nas áreas e nos lotes." />

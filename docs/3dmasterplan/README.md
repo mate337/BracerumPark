@@ -10,6 +10,11 @@ aplicação **fora do site**: nenhuma página do site aponta para ela ainda (o u
 > maiúsculas, o caminho é um redirecionamento na hospedagem — não duas pastas com o mesmo nome em
 > caixas diferentes, que quebra o repositório no Mac e no Windows.
 
+> **Barra final.** O Vercel entrega `/3dmasterplan` sem redirecionar para `/3dmasterplan/`, e sem a
+> barra o navegador procura `app.css`, `app.js` e `data/` na raiz do site (foi o que quebrou na primeira
+> publicação, 2026-10-20). O primeiro `<script>` do `index.html` leva para o endereço com barra,
+> mantendo `#área`, antes de carregar qualquer coisa. Não tirar.
+
 ## O que a pessoa faz nela
 
 - **Gira, aproxima e move** a maquete (mouse: arrastar gira, botão direito move, roda aproxima no
