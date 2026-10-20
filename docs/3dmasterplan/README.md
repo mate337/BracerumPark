@@ -19,11 +19,14 @@ aplicação **fora do site**: nenhuma página do site aponta para ela ainda (o u
 
 - **Gira, aproxima e move** a maquete (mouse: arrastar gira, botão direito move, roda aproxima no
   ponto do cursor; toque: um dedo gira, dois dedos movem e aproximam; setas do teclado movem).
-- **Clica numa área** (no prédio, no chão, no pino ou na lista à esquerda): a câmera voa até lá, a
-  área fica em areia, o resto esmaece, e abre o cartão com números do V12, texto, fotos do site e o
-  link para a página do site sobre o assunto.
+- **Clica num dos 21 pontos do mapa** (no prédio, no chão, no pino ou na lista "Conheça o Bracerum
+  Park"): a câmera voa até lá, o ponto fica em areia, o resto esmaece, e abre o cartão com números,
+  texto, fotos do site e o link para a página do site sobre o assunto. Os 21 pontos, com nome e ordem,
+  são os da legenda do folheto do cliente (2026-10-20) — ver "Os 21 pontos" abaixo.
 - **Lotes à venda (com preço):** o botão "Lotes à venda" pinta os 612 lotes pela categoria de preço,
-  esconde os galpões ilustrativos e rotula as quadras Q01–Q42. Clicar num lote (em qualquer modo)
+  rotula as quadras Q01–Q42 e mantém os galpões ilustrativos no meio dos terrenos (o cliente pediu
+  em 2026-10-20 que eles não sumissem); o lote escolhido aparece por cima do galpão. Clicar num lote
+  (em qualquer modo, inclusive no telhado do galpão)
   mostra o nome oficial (`LTIND.Q07.L014`), a área, a categoria e o **valor final** — preço por m² ×
   área —, com janela de preço, forma de pagamento, sinal e parcelas. Shift + clique (ou "Somar
   lotes" no cartão) junta lotes numa simulação; "Quadra Q07 inteira" seleciona a quadra. A faixa de
@@ -31,12 +34,13 @@ aplicação **fora do site**: nenhuma página do site aponta para ela ainda (o u
   "Pedir proposta" abre um e-mail para a equipe comercial já com os lotes e a simulação. Detalhes na
   seção "Lotes à venda e preços" abaixo.
 - **Ferramentas:** vista geral, de cima (na orientação da prancha: rodovia em cima, pista embaixo),
-  girar sozinho, tour pelas 12 áreas, medir distância no chão, ligar/desligar rótulos, hora do sol
+  girar sozinho, tour pelos 21 pontos, medir distância no chão, ligar/desligar rótulos, hora do sol
   (as sombras andam; posição solar real para Villeta na data de hoje) e tela cheia. A bússola gira
   com a câmera; clicar nela põe o norte para cima.
 - **Idioma:** PT, EN e ES, com a mesma chave `bp-lang` do `localStorage` do site — quem escolheu
   inglês no site abre a maquete em inglês.
-- **Endereço por área:** `…/3dmasterplan/#hotel`, `#resort`, `#industrial`…; `#lotes` abre o modo de
+- **Endereço por ponto:** `…/3dmasterplan/#hotel`, `#eventos`, `#posto`, `#heliponto`… (os `id` em
+  `AREAS`; os endereços antigos `#condominio`, `#servicos`, `#aeroporto` e `#infra` continuam valendo); `#lotes` abre o modo de
   lotes; `#lote-Q07.L014` abre um lote e `#lotes-Q22.L012-Q22.L013-Q05` uma simulação (um `Qxx`
   sozinho = a quadra inteira). A barra de endereço acompanha a seleção, então dá para mandar o link.
 
@@ -45,7 +49,7 @@ aplicação **fora do site**: nenhuma página do site aponta para ela ainda (o u
 | Arquivo | O que é |
 |---|---|
 | `3dmasterplan/index.html` | A página. As imagens do site entram por `../assets/` (meta `bp-assets`) e os links para o site por `../` (meta `bp-site`). |
-| `3dmasterplan/app.js` | A aplicação: cena, volumes, interação, as 12 áreas (polígono, âncora, textos nos três idiomas, fotos, link) e os textos da interface. |
+| `3dmasterplan/app.js` | A aplicação: cena, volumes, interação, os 21 pontos (polígono, âncora, textos nos três idiomas, fotos, link) e a regra que liga cada volume da maquete a um ponto (`pontoDoVolume`) e os textos da interface. |
 | `3dmasterplan/app.css` | A interface, com a marca do site (preto/papel/areia/marrom, Noto Serif + Helvetica, cantos retos, zero vermelho). |
 | `3dmasterplan/data/scene.json` | Gerado: volumes, casas, casca, árvores, as 41 quadras do V12 e o contorno do parque. |
 | `3dmasterplan/data/lotes.json` | Gerado: os 612 lotes à venda (nome, quadra, categoria, área, contorno) e as quadras, com a Q37 marcada como fora da oferta. |
@@ -159,3 +163,23 @@ lista dos 612 nomes oficiais** (`LTIND.Qxx.Lyyy.A0xxxx…`), trocar pelas áreas
 
 **Disponibilidade:** a tabela diz que a disponibilidade é confirmada na proposta; o app não marca lote
 vendido ou reservado. Se o cliente quiser, dá para pôr um campo `status` em `lotes.json`.
+
+## Os 21 pontos
+
+Nome e ordem são os da legenda "Conheça o BracerumPark" do folheto que o cliente mandou em
+2026-10-20 (a seção "Tempos & Distâncias" do mesmo folheto foi deixada de fora, a pedido): 01 Entrada
+Parque · 02 Posto de Gasolina · 03 Clube do Caminhoneiro · 04 Portaria · 05 Bracerum Outlet · 06 Bracerum
+Market · 07 Centro tecnológico · 08 Hotel · 09 Centro de eventos · 10 Escola · 11 Bracerum Resort · 12
+Bracerum Condo · 13 Bracerum Market · 14 Ambulatório · 15 Bombeiro Civil · 16 Lotes industriais · 17
+Pista de Pouso · 18 Hangares · 19 Heliponto · 20 ETE/ETA · 21 Administração Parque.
+
+**O desenho do folheto e a legenda não batem a partir do 09:** o mapa só numera até 19 e, do 09 em
+diante, cada número está um atrás da legenda (o "09" do desenho está na Escola, que é o 10 da legenda;
+o "15", repetido três vezes na grade, são os Lotes industriais, o 16 da legenda). A maquete segue a
+legenda e põe cada ponto onde a coisa está: o 06 é a faixa comercial vertical (no V12, parte do
+Outlet), o 13 é o supermercado na ponta dela, o 08 é a torre do hotel e o 09 a casca do centro de
+convenções com o Salão de Eventos. **A confirmar com o cliente:** o 14 (Ambulatório) ficou no bloco de
+serviços da coluna 5, onde o V12 desenha ambulatório, refeitório e creche; o 15 (Bombeiro Civil) ficou
+no bloco da coluna 6 (Hub de serviços e Grêmio), onde o folheto põe um marcador sem nome — no V12 os
+bombeiros civis estão no mesmo prédio do ambulatório. Os dois "Bracerum Market" (06 e 13) repetem o
+nome da legenda.

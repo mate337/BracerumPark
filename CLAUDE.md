@@ -68,8 +68,8 @@ rotas) que as seis páginas internas baixavam e interpretavam à toa. Ele roda d
 
 ### Masterplan 3D — aplicação fora do site (2026-10-19)
 - **`3dmasterplan/`** é uma maquete 3D interativa do V12 (three.js 0.169.0 vendorizado, sem CDN):
-  gira/aproxima/move, clique em área (12, com cartão de números do V12, fotos do site e link para a
-  página) ou em **lote** (os 41, com a metragem escrita na planta e a regra de venda), vista geral, de
+  gira/aproxima/move, clique num dos **21 pontos do mapa** (nome e ordem da legenda do folheto do cliente,
+  2026-10-20; cartão com números, fotos do site e link) ou em **lote** (612, com preço — ver abaixo), vista geral, de
   cima, tour, régua, rótulos, hora do sol com sombra real, PT/EN/ES pela mesma chave `bp-lang` do site
   e links por área (`#hotel`, `#lote-C3-L4`). Documentação completa em **`docs/3dmasterplan/README.md`**.
 - **Não está ligada ao site** (pedido de "aplicação fora do site" + a regra de não mexer no site).
@@ -87,7 +87,8 @@ rotas) que as seis páginas internas baixavam e interpretavam à toa. Ele roda d
   os "41 lotes" e a referência C?-L? da maquete. Categorias Vitrine/Business/Padrão/Interna (×1,15/1,10/
   1,00/0,90), três janelas (Expo até 13/11/2026 a US$ 160/m² Padrão; Pós-Expo US$ 185; Fase 1 plena
   US$ 220 a partir de 01/04/2027), faixas por quantidade e três pagamentos. O modo "Lotes à venda" da
-  maquete calcula o valor de cada lote e de simulações; os dez exemplos da tabela conferem. Preços em
+  maquete calcula o valor de cada lote e de simulações; os dez exemplos da tabela conferem. **Os galpões
+  ilustrativos ficam visíveis no modo de lotes** (pedido do cliente em 2026-10-20). Preços em
   `3dmasterplan/data/precos.json` (editar à mão quando sair tabela nova); lotes gerados por
   `docs/3dmasterplan/build_lotes.py`. 39 lotes irregulares têm área medida no mapa (≈) — pedir ao
   cliente a lista dos nomes oficiais com a área. Divergências (Vitrine 181.410 × 181.650 m²; Q38.L001
