@@ -270,3 +270,7 @@ Faltam (mencionados no `LEIA-ME.txt` original, ainda não enviados): `tecnologic
 ## Próximo passo
 
 Aguardando o usuário: (1) fotos próprias dos terminais privados, para substituir as ilustrativas; (2) o dado de anos de história da Bracerum como importadora de aço.
+
+**Plano de divulgação (2026-10-21):** outdoors no Paraguai, influenciadores, eventos no PY e feiras no
+Brasil estão em `docs/plano-divulgacao.md` (cópia do doc vivo, com fontes). Uma das ações cabe ao site:
+a página "Agende sua visita", com UTM, QR e o campo "Como nos conheceu" — ainda não feita.
