@@ -4,10 +4,11 @@ from shapely.geometry import Point
 from engine import union_polys, merge_lines, d_of, country_faces, lines
 
 PAL = {
-    "ink": "#0e0d0b", "py": "#1c1a15", "urban": "#2a261e",
-    "water": "#1b4a6e", "river": "#3d84b4",
-    "road1": "#6b6049", "road2": "#4a4334", "road3": "#36312a",
-    "border": "#cbb88f", "sand": "#cbb88f", "paper": "#f7f3ea",
+    # versão clara: "ink" é o fundo/halo, "paper" o traço principal, "sand" o acento marrom
+    "ink": "#ffffff", "py": "#f4efe4", "urban": "#e4dccb",
+    "water": "#bcd4e6", "river": "#4f8dbd",
+    "road1": "#c4b38c", "road2": "#d9cfb9", "road3": "#e6dfd0",
+    "border": "#473315", "sand": "#473315", "paper": "#0e0d0b",
 }
 
 BIG_RIVERS = {"Río Paraguay", "Rio Paraguai", "Rio Paraná", "Río Paraná"}

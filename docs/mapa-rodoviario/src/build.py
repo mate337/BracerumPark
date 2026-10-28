@@ -8,7 +8,7 @@ Regerar (a partir de docs/mapa-rodoviario/):
   python3 src/fetch.py tiles                      # tiles OpenFreeMap (não versionados)
   curl -L -o ne/countries.geojson https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_10m_admin_0_countries.geojson
   Noto Serif em fonts/NotoSerif.ttf e fonts/NotoSerif-Italic.ttf; logo em logo.svg
-    (cp ../../assets/logo/logo-horizontal-cream.svg logo.svg)
+    (cp ../../assets/logo/logo-horizontal-black.svg logo.svg)
   python3 src/routes.py routes.json               # só se os pontos mudarem (OSRM)
   python3 src/build.py mapa.html && node src/shot.js "$PWD/mapa.html" mapa.png 1920 1080 mapa-rodoviario-bracerum-park.pdf
 """
@@ -153,7 +153,7 @@ def route_paths(view, R, keys, dashed=()):
         d = d_of(l)
         halo.append(f'<path d="{d}"/>')
         line.append(f'<path d="{d}"/>')
-    return (f'<g fill="none" stroke="{PAL["sand"]}" stroke-opacity=".16" stroke-width="11" '
+    return (f'<g fill="none" stroke="{PAL["sand"]}" stroke-opacity=".18" stroke-width="11" '
             f'stroke-linecap="round" stroke-linejoin="round">{"".join(halo)}</g>'
             f'<g fill="none" stroke="{PAL["sand"]}" stroke-width="3.2" stroke-linecap="round" '
             f'stroke-linejoin="round">{"".join(line)}</g>')
@@ -311,56 +311,56 @@ CSS = """
 @font-face{font-family:"Noto Serif";src:url("fonts/NotoSerif-Italic.ttf");font-weight:100 900;font-style:italic}
 @page{size:1920px 1080px;margin:0}
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{width:1920px;height:1080px;background:#0e0d0b;overflow:hidden}
-body{position:relative;font-family:Helvetica,"Helvetica Neue",Arial,"Liberation Sans",sans-serif;color:#f7f3ea;
+html,body{width:1920px;height:1080px;background:#ffffff;overflow:hidden}
+body{position:relative;font-family:Helvetica,"Helvetica Neue",Arial,"Liberation Sans",sans-serif;color:#0e0d0b;
   -webkit-print-color-adjust:exact;print-color-adjust:exact}
 svg{position:absolute;top:0;display:block}
-svg text{paint-order:stroke;stroke:#0e0d0b;stroke-linejoin:round}
-.d-name{font:700 13px Helvetica,Arial,sans-serif;letter-spacing:.14em;fill:#f7f3ea;stroke-width:4px}
-.d-name .sep{fill:#cbb88f;font-weight:400}
-.d-km{font:400 27px "Noto Serif",serif;fill:#f7f3ea;stroke-width:5px}
+svg text{paint-order:stroke;stroke:#ffffff;stroke-linejoin:round}
+.d-name{font:700 13px Helvetica,Arial,sans-serif;letter-spacing:.14em;fill:#0e0d0b;stroke-width:4px}
+.d-name .sep{fill:#473315;font-weight:400}
+.d-km{font:400 27px "Noto Serif",serif;fill:#0e0d0b;stroke-width:5px}
 .d-km--s{font-size:23px}
-.d-t{font-style:italic;fill:#cbb88f}
-.d-sub{font:400 12.5px Helvetica,Arial,sans-serif;fill:#cbb88f;fill-opacity:.85;stroke-width:4px;letter-spacing:.02em}
-.town{font:400 12.5px Helvetica,Arial,sans-serif;fill:#f7f3ea;fill-opacity:.62;stroke-width:3.5px}
+.d-t{font-style:italic;fill:#473315}
+.d-sub{font:400 12.5px Helvetica,Arial,sans-serif;fill:#473315;fill-opacity:.85;stroke-width:4px;letter-spacing:.02em}
+.town{font:400 12.5px Helvetica,Arial,sans-serif;fill:#0e0d0b;fill-opacity:.62;stroke-width:3.5px}
 .town--hi{font-weight:700;fill-opacity:.85;letter-spacing:.06em}
-.country{font:600 17px Helvetica,Arial,sans-serif;fill:#f7f3ea;fill-opacity:.26;stroke-width:0;letter-spacing:.32em}
+.country{font:600 17px Helvetica,Arial,sans-serif;fill:#0e0d0b;fill-opacity:.26;stroke-width:0;letter-spacing:.32em}
 .country--d{font-size:15px}
-.riv{font:italic 400 14.5px "Noto Serif",serif;fill:#7eb2d6;stroke-width:3.5px;letter-spacing:.04em}
-.shield text{font:700 10.5px Helvetica,Arial,sans-serif;fill:#cbb88f;stroke-width:0;letter-spacing:.04em}
-.park-name{font:700 14px Helvetica,Arial,sans-serif;letter-spacing:.2em;fill:#f7f3ea;stroke-width:5px}
+.riv{font:italic 400 14.5px "Noto Serif",serif;fill:#2f6f9f;stroke-width:3.5px;letter-spacing:.04em}
+.shield text{font:700 10.5px Helvetica,Arial,sans-serif;fill:#473315;stroke-width:0;letter-spacing:.04em}
+.park-name{font:700 14px Helvetica,Arial,sans-serif;letter-spacing:.2em;fill:#0e0d0b;stroke-width:5px}
 .park-name--l{font-size:17px}
-.park-sub{font:italic 400 15px "Noto Serif",serif;fill:#cbb88f;stroke-width:4px}
-.exit{font:italic 400 14px "Noto Serif",serif;fill:#cbb88f;stroke-width:4px}
+.park-sub{font:italic 400 15px "Noto Serif",serif;fill:#473315;stroke-width:4px}
+.exit{font:italic 400 14px "Noto Serif",serif;fill:#473315;stroke-width:4px}
 .arr{font-family:Helvetica,Arial,"Liberation Sans",sans-serif;font-style:normal}
-.frame-tag{font:700 10.5px Helvetica,Arial,sans-serif;letter-spacing:.18em;fill:#f7f3ea;fill-opacity:.75;stroke-width:3px}
-.sc{font:400 11.5px Helvetica,Arial,sans-serif;fill:#f7f3ea;fill-opacity:.7;stroke-width:0}
-.divider{position:absolute;top:0;bottom:0;left:1120px;width:2px;background:#0e0d0b}
+.frame-tag{font:700 10.5px Helvetica,Arial,sans-serif;letter-spacing:.18em;fill:#0e0d0b;fill-opacity:.75;stroke-width:3px}
+.sc{font:400 11.5px Helvetica,Arial,sans-serif;fill:#0e0d0b;fill-opacity:.7;stroke-width:0}
+.divider{position:absolute;top:0;bottom:0;left:1120px;width:1px;background:rgba(14,13,11,.35)}
 .head{position:absolute;left:48px;top:44px;width:470px}
-.eyebrow{font:700 12.5px Helvetica,Arial,sans-serif;letter-spacing:.24em;color:#cbb88f;text-transform:uppercase;
+.eyebrow{font:700 12.5px Helvetica,Arial,sans-serif;letter-spacing:.24em;color:#473315;text-transform:uppercase;
   display:flex;align-items:center;gap:12px}
-.eyebrow::before{content:"";width:28px;height:1px;background:#cbb88f}
+.eyebrow::before{content:"";width:28px;height:1px;background:#473315}
 .logo{display:block;width:250px;height:auto}
 h1{font:400 66px/1 "Noto Serif",serif;margin-top:34px;letter-spacing:-.01em}
-h1 em{font-style:italic;color:#cbb88f}
-.lede{font:400 16px/1.5 Helvetica,Arial,sans-serif;color:rgba(247,243,234,.72);margin-top:16px;max-width:400px}
+h1 em{font-style:italic;color:#473315}
+.lede{font:400 16px/1.5 Helvetica,Arial,sans-serif;color:rgba(14,13,11,.72);margin-top:16px;max-width:400px}
 .veil{position:absolute;left:0;top:0;width:760px;height:420px;
-  background:radial-gradient(ellipse 100% 100% at 0 0,rgba(14,13,11,.94) 0,rgba(14,13,11,.8) 45%,rgba(14,13,11,0) 100%)}
+  background:radial-gradient(ellipse 100% 100% at 0 0,rgba(255,255,255,.94) 0,rgba(255,255,255,.8) 45%,rgba(255,255,255,0) 100%)}
 .legend{position:absolute;left:32px;bottom:32px;width:318px;padding:20px 20px 18px;font:400 12.5px/1.35 Helvetica,Arial,sans-serif;
-  color:rgba(247,243,234,.8);background:rgba(14,13,11,.86);border:1px solid rgba(203,184,143,.18)}
+  color:rgba(14,13,11,.8);background:rgba(255,255,255,.86);border:1px solid rgba(71,51,21,.18)}
 .legend .sc-row{display:flex;align-items:flex-end;justify-content:space-between;margin-top:16px;padding-top:14px;
-  border-top:1px solid rgba(203,184,143,.18)}
+  border-top:1px solid rgba(71,51,21,.18)}
 .legend .sc-row svg text{paint-order:normal}
-.legend h3{font:700 11px Helvetica,Arial,sans-serif;letter-spacing:.22em;color:#cbb88f;text-transform:uppercase;margin-bottom:10px}
+.legend h3{font:700 11px Helvetica,Arial,sans-serif;letter-spacing:.22em;color:#473315;text-transform:uppercase;margin-bottom:10px}
 .legend ul{list-style:none;display:grid;gap:7px}
 .legend li{display:flex;align-items:center;gap:12px}
 .legend svg{position:static;flex:none}
 .dtag{position:absolute;left:1160px;top:40px;font:700 11px Helvetica,Arial,sans-serif;letter-spacing:.22em;
-  color:#cbb88f;text-transform:uppercase}
-.dtag b{display:block;font:italic 400 20px "Noto Serif",serif;letter-spacing:0;color:#f7f3ea;text-transform:none;margin-top:6px}
+  color:#473315;text-transform:uppercase}
+.dtag b{display:block;font:italic 400 20px "Noto Serif",serif;letter-spacing:0;color:#0e0d0b;text-transform:none;margin-top:6px}
 .foot{position:absolute;left:1122px;right:0;bottom:0;height:120px;
-  background:linear-gradient(to top,rgba(14,13,11,.9),rgba(14,13,11,0))}
-.credits{position:absolute;right:32px;bottom:18px;font:400 10px Helvetica,Arial,sans-serif;color:rgba(247,243,234,.5);
+  background:linear-gradient(to top,rgba(255,255,255,.9),rgba(255,255,255,0))}
+.credits{position:absolute;right:32px;bottom:18px;font:400 10px Helvetica,Arial,sans-serif;color:rgba(14,13,11,.5);
   text-align:right;max-width:720px;line-height:1.45}
 """
 
