@@ -10,6 +10,23 @@ O site tem **7 páginas**: `index.html`, `tributacao.html`, `bracerum.html`, `ho
 rotas) que as seis páginas internas baixavam e interpretavam à toa. Ele roda depois do
 `script.js` porque usa `hasGsap`, `reduceMotion` e `tr()`.
 
+### Masterplan V14 — planta mais nova, base da maquete 3D (2026-10-29)
+- **O cliente enviou o "Masterplan BRACERUM PARK V14 — 28/10/2026 — lotes identificados"** (mesma
+  prancha e mesmas coordenadas do V12, com o **nome oficial de cada lote** escrito dentro dele:
+  `LTIND.Q07.L014.A01250.ESQNAO.RT.L` = quadra, lote, área de contrato, esquina, forma, frentes).
+  Registro, quadro de áreas literal e o que mudou em **`docs/masterplan-v14.md`**; o PDF está em
+  `docs/masterplan-v14/`. **Onde diverge do V12, vale o V14.**
+- **Principais mudanças:** **615 lotes, 766.693 m²** (Q01–Q42; Q37 recinto e Q11 Administração fora da
+  oferta); **Resort 31 lotes, 38.072 m²** (eram 141, 142.067 m²) na borda junto à pista; **Condo 67
+  torres, 1.200 aptos, 114.273 m²**; **Bracerum Club** 40.706 m² (piscina olímpica, tênis, padel, Salão
+  de Eventos); Outlet 61.850 m²; Supermercado + 12 lojas 4.606 m²; Bombeiros + Posto Policial +
+  Ambulatório + Escola/Creche + E.T.A. no vértice norte; Refeitório, Grêmio e **Hub de serviços** (8
+  lotes) junto à pista; Gate 1.210 m²; 1.986 autos + 500 motos. Hotel, Convenções e aeroporto iguais.
+- **A confirmar** (§5 do documento): Q04.L017 1.650 × 1.410 m²; tabela de preços nova para os 615 lotes
+  (a v3.1 é do V14-02); Q11 fora da oferta; "Bracerum Market" × "Bracerum Outlet" na faixa vertical.
+- **Só a maquete 3D foi atualizada.** O site continua sem mexer; quando for liberado, rever o §8 do
+  `docs/masterplan-v12.md` com os números do V14.
+
 ### Masterplan V12 — fonte de verdade da implantação (2026-10-16)
 - **O cliente enviou a planta "BRACERUM PARK — VERSÃO 12 — 01-10-26"** (AutoCAD, vetorial, escala
   1:1000). Registro completo, setor por setor, em **`docs/masterplan-v12.md`**; o PDF original, a
@@ -67,17 +84,19 @@ rotas) que as seis páginas internas baixavam e interpretavam à toa. Ele roda d
   muda por enquanto.
 
 ### Masterplan 3D — aplicação fora do site (2026-10-19)
-- **`3dmasterplan/`** é uma maquete 3D interativa do V12 (three.js 0.169.0 vendorizado, sem CDN):
-  gira/aproxima/move, clique num dos **21 pontos do mapa** (nome e ordem da legenda do folheto do cliente,
-  2026-10-20; cartão com números, fotos do site e link) ou em **lote** (612, com preço — ver abaixo), vista geral, de
-  cima, tour, régua, rótulos, hora do sol com sombra real, PT/EN/ES pela mesma chave `bp-lang` do site
-  e links por área (`#hotel`, `#lote-C3-L4`). Documentação completa em **`docs/3dmasterplan/README.md`**.
+- **`3dmasterplan/`** é uma maquete 3D interativa do **V14 de 28/10/2026** (era do V12 até 2026-10-29;
+  three.js 0.169.0 vendorizado, sem CDN): gira/aproxima/move, clique num dos **23 pontos do mapa** (os
+  21 da legenda do folheto do cliente, 2026-10-20, com nome e ordem dele, + 22 Bracerum Club e 23
+  Refeitório/Grêmio/Hub, que o V14 trouxe; cartão com números, fotos do site e link) ou em **lote**
+  (615, com nome oficial, feição e preço — ver abaixo), vista geral, de cima, tour, régua, rótulos, hora
+  do sol com sombra real, PT/EN/ES pela mesma chave `bp-lang` do site e links por área (`#hotel`,
+  `#lote-Q38.L001`, `#lotes-Q38-Q39`). Documentação completa em **`docs/3dmasterplan/README.md`**.
 - **Não está ligada ao site** (pedido de "aplicação fora do site" + a regra de não mexer no site).
   Publicada junto, abre em `bracerumpark.com/3dmasterplan/` — **em minúsculas** (o cliente sugeriu
   "/3DMasterplan"; com maiúsculas só por redirecionamento na hospedagem).
-- **Dados gerados** por `docs/3dmasterplan/build_data.py`, que reaproveita o `build_refs.py` da
-  vista aérea (mesmas alturas). As **alturas e a arquitetura são estimativas** — o V12 não define
-  altura; a interface avisa. Textos e números dos cartões ficam em `AREAS` no `3dmasterplan/app.js`.
+- **Dados gerados** por `docs/3dmasterplan/build_data.py` (classe `Maquete14`, lê o PDF do V14), que
+  reaproveita o `build_refs.py` da vista aérea (mesmas alturas). As **alturas e a arquitetura são
+  estimativas** — a planta não define altura; a interface avisa. Textos e números dos cartões ficam em `AREAS` no `3dmasterplan/app.js`.
 - Usa imagens do site por `../assets/` — não mover a pasta para outro nível sem trocar a meta
   `bp-assets`.
 - **Lotes à venda com preço (2026-10-20).** O cliente mandou a Política Comercial P1 (Tabela de Preços
@@ -90,9 +109,14 @@ rotas) que as seis páginas internas baixavam e interpretavam à toa. Ele roda d
   maquete calcula o valor de cada lote e de simulações; os dez exemplos da tabela conferem. **Os galpões
   ilustrativos ficam visíveis no modo de lotes** (pedido do cliente em 2026-10-20). Preços em
   `3dmasterplan/data/precos.json` (editar à mão quando sair tabela nova); lotes gerados por
-  `docs/3dmasterplan/build_lotes.py`. 39 lotes irregulares têm área medida no mapa (≈) — pedir ao
-  cliente a lista dos nomes oficiais com a área. Divergências (Vitrine 181.410 × 181.650 m²; Q38.L001
-  verde no mapa) e o que o V14-02 mudou estão em `docs/3dmasterplan/README.md`.
+  `docs/3dmasterplan/build_lotes.py`.
+- **Lotes do V14 (2026-10-29).** O `build_lotes.py` agora lê os **nomes oficiais escritos no PDF do V14**
+  (`LTIND.Qxx.Lyyy.A0xxxx.ESQ….FORMA.FRENTES`): **615 lotes, 766.693 m²**, todas as áreas de contrato
+  (nada mais medido com ≈) — bate com o quadro do V14. A Q38 juntou-se à Q39 (13 → 17 lotes) e a Q11
+  (Administração) saiu da oferta; Q37 continua fora. O cartão do lote mostra o nome oficial e a feição
+  (esquina/meio, retangular/poligonal, frentes). Os preços e a regra de categoria seguem a Tabela v3.1;
+  nenhum lote mudou de categoria e os quatro novos da Q38 são Interna. Rótulos duplicados do PDF e o
+  que confirmar: §4–5 de `docs/masterplan-v14.md` e `docs/3dmasterplan/README.md`.
 
 ### Fotos finalizadas do cliente (v6.3 — 2026-09-28)
 - **Fonte:** pasta do Google Drive "Imagens BracerumPark Finalizadas" (id `1CETdiYdL13Jhh2twQe6kAF10yvMt1YF6`),
@@ -355,10 +379,11 @@ Faltam (mencionados no `LEIA-ME.txt` original, ainda não enviados): `tecnologic
 
 ## Próximo passo
 
-Aguardando o usuário: (0) retorno sobre o **Masterplan 3D** (`3dmasterplan/`) e se ele entra
-linkado no site; a lista oficial dos 612 lotes com área (para os 39 irregulares) e as duas
-divergências da tabela de lotes (ver `docs/3dmasterplan/README.md`); (1) **ok para levar o Masterplan V12 ao site** — a lista do que muda, já com
-as respostas de 16/10, está no §8 de `docs/masterplan-v12.md`; até lá, não mexer no site; (2) a
+Aguardando o usuário: (0) retorno sobre o **Masterplan 3D no V14** (`3dmasterplan/`) e se ele entra
+linkado no site; as confirmações do §5 de `docs/masterplan-v14.md` (Q04.L017 1.650 × 1.410 m²,
+tabela de preços para os 615 lotes, Q11 fora da oferta, "Market" × "Outlet"); (1) **ok para levar o
+masterplan ao site** — a lista do que muda está no §8 de `docs/masterplan-v12.md`, a rever com os
+números do V14; até lá, não mexer no site; (2) a
 vista aérea do V12 gerada pelo Astra-6 com `docs/prompt-aerea-v12/` (quando chegar, ela pode
 substituir a `vista-aerea-park-02.jpg` do masterplan — e os pinos precisam ser remarcados); (3) fotos próprias dos terminais privados, para
 substituir as ilustrativas; (4) o dado de anos de história da Bracerum como importadora de aço.

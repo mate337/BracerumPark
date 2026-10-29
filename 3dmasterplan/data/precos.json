@@ -3,7 +3,6 @@
   "tabela": "v3.1",
   "revisao": "2026-10-14",
   "masterplan": "V14-02 (09/10/2026)",
-  "estoque": { "lotes": 612, "area": 765960 },
   "categorias": {
     "V": { "nome": { "pt": "Vitrine", "en": "Showcase", "es": "Vitrina" }, "fator": "1,15", "cor": "#b08a48" },
     "B": { "nome": { "pt": "Business", "en": "Business", "es": "Business" }, "fator": "1,10", "cor": "#6188b6" },

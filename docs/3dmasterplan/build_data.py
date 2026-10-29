@@ -1,27 +1,30 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Gera os dados do Masterplan 3D (3dmasterplan/data/) a partir da planta V12.
+"""Gera os dados do Masterplan 3D (3dmasterplan/data/) a partir da planta V14 (28/10/2026).
 
     python3 docs/3dmasterplan/build_data.py      # da raiz do repositório
 
 Escreve em 3dmasterplan/data/:
   scene.json     volumes (polígono + altura + tipo), casas do resort, casca do centro de convenções,
-                 árvores, os 41 lotes industriais com a metragem da planta e o contorno do parque
-  parque.webp    o chão do parque: a planta V12 sem texto, nas cores da maquete, com oclusão no pé
+                 árvores e o contorno do parque
+  parque.webp    o chão do parque: a planta V14 sem texto, nas cores da maquete, com oclusão no pé
                  dos prédios e das árvores, sobre o entorno real
+(os lotes à venda saem do mesmo PDF, por docs/3dmasterplan/build_lotes.py)
   entorno.webp   o entorno real (OpenStreetMap) em volta, 10 x 9,5 km, esmaecido nas bordas
 
 Reaproveita de docs/prompt-aerea-v12/build_refs.py a leitura do PDF, a georreferência pela curva
-da PY-19 e a maquete de volumes (as mesmas alturas estimadas da vista aérea — o V12 não define
-altura de nada). Coordenadas em metros da prancha: X para a direita, Y para baixo, origem no canto
+da PY-19 e a maquete de volumes (as mesmas alturas estimadas da vista aérea — a planta não define
+altura de nada). O V14 usa a mesma prancha e as mesmas coordenadas do V12 (os rótulos "20.000 m²"
+caem no mesmo lugar), então o encaixe na PY-19 vale igual; o que muda é onde procurar cada prédio,
+em Maquete14.montar(). Coordenadas em metros da prancha: X para a direita, Y para baixo, origem no canto
 superior esquerdo; o norte aponta para a direita (ver `north` no scene.json).
 
-PRECISA RODAR DE NOVO SE o cliente mandar outra versão da planta ou se mudar alguma altura/regra
-de volume em build_refs.py. Dependências: as do build_refs.py + opencv-python-headless.
+PRECISA RODAR DE NOVO SE o cliente mandar outra versão da planta (trocar PLANTA e conferir as caixas
+de Maquete14.montar) ou se mudar alguma altura. Dependências: as do build_refs.py + opencv-python-headless.
 Entorno: © colaboradores do OpenStreetMap (ODbL).
 """
 
-import base64, csv, json, math, os, re, sys
+import base64, json, math, os, sys
 import cv2
 import numpy as np
 from PIL import Image, ImageDraw, ImageFilter
@@ -33,7 +36,7 @@ sys.path.insert(0, os.path.join(ROOT, 'docs', 'prompt-aerea-v12'))
 import build_refs as br                                            # noqa: E402
 
 OUT = os.path.join(ROOT, '3dmasterplan', 'data')
-ROTULOS = os.path.join(ROOT, 'docs', 'masterplan-v12', 'rotulos-v12.tsv')
+PLANTA = os.path.join(ROOT, 'docs', 'masterplan-v14', 'BRACERUM_PARK_V14_2026-10-28_lotes_identificados.pdf')
 TEX_W = 4096                       # largura da textura do parque (0,63 m/px)
 CTX_MPP = 2.5                      # m/px do entorno
 RES = 1.0                          # grade de alturas (só para oclusão e para afastar árvores de prédio)
@@ -94,6 +97,168 @@ def contornos(mask, ox, oy, eps_px, min_px=20):
     return out
 
 
+
+def planta_v14():
+    """A planta V14 sem texto (build_refs.planta), em cache: renderizar a prancha leva ~3 min."""
+    br.PDF = PLANTA
+    os.makedirs(br.CACHE, exist_ok=True)
+    f = os.path.join(br.CACHE, 'planta-v14.npz')
+    if os.path.exists(f) and os.path.getmtime(f) > os.path.getmtime(PLANTA):
+        d = np.load(f)
+        return d['plano'], tuple(float(v) for v in d['sheet'])
+    plano, sheet = br.planta()
+    np.savez_compressed(f, plano=plano, sheet=np.array(sheet))
+    return plano, sheet
+
+
+def ret_girado(cx, cy, comp, larg, ang):
+    """Retângulo em metros, centrado em (cx, cy), girado `ang` radianos."""
+    ca, sa = math.cos(ang), math.sin(ang)
+    return [(cx + i * comp / 2 * ca - j * larg / 2 * sa, cy + i * comp / 2 * sa + j * larg / 2 * ca)
+            for i, j in ((-1, -1), (1, -1), (1, 1), (-1, 1))]
+
+
+class Maquete14(Maquete3D):
+    """Volumes do V14 (28/10/2026). Mesmas regras e alturas da maquete do V12; as caixas (em % da
+    prancha) dizem onde está cada coisa nesta versão. Alturas são estimativas."""
+
+    def encolher(self, comps, margem, h, tag):
+        """Prédio dentro do lote: a mancha do lote recuada `margem` metros."""
+        for c in comps:
+            m = ndi.binary_erosion(c['lab'][c['sl']] == c['i'], iterations=max(1, round(margem * br.K)))
+            for pts in contornos(m, c['sl'][1].start, c['sl'][0].start, 1.0):
+                self.poligono(pts, h, tag)
+
+    def casa_no_lote(self, c, h=7, tag='casa', larg_max=12, comp_max=15):
+        gy, gx = self.grade(c)
+        gy, gx = gy * self.res, gx * self.res
+        cy, cx = gy.mean(), gx.mean()
+        ev, vec = np.linalg.eigh(np.cov(np.vstack([gx - cx, gy - cy])))
+        L, S = 3.4 * math.sqrt(ev[1]), 3.4 * math.sqrt(ev[0])
+        a, b = min(comp_max, L * 0.55) / 2, min(larg_max, S * 0.72) / 2
+        self.poligono([(cx + i * a * vec[0, 1] + j * b * vec[0, 0], cy + i * a * vec[1, 1] + j * b * vec[1, 0])
+                       for i, j in ((-1, -1), (1, -1), (1, 1), (-1, 1))], h, tag)
+        return math.atan2(vec[1, 1], vec[0, 1])
+
+    def montar(self):
+        rgb, dentro, res = self.rgb, self.dentro, self.res
+        caixa = lambda c, x0, y0, x1, y1: x0 <= c['cx'] <= x1 and y0 <= c['cy'] <= y1
+        celulas = lambda metros: max(1, round(metros / res))
+
+        # lotes industriais -> galpões, como no V12 (a quadra de 400 m da Q38+Q39 ganha dois galpões)
+        lotes = (np.abs(rgb - np.array([165, 221, 110])).max(-1) <= 14) & dentro
+        lotes = self.componentes(ndi.binary_closing(lotes, structure=np.ones((5, 5))), 4000, 40000)
+        for n, c in enumerate(sorted(lotes, key=lambda c: (round(c['cy']), c['cx']))):
+            gy, gx = self.grade(c)
+            M = np.zeros((gy.max() - gy.min() + 1, gx.max() - gx.min() + 1), bool)
+            M[gy - gy.min(), gx - gx.min()] = True
+            r0, c0, r1, c1 = self.maior_retangulo(ndi.binary_erosion(M, iterations=celulas(2)))
+            X0, Y0, X1, Y1 = [v * res for v in (gx.min() + c0, gy.min() + r0, gx.min() + c1, gy.min() + r1)]
+            w, d = X1 - X0, Y1 - Y0
+            if w < 40 or d < 22:
+                continue
+            if d < 30:
+                self.retangulo(X0 + 8, Y0 + 5, X1 - 8, Y1 - 5, 10, 'galpão'); continue
+            mx = 14 if w > 120 else 8
+            ya, yb = (8, 26) if n % 2 == 0 else (26, 8)
+            bx0, bx1, by0, by1 = X0 + mx, X1 - mx, Y0 + ya, Y1 - yb
+            tipo = (n * 37) % 20
+            if bx1 - bx0 > 300:
+                m = (bx0 + bx1) / 2
+                self.retangulo(bx0, by0, m - 12, by1, 12, 'galpão'); self.retangulo(m + 12, by0, bx1, by1, 12, 'galpão')
+            elif tipo <= 12 or bx1 - bx0 < 120:
+                self.retangulo(bx0, by0, bx1, by1, 12, 'galpão')
+            elif tipo <= 16:
+                m = (bx0 + bx1) / 2
+                self.retangulo(bx0, by0, m - 6, by1, 11, 'galpão'); self.retangulo(m + 6, by0, bx1, by1, 11, 'galpão')
+            else:
+                p = (bx1 - bx0 + 6) / 4
+                for j in range(4):
+                    self.retangulo(bx0 + j * p, by0, bx0 + (j + 1) * p - 6, by1, 9, 'galpão')
+
+        branco = self.componentes((rgb.min(-1) >= 245) & dentro, 40, 12000)
+        sel = lambda x0, y0, x1, y1, a0, a1, f=0.0: [c for c in branco if caixa(c, x0, y0, x1, y1)
+                                                    and a0 <= c['area'] <= a1 and c['fill'] >= f]
+
+        # Bracerum Condo: 67 torres. As de 1 quarto vêm desenhadas em três peças (ala, núcleo, ala),
+        # unidas aqui por um fechamento; 16 de 1 quarto (24 unid., 6 pav.), 39 em cruz de 2 quartos e
+        # 12 retangulares de 3 quartos (16 unid., 4 pav.)
+        pecas = [c for c in sel(65.5, 19.5, 85.5, 63, 140, 460, 0.7) if max(c['bw'], c['bh']) <= 30]
+        tm = np.zeros(dentro.shape, bool)
+        for c in pecas:
+            tm[c['sl']] |= c['lab'][c['sl']] == c['i']
+        tl, tn = ndi.label(ndi.binary_closing(tm, structure=np.ones((5, 5))))
+        for i, sl in enumerate(ndi.find_objects(tl)):
+            m = tl[sl] == i + 1
+            area = m.sum() / br.K / br.K
+            if area < 200:
+                continue
+            h, tag = (19, 'torre1') if area > 480 else (13, 'torre')
+            for pts in contornos(m, sl[1].start, sl[0].start, 1.0):
+                self.poligono(pts, h, tag)
+
+        # Bracerum Resort: 31 lotes na borda de baixo, uma casa por lote; portaria e salão de festas
+        for c in sel(65.5, 64, 77, 82.8, 450, 1600, 0.35):
+            self.casa_no_lote(c)
+        self.extrudar(sel(70.3, 65.3, 70.8, 66.2, 250, 350), 5, 'portaria resort')
+        for c in sel(66.2, 82.8, 66.8, 83.8, 1500, 1900):
+            X, Y = self.pc(c['cx'], c['cy'])
+            self.retangulo(X - 13, Y - 9, X + 13, Y + 9, 7, 'salão de festas')
+
+        # ponta norte: Centro Tecnológico + Espaço Business (4 pavimentos), hotel, casca
+        self.extrudar(sel(74, 15, 77, 18.5, 800, 1300), 15, 'centro tecnológico')
+        hotel = self.componentes((np.abs(rgb - 190).max(-1) <= 3) & dentro, 1500, 4000)
+        self.extrudar([c for c in hotel if caixa(c, 80, 15, 85, 21)], 36, 'hotel')
+        casca = (np.abs(rgb - np.array([242, 242, 255])).max(-1) <= 6) & dentro
+        for c in [c for c in self.componentes(casca, 3000, 30000) if caixa(c, 80, 6, 96, 22)]:
+            gy, gx = self.grade(c)
+            M = np.zeros((gy.max() - gy.min() + 1, gx.max() - gx.min() + 1), bool)
+            M[gy - gy.min(), gx - gx.min()] = True
+            M = ndi.binary_closing(M, iterations=celulas(3))
+            dist = ndi.distance_transform_edt(M)
+            yy, xx = np.nonzero(M)
+            hs = (21 * np.sqrt(np.clip(dist / max(dist.max(), 1), 0, 1)))[yy, xx].astype(np.float32)
+            self.mascara(yy + gy.min(), xx + gx.min(), 0, 'casca', hs=hs)
+        # canto nordeste: corpo de bombeiros e posto policial (a planta só desenha os lotes), posto de
+        # saúde/ambulatório (a planta marca uma cruz), escola em arco, creche e E.T.A.
+        bomb = sel(93.3, 13.8, 94, 15, 450, 700)
+        ang = self.casa_no_lote(bomb[0], h=7, tag='bombeiros', larg_max=16, comp_max=20) if bomb else 0.6
+        X, Y = self.pc(92.86, 13.46)
+        self.poligono(ret_girado(X, Y, 18, 13, ang), 6, 'policial')
+        X, Y = self.pc(93.58, 17.87)
+        self.retangulo(X - 18, Y - 13, X + 18, Y + 13, 8, 'ambulatório')
+        self.extrudar(sel(95.4, 18, 97.4, 21.2, 150, 1400), 9, 'escola')
+        self.extrudar(sel(95, 22.3, 95.4, 22.8, 300, 450), 6, 'creche')
+        self.extrudar(sel(92.5, 24.3, 95.6, 25.6, 60, 200), 5, 'ETA')
+        # Bracerum Club: salão de eventos, bar e vestiários junto às quadras
+        self.extrudar(sel(89.8, 29.8, 90.6, 30.4, 2500, 3300, 0.9), 9, 'salão de eventos')
+        self.extrudar(sel(86.3, 32.8, 86.7, 33.2, 500, 650), 5, 'bar')
+        self.extrudar(sel(80.7, 30, 81, 36.2, 150, 250), 4, 'vestiário')
+
+        # comércio: Bracerum Outlet em L (sem prédio desenhado), supermercado + lojas e docas
+        self.retangulo_pct(49.8, 12.0, 64.8, 14.4, 8, 'outlet')
+        self.retangulo_pct(66.6, 15.5, 68.2, 38.0, 8, 'outlet')
+        self.extrudar(sel(66.4, 46, 67, 47, 4000, 5000), 9, 'supermercado')
+        self.extrudar(sel(65.8, 40.5, 66.3, 41.3, 900, 1200), 7, 'docas')
+
+        # entrada: posto em L, Gate-1, Gate-2 e apoio do pátio de caminhões
+        self.extrudar(sel(39, 13, 49, 20, 150, 1700, 0.3), 6, 'posto e portaria')
+
+        # aeroporto, recinto alfandegado (10 lotes, um galpão em cada) e infraestrutura (como no V12)
+        self.extrudar(sel(6, 65.5, 14, 68.3, 450, 1500), 12, 'hangar')
+        self.extrudar(sel(14, 66, 16.5, 68.5, 900, 1400), 6, 'abastecimento')
+        self.encolher(sel(16.5, 66, 22.8, 77, 1300, 1700, 0.9), 4, 10, 'recinto')
+        self.extrudar(sel(7, 61, 9, 62.2, 200, 400) + sel(8.2, 56.8, 8.8, 57.7, 150, 300), 5, 'ETE')
+        self.extrudar(sel(10.5, 59.5, 11.3, 61.6, 600, 800) + sel(11.2, 55.2, 11.8, 56.0, 400, 600), 5, 'subestação')
+        self.extrudar(sel(12.4, 57.5, 13.0, 59.5, 3500, 4500), 9, 'galpões de manutenção')
+        self.retangulo_pct(11.95, 37.2, 12.55, 38.2, 7, 'administração')
+
+        # junto à pista: refeitório, grêmio e o Hub de serviços (8 lotes em faixa, um galpão em cada)
+        self.extrudar(sel(50.4, 83.8, 51, 84.6, 2800, 3500, 0.8), 8, 'refeitório')
+        self.extrudar(sel(53.3, 83.9, 53.7, 84.7, 350, 500), 6, 'grêmio')
+        self.encolher(sel(57, 83, 65, 88, 1000, 1800, 0.8), 4, 10, 'hub de serviços')
+        return self
+
 def recolorir_3d(rgba):
     """Planta nas cores da maquete; o que não está na paleta perde 70% da saturação."""
     rgb = rgba[..., :3].astype(np.float32)
@@ -123,47 +288,6 @@ def dividir(v, comprimento, vao):
         r = (x0 + a, y0, x0 + b, y1) if horiz else (x0, y0 + a, x1, y0 + b)
         out.append(dict(t=v['t'], h=v['h'] + (1.5 if i % 3 == 1 else 0),
                         p=[(r[0], r[1]), (r[2], r[1]), (r[2], r[3]), (r[0], r[3])]))
-    return out
-
-
-def lotes(plano, sheet):
-    """Os 41 lotes: contorno pela cor da planta e metragem pelo rótulo que cai dentro de cada um."""
-    rgb, dentro = plano[..., :3].astype(int), plano[..., 3] > 0
-    H, W = dentro.shape
-    m = ndi.binary_closing((np.abs(rgb - np.array([165, 221, 110])).max(-1) <= 14) & dentro, structure=np.ones((5, 5)))
-    lab, n = ndi.label(m)
-    areas = ndi.sum(m, lab, index=np.arange(1, n + 1)) / br.K / br.K
-    rot = []
-    with open(ROTULOS, encoding='utf-8') as fh:
-        for r in csv.DictReader(fh, delimiter='\t'):
-            t = r['rotulo'].strip()
-            if re.fullmatch(r'[\d.]+m[²2]', t):
-                rot.append((float(r['x_%']), float(r['y_%']), int(t[:-2].replace('.', ''))))
-    col = lambda x: 'borda' if x < 14 else ('C1' if x < 21 else 'C2' if x < 30 else 'C3' if x < 38 else
-                                            'C4' if x < 47 else 'C5' if x < 55.5 else 'C6')
-    lin = lambda y: 'L1' if y < 20 else 'L2' if y < 30 else 'L3' if y < 40 else 'L4' if y < 50 else \
-        'L5' if y < 60 else 'L6' if y < 69 else 'L7'
-    out, usados = [], set()
-    for i, sl in enumerate(ndi.find_objects(lab)):
-        if not (4000 <= areas[i] <= 40000):
-            continue
-        mask = lab[sl] == i + 1
-        ys, xs = np.nonzero(mask)
-        cx, cy = (xs.mean() + sl[1].start) / W * 100, (ys.mean() + sl[0].start) / H * 100
-        # o rótulo da planta fica no meio do lote (âncora à esquerda do texto)
-        cand = [(math.hypot(rx + 1.6 - cx, (ry - cy) * 0.46), j) for j, (rx, ry, a) in enumerate(rot)
-                if j not in usados and lab[min(H - 1, int(ry / 100 * H)), min(W - 1, int((rx + 1.6) / 100 * W))] == i + 1]
-        if not cand:
-            print(f'  lote sem rótulo em ({cx:.1f}%, {cy:.1f}%) — {areas[i]:.0f} m² medidos')
-            continue
-        j = min(cand)[1]
-        usados.add(j)
-        rx, ry, a = rot[j]
-        ref = 'frente' if a == 21650 else ('borda' if col(rx) == 'borda' else f'{col(rx)}-{lin(ry)}')
-        pol = contornos(mask, sl[1].start, sl[0].start, 2.0)
-        pol = max(pol, key=lambda p: abs(cv2.contourArea(np.array(p, np.float32))))
-        out.append(dict(id=ref, a=a, med=round(areas[i]), p=[round(v, 1) for xy in pol for v in xy]))
-    out.sort(key=lambda l: (l['id'] in ('frente', 'borda'), l['id'][-2:], l['id']))
     return out
 
 
@@ -260,12 +384,12 @@ def esmaecer(im, cor, margem):
 def main():
     os.makedirs(br.CACHE, exist_ok=True)
     os.makedirs(OUT, exist_ok=True)
-    print('planta…')
-    plano, sheet = br.planta()
+    print('planta V14…')
+    plano, sheet = planta_v14()
     data = br.osm()
     geo = br.Geo(data, sheet)
     print('volumes…')
-    maq = Maquete3D(plano, sheet, res=RES).montar()
+    maq = Maquete14(plano, sheet, res=RES).montar()
     vol = []
     for v in maq.vol:
         if v['t'] == 'outlet':
@@ -274,9 +398,6 @@ def main():
             vol.append(v)
     for k, n in sorted(maq.conta.items()):
         print(f'  {k:32s} {n}')
-    print('lotes…')
-    lts = lotes(plano, sheet)
-    print(f'  {len(lts)} lotes · {sum(l["a"] for l in lts):,} m² pelos rótulos'.replace(',', '.'))
     print('árvores…')
     arv = arvores(plano, maq, sheet)
     print(f'  {len(arv)} árvores')
@@ -296,7 +417,7 @@ def main():
 
     nlat, nlon = geo.latlon(W / 2, H / 2)
     cena = {
-        'fonte': 'BRACERUM PARK — Masterplan V12 (01/10/2026), escala 1:1000',
+        'fonte': 'BRACERUM PARK — Masterplan V14 (28/10/2026, lotes identificados), escala 1:1000',
         'sheet': [round(W, 2), round(H, 2)],
         'north': [round(math.cos(geo.A), 5), round(math.sin(geo.A), 5)],     # direção do norte na prancha
         'A': round(geo.A, 6),
@@ -307,7 +428,6 @@ def main():
         'vol': [dict(t=v['t'], h=v['h'], p=[round(c, 2) for xy in v['p'] for c in xy]) for v in vol],
         'casca': casca(maq),
         'arvores': [round(c, 1) if i % 3 < 2 else round(c, 2) for t in arv for i, c in enumerate(t)],
-        'lotes': lts,
     }
     with open(os.path.join(OUT, 'scene.json'), 'w', encoding='utf-8') as fh:
         json.dump(cena, fh, ensure_ascii=False, separators=(',', ':'))

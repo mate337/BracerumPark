@@ -1,7 +1,7 @@
 /* Masterplan 3D — Bracerum Park
-   Maquete interativa da planta V12 (01/10/2026). Os dados vêm de data/scene.json, gerado por
-   docs/3dmasterplan/build_data.py — posições, contornos e metragens saem da planta; as alturas são
-   estimativas (o V12 não define altura de nada).
+   Maquete interativa do Masterplan V14 (28/10/2026). Os dados vêm de data/scene.json e data/lotes.json,
+   gerados por docs/3dmasterplan/build_data.py e build_lotes.py — posições, contornos, lotes e metragens
+   saem da planta; as alturas são estimativas (o V14 não define altura de nada).
 
    Referencial: X e Z do mundo = X e Y da prancha (metros, Y da prancha para baixo), com a origem no
    centro da prancha; Y do mundo para cima. O norte aponta para a direita da prancha (`north`). */
@@ -28,29 +28,29 @@ const T = {
     'ui.noWebgl': 'Este navegador não abriu a maquete 3D.',
     'ui.noWebglText': 'A visualização precisa de WebGL. Tente outro navegador ou um computador — enquanto isso, a imagem mostra o masterplan.',
     'ui.toSiteMp': 'Ver o masterplan no site', 'ui.backAria': 'Bracerum Park — voltar ao site', 'ui.title': 'Masterplan',
-    'ui.version': 'Planta V12 · lotes V14-02', 'ui.back': 'Voltar ao site', 'ui.h1a': 'A cidade industrial', 'ui.h1b': 'em volume',
+    'ui.version': 'Masterplan V14 · 28/10/2026', 'ui.back': 'Voltar ao site', 'ui.h1a': 'A cidade industrial', 'ui.h1b': 'em volume',
     'f.area': 'área total', 'f.front': 'de frente para a PY-19', 'f.lots': 'lotes à venda', 'f.runway': 'pista de pouso',
     'ui.areas': 'Conheça o Bracerum Park',
-    'ui.note': 'Maquete ilustrativa. Posições e metragens da planta V12; lotes, categorias e preços da Política Comercial P1 (mapa V14-02, Tabela v3.1). Alturas e arquitetura são estimativas — o projeto não define altura dos prédios.',
+    'ui.note': 'Maquete ilustrativa do Masterplan V14 (28/10/2026): posições, lotes e metragens da planta; categorias e preços da Política Comercial P1 (Tabela v3.1). Alturas e arquitetura são estimativas — o projeto não define altura dos prédios.',
     'ui.close': 'Fechar', 'ui.prev': 'Anterior', 'ui.next': 'Próxima', 'ui.toolsAria': 'Ferramentas da maquete',
-    'ui.north': 'Norte para cima', 'ui.credit': 'Planta V12 (01/10/2026) · lotes e preços: mapa V14-02 e Tabela v3.1 · alturas estimadas · entorno', 'ui.stage': 'Maquete 3D do Bracerum Park',
+    'ui.north': 'Norte para cima', 'ui.credit': 'Masterplan V14 (28/10/2026) · preços: Tabela P1 v3.1 · alturas estimadas · entorno', 'ui.stage': 'Maquete 3D do Bracerum Park',
     't.areas': 'Pontos', 't.home': 'Vista geral', 't.top': 'De cima', 't.rotate': 'Girar', 't.tour': 'Tour', 't.measure': 'Medir',
     't.labels': 'Rótulos', 't.sun': 'Hora do sol', 't.full': 'Tela cheia',
     'hint.desk': 'Arraste para girar · botão direito para mover · role para aproximar · clique num ponto ou num lote',
     'hint.touch': 'Um dedo gira · dois dedos movem e aproximam · toque num ponto ou num lote',
     'hint.measure': 'Clique em dois pontos do chão para medir · Esc para sair',
-    'hint.tour': 'Tour pelos 21 pontos · toque na maquete para parar',
+    'hint.tour': 'Tour pelos pontos do mapa · toque na maquete para parar',
     'card.area': 'Ponto', 'card.site': 'Ver no site', 'card.contact': 'Falar com a equipe comercial',
     'card.nophoto': 'Ainda não há imagens desta área — o volume é uma estimativa a partir da planta.',
     'card.photo': 'Foto', 'tip.open': 'clique para ver',
     't.lots': 'Lotes à venda',
-    'lots.eyebrow': 'Política Comercial P1 · Tabela {v}', 'lots.title': 'Lotes à venda', 'lots.sub': '{n} lotes · {a} m² · Masterplan V14-02',
+    'lots.eyebrow': 'Política Comercial P1 · Tabela {v}', 'lots.title': 'Lotes à venda', 'lots.sub': '{n} lotes · {a} m² · Masterplan V14 (28/10/2026)',
     'lots.window': 'Janela de preço', 'lots.pay': 'Pagamento', 'lots.legendHead': 'Preço por m² · 1 a 8 lotes · 20% + 12x', 'lots.lots': 'lotes',
     'lots.recinto': 'Q37 · recinto alfandegado, fora da oferta', 'lots.see': 'Ver lotes e preços',
     'lots.howto': 'Clique num lote para ver o valor. Shift + clique soma lotes à simulação; o preço por m² cai a partir de 9 lotes.',
     'lots.howtoTouch': 'Toque num lote para ver o valor. Para somar lotes, use “Somar lotes” no cartão.',
     'lot.eyebrow': 'Lote industrial · Quadra {q}', 'lot.quadra': 'Quadra {q}', 'lot.multiEyebrow': 'Simulação · quadras {q}', 'lot.multiTitle': '{n} lotes · {a} m²',
-    'lot.area': 'área nominal do lote ({cod} no nome oficial)', 'lot.areaApprox': 'área aproximada, medida no mapa de lotes',
+    'lot.area': 'área de contrato, do nome oficial do lote ({cod})', 'lot.areaApprox': 'área aproximada, medida no mapa de lotes',
     'lot.cat': 'categoria · fator ×{f} sobre o preço Padrão', 'lot.total': 'Valor do lote', 'lot.totalOp': 'Total da operação',
     'lot.m2': '{p}/m² × {a} m²', 'lot.m2avg': 'média de {p}/m² × {a} m²', 'lot.down': 'Sinal de 20% na assinatura', 'lot.inst': '{n} parcelas mensais de',
     'lot.cash': 'Pagamento único na assinatura', 'lot.tier': 'Faixa de {de} a {ate} lotes na operação.', 'lot.tierUp': 'Faixa de {de} lotes ou mais na operação.',
@@ -60,7 +60,7 @@ const T = {
     'lot.expoNote': 'Preço de lançamento para reservas assinadas até 13/11/2026, dentro da cota de 64 lotes.',
     'lot.approxNote': 'Lote de formato irregular: a área foi medida no mapa de lotes e pode diferir alguns m² da área de contrato, que vem no nome oficial do lote.',
     'lot.approxNoteN': 'Há {n} lote(s) de formato irregular: área medida no mapa de lotes, pode diferir alguns m² da área de contrato.',
-    'q.recinto': 'Recinto alfandegado', 'q.recintoArea': 'área da quadra Q37', 'q.fora': 'fora da oferta de lotes',
+    'q.recinto': 'Recinto alfandegado', 'lot.esquina': 'lote de esquina', 'lot.meio': 'meio de quadra', 'lot.retangular': 'retangular', 'lot.poligonal': 'poligonal', 'lot.frente': 'frente {f}', 'lot.frentes': 'frentes {f}', 'lot.e': ' e ', 'dir.N': 'norte', 'dir.S': 'sul', 'dir.L': 'leste', 'dir.O': 'oeste', 'lot.nomeOficial': 'Nome no masterplan: {n}', 'q.recintoArea': 'área da quadra Q37', 'q.fora': 'fora da oferta de lotes',
     'q.recintoTxt': 'A quadra Q37, junto ao Aeroporto de Cargas, é o recinto alfandegado do parque e não integra a oferta de lotes.',
     'mail.subject': 'Proposta Bracerum Park — {l}', 'mail.hello': 'Olá, gostaria de receber uma proposta para:',
     'mail.sim': 'Simulação no Masterplan 3D (Tabela {v}):', 'mail.parc': 'sinal {s} + {n} × {p}', 'measure.label': 'Medida',
@@ -70,29 +70,29 @@ const T = {
     'ui.noWebgl': 'This browser could not open the 3D model.',
     'ui.noWebglText': 'The viewer needs WebGL. Try another browser or a computer — meanwhile, the image shows the master plan.',
     'ui.toSiteMp': 'See the master plan on the site', 'ui.backAria': 'Bracerum Park — back to the site', 'ui.title': 'Master plan',
-    'ui.version': 'Plan V12 · lots V14-02', 'ui.back': 'Back to the site', 'ui.h1a': 'The industrial city', 'ui.h1b': 'in three dimensions',
+    'ui.version': 'Master plan V14 · 2026-10-28', 'ui.back': 'Back to the site', 'ui.h1a': 'The industrial city', 'ui.h1b': 'in three dimensions',
     'f.area': 'total area', 'f.front': 'of frontage on the PY-19', 'f.lots': 'lots for sale', 'f.runway': 'airstrip',
     'ui.areas': 'Discover Bracerum Park',
-    'ui.note': 'Illustrative model. Positions and areas from plan V12; lots, categories and prices from Commercial Policy P1 (V14-02 map, price list v3.1). Heights and architecture are estimates — the project does not define building heights.',
+    'ui.note': 'Illustrative model of Master plan V14 (2026-10-28): positions, lots and areas from the plan; categories and prices from Commercial Policy P1 (price list v3.1). Heights and architecture are estimates — the project does not define building heights.',
     'ui.close': 'Close', 'ui.prev': 'Previous', 'ui.next': 'Next', 'ui.toolsAria': 'Model tools',
-    'ui.north': 'North up', 'ui.credit': 'Plan V12 (2026-10-01) · lots and prices: V14-02 map and price list v3.1 · estimated heights · surroundings', 'ui.stage': 'Bracerum Park 3D model',
+    'ui.north': 'North up', 'ui.credit': 'Master plan V14 (2026-10-28) · prices: P1 price list v3.1 · estimated heights · surroundings', 'ui.stage': 'Bracerum Park 3D model',
     't.areas': 'Points', 't.home': 'Overview', 't.top': 'Top view', 't.rotate': 'Rotate', 't.tour': 'Tour', 't.measure': 'Measure',
     't.labels': 'Labels', 't.sun': 'Time of day', 't.full': 'Full screen',
     'hint.desk': 'Drag to rotate · right button to pan · scroll to zoom · click a point or a lot',
     'hint.touch': 'One finger rotates · two fingers pan and zoom · tap a point or a lot',
     'hint.measure': 'Click two points on the ground to measure · Esc to exit',
-    'hint.tour': 'Tour of the 21 points · tap the model to stop',
+    'hint.tour': 'Tour of the map points · tap the model to stop',
     'card.area': 'Point', 'card.site': 'See on the site', 'card.contact': 'Talk to the sales team',
     'card.nophoto': 'No images of this area yet — the volume is an estimate based on the plan.',
     'card.photo': 'Photo', 'tip.open': 'click to open',
     't.lots': 'Lots for sale',
-    'lots.eyebrow': 'Commercial Policy P1 · Price list {v}', 'lots.title': 'Lots for sale', 'lots.sub': '{n} lots · {a} m² · Master plan V14-02',
+    'lots.eyebrow': 'Commercial Policy P1 · Price list {v}', 'lots.title': 'Lots for sale', 'lots.sub': '{n} lots · {a} m² · Master plan V14 (2026-10-28)',
     'lots.window': 'Price window', 'lots.pay': 'Payment', 'lots.legendHead': 'Price per m² · 1 to 8 lots · 20% + 12x', 'lots.lots': 'lots',
     'lots.recinto': 'Q37 · customs bonded area, not for sale', 'lots.see': 'See lots and prices',
     'lots.howto': 'Click a lot to see its price. Shift + click adds lots to the quote; the price per m² drops from 9 lots up.',
     'lots.howtoTouch': 'Tap a lot to see its price. To add lots, use “Add lots” on the card.',
     'lot.eyebrow': 'Industrial lot · Block {q}', 'lot.quadra': 'Block {q}', 'lot.multiEyebrow': 'Quote · blocks {q}', 'lot.multiTitle': '{n} lots · {a} m²',
-    'lot.area': 'nominal lot area ({cod} in the official name)', 'lot.areaApprox': 'approximate area, measured on the lot map',
+    'lot.area': 'contract area, from the lot’s official name ({cod})', 'lot.areaApprox': 'approximate area, measured on the lot map',
     'lot.cat': 'category · ×{f} on the Standard price', 'lot.total': 'Lot price', 'lot.totalOp': 'Total for the deal',
     'lot.m2': '{p}/m² × {a} m²', 'lot.m2avg': 'average {p}/m² × {a} m²', 'lot.down': '20% down payment on signing', 'lot.inst': '{n} monthly instalments of',
     'lot.cash': 'Single payment on signing', 'lot.tier': 'Bracket of {de} to {ate} lots in the deal.', 'lot.tierUp': 'Bracket of {de} lots or more in the deal.',
@@ -102,7 +102,7 @@ const T = {
     'lot.expoNote': 'Launch price for reservations signed by 13 Nov 2026, within the quota of 64 lots.',
     'lot.approxNote': 'Irregular lot: the area was measured on the lot map and may differ by a few m² from the contract area, which is part of the lot’s official name.',
     'lot.approxNoteN': '{n} irregular lot(s): area measured on the lot map, may differ by a few m² from the contract area.',
-    'q.recinto': 'Customs bonded area', 'q.recintoArea': 'area of block Q37', 'q.fora': 'not part of the lots for sale',
+    'q.recinto': 'Customs bonded area', 'lot.esquina': 'corner lot', 'lot.meio': 'mid-block', 'lot.retangular': 'rectangular', 'lot.poligonal': 'polygonal', 'lot.frente': 'faces {f}', 'lot.frentes': 'faces {f}', 'lot.e': ' and ', 'dir.N': 'north', 'dir.S': 'south', 'dir.L': 'east', 'dir.O': 'west', 'lot.nomeOficial': 'Name in the master plan: {n}', 'q.recintoArea': 'area of block Q37', 'q.fora': 'not part of the lots for sale',
     'q.recintoTxt': 'Block Q37, next to the Cargo Airport, is the park’s customs bonded area and is not part of the lots for sale.',
     'mail.subject': 'Bracerum Park proposal — {l}', 'mail.hello': 'Hello, I would like a proposal for:',
     'mail.sim': 'Quote from the 3D Master plan (price list {v}):', 'mail.parc': '{s} down + {n} × {p}', 'measure.label': 'Distance',
@@ -112,29 +112,29 @@ const T = {
     'ui.noWebgl': 'Este navegador no abrió la maqueta 3D.',
     'ui.noWebglText': 'La visualización necesita WebGL. Pruebe otro navegador o una computadora — mientras tanto, la imagen muestra el masterplan.',
     'ui.toSiteMp': 'Ver el masterplan en el sitio', 'ui.backAria': 'Bracerum Park — volver al sitio', 'ui.title': 'Masterplan',
-    'ui.version': 'Plano V12 · lotes V14-02', 'ui.back': 'Volver al sitio', 'ui.h1a': 'La ciudad industrial', 'ui.h1b': 'en volumen',
+    'ui.version': 'Masterplan V14 · 28/10/2026', 'ui.back': 'Volver al sitio', 'ui.h1a': 'La ciudad industrial', 'ui.h1b': 'en volumen',
     'f.area': 'superficie total', 'f.front': 'de frente sobre la PY-19', 'f.lots': 'lotes en venta', 'f.runway': 'pista de aterrizaje',
     'ui.areas': 'Conozca Bracerum Park',
-    'ui.note': 'Maqueta ilustrativa. Posiciones y superficies del plano V12; lotes, categorías y precios de la Política Comercial P1 (mapa V14-02, lista v3.1). Alturas y arquitectura son estimaciones — el proyecto no define la altura de los edificios.',
+    'ui.note': 'Maqueta ilustrativa del Masterplan V14 (28/10/2026): posiciones, lotes y superficies del plano; categorías y precios de la Política Comercial P1 (lista v3.1). Alturas y arquitectura son estimaciones — el proyecto no define la altura de los edificios.',
     'ui.close': 'Cerrar', 'ui.prev': 'Anterior', 'ui.next': 'Siguiente', 'ui.toolsAria': 'Herramientas de la maqueta',
-    'ui.north': 'Norte arriba', 'ui.credit': 'Plano V12 (01/10/2026) · lotes y precios: mapa V14-02 y lista v3.1 · alturas estimadas · entorno', 'ui.stage': 'Maqueta 3D de Bracerum Park',
+    'ui.north': 'Norte arriba', 'ui.credit': 'Masterplan V14 (28/10/2026) · precios: lista P1 v3.1 · alturas estimadas · entorno', 'ui.stage': 'Maqueta 3D de Bracerum Park',
     't.areas': 'Puntos', 't.home': 'Vista general', 't.top': 'Desde arriba', 't.rotate': 'Girar', 't.tour': 'Recorrido', 't.measure': 'Medir',
     't.labels': 'Rótulos', 't.sun': 'Hora del sol', 't.full': 'Pantalla completa',
     'hint.desk': 'Arrastre para girar · botón derecho para mover · rueda para acercar · haga clic en un punto o un lote',
     'hint.touch': 'Un dedo gira · dos dedos mueven y acercan · toque un punto o un lote',
     'hint.measure': 'Haga clic en dos puntos del suelo para medir · Esc para salir',
-    'hint.tour': 'Recorrido por los 21 puntos · toque la maqueta para detener',
+    'hint.tour': 'Recorrido por los puntos del mapa · toque la maqueta para detener',
     'card.area': 'Punto', 'card.site': 'Ver en el sitio', 'card.contact': 'Hablar con el equipo comercial',
     'card.nophoto': 'Todavía no hay imágenes de esta área — el volumen es una estimación a partir del plano.',
     'card.photo': 'Foto', 'tip.open': 'clic para ver',
     't.lots': 'Lotes en venta',
-    'lots.eyebrow': 'Política Comercial P1 · Lista {v}', 'lots.title': 'Lotes en venta', 'lots.sub': '{n} lotes · {a} m² · Masterplan V14-02',
+    'lots.eyebrow': 'Política Comercial P1 · Lista {v}', 'lots.title': 'Lotes en venta', 'lots.sub': '{n} lotes · {a} m² · Masterplan V14 (28/10/2026)',
     'lots.window': 'Ventana de precio', 'lots.pay': 'Pago', 'lots.legendHead': 'Precio por m² · 1 a 8 lotes · 20% + 12x', 'lots.lots': 'lotes',
     'lots.recinto': 'Q37 · recinto aduanero, fuera de la oferta', 'lots.see': 'Ver lotes y precios',
     'lots.howto': 'Haga clic en un lote para ver el valor. Shift + clic suma lotes a la simulación; el precio por m² baja desde 9 lotes.',
     'lots.howtoTouch': 'Toque un lote para ver el valor. Para sumar lotes, use “Sumar lotes” en la tarjeta.',
     'lot.eyebrow': 'Lote industrial · Manzana {q}', 'lot.quadra': 'Manzana {q}', 'lot.multiEyebrow': 'Simulación · manzanas {q}', 'lot.multiTitle': '{n} lotes · {a} m²',
-    'lot.area': 'superficie nominal del lote ({cod} en el nombre oficial)', 'lot.areaApprox': 'superficie aproximada, medida en el mapa de lotes',
+    'lot.area': 'superficie de contrato, del nombre oficial del lote ({cod})', 'lot.areaApprox': 'superficie aproximada, medida en el mapa de lotes',
     'lot.cat': 'categoría · factor ×{f} sobre el precio Estándar', 'lot.total': 'Valor del lote', 'lot.totalOp': 'Total de la operación',
     'lot.m2': '{p}/m² × {a} m²', 'lot.m2avg': 'promedio de {p}/m² × {a} m²', 'lot.down': 'Seña del 20% a la firma', 'lot.inst': '{n} cuotas mensuales de',
     'lot.cash': 'Pago único a la firma', 'lot.tier': 'Franja de {de} a {ate} lotes en la operación.', 'lot.tierUp': 'Franja de {de} lotes o más en la operación.',
@@ -144,30 +144,31 @@ const T = {
     'lot.expoNote': 'Precio de lanzamiento para reservas firmadas hasta el 13/11/2026, dentro del cupo de 64 lotes.',
     'lot.approxNote': 'Lote de forma irregular: la superficie se midió en el mapa de lotes y puede diferir algunos m² de la superficie de contrato, que figura en el nombre oficial del lote.',
     'lot.approxNoteN': 'Hay {n} lote(s) de forma irregular: superficie medida en el mapa de lotes, puede diferir algunos m² de la de contrato.',
-    'q.recinto': 'Recinto aduanero', 'q.recintoArea': 'superficie de la manzana Q37', 'q.fora': 'fuera de la oferta de lotes',
+    'q.recinto': 'Recinto aduanero', 'lot.esquina': 'lote de esquina', 'lot.meio': 'medio de manzana', 'lot.retangular': 'rectangular', 'lot.poligonal': 'poligonal', 'lot.frente': 'frente {f}', 'lot.frentes': 'frentes {f}', 'lot.e': ' y ', 'dir.N': 'norte', 'dir.S': 'sur', 'dir.L': 'este', 'dir.O': 'oeste', 'lot.nomeOficial': 'Nombre en el masterplan: {n}', 'q.recintoArea': 'superficie de la manzana Q37', 'q.fora': 'fuera de la oferta de lotes',
     'q.recintoTxt': 'La manzana Q37, junto al Aeropuerto de Cargas, es el recinto aduanero del parque y no integra la oferta de lotes.',
     'mail.subject': 'Propuesta Bracerum Park — {l}', 'mail.hello': 'Hola, quisiera recibir una propuesta para:',
     'mail.sim': 'Simulación en el Masterplan 3D (lista {v}):', 'mail.parc': 'seña {s} + {n} × {p}', 'measure.label': 'Medida',
   },
 };
 
-/* Os 21 pontos do mapa, na ordem e com os nomes da legenda do cliente ("Conheça o BracerumPark",
-   2026-10-20). Polígono e âncora em % da prancha (x da esquerda, y do topo), altura do pino (m),
-   distância da câmera ao chegar, fotos do site e a página do site que fala do assunto. */
+/* Os pontos do mapa: os 21 da legenda do folheto do cliente ("Conheça o BracerumPark", 2026-10-20),
+   na ordem e com os nomes dele, mais dois que o Masterplan V14 (28/10/2026) trouxe e a legenda não
+   tem (22 Bracerum Club, 23 Refeitório/Grêmio/Hub). Posições e números do V14. Polígono e âncora em %
+   da prancha (x da esquerda, y do topo), altura do pino (m), distância da câmera ao chegar. */
 const AREAS = [
   { id: 'entrada', poly: [[39.2, 3.2], [48.9, 3.2], [48.9, 9.4], [39.2, 9.4]], at: [42.3, 6.0], ph: 34, dist: 520,
     name: { pt: 'Entrada Parque', en: 'Park entrance', es: 'Entrada del Parque' },
     kpis: [
       { n: 2100, u: 'm', l: { pt: 'de frente para a PY-19', en: 'of frontage on the PY-19', es: 'de frente sobre la PY-19' } },
       { n: 13, u: 'm', l: { pt: 'Via Costeira, a via paralela que distribui o acesso', en: 'Via Costeira, the parallel road that distributes access', es: 'Vía Costera, la calle paralela que distribuye el acceso' } }],
-    text: { pt: 'O acesso único pela PY-19 fica no meio da frente do parque: a alça sai da rodovia, faz o retorno e entra na Via Costeira, uma via paralela de 13 m — o caminhão não para na rodovia.',
-      en: 'The single access from the PY-19 sits in the middle of the park’s frontage: the loop leaves the highway, turns back and joins the Via Costeira, a 13 m parallel road — trucks never stop on the highway.',
-      es: 'El acceso único por la PY-19 está en el medio del frente del parque: el lazo sale de la ruta, hace el retorno y entra en la Vía Costera, una calle paralela de 13 m — el camión no se detiene en la ruta.' },
+    text: { pt: 'O acesso pela PY-19 fica no meio da frente do parque: a alça sai da rodovia, faz o retorno e entra na Via Costeira, uma via paralela de 13 m — o caminhão não para na rodovia.',
+      en: 'Access from the PY-19 sits in the middle of the park’s frontage: the loop leaves the highway, turns back and joins the Via Costeira, a 13 m parallel road — trucks never stop on the highway.',
+      es: 'El acceso por la PY-19 está en el medio del frente del parque: el lazo sale de la ruta, hace el retorno y entra en la Vía Costera, una calle paralela de 13 m — el camión no se detiene en la ruta.' },
     photos: ['web/fotos/park-aereo-rio.jpg', 'web/fotos/vias-rotatoria.jpg'] },
-  { id: 'posto', poly: [[39.2, 9.4], [43.6, 9.4], [43.6, 20.3], [39.2, 20.3]], at: [41.6, 15.6], ph: 30, dist: 380,
+  { id: 'posto', poly: [[39.2, 9.4], [43.6, 9.4], [43.6, 20.3], [39.2, 20.3]], at: [41.6, 16.2], ph: 30, dist: 380,
     name: { pt: 'Posto de Gasolina', en: 'Fuel station', es: 'Estación de servicio' },
     kpis: [
-      { n: 7250, u: 'm²', l: { pt: 'posto, salão, restaurante, quadras e quiosques', en: 'fuel station, hall, restaurant, courts and kiosks', es: 'estación de servicio, salón, restaurante, canchas y quioscos' } }],
+      { n: 3355, u: 'm²', l: { pt: 'posto, salão, restaurante e Clube do Caminhoneiro', en: 'fuel station, hall, restaurant and Truckers’ Club', es: 'estación de servicio, salón, restaurante y Club del Camionero' } }],
     text: { pt: 'O posto em L, com salão e restaurante, fica no lado esquerdo do pátio de caminhões, na entrada — atende quem chega pela PY-19 e quem trabalha no parque.',
       en: 'The L-shaped fuel station, with a hall and restaurant, sits on the left side of the truck yard, at the entrance — serving those arriving from the PY-19 and those who work in the park.',
       es: 'La estación de servicio en L, con salón y restaurante, está en el lado izquierdo del patio de camiones, en la entrada — atiende a quien llega por la PY-19 y a quien trabaja en el parque.' },
@@ -175,125 +176,125 @@ const AREAS = [
   { id: 'clube', poly: [[43.6, 9.4], [47.4, 9.4], [47.4, 20.3], [43.6, 20.3]], at: [45.6, 12.4], ph: 30, dist: 440,
     name: { pt: 'Clube do Caminhoneiro', en: 'Truckers’ Club', es: 'Club del Camionero' },
     kpis: [
-      { n: 40065, u: 'm²', l: { pt: 'Clube do Caminhoneiro e pátio de caminhões', en: 'Truckers’ Club and truck yard', es: 'Club del Camionero y patio de camiones' } }],
-    text: { pt: 'Pátio de caminhões com rotatória, vagas em espinha de peixe e quadra: o caminhão espera fora da área industrial, com estrutura para o motorista, e entra pela Portaria quando é chamado.',
-      en: 'A truck yard with a roundabout, herringbone bays and a sports court: trucks wait outside the industrial area, with facilities for the driver, and go through the gate when called.',
-      es: 'Patio de camiones con rotonda, estacionamiento en espiga y cancha: el camión espera fuera del área industrial, con estructura para el conductor, y entra por la Portería cuando lo llaman.' },
+      { t: { pt: 'pátio de caminhões com rotatória, vagas em espinha de peixe e quadra', en: 'truck yard with a roundabout, herringbone bays and a sports court', es: 'patio de camiones con rotonda, estacionamiento en espiga y cancha' } }],
+    text: { pt: 'O caminhão espera fora da área industrial, com estrutura para o motorista, e entra pelo Gate quando é chamado.',
+      en: 'Trucks wait outside the industrial area, with facilities for the driver, and go through the gate when called.',
+      es: 'El camión espera fuera del área industrial, con estructura para el conductor, y entra por el portón cuando lo llaman.' },
     photos: ['park/select-apoio-caminhoes.jpg', 'park/vias-caminhoes.jpg'], link: 'select.html' },
-  { id: 'portaria', poly: [[47.4, 9.4], [48.9, 9.4], [48.9, 20.3], [47.4, 20.3]], at: [48.3, 16.0], ph: 30, dist: 340,
+  { id: 'portaria', poly: [[47.4, 9.4], [48.9, 9.4], [48.9, 20.3], [47.4, 20.3]], at: [48.2, 17.6], ph: 30, dist: 340,
     name: { pt: 'Portaria', en: 'Gatehouse', es: 'Portería' },
     kpis: [
-      { n: 680, u: 'm²', l: { pt: 'Gate de acesso à área industrial', en: 'gate into the industrial area', es: 'portón de acceso al área industrial' } }],
-    text: { pt: 'O Gate controla a entrada da área industrial e abre direto no boulevard central, que atravessa o parque até o bloco de serviços junto à pista.',
-      en: 'The gate controls access to the industrial area and opens straight onto the central boulevard, which crosses the park to the services block by the runway.',
-      es: 'El portón controla la entrada al área industrial y abre directo al bulevar central, que atraviesa el parque hasta el bloque de servicios junto a la pista.' },
+      { n: 1210, u: 'm²', l: { pt: 'Gate / acesso à indústria', en: 'gate / industrial access', es: 'portón / acceso a la industria' } }],
+    text: { pt: 'Dois gates controlam a área industrial: o Gate-1 abre direto no boulevard central, que atravessa o parque até a pista; o Gate-2 fica do outro lado do pátio, junto ao posto.',
+      en: 'Two gates control the industrial area: Gate-1 opens straight onto the central boulevard, which crosses the park to the runway; Gate-2 is on the other side of the yard, by the fuel station.',
+      es: 'Dos portones controlan el área industrial: el Gate-1 abre directo al bulevar central, que atraviesa el parque hasta la pista; el Gate-2 está del otro lado del patio, junto a la estación de servicio.' },
     photos: ['web/fotos/portaria.jpg'] },
-  { id: 'outlet', poly: [[48.9, 8.8], [69.5, 8.8], [69.5, 15.9], [48.9, 15.9]], at: [57.6, 12.6], ph: 32, dist: 800,
+  { id: 'outlet', poly: [[48.9, 8.8], [69.6, 8.8], [69.6, 15.9], [48.9, 15.9]], at: [57.6, 12.6], ph: 32, dist: 800,
     name: { pt: 'Bracerum Outlet', en: 'Bracerum Outlet', es: 'Bracerum Outlet' },
     kpis: [
-      { n: 61850, u: 'm²', l: { pt: 'Bracerum Outlet, na frente da rodovia', en: 'Bracerum Outlet, facing the highway', es: 'Bracerum Outlet, frente a la ruta' } },
+      { n: 61850, u: 'm²', l: { pt: 'Bracerum Outlet, em L na frente da rodovia', en: 'L-shaped Bracerum Outlet facing the highway', es: 'Bracerum Outlet en L frente a la ruta' } },
       { n: 433, u: 'm', l: { pt: 'de frente para a Via Costeira', en: 'of frontage on the Via Costeira', es: 'de frente sobre la Vía Costera' } }],
     text: { pt: 'Comércio na frente da PY-19, ao lado da entrada, com vitrine para quem passa na rodovia. A arquitetura ainda não foi definida — os volumes são ilustrativos.',
       en: 'Retail on the PY-19 frontage, next to the entrance, in full view of highway traffic. The architecture has not been defined yet — the volumes are illustrative.',
       es: 'Comercio frente a la PY-19, junto a la entrada, a la vista de quien pasa por la ruta. La arquitectura aún no está definida — los volúmenes son ilustrativos.' },
     photos: ['park/select-comercial-dia.jpg', 'park/select-fachada-brises.jpg', 'park/select-comercial-noite.jpg'], link: 'select.html' },
-  { id: 'market', poly: [[65.8, 15.9], [69.5, 15.9], [69.5, 40.3], [65.8, 40.3]], at: [67.4, 27.0], ph: 30, dist: 640,
+  { id: 'market', poly: [[65.6, 15.9], [69.6, 15.9], [69.6, 40.0], [65.6, 40.0]], at: [67.4, 27.0], ph: 30, dist: 640,
     name: { pt: 'Bracerum Market', en: 'Bracerum Market', es: 'Bracerum Market' },
     kpis: [
-      { t: { pt: 'faixa comercial ao longo do acesso ao Resort, da Via Costeira até o Supermercado', en: 'retail strip along the Resort access road, from the Via Costeira to the supermarket', es: 'franja comercial a lo largo del acceso al Resort, de la Vía Costera al Supermercado' } }],
-    text: { pt: 'A faixa comercial desce da Via Costeira até o Supermercado, entre a área industrial e o acesso ao Resort. A arquitetura ainda não foi definida — os volumes são ilustrativos.',
-      en: 'The retail strip runs down from the Via Costeira to the supermarket, between the industrial area and the Resort access road. The architecture has not been defined yet — the volumes are illustrative.',
-      es: 'La franja comercial baja de la Vía Costera hasta el Supermercado, entre el área industrial y el acceso al Resort. La arquitectura aún no está definida — los volúmenes son ilustrativos.' },
+      { t: { pt: 'faixa comercial ao longo do acesso ao Condo, da Via Costeira até o Supermercado', en: 'retail strip along the Condo access road, from the Via Costeira to the supermarket', es: 'franja comercial a lo largo del acceso al Condo, de la Vía Costera al Supermercado' } }],
+    text: { pt: 'A faixa comercial desce da Via Costeira até o Supermercado, entre a área industrial e o Bracerum Condo. A arquitetura ainda não foi definida — os volumes são ilustrativos.',
+      en: 'The retail strip runs down from the Via Costeira to the supermarket, between the industrial area and Bracerum Condo. The architecture has not been defined yet — the volumes are illustrative.',
+      es: 'La franja comercial baja de la Vía Costera hasta el Supermercado, entre el área industrial y el Bracerum Condo. La arquitectura aún no está definida — los volúmenes son ilustrativos.' },
     photos: ['park/select-comercial-dia.jpg', 'park/select-market-interior.jpg'], link: 'select.html' },
-  { id: 'tecnologico', poly: [[69.5, 9.6], [74.8, 9.6], [74.8, 17], [69.5, 17]], at: [71.9, 13.6], ph: 36, dist: 420,
+  { id: 'tecnologico', poly: [[73.0, 10.5], [78.2, 10.5], [78.2, 19.8], [73.0, 19.8]], at: [75.5, 16.6], ph: 40, dist: 420,
     name: { pt: 'Centro Tecnológico', en: 'Technology Center', es: 'Centro Tecnológico' },
     kpis: [
-      { n: 2340, u: 'm²', l: { pt: 'por piso, com o Espaço Business', en: 'per floor, with the Business Space', es: 'por piso, con el Espacio Business' } },
-      { t: { pt: 'dois edifícios espelhados, na esquina da Via Costeira com o acesso ao Resort', en: 'two mirrored buildings on the corner of the Via Costeira and the Resort access road', es: 'dos edificios espejados, en la esquina de la Vía Costera con el acceso al Resort' } }],
-    text: { pt: 'É o primeiro edifício de quem chega à ponta norte pela via que leva ao Hotel e ao Resort: escritórios, coworking e salas de reunião para as empresas do parque.',
-      en: 'It is the first building you reach at the north end, on the road to the Hotel and the Resort: offices, coworking and meeting rooms for the companies in the park.',
-      es: 'Es el primer edificio de quien llega a la punta norte por la calle que lleva al Hotel y al Resort: oficinas, coworking y salas de reunión para las empresas del parque.' },
+      { n: 9785, u: 'm²', l: { pt: 'Centro Tecnológico e Espaço Business, com roof top', en: 'Technology Center and Business Space, with a roof top', es: 'Centro Tecnológico y Espacio Business, con roof top' } },
+      { n: 4, u: { pt: 'pavimentos', en: 'floors', es: 'pisos' }, l: { pt: 'dois edifícios espelhados em volta de um espelho d’água', en: 'two mirrored buildings around a reflecting pool', es: 'dos edificios espejados alrededor de un espejo de agua' } }],
+    text: { pt: 'Na entrada da ponta norte, entre os estacionamentos: escritórios, coworking e salas de reunião para as empresas do parque.',
+      en: 'At the entrance to the north end, between the car parks: offices, coworking and meeting rooms for the companies in the park.',
+      es: 'En la entrada de la punta norte, entre los estacionamientos: oficinas, coworking y salas de reunión para las empresas del parque.' },
     photos: ['park/tec-fachada.jpg', 'park/tec-recepcao.jpg', 'park/tec-lounge.jpg', 'park/tec-coworking.jpg'] },
-  { id: 'hotel', poly: [[74.8, 14.8], [91.6, 14.8], [91.6, 26.6], [81.4, 26.6], [81.4, 17], [74.8, 17]], at: [85.8, 17.4], ph: 72, dist: 560,
+  { id: 'hotel', poly: [[79.3, 15.4], [92.0, 15.4], [92.0, 26.2], [79.3, 26.2]], at: [82.3, 18.2], ph: 72, dist: 560,
     name: { pt: 'Hotel', en: 'Hotel', es: 'Hotel' },
     kpis: [
       { n: 384, u: 'studios', l: { pt: 'Bracerum Hotel · 30.000 m²', en: 'Bracerum Hotel · 30,000 m²', es: 'Bracerum Hotel · 30.000 m²' } },
-      { n: 2036, u: { pt: 'vagas', en: 'spaces', es: 'plazas' }, l: { pt: 'estacionamento da cidade e do hotel', en: 'city and hotel parking', es: 'estacionamiento de la ciudad y del hotel' } }],
-    text: { pt: 'A torre de varandas do hotel encosta na cobertura em casca do centro de eventos, na ponta norte, junto à Via Costeira, com o estacionamento arborizado que atende a cidade e o hotel.',
-      en: 'The hotel’s balconied tower leans against the shell roof of the events center at the north end, by the Via Costeira, next to the tree-lined parking that serves the city and the hotel.',
-      es: 'La torre de balcones del hotel se apoya en la cubierta en cáscara del centro de eventos, en la punta norte, junto a la Vía Costera, con el estacionamiento arbolado que atiende a la ciudad y al hotel.' },
+      { n: 1986, u: { pt: 'vagas', en: 'spaces', es: 'plazas' }, l: { pt: 'para carros e mais 500 para motos', en: 'for cars, plus 500 for motorcycles', es: 'para autos y otras 500 para motos' } }],
+    text: { pt: 'A torre de varandas do hotel encosta na cobertura em casca do centro de eventos, na ponta norte, cercada pelos estacionamentos arborizados que atendem a cidade e o hotel.',
+      en: 'The hotel’s balconied tower leans against the shell roof of the events center at the north end, surrounded by the tree-lined car parks that serve the city and the hotel.',
+      es: 'La torre de balcones del hotel se apoya en la cubierta en cáscara del centro de eventos, en la punta norte, rodeada por los estacionamientos arbolados que atienden a la ciudad y al hotel.' },
     photos: ['web/fotos/hotel-fachada-varandas.jpg', 'web/fotos/hotel-cupula-piscina.jpg', 'web/fotos/hotel-recepcao.jpg', 'web/fotos/hotel-quarto.jpg', 'web/fotos/hotel-varanda-vista.jpg'], link: 'hotel.html' },
-  { id: 'eventos', poly: [[74.8, 7.8], [91.6, 7.8], [91.6, 14.8], [74.8, 14.8]], at: [89.6, 12.2], ph: 50, dist: 600,
+  { id: 'eventos', poly: [[79.3, 7.4], [92.0, 7.4], [92.0, 15.4], [79.3, 15.4]], at: [86.3, 11.6], ph: 50, dist: 600,
     name: { pt: 'Centro de eventos', en: 'Events center', es: 'Centro de eventos' },
     kpis: [
-      { n: 13500, u: 'm²', l: { pt: 'Centro de Convenções, com anfiteatro de 1.200 lugares', en: 'convention center with a 1,200-seat amphitheater', es: 'centro de convenciones, con anfiteatro de 1.200 lugares' } },
-      { n: 3200, u: 'm²', l: { pt: 'Salão de Eventos', en: 'event hall', es: 'salón de eventos' } }],
-    text: { pt: 'A cobertura em casca de vidro do Centro de Convenções reúne feiras, congressos e o anfiteatro de 1.200 lugares; ao lado, na borda da Via Costeira, fica o Salão de Eventos.',
-      en: 'The glass shell roof of the Convention Center hosts fairs, congresses and the 1,200-seat amphitheater; next to it, on the Via Costeira, is the event hall.',
-      es: 'La cubierta en cáscara de vidrio del Centro de Convenciones reúne ferias, congresos y el anfiteatro de 1.200 lugares; al lado, junto a la Vía Costera, está el Salón de Eventos.' },
-    photos: ['web/fotos/hotel-cupula-dia.jpg', 'web/fotos/convencoes-foyer.jpg', 'web/fotos/convencoes-galeria.jpg', 'web/fotos/convencoes-auditorio.jpg', 'web/fotos/convencoes-restaurante.jpg', 'park/amen-salao-eventos.jpg'], link: 'hotel.html' },
-  { id: 'escola', poly: [[91.6, 10.5], [98.6, 10.5], [94.4, 26.6], [91.6, 26.6]], at: [94.6, 18.4], ph: 32, dist: 400,
+      { n: 13500, u: 'm²', l: { pt: 'Centro de Convenções', en: 'convention center', es: 'centro de convenciones' } },
+      { n: 1200, u: { pt: 'lugares', en: 'seats', es: 'lugares' }, l: { pt: 'no anfiteatro', en: 'in the amphitheater', es: 'en el anfiteatro' } }],
+    text: { pt: 'A cobertura em casca de vidro do Centro de Convenções reúne feiras, congressos e o anfiteatro de 1.200 lugares, colada ao hotel. O Salão de Eventos, de 3.200 m², fica no Bracerum Club.',
+      en: 'The glass shell roof of the Convention Center hosts fairs, congresses and the 1,200-seat amphitheater, right next to the hotel. The 3,200 m² event hall is at Bracerum Club.',
+      es: 'La cubierta en cáscara de vidrio del Centro de Convenciones reúne ferias, congresos y el anfiteatro de 1.200 lugares, junto al hotel. El Salón de Eventos, de 3.200 m², está en el Bracerum Club.' },
+    photos: ['web/fotos/hotel-cupula-dia.jpg', 'web/fotos/convencoes-foyer.jpg', 'web/fotos/convencoes-galeria.jpg', 'web/fotos/convencoes-auditorio.jpg', 'web/fotos/convencoes-restaurante.jpg'], link: 'hotel.html' },
+  { id: 'escola', poly: [[94.7, 15.0], [98.9, 15.0], [96.6, 23.4], [94.7, 23.4]], at: [96.3, 19.4], ph: 30, dist: 380,
     name: { pt: 'Escola', en: 'School', es: 'Escuela' },
     kpis: [
-      { n: 2775, u: 'm²', l: { pt: 'por piso', en: 'per floor', es: 'por piso' } },
-      { t: { pt: 'quadra poliesportiva e parquinho à frente', en: 'multi-sport court and playground in front', es: 'cancha polideportiva y juegos infantiles al frente' } }],
-    text: { pt: 'Edifício em arco no vértice norte do parque, perto do Resort e do Bracerum Condo — para os filhos de quem mora e trabalha no Bracerum Park.',
-      en: 'An arc-shaped building at the northern tip of the park, close to the Resort and Bracerum Condo — for the children of people who live and work at Bracerum Park.',
-      es: 'Edificio en arco en el vértice norte del parque, cerca del Resort y del Bracerum Condo — para los hijos de quienes viven y trabajan en Bracerum Park.' },
+      { n: 8121, u: 'm²', l: { pt: 'escola e creche', en: 'school and daycare', es: 'escuela y guardería' } },
+      { t: { pt: 'escola em arco, creche e campo à frente', en: 'arc-shaped school, daycare and a pitch in front', es: 'escuela en arco, guardería y cancha al frente' } }],
+    text: { pt: 'No vértice norte do parque, ao lado do posto de saúde e do Bracerum Condo — para os filhos de quem mora e trabalha no Bracerum Park.',
+      en: 'At the northern tip of the park, next to the health post and Bracerum Condo — for the children of people who live and work at Bracerum Park.',
+      es: 'En el vértice norte del parque, junto al puesto de salud y al Bracerum Condo — para los hijos de quienes viven y trabajan en Bracerum Park.' },
     photos: [] },
-  { id: 'resort', poly: [[69.5, 17], [81.4, 17], [81.4, 26.6], [94.4, 26.6], [81.6, 47.3], [69.5, 47.3]], at: [79.4, 30.5], ph: 32, dist: 860,
+  { id: 'resort', poly: [[65.5, 64.3], [77.4, 64.3], [77.4, 67.3], [66.8, 84.6], [65.5, 84.6]], at: [69.8, 72.6], ph: 30, dist: 620,
     name: { pt: 'Bracerum Resort', en: 'Bracerum Resort', es: 'Bracerum Resort' },
     kpis: [
-      { n: 141, u: { pt: 'lotes', en: 'lots', es: 'lotes' }, l: { pt: 'casas em condomínio fechado', en: 'houses in a gated community', es: 'casas en barrio cerrado' } },
-      { n: 142067, u: 'm²', l: { pt: 'área do Resort', en: 'Resort area', es: 'superficie del Resort' } },
-      { t: { pt: 'lago central com coreto, clubhouse, piscinas, campo de futebol e quadras', en: 'central lake with a gazebo, clubhouse, pools, football pitch and courts', es: 'lago central con glorieta, clubhouse, piscinas, cancha de fútbol y canchas' } }],
-    text: { pt: 'Condomínio fechado de casas na ponta norte: anéis de lotes em volta de uma praça e de um lago central, ruas curvas e um setor de lazer com clubhouse. Portaria própria na via de acesso. As casas da maquete são volumes genéricos — as plantas por unidade ainda serão definidas.',
-      en: 'A gated community of houses at the north end: rings of lots around a square and a central lake, curving streets and a leisure area with a clubhouse. Its own gatehouse on the access road. The houses in this model are generic volumes — unit floor plans are still to be defined.',
-      es: 'Barrio cerrado de casas en la punta norte: anillos de lotes alrededor de una plaza y de un lago central, calles curvas y un sector de recreación con clubhouse. Portería propia en la calle de acceso. Las casas de la maqueta son volúmenes genéricos — las plantas por unidad aún se definirán.' },
-    photos: ['web/fotos/resort-lago.jpg', 'web/fotos/resort-casas-rua.jpg', 'web/fotos/resort-casa.jpg', 'park/resort-clubhouse.jpg', 'web/fotos/amen-piscina-quincho.jpg'], link: 'resort.html' },
-  { id: 'condo', poly: [[65.8, 47.8], [81.7, 47.3], [70.9, 78], [65.8, 78]], at: [73.4, 57], ph: 36, dist: 760,
+      { n: 31, u: { pt: 'lotes', en: 'lots', es: 'lotes' }, l: { pt: 'residenciais, de 600 a 1.481 m²', en: 'residential, from 600 to 1,481 m²', es: 'residenciales, de 600 a 1.481 m²' } },
+      { n: 38072, u: 'm²', l: { pt: 'área do Resort, com lago, portaria e salão de festas', en: 'Resort area, with a lake, gatehouse and party hall', es: 'superficie del Resort, con lago, portería y salón de fiestas' } }],
+    text: { pt: 'Condomínio de casas na borda leste, junto à pista: os lotes se alinham ao longo da via e da diagonal do terreno, em volta de um lago. As casas da maquete são volumes genéricos — as plantas por unidade ainda serão definidas.',
+      en: 'A community of houses on the eastern edge, by the runway: the lots line the street and the site’s diagonal edge, around a lake. The houses in this model are generic volumes — unit floor plans are still to be defined.',
+      es: 'Condominio de casas en el borde este, junto a la pista: los lotes se alinean a lo largo de la calle y de la diagonal del terreno, alrededor de un lago. Las casas de la maqueta son volúmenes genéricos — las plantas por unidad aún se definirán.' },
+    photos: ['web/fotos/resort-lago.jpg', 'web/fotos/resort-casas-rua.jpg', 'web/fotos/resort-casa.jpg'], link: 'resort.html' },
+  { id: 'condo', poly: [[69.4, 20.3], [80.7, 20.3], [80.7, 39.4], [86.6, 39.4], [86.6, 50.3], [82.5, 60], [78, 63.6], [65.5, 63.6], [65.5, 51], [69.4, 51]],
+    at: [76.2, 40.6], ph: 44, dist: 820,
     name: { pt: 'Bracerum Condo', en: 'Bracerum Condo', es: 'Bracerum Condo' },
     kpis: [
-      { n: 608, u: { pt: 'apartamentos', en: 'apartments', es: 'departamentos' }, l: { pt: 'em 38 torres de 16 unidades', en: 'in 38 towers of 16 units', es: 'en 38 torres de 16 unidades' } },
-      { n: 49704, u: 'm²', l: { pt: 'área do condomínio', en: 'site area', es: 'superficie del condominio' } },
-      { t: { pt: 'salão de festas, campo society e quadras', en: 'party hall, five-a-side pitch and courts', es: 'salón de fiestas, cancha de fútbol 7 y canchas' } }],
-    text: { pt: 'Moradia ao lado do trabalho: as torres se organizam em quatro grupos com espelhos d’água, entre o Resort e a área de serviços. Na maquete as torres têm 4 pavimentos, estimados pelo número de vagas desenhadas na planta.',
-      en: 'Homes next to work: the towers are arranged in four groups with reflecting pools, between the Resort and the services area. In this model the towers have 4 floors, estimated from the number of parking spaces drawn on the plan.',
-      es: 'Vivienda al lado del trabajo: las torres se organizan en cuatro grupos con espejos de agua, entre el Resort y el área de servicios. En la maqueta las torres tienen 4 pisos, estimados por la cantidad de estacionamientos dibujados en el plano.' },
+      { n: 1200, u: { pt: 'apartamentos', en: 'apartments', es: 'departamentos' }, l: { pt: 'em 67 torres · 114.273 m²', en: 'in 67 towers · 114,273 m²', es: 'en 67 torres · 114.273 m²' } },
+      { n: 16, u: { pt: 'torres', en: 'towers', es: 'torres' }, l: { pt: 'de 1 quarto (384 unidades)', en: 'of one-bedroom units (384)', es: 'de 1 dormitorio (384 unidades)' } },
+      { n: 39, u: { pt: 'torres', en: 'towers', es: 'torres' }, l: { pt: 'de 2 quartos (624 unidades)', en: 'of two-bedroom units (624)', es: 'de 2 dormitorios (624 unidades)' } },
+      { n: 12, u: { pt: 'torres', en: 'towers', es: 'torres' }, l: { pt: 'de 3 quartos (192 unidades)', en: 'of three-bedroom units (192)', es: 'de 3 dormitorios (192 unidades)' } }],
+    text: { pt: 'Moradia ao lado do trabalho: as torres se agrupam em quadras com espelhos d’água e jardins, entre o Outlet, o Bracerum Club e o Resort. Na maquete, as de 1 quarto têm 6 pavimentos e as demais 4, estimados pelo número de unidades.',
+      en: 'Homes next to work: the towers are grouped in blocks with reflecting pools and gardens, between the Outlet, Bracerum Club and the Resort. In this model the one-bedroom towers have 6 floors and the others 4, estimated from the number of units.',
+      es: 'Vivienda al lado del trabajo: las torres se agrupan en manzanas con espejos de agua y jardines, entre el Outlet, el Bracerum Club y el Resort. En la maqueta, las de 1 dormitorio tienen 6 pisos y las demás 4, estimados por la cantidad de unidades.' },
     photos: [] },
-  { id: 'supermercado', poly: [[65.8, 40.3], [69.5, 40.3], [69.5, 47.8], [65.8, 47.8]], at: [67.5, 43.1], ph: 30, dist: 380,
+  { id: 'supermercado', poly: [[65.5, 40.0], [69.6, 40.0], [69.6, 51], [65.5, 51]], at: [66.7, 46.3], ph: 30, dist: 380,
     name: { pt: 'Bracerum Market', en: 'Bracerum Market', es: 'Bracerum Market' },
     kpis: [
-      { n: 4606, u: 'm²', l: { pt: 'supermercado, na ponta da faixa comercial', en: 'supermarket at the end of the retail strip', es: 'supermercado, en la punta de la franja comercial' } }],
-    text: { pt: 'O supermercado fecha a faixa comercial, de frente para o boulevard que separa o Resort do Bracerum Condo, com estacionamento arborizado.',
-      en: 'The supermarket closes the retail strip, facing the boulevard between the Resort and Bracerum Condo, with tree-lined parking.',
-      es: 'El supermercado cierra la franja comercial, frente al bulevar que separa el Resort del Bracerum Condo, con estacionamiento arbolado.' },
+      { n: 4606, u: 'm²', l: { pt: 'supermercado e 12 lojas, com docas de carga', en: 'supermarket and 12 shops, with loading docks', es: 'supermercado y 12 locales, con muelles de carga' } }],
+    text: { pt: 'O supermercado e as lojas fecham a faixa comercial, com estacionamento arborizado e docas próprias para o abastecimento.',
+      en: 'The supermarket and shops close the retail strip, with tree-lined parking and their own loading docks.',
+      es: 'El supermercado y los locales cierran la franja comercial, con estacionamiento arbolado y muelles propios para el abastecimiento.' },
     photos: ['park/select-market-interior.jpg'], link: 'select.html' },
-  { id: 'ambulatorio', poly: [[48.3, 80.8], [57.6, 80.8], [57.6, 90], [48.3, 90]], at: [54.6, 84.8], ph: 30, dist: 420,
+  { id: 'ambulatorio', poly: [[91.6, 15.6], [94.7, 15.6], [94.7, 21.6], [91.6, 21.6]], at: [93.6, 17.9], ph: 30, dist: 360,
     name: { pt: 'Ambulatório', en: 'Outpatient clinic', es: 'Ambulatorio' },
     kpis: [
-      { n: 2377, u: 'm²', l: { pt: 'ambulatório, resgate e brigadistas', en: 'outpatient clinic, rescue and fire brigade', es: 'ambulatorio, rescate y brigadistas' } },
-      { n: 7748, u: 'm²', l: { pt: 'bloco de serviços, com refeitório (4.639 m²) e creche (2.083 m²)', en: 'services block, with a canteen (4,639 m²) and daycare (2,083 m²)', es: 'bloque de servicios, con comedor (4.639 m²) y guardería (2.083 m²)' } }],
-    text: { pt: 'No fim do boulevard central, junto à pista, o bloco de serviços reúne o ambulatório com resgate, o refeitório e a creche — atendimento perto de quem trabalha nas indústrias.',
-      en: 'At the end of the central boulevard, by the runway, the services block brings together the outpatient clinic and rescue, the canteen and the daycare — care close to the people working in the industries.',
-      es: 'Al final del bulevar central, junto a la pista, el bloque de servicios reúne el ambulatorio con rescate, el comedor y la guardería — atención cerca de quienes trabajan en las industrias.' },
-    photos: ['park/amen-comedor.jpg'] },
-  { id: 'bombeiros', poly: [[57.6, 80.8], [65.9, 80.8], [65.9, 85], [63.9, 90], [57.6, 90]], at: [60.4, 85.6], ph: 30, dist: 420,
+      { n: 4113, u: 'm²', l: { pt: 'posto de saúde e ambulatório', en: 'health post and outpatient clinic', es: 'puesto de salud y ambulatorio' } }],
+    text: { pt: 'O posto de saúde fica no vértice norte, ao lado do Corpo de Bombeiros, do Posto Policial e da Escola, com acesso direto pela Via Costeira.',
+      en: 'The health post is at the northern tip, next to the fire station, the police post and the School, with direct access from the Via Costeira.',
+      es: 'El puesto de salud está en el vértice norte, junto a los Bomberos, al Puesto Policial y a la Escuela, con acceso directo por la Vía Costera.' },
+    photos: [] },
+  { id: 'bombeiros', poly: [[91.6, 10.8], [95.4, 10.8], [94.7, 15.6], [91.6, 15.6]], at: [93.3, 13.9], ph: 30, dist: 360,
     name: { pt: 'Bombeiro Civil', en: 'Fire brigade', es: 'Bomberos civiles' },
     kpis: [
-      { t: { pt: 'bombeiros civis e brigadistas do parque, na borda da pista', en: 'the park’s civilian firefighters and brigade, by the runway', es: 'bomberos civiles y brigadistas del parque, junto a la pista' } },
-      { n: 12180, u: 'm²', l: { pt: 'Hub de serviços para indústrias, ao lado', en: 'industrial services hub, next door', es: 'hub de servicios para industrias, al lado' } }],
-    text: { pt: 'A base dos bombeiros civis fica na borda da pista, ao lado do Hub de serviços para indústrias e do Grêmio Recreativo, a poucos minutos de qualquer quadra pelo boulevard central.',
-      en: 'The civilian fire brigade is based by the runway, next to the industrial services hub and the recreation club, a few minutes from any block along the central boulevard.',
-      es: 'La base de los bomberos civiles está junto a la pista, al lado del Hub de servicios para industrias y del Club Recreativo, a pocos minutos de cualquier manzana por el bulevar central.' },
+      { n: 620, u: 'm²', l: { pt: 'Corpo de Bombeiros', en: 'fire station', es: 'cuartel de bomberos' } },
+      { n: 506, u: 'm²', l: { pt: 'Posto Policial, ao lado', en: 'police post, next door', es: 'puesto policial, al lado' } }],
+    text: { pt: 'O Corpo de Bombeiros e o Posto Policial ficam lado a lado no vértice norte, de frente para a Via Costeira, junto ao posto de saúde.',
+      en: 'The fire station and the police post sit side by side at the northern tip, facing the Via Costeira, next to the health post.',
+      es: 'Los Bomberos y el Puesto Policial están uno al lado del otro en el vértice norte, frente a la Vía Costera, junto al puesto de salud.' },
     photos: [] },
-  { id: 'industrial', poly: [[18.3, 8.8], [39.2, 8.8], [39.2, 20.3], [48.9, 20.3], [48.9, 15.9], [65.8, 15.9], [65.8, 80.8], [16.5, 80.8], [16.5, 63.3], [5, 63.3]],
+  { id: 'industrial', poly: [[18.3, 8.8], [39.2, 8.8], [39.2, 20.3], [48.9, 20.3], [48.9, 15.9], [65.5, 15.9], [65.5, 80.8], [16.5, 80.8], [16.5, 63.3], [5, 63.3]],
     at: [38.5, 46], ph: 56, dist: 1900,
     name: { pt: 'Lotes industriais', en: 'Industrial lots', es: 'Lotes industriales' },
     kpis: [
-      { n: 612, u: { pt: 'lotes', en: 'lots', es: 'lotes' }, l: { pt: 'à venda, de 1.250 m² (25 × 50 m) cada — 765.960 m² no total', en: 'for sale, 1,250 m² (25 × 50 m) each — 765,960 m² in total', es: 'en venta, de 1.250 m² (25 × 50 m) cada uno — 765.960 m² en total' } },
+      { v: () => `${fmt(L.lotes.length)} ${tr({ pt: 'lotes', en: 'lots', es: 'lotes' })}`, l: () => ({ pt: `à venda, de 1.250 m² (25 × 50 m) cada — ${fmt(L.lotes.reduce((s, l) => s + l.a, 0))} m² no total`, en: `for sale, 1,250 m² (25 × 50 m) each — ${fmt(L.lotes.reduce((s, l) => s + l.a, 0))} m² in total`, es: `en venta, de 1.250 m² (25 × 50 m) cada uno — ${fmt(L.lotes.reduce((s, l) => s + l.a, 0))} m² en total` }) },
       { v: () => `${usd(P.precos[janelaVigente()].P[0][0])}/m²`, l: () => ({ pt: `lote Padrão, 1 a 8 lotes, 20% + 12x — janela ${tr(P.janelas.find((j) => j.id === janelaVigente()).curto)}`, en: `Standard lot, 1 to 8 lots, 20% + 12x — ${tr(P.janelas.find((j) => j.id === janelaVigente()).curto)} window`, es: `lote Estándar, 1 a 8 lotes, 20% + 12x — ventana ${tr(P.janelas.find((j) => j.id === janelaVigente()).curto)}` }) },
-      { t: { pt: 'quadras Q01 a Q42; a quadra-padrão tem 200 × 100 m e 16 lotes (Q37 é o recinto alfandegado, fora da oferta)', en: 'blocks Q01 to Q42; a standard block is 200 × 100 m with 16 lots (Q37 is the customs bonded area, not for sale)', es: 'manzanas Q01 a Q42; la manzana estándar tiene 200 × 100 m y 16 lotes (Q37 es el recinto aduanero, fuera de la oferta)' } }],
+      { t: { pt: 'quadras Q01 a Q42; a quadra-padrão tem 200 × 100 m e 16 lotes (Q37, o recinto alfandegado, e Q11, da Administração, ficam fora da oferta)', en: 'blocks Q01 to Q42; a standard block is 200 × 100 m with 16 lots (Q37, the customs bonded area, and Q11, the administration, are not for sale)', es: 'manzanas Q01 a Q42; la manzana estándar tiene 200 × 100 m y 16 lotes (Q37, el recinto aduanero, y Q11, de la Administración, quedan fuera de la oferta)' } }],
     text: { pt: 'A grade industrial ocupa o miolo do parque: quadras separadas por vias com rotatórias, um boulevard arborizado em cada sentido e o canal de drenagem. A unidade de venda é o lote de 1.250 m² — compre um ou junte vários; a partir de 9 lotes o preço por m² cai. O preço depende da categoria do lote: Vitrine (frente da entrada e da avenida principal), Business, Padrão e Interna.',
       en: 'The industrial grid fills the core of the park: blocks separated by streets with roundabouts, a tree-lined boulevard in each direction and the drainage canal. The unit of sale is the 1,250 m² lot — buy one or combine several; from 9 lots up the price per m² drops. The price depends on the lot category: Showcase (facing the entrance and the main avenue), Business, Standard and Inner.',
       es: 'La grilla industrial ocupa el centro del parque: manzanas separadas por calles con rotondas, un bulevar arbolado en cada sentido y el canal de drenaje. La unidad de venta es el lote de 1.250 m² — compre uno o junte varios; desde 9 lotes el precio por m² baja. El precio depende de la categoría del lote: Vitrina (frente a la entrada y a la avenida principal), Business, Estándar e Interna.' },
@@ -308,17 +309,17 @@ const AREAS = [
       en: 'The runway runs diagonally along the entire eastern edge of the park, with green strips on both sides. At the southern end is the apron of the Bracerum Cargo Airport, with the hangars and the helipad.',
       es: 'La pista corre en diagonal a lo largo de todo el borde este del parque, con franjas verdes a ambos lados. En la punta sur está la plataforma del Aeropuerto de Cargas Bracerum, con los hangares y el helipuerto.' },
     photos: ['web/fotos/aero-pista-aerea.jpg', 'web/fotos/aero-cabeceira.jpg'] },
-  { id: 'hangares', poly: [[3, 63.3], [14.4, 63.3], [14.4, 76.6], [3, 76.2]], at: [8.0, 66.8], ph: 34, dist: 540,
+  { id: 'hangares', poly: [[3, 63.3], [22.9, 63.3], [22.9, 77.9], [3, 76.2]], at: [8.0, 66.8], ph: 34, dist: 560,
     name: { pt: 'Hangares', en: 'Hangars', es: 'Hangares' },
     kpis: [
       { n: 7686, u: 'm²', l: { pt: '7 hangares, lounge e abastecimento', en: '7 hangars, lounge and refueling', es: '7 hangares, lounge y abastecimiento' } },
       { n: 42060, u: 'm²', l: { pt: 'pátio do Aeroporto de Cargas Bracerum', en: 'Bracerum Cargo Airport apron', es: 'plataforma del Aeropuerto de Cargas Bracerum' } },
-      { n: 15619, u: 'm²', l: { pt: 'recinto alfandegado (quadra Q37), ao lado do pátio', en: 'customs bonded area (block Q37), next to the apron', es: 'recinto aduanero (manzana Q37), junto a la plataforma' } }],
+      { n: 15619, u: 'm²', l: { pt: 'recinto alfandegado (quadra Q37, 10 lotes), ao lado do pátio', en: 'customs bonded area (block Q37, 10 lots), next to the apron', es: 'recinto aduanero (manzana Q37, 10 lotes), junto a la plataforma' } }],
     text: { pt: 'Os hangares ficam de frente para o pátio, com o estacionamento do aeródromo atrás. Carga e executivos chegam de avião direto ao parque, e o recinto alfandegado fica ao lado.',
       en: 'The hangars face the apron, with the airfield parking behind them. Cargo and executives fly straight into the park, with the customs bonded area next door.',
       es: 'Los hangares dan a la plataforma, con el estacionamiento del aeródromo detrás. Carga y ejecutivos llegan en avión directo al parque, con el recinto aduanero al lado.' },
     photos: ['web/fotos/hangar-bracerum.jpg', 'web/fotos/aero-patio-jato.jpg', 'web/fotos/hangar-interior.jpg'] },
-  { id: 'heliponto', poly: [[14.4, 63.3], [17, 63.3], [17, 77.6], [14.4, 76.6]], at: [15.6, 70.2], ph: 26, dist: 360,
+  { id: 'heliponto', poly: [[14.4, 63.3], [16.6, 63.3], [16.6, 77.6], [14.4, 76.6]], at: [15.6, 70.2], ph: 26, dist: 360,
     name: { pt: 'Heliponto', en: 'Helipad', es: 'Helipuerto' },
     kpis: [
       { t: { pt: 'no pátio dos hangares, junto ao abastecimento', en: 'on the hangar apron, next to the refueling point', es: 'en la plataforma de los hangares, junto al abastecimiento' } }],
@@ -330,45 +331,67 @@ const AREAS = [
     name: { pt: 'ETE/ETA', en: 'Wastewater and water treatment', es: 'Plantas de efluentes y de agua' },
     kpis: [
       { n: 14557, u: 'm²', l: { pt: 'E.T.E. e subestação de energia', en: 'wastewater treatment plant and power substation', es: 'planta de efluentes y subestación de energía' } },
-      { n: 2665, u: 'm²', l: { pt: 'E.T.A., na outra ponta, junto à Escola', en: 'water treatment plant, at the other end, by the School', es: 'planta de agua, en la otra punta, junto a la Escuela' } },
+      { n: 2772, u: 'm²', l: { pt: 'E.T.A., no vértice norte, junto à Escola', en: 'water treatment plant, at the northern tip, by the School', es: 'planta de agua, en el vértice norte, junto a la Escuela' } },
       { n: 4125, u: 'm²', l: { pt: 'galpões de manutenção do Park', en: 'park maintenance sheds', es: 'galpones de mantenimiento del Park' } }],
     text: { pt: 'Na ponta sul ficam a estação de tratamento de esgoto e a subestação de energia, separadas por uma faixa verde de 16 m, e os galpões de manutenção do parque. A estação de tratamento de água fica na outra ponta, ao lado da Escola.',
       en: 'At the southern end are the wastewater treatment plant and the power substation, separated by a 16 m green strip, and the park’s maintenance sheds. The water treatment plant is at the other end, next to the School.',
       es: 'En la punta sur están la planta de tratamiento de efluentes y la subestación de energía, separadas por una franja verde de 16 m, y los galpones de mantenimiento del parque. La planta de agua está en la otra punta, junto a la Escuela.' },
     photos: ['park/ete-eta.jpg'], link: 'qualidade.html' },
-  { id: 'administracao', poly: [[10.3, 35.5], [13.5, 35.5], [13.5, 40.2], [10.3, 40.2]], at: [11.9, 37.6], ph: 26, dist: 340,
+  { id: 'administracao', poly: [[10.3, 35.5], [13.6, 35.5], [13.6, 40.2], [10.3, 40.2]], at: [12.3, 37.6], ph: 26, dist: 340,
     name: { pt: 'Administração Parque', en: 'Park administration', es: 'Administración del Parque' },
     kpis: [
-      { n: 1150, u: 'm²', l: { pt: 'Administração do Park', en: 'park administration', es: 'administración del Park' } }],
+      { n: 1150, u: 'm²', l: { pt: 'Administração do Park, no lote Q11', en: 'park administration, on lot Q11', es: 'administración del Park, en el lote Q11' } }],
     text: { pt: 'A administração do parque fica num lote próprio na borda da grade industrial, perto da ETE e da subestação.',
       en: 'The park administration sits on its own lot at the edge of the industrial grid, near the wastewater plant and the substation.',
       es: 'La administración del parque está en un lote propio en el borde de la grilla industrial, cerca de la planta de efluentes y de la subestación.' },
     photos: [] },
+  { id: 'club', poly: [[80.7, 27.0], [94.3, 27.0], [85.4, 44.8], [80.7, 44.8]], at: [86.6, 33.6], ph: 32, dist: 560,
+    name: { pt: 'Bracerum Club', en: 'Bracerum Club', es: 'Bracerum Club' },
+    kpis: [
+      { n: 40706, u: 'm²', l: { pt: 'clube de esporte e lazer', en: 'sports and leisure club', es: 'club de deporte y recreación' } },
+      { n: 3200, u: 'm²', l: { pt: 'Salão de Eventos', en: 'event hall', es: 'Salón de Eventos' } },
+      { t: { pt: 'dois campos society, poliesportiva, tênis, pádel e beach tennis, piscinas com deck, bar e playground', en: 'two five-a-side pitches, multi-sport court, tennis, padel and beach tennis, pools with decks, bar and playground', es: 'dos canchas de fútbol 7, polideportiva, tenis, pádel y beach tennis, piscinas con deck, bar y juegos infantiles' } }],
+    text: { pt: 'Novo no Masterplan V14: o clube fica entre o Bracerum Condo e a Via Costeira, com as quadras de um lado, as piscinas e o bar no meio e o Salão de Eventos na ponta.',
+      en: 'New in Master plan V14: the club sits between Bracerum Condo and the Via Costeira, with the courts on one side, the pools and bar in the middle and the event hall at the tip.',
+      es: 'Nuevo en el Masterplan V14: el club está entre el Bracerum Condo y la Vía Costera, con las canchas de un lado, las piscinas y el bar en el medio y el Salón de Eventos en la punta.' },
+    photos: ['web/fotos/amen-piscina-quincho.jpg', 'web/fotos/amen-quadra.jpg', 'park/amen-salao-eventos.jpg'] },
+  { id: 'servicos', poly: [[48.3, 80.8], [65.9, 80.8], [65.9, 85], [63.9, 90], [48.3, 90]], at: [55.0, 84.4], ph: 30, dist: 520,
+    name: { pt: 'Refeitório, Grêmio e Hub de serviços', en: 'Canteen, recreation club and services hub', es: 'Comedor, Club Recreativo y Hub de servicios' },
+    kpis: [
+      { n: 3288, u: 'm²', l: { pt: 'Refeitório', en: 'canteen', es: 'comedor' } },
+      { n: 4460, u: 'm²', l: { pt: 'Grêmio Recreativo, com campo e piscina', en: 'recreation club, with a pitch and a pool', es: 'Club Recreativo, con cancha y piscina' } },
+      { n: 12180, u: 'm²', l: { pt: 'Hub de serviços para indústrias, em 8 lotes', en: 'industrial services hub, in 8 lots', es: 'Hub de servicios para industrias, en 8 lotes' } }],
+    text: { pt: 'No fim do boulevard central, junto à pista: o refeitório e o Grêmio Recreativo de quem trabalha no parque e, ao lado, o Hub de serviços para as indústrias.',
+      en: 'At the end of the central boulevard, by the runway: the canteen and recreation club for the people who work in the park and, next to them, the industrial services hub.',
+      es: 'Al final del bulevar central, junto a la pista: el comedor y el Club Recreativo de quienes trabajan en el parque y, al lado, el Hub de servicios para las industrias.' },
+    photos: ['park/amen-comedor.jpg'] },
 ];
 // apelidos dos endereços antigos (#condominio etc.)
-const APELIDO = { condominio: 'condo', servicos: 'ambulatorio', aeroporto: 'hangares', infra: 'ete' };
+const APELIDO = { condominio: 'condo', aeroporto: 'hangares', infra: 'ete' };
 // quando os rótulos se sobrepõem, ganha quem vem antes nesta lista
-const PRIORIDADE = ['hotel', 'eventos', 'resort', 'industrial', 'entrada', 'outlet', 'pista', 'condo', 'tecnologico', 'hangares', 'market',
-  'supermercado', 'escola', 'ambulatorio', 'bombeiros', 'clube', 'posto', 'portaria', 'heliponto', 'ete', 'administracao'];
+const PRIORIDADE = ['hotel', 'eventos', 'condo', 'industrial', 'entrada', 'outlet', 'resort', 'club', 'pista', 'tecnologico', 'hangares', 'market',
+  'supermercado', 'escola', 'servicos', 'ambulatorio', 'bombeiros', 'clube', 'posto', 'portaria', 'heliponto', 'ete', 'administracao'];
 // ordem de teste do clique no chão: do mais específico ao mais amplo
-const HIT_ORDER = ['posto', 'clube', 'portaria', 'entrada', 'tecnologico', 'eventos', 'hotel', 'escola', 'outlet', 'supermercado', 'market',
-  'resort', 'condo', 'ambulatorio', 'bombeiros', 'administracao', 'ete', 'heliponto', 'hangares', 'pista', 'industrial'];
+const HIT_ORDER = ['posto', 'clube', 'portaria', 'entrada', 'tecnologico', 'eventos', 'hotel', 'bombeiros', 'ambulatorio', 'escola', 'club',
+  'outlet', 'supermercado', 'market', 'resort', 'condo', 'servicos', 'administracao', 'ete', 'heliponto', 'hangares', 'pista', 'industrial'];
 // a que ponto pertence cada volume da maquete (x e y do centro do volume em % da prancha)
 function pontoDoVolume(tag, x, y) {
   switch (tag) {
-    case 'posto e portaria': return x < 43.6 ? 'posto' : x < 47.4 ? 'clube' : 'portaria';
+    case 'posto e portaria': return x < 40.3 ? 'portaria' : x < 43.6 ? 'posto' : x < 46.9 ? 'clube' : 'portaria';
     case 'outlet': return y < 15.9 ? 'outlet' : 'market';
-    case 'supermercado': return 'supermercado';
+    case 'supermercado': case 'docas': return 'supermercado';
     case 'galpão': return 'industrial';
+    case 'recinto': case 'hangar': return 'hangares';
     case 'centro tecnológico': return 'tecnologico';
     case 'hotel': return 'hotel';
-    case 'salão de eventos': case 'casca': return 'eventos';
-    case 'escola': return 'escola';
-    case 'casa': case 'casa-clube': return 'resort';
-    case 'torre': case 'salão de festas': return 'condo';
-    case 'refeitório, creche, ambulatório': return 'ambulatorio';
-    case 'hub de serviços': case 'grêmio': return 'bombeiros';
-    case 'hangar': return 'hangares';
+    case 'casca': return 'eventos';
+    case 'salão de eventos': case 'bar': case 'vestiário': return 'club';
+    case 'escola': case 'creche': return 'escola';
+    case 'casa': case 'portaria resort': case 'salão de festas': return 'resort';
+    case 'torre': case 'torre1': return 'condo';
+    case 'refeitório': case 'grêmio': case 'hub de serviços': return 'servicos';
+    case 'ambulatório': return 'ambulatorio';
+    case 'bombeiros': case 'policial': return 'bombeiros';
     case 'abastecimento': return 'heliponto';
     case 'ETE': case 'subestação': case 'galpões de manutenção': case 'ETA': return 'ete';
     case 'administração': return 'administracao';
@@ -378,13 +401,16 @@ function pontoDoVolume(tag, x, y) {
 // fachada e telhado por tipo de volume; cor em RGB 0–1 (multiplica a cor do material)
 const ESTILO = {
   'galpão': ['w_metal', 'r_metal', [1, 1, 1]], hangar: ['w_metal', 'r_metal', [0.98, 0.98, 0.98]],
-  'galpões de manutenção': ['w_metal', 'r_metal', [0.97, 0.97, 0.96]],
-  hotel: ['w_floor', 'r_flat', [1, 0.975, 0.94]], torre: ['w_floor', 'r_flat', [1, 0.985, 0.96]],
+  recinto: ['w_metal', 'r_metal', [0.97, 0.97, 0.96]], 'hub de serviços': ['w_metal', 'r_metal', [0.99, 0.99, 0.98]],
+  'galpões de manutenção': ['w_metal', 'r_metal', [0.97, 0.97, 0.96]], docas: ['w_metal', 'r_metal', [0.98, 0.98, 0.97]],
+  hotel: ['w_floor', 'r_flat', [1, 0.975, 0.94]], torre: ['w_floor', 'r_flat', [1, 0.985, 0.96]], torre1: ['w_floor', 'r_flat', [0.99, 0.98, 0.96]],
   'centro tecnológico': ['w_floor', 'r_flat', [0.97, 0.97, 0.97]], escola: ['w_floor', 'r_flat', [1, 0.98, 0.95]],
-  'administração': ['w_floor', 'r_flat', [1, 1, 1]], 'refeitório, creche, ambulatório': ['w_floor', 'r_flat', [1, 0.98, 0.95]],
-  'hub de serviços': ['w_floor', 'r_flat', [1, 1, 1]], outlet: ['w_shop', 'r_flat', [1, 0.985, 0.96]],
-  supermercado: ['w_shop', 'r_flat', [1, 1, 1]], 'posto e portaria': ['w_shop', 'r_flat', [1, 1, 1]],
-  'salão de eventos': ['w_shop', 'r_flat', [1, 0.98, 0.95]], casa: ['w_house', 'r_house', [1, 1, 1]],
+  creche: ['w_floor', 'r_flat', [1, 0.98, 0.95]], 'ambulatório': ['w_floor', 'r_flat', [1, 1, 1]],
+  bombeiros: ['w_floor', 'r_flat', [0.98, 0.97, 0.95]], policial: ['w_floor', 'r_flat', [0.97, 0.97, 0.97]],
+  'administração': ['w_floor', 'r_flat', [1, 1, 1]], 'refeitório': ['w_floor', 'r_flat', [1, 0.98, 0.95]],
+  outlet: ['w_shop', 'r_flat', [1, 0.985, 0.96]], supermercado: ['w_shop', 'r_flat', [1, 1, 1]],
+  'posto e portaria': ['w_shop', 'r_flat', [1, 1, 1]], 'salão de eventos': ['w_shop', 'r_flat', [1, 0.98, 0.95]],
+  'salão de festas': ['w_shop', 'r_flat', [1, 0.98, 0.95]], casa: ['w_house', 'r_house', [1, 1, 1]],
 };
 
 let lang = 'pt';
@@ -1183,7 +1209,7 @@ function faixaTxt(c) {
 }
 function linkProposta(c) {
   const jan = P.janelas.find((j) => j.id === janela), pg = P.pagamentos.find((p) => p.id === pagto);
-  const nomes = escolhidos.map((l) => `LTIND.${l.id} — ${nomeCat(l.cat)} — ${l.ex ? '' : '≈ '}${fmt(l.a)} m²`);
+  const nomes = escolhidos.map((l) => `${l.nome || 'LTIND.' + l.id} — ${nomeCat(l.cat)} — ${fmt(l.a)} m²`);
   const cond = c.np ? subst(t('mail.parc'), { s: usd(c.sinal), n: c.np, p: usd(c.parcela) }) : t('lot.cash');
   const corpo = [t('mail.hello'), '', ...nomes, '', subst(t('mail.sim'), { v: P.tabela }),
     `${t('lots.window')}: ${tr(jan.nome)} (${tr(jan.quando)})`, `${t('lots.pay')}: ${tr(pg.nome)}`,
@@ -1191,6 +1217,14 @@ function linkProposta(c) {
     location.origin + location.pathname + location.hash].join('\n');
   const assunto = subst(t('mail.subject'), { l: escolhidos.length === 1 ? 'LTIND.' + escolhidos[0].id : `${escolhidos.length} ${t('lots.lots')}` });
   return `mailto:${P.contato.emails.join(',')}?subject=${encodeURIComponent(assunto)}&body=${encodeURIComponent(corpo)}`;
+}
+/* LTIND.Q07.L014.A01250.ESQNAO.RT.L -> "meio de quadra · retangular · frente leste" */
+function feicao(nome) {
+  const [, , , , esq, forma, fr] = nome.split('.');
+  const lados = (fr || '').split('+').map((c) => t('dir.' + c)).filter((x) => !x.startsWith('dir.'));
+  const lista = lados.length > 1 ? lados.slice(0, -1).join(', ') + t('lot.e') + lados[lados.length - 1] : lados[0];
+  const frente = lados.length ? subst(t(lados.length > 1 ? 'lot.frentes' : 'lot.frente'), { f: lista }) : '';
+  return [t(esq === 'ESQSIM' ? 'lot.esquina' : 'lot.meio'), t(forma === 'PO' ? 'lot.poligonal' : 'lot.retangular'), frente].filter(Boolean).join(' · ');
 }
 function mostraCartaoLotes() {
   const lista = escolhidos, c = calcula(lista), um = lista.length === 1 ? lista[0] : null;
@@ -1202,10 +1236,11 @@ function mostraCartaoLotes() {
   const sw = (k) => `<i class="sw" style="background:${P.categorias[k].cor}"></i>`;
   const linhas = um
     ? [[esc(`${um.ex ? '' : '≈ '}${fmt(um.a)} m²`), esc(um.ex ? subst(t('lot.area'), { cod: 'A' + String(um.a).padStart(5, '0') }) : t('lot.areaApprox'))],
-       [sw(um.cat) + esc(nomeCat(um.cat)), esc(subst(t('lot.cat'), { f: P.categorias[um.cat].fator }))]]
+       [sw(um.cat) + esc(nomeCat(um.cat)), esc(subst(t('lot.cat'), { f: P.categorias[um.cat].fator }))],
+       ...(um.nome ? [['', esc(feicao(um.nome))]] : [])]
     : Object.entries(c.cats).sort((a, b) => b[1].a - a[1].a).map(([k, v]) =>
       [`${sw(k)}${v.n} × ${esc(nomeCat(k))}`, esc(`${fmt(v.a)} m² × ${usd(v.pm)}/m² = ${usd(v.v)}`)]);
-  $('#cardKpis').innerHTML = linhas.map(([dt, dd]) => `<div><dt>${dt}</dt><dd>${dd}</dd></div>`).join('');
+  $('#cardKpis').innerHTML = linhas.map(([dt, dd]) => (dt ? `<div><dt>${dt}</dt><dd>${dd}</dd></div>` : `<div class="solo"><dd>${dd}</dd></div>`)).join('');
   const jan = P.janelas.find((j) => j.id === janela);
   const q = L.quadras.find((x) => x.q === (um ? um.q : quadras.length === 1 ? quadras[0] : null));
   const chip = (attr, id, rot) => `<li><button type="button" data-${attr}="${id}" aria-label="${esc(subst(t('lot.remove'), { id: rot }))}">${esc(rot)}<span aria-hidden="true">×</span></button></li>`;
@@ -1233,12 +1268,14 @@ function mostraCartaoLotes() {
     </div>`;
   $('#cardText').textContent = t('lot.notes') + (janela === 'expo' ? ' ' + t('lot.expoNote') : '');
   const aprox = lista.filter((l) => !l.ex);
-  $('#cardNote').textContent = aprox.length ? (um ? t('lot.approxNote') : subst(t('lot.approxNoteN'), { n: aprox.length })) : '';
+  $('#cardNote').textContent = aprox.length ? (um ? t('lot.approxNote') : subst(t('lot.approxNoteN'), { n: aprox.length }))
+    : um?.nome ? subst(t('lot.nomeOficial'), { n: um.nome }) : '';
   $('#cardActions').innerHTML = `<p class="contact">${esc(P.contato.nomes)} · ${P.contato.emails.map(esc).join(' · ')}</p>`;
   $('#cardNav').hidden = true;
   abreCartao();
 }
 function mostraRecinto(q) {
+  if (q.fora !== 'recinto alfandegado') { escolheArea(areaIdx.administracao); return; }
   selected = { kind: 'recinto', q };
   escolhidos = [];
   marcaSelecao(-1);
@@ -1263,7 +1300,7 @@ function painelLotes() {
   $('#lotPanel').innerHTML = `
     <p class="eyebrow">${esc(subst(t('lots.eyebrow'), { v: P.tabela }))}</p>
     <h2 class="lotpanel__title">${esc(t('lots.title'))}</h2>
-    <p class="lotpanel__sub">${esc(subst(t('lots.sub'), { n: fmt(P.estoque.lotes), a: fmt(P.estoque.area) }))}</p>
+    <p class="lotpanel__sub">${esc(subst(t('lots.sub'), { n: fmt(L.lotes.length), a: fmt(L.lotes.reduce((s, l) => s + l.a, 0)) }))}</p>
     ${segJanela()}
     <p class="calc__when">${esc(tr(P.janelas.find((j) => j.id === janela).quando))}</p>
     <p class="lotpanel__head">${esc(t('lots.legendHead'))}</p>
@@ -1336,7 +1373,8 @@ function hoverEm(cx, cy) {
     tip.innerHTML = `<small>LTIND.${esc(l.id)}</small><b>${esc(nomeCat(l.cat))} · ${l.ex ? '' : '≈ '}${fmt(l.a)} m²</b>${usd(precoM2(l.cat, 1) * l.a)} <span class="tip__m">${esc(tr(jn.curto))} · ${esc(tr(pg.nome))}</span>`;
   } else if (a.recinto) {
     setHover(-1); hoverLote(null);
-    tip.innerHTML = `<small>${esc(a.recinto.q)}</small><b>${esc(t('q.recinto'))}</b>${esc(t('q.fora'))}`;
+    const adm = a.recinto.fora !== 'recinto alfandegado';
+    tip.innerHTML = `<small>${esc(a.recinto.q)}</small><b>${esc(adm ? tr(AREAS[areaIdx.administracao].name) : t('q.recinto'))}</b>${esc(t('q.fora'))}`;
   } else {
     hoverLote(null); setHover(a.area);
     tip.innerHTML = `<small>${String(a.area + 1).padStart(2, '0')} · ${esc(t('tip.open'))}</small><b>${esc(tr(AREAS[a.area].name))}</b>`;
