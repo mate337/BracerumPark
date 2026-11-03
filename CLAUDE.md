@@ -22,8 +22,9 @@ rotas) que as seis páginas internas baixavam e interpretavam à toa. Ele roda d
   EN/ES inline e a **mesma chave `bp-lang`**, então o idioma escolhido vale nos dois lados.
 - Fundo `assets/web/fotos/park-aereo-rio-1000.jpg` (cópia leve da vista aérea) e imagem de
   compartilhamento `assets/web/og-linktree.jpg` (1200×630, URL absoluta no `og:image`).
-- **Pendente:** o Park não tem perfil oficial em rede social — "Redes sociais" usa os Instagrams de
-  Cleber e Sydney (os mesmos do footer). Quando houver @ oficial (Instagram/LinkedIn), entra no topo do grupo 03.
+- **Redes sociais = só os perfis oficiais do Park** (pedido do cliente, 2026-11-03): Instagram
+  `@bracerumpark`, Facebook (`profile.php?id=61594419791801`) e LinkedIn (`company/bracerumpark`). Os
+  Instagrams pessoais de Cleber e Sydney saíram do linktree (continuam no footer do site).
 
 ### Fotos finalizadas do cliente (v6.3 — 2026-09-28)
 - **Fonte:** pasta do Google Drive "Imagens BracerumPark Finalizadas" (id `1CETdiYdL13Jhh2twQe6kAF10yvMt1YF6`),
