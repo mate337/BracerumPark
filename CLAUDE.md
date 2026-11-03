@@ -12,7 +12,8 @@ rotas) que as seis páginas internas baixavam e interpretavam à toa. Ele roda d
 
 ### Linktree (v6.4 — 2026-11-03)
 - `linktree/index.html` → **bracerumpark.com/linktree** (pasta com `index.html`, funciona em qualquer host
-  estático, com ou sem barra final — os caminhos são relativos `../`). Quatro grupos pedidos pelo cliente:
+  estático, com ou sem barra final — os caminhos são relativos `../`). O site é servido pela **Vercel a partir do
+  `main`**; o `vercel.json` só garante `/linktree` sem barra (o arquivo do site continua servido como está). Quatro grupos pedidos pelo cliente:
   **01 Site** (cartão com foto + atalhos Masterplan/Tributação/Hotel/Resort/Select), **02 WhatsApp**
   (Cleber · PY e Sydney · BR, mensagem pré-preenchida no idioma ativo), **03 Redes sociais** e
   **04 Localização** (Google Maps + o mapa logístico da home).
