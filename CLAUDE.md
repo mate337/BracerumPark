@@ -10,6 +10,20 @@ O site tem **7 páginas**: `index.html`, `tributacao.html`, `bracerum.html`, `ho
 rotas) que as seis páginas internas baixavam e interpretavam à toa. Ele roda depois do
 `script.js` porque usa `hasGsap`, `reduceMotion` e `tr()`.
 
+### Linktree (v6.4 — 2026-11-03)
+- `linktree/index.html` → **bracerumpark.com/linktree** (pasta com `index.html`, funciona em qualquer host
+  estático, com ou sem barra final — os caminhos são relativos `../`). Quatro grupos pedidos pelo cliente:
+  **01 Site** (cartão com foto + atalhos Masterplan/Tributação/Hotel/Resort/Select), **02 WhatsApp**
+  (Cleber · PY e Sydney · BR, mensagem pré-preenchida no idioma ativo), **03 Redes sociais** e
+  **04 Localização** (Google Maps + o mapa logístico da home).
+- **Página independente de propósito:** não carrega `style.css`/`script.js`/`i18n.js` (145 KB) — quem
+  chega vem da bio do Instagram, no celular. Mesmos tokens, tipografia e cantos do site; dicionário
+  EN/ES inline e a **mesma chave `bp-lang`**, então o idioma escolhido vale nos dois lados.
+- Fundo `assets/web/fotos/park-aereo-rio-1000.jpg` (cópia leve da vista aérea) e imagem de
+  compartilhamento `assets/web/og-linktree.jpg` (1200×630, URL absoluta no `og:image`).
+- **Pendente:** o Park não tem perfil oficial em rede social — "Redes sociais" usa os Instagrams de
+  Cleber e Sydney (os mesmos do footer). Quando houver @ oficial (Instagram/LinkedIn), entra no topo do grupo 03.
+
 ### Fotos finalizadas do cliente (v6.3 — 2026-09-28)
 - **Fonte:** pasta do Google Drive "Imagens BracerumPark Finalizadas" (id `1CETdiYdL13Jhh2twQe6kAF10yvMt1YF6`),
   51 renders PNG 1672×941 com nome genérico ("Imagem do Codex …"), seis deles repetidos. Os originais
