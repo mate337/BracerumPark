@@ -21,7 +21,7 @@ ASU = (-25.2400, -57.5191)           # Aeroporto Internacional Silvio Pettirossi
 ASUNCION = (-25.2867, -57.6470)
 
 BASE = 5.0                       # 100% = caminho principal Terport–Villeta–Park
-WEIGHT = {"main": 1.0, "border": 0.5, "road1": 0.7, "road2": 0.3}
+WEIGHT = {"main": 1.5, "border": 0.5, "road1": 0.7, "road2": 0.3}
 OPAC = {"main": 1, "border": .45, "road1": .85, "road2": .6}
 BORDER_LEVELS = {2, 4, 8}        # país, departamento/província, distrito/município
 
