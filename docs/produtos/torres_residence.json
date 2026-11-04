@@ -3,6 +3,7 @@
  "torres": [
   {
    "torre": "T01",
+   "codigo_bloco": "40101",
    "tipologia": "3 quartos",
    "x": 1846.5,
    "y": 638.9,
@@ -24,6 +25,7 @@
   },
   {
    "torre": "T02",
+   "codigo_bloco": "40102",
    "tipologia": "3 quartos",
    "x": 1884.5,
    "y": 638.9,
@@ -45,6 +47,7 @@
   },
   {
    "torre": "T03",
+   "codigo_bloco": "40103",
    "tipologia": "3 quartos",
    "x": 1922.6,
    "y": 638.9,
@@ -66,6 +69,7 @@
   },
   {
    "torre": "T04",
+   "codigo_bloco": "40104",
    "tipologia": "3 quartos",
    "x": 1960.4,
    "y": 638.9,
@@ -87,6 +91,7 @@
   },
   {
    "torre": "T05",
+   "codigo_bloco": "40105",
    "tipologia": "3 quartos",
    "x": 1998.5,
    "y": 638.9,
@@ -108,6 +113,7 @@
   },
   {
    "torre": "T06",
+   "codigo_bloco": "40106",
    "tipologia": "3 quartos",
    "x": 2036.5,
    "y": 638.9,
@@ -129,6 +135,7 @@
   },
   {
    "torre": "T07",
+   "codigo_bloco": "40107",
    "tipologia": "3 quartos",
    "x": 1846.5,
    "y": 679.1,
@@ -150,6 +157,7 @@
   },
   {
    "torre": "T08",
+   "codigo_bloco": "40108",
    "tipologia": "3 quartos",
    "x": 2010.1,
    "y": 679.1,
@@ -171,6 +179,7 @@
   },
   {
    "torre": "T09",
+   "codigo_bloco": "40109",
    "tipologia": "3 quartos",
    "x": 1846.4,
    "y": 719.4,
@@ -192,6 +201,7 @@
   },
   {
    "torre": "T10",
+   "codigo_bloco": "40110",
    "tipologia": "3 quartos",
    "x": 1884.5,
    "y": 719.3,
@@ -213,6 +223,7 @@
   },
   {
    "torre": "T11",
+   "codigo_bloco": "40111",
    "tipologia": "3 quartos",
    "x": 1922.5,
    "y": 719.2,
@@ -234,6 +245,7 @@
   },
   {
    "torre": "T12",
+   "codigo_bloco": "40112",
    "tipologia": "3 quartos",
    "x": 1960.4,
    "y": 719.4,
@@ -255,6 +267,7 @@
   },
   {
    "torre": "T13",
+   "codigo_bloco": "40113",
    "tipologia": "2 quartos",
    "x": 1963.7,
    "y": 358.5,
@@ -276,6 +289,7 @@
   },
   {
    "torre": "T14",
+   "codigo_bloco": "40114",
    "tipologia": "2 quartos",
    "x": 2001.7,
    "y": 358.3,
@@ -297,6 +311,7 @@
   },
   {
    "torre": "T15",
+   "codigo_bloco": "40115",
    "tipologia": "2 quartos",
    "x": 2039.9,
    "y": 358.5,
@@ -318,6 +333,7 @@
   },
   {
    "torre": "T16",
+   "codigo_bloco": "40116",
    "tipologia": "2 quartos",
    "x": 1963.7,
    "y": 396.7,
@@ -339,6 +355,7 @@
   },
   {
    "torre": "T17",
+   "codigo_bloco": "40117",
    "tipologia": "2 quartos",
    "x": 2039.8,
    "y": 396.7,
@@ -360,6 +377,7 @@
   },
   {
    "torre": "T18",
+   "codigo_bloco": "40118",
    "tipologia": "2 quartos",
    "x": 1963.7,
    "y": 435.2,
@@ -381,6 +399,7 @@
   },
   {
    "torre": "T19",
+   "codigo_bloco": "40119",
    "tipologia": "2 quartos",
    "x": 2001.8,
    "y": 435.4,
@@ -402,6 +421,7 @@
   },
   {
    "torre": "T20",
+   "codigo_bloco": "40120",
    "tipologia": "2 quartos",
    "x": 2039.8,
    "y": 435.6,
@@ -423,6 +443,7 @@
   },
   {
    "torre": "T21",
+   "codigo_bloco": "40121",
    "tipologia": "2 quartos",
    "x": 1839.8,
    "y": 493.3,
@@ -444,6 +465,7 @@
   },
   {
    "torre": "T22",
+   "codigo_bloco": "40122",
    "tipologia": "2 quartos",
    "x": 1877.9,
    "y": 493.3,
@@ -465,6 +487,7 @@
   },
   {
    "torre": "T23",
+   "codigo_bloco": "40123",
    "tipologia": "2 quartos",
    "x": 1915.9,
    "y": 493.3,
@@ -486,6 +509,7 @@
   },
   {
    "torre": "T24",
+   "codigo_bloco": "40124",
    "tipologia": "2 quartos",
    "x": 1963.7,
    "y": 493.2,
@@ -507,6 +531,7 @@
   },
   {
    "torre": "T25",
+   "codigo_bloco": "40125",
    "tipologia": "2 quartos",
    "x": 2001.8,
    "y": 493.2,
@@ -528,6 +553,7 @@
   },
   {
    "torre": "T26",
+   "codigo_bloco": "40126",
    "tipologia": "2 quartos",
    "x": 2039.8,
    "y": 493.3,
@@ -549,6 +575,7 @@
   },
   {
    "torre": "T27",
+   "codigo_bloco": "40127",
    "tipologia": "2 quartos",
    "x": 2087.8,
    "y": 493.3,
@@ -570,6 +597,7 @@
   },
   {
    "torre": "T28",
+   "codigo_bloco": "40128",
    "tipologia": "2 quartos",
    "x": 2125.6,
    "y": 493.3,
@@ -591,6 +619,7 @@
   },
   {
    "torre": "T29",
+   "codigo_bloco": "40129",
    "tipologia": "2 quartos",
    "x": 2163.7,
    "y": 493.3,
@@ -612,6 +641,7 @@
   },
   {
    "torre": "T30",
+   "codigo_bloco": "40130",
    "tipologia": "2 quartos",
    "x": 1839.9,
    "y": 531.6,
@@ -633,6 +663,7 @@
   },
   {
    "torre": "T31",
+   "codigo_bloco": "40131",
    "tipologia": "2 quartos",
    "x": 1915.9,
    "y": 531.6,
@@ -654,6 +685,7 @@
   },
   {
    "torre": "T32",
+   "codigo_bloco": "40132",
    "tipologia": "2 quartos",
    "x": 1963.7,
    "y": 531.6,
@@ -675,6 +707,7 @@
   },
   {
    "torre": "T33",
+   "codigo_bloco": "40133",
    "tipologia": "2 quartos",
    "x": 2039.8,
    "y": 531.6,
@@ -696,6 +729,7 @@
   },
   {
    "torre": "T34",
+   "codigo_bloco": "40134",
    "tipologia": "2 quartos",
    "x": 2087.7,
    "y": 531.6,
@@ -717,6 +751,7 @@
   },
   {
    "torre": "T35",
+   "codigo_bloco": "40135",
    "tipologia": "2 quartos",
    "x": 2163.7,
    "y": 531.6,
@@ -738,6 +773,7 @@
   },
   {
    "torre": "T36",
+   "codigo_bloco": "40136",
    "tipologia": "2 quartos",
    "x": 1839.9,
    "y": 570.7,
@@ -759,6 +795,7 @@
   },
   {
    "torre": "T37",
+   "codigo_bloco": "40137",
    "tipologia": "2 quartos",
    "x": 1877.8,
    "y": 570.6,
@@ -780,6 +817,7 @@
   },
   {
    "torre": "T38",
+   "codigo_bloco": "40138",
    "tipologia": "2 quartos",
    "x": 1915.9,
    "y": 570.4,
@@ -801,6 +839,7 @@
   },
   {
    "torre": "T39",
+   "codigo_bloco": "40139",
    "tipologia": "2 quartos",
    "x": 1963.6,
    "y": 570.4,
@@ -822,6 +861,7 @@
   },
   {
    "torre": "T40",
+   "codigo_bloco": "40140",
    "tipologia": "2 quartos",
    "x": 2001.8,
    "y": 570.4,
@@ -843,6 +883,7 @@
   },
   {
    "torre": "T41",
+   "codigo_bloco": "40141",
    "tipologia": "2 quartos",
    "x": 2039.8,
    "y": 570.4,
@@ -864,6 +905,7 @@
   },
   {
    "torre": "T42",
+   "codigo_bloco": "40142",
    "tipologia": "2 quartos",
    "x": 2087.8,
    "y": 570.4,
@@ -885,6 +927,7 @@
   },
   {
    "torre": "T43",
+   "codigo_bloco": "40143",
    "tipologia": "2 quartos",
    "x": 2125.7,
    "y": 570.4,
@@ -906,6 +949,7 @@
   },
   {
    "torre": "T44",
+   "codigo_bloco": "40144",
    "tipologia": "2 quartos",
    "x": 1710.0,
    "y": 640.8,
@@ -927,6 +971,7 @@
   },
   {
    "torre": "T45",
+   "codigo_bloco": "40145",
    "tipologia": "2 quartos",
    "x": 1748.1,
    "y": 640.8,
@@ -948,6 +993,7 @@
   },
   {
    "torre": "T46",
+   "codigo_bloco": "40146",
    "tipologia": "2 quartos",
    "x": 1785.9,
    "y": 641.0,
@@ -969,6 +1015,7 @@
   },
   {
    "torre": "T47",
+   "codigo_bloco": "40147",
    "tipologia": "2 quartos",
    "x": 1710.0,
    "y": 679.2,
@@ -990,6 +1037,7 @@
   },
   {
    "torre": "T48",
+   "codigo_bloco": "40148",
    "tipologia": "2 quartos",
    "x": 1785.9,
    "y": 679.2,
@@ -1011,6 +1059,7 @@
   },
   {
    "torre": "T49",
+   "codigo_bloco": "40149",
    "tipologia": "2 quartos",
    "x": 1710.0,
    "y": 717.7,
@@ -1032,6 +1081,7 @@
   },
   {
    "torre": "T50",
+   "codigo_bloco": "40150",
    "tipologia": "2 quartos",
    "x": 1748.0,
    "y": 717.7,
@@ -1053,6 +1103,7 @@
   },
   {
    "torre": "T51",
+   "codigo_bloco": "40151",
    "tipologia": "2 quartos",
    "x": 1785.9,
    "y": 717.5,
@@ -1074,6 +1125,7 @@
   },
   {
    "torre": "T52",
+   "codigo_bloco": "40152",
    "tipologia": "1 quarto",
    "x": 1850.0,
    "y": 256.7,
@@ -1095,6 +1147,7 @@
   },
   {
    "torre": "T53",
+   "codigo_bloco": "40153",
    "tipologia": "1 quarto",
    "x": 1905.8,
    "y": 256.7,
@@ -1116,6 +1169,7 @@
   },
   {
    "torre": "T54",
+   "codigo_bloco": "40154",
    "tipologia": "1 quarto",
    "x": 1973.8,
    "y": 256.7,
@@ -1137,6 +1191,7 @@
   },
   {
    "torre": "T55",
+   "codigo_bloco": "40155",
    "tipologia": "1 quarto",
    "x": 2029.7,
    "y": 256.7,
@@ -1158,6 +1213,7 @@
   },
   {
    "torre": "T56",
+   "codigo_bloco": "40156",
    "tipologia": "1 quarto",
    "x": 1877.7,
    "y": 281.3,
@@ -1179,6 +1235,7 @@
   },
   {
    "torre": "T57",
+   "codigo_bloco": "40157",
    "tipologia": "1 quarto",
    "x": 2001.7,
    "y": 281.7,
@@ -1200,6 +1257,7 @@
   },
   {
    "torre": "T58",
+   "codigo_bloco": "40158",
    "tipologia": "1 quarto",
    "x": 1850.0,
    "y": 305.0,
@@ -1221,6 +1279,7 @@
   },
   {
    "torre": "T59",
+   "codigo_bloco": "40159",
    "tipologia": "1 quarto",
    "x": 1905.9,
    "y": 305.0,
@@ -1242,6 +1301,7 @@
   },
   {
    "torre": "T60",
+   "codigo_bloco": "40160",
    "tipologia": "1 quarto",
    "x": 1973.8,
    "y": 305.0,
@@ -1263,6 +1323,7 @@
   },
   {
    "torre": "T61",
+   "codigo_bloco": "40161",
    "tipologia": "1 quarto",
    "x": 2029.5,
    "y": 305.1,
@@ -1284,6 +1345,7 @@
   },
   {
    "torre": "T62",
+   "codigo_bloco": "40162",
    "tipologia": "1 quarto",
    "x": 1850.0,
    "y": 352.0,
@@ -1305,6 +1367,7 @@
   },
   {
    "torre": "T63",
+   "codigo_bloco": "40163",
    "tipologia": "1 quarto",
    "x": 1905.8,
    "y": 352.0,
@@ -1326,6 +1389,7 @@
   },
   {
    "torre": "T64",
+   "codigo_bloco": "40164",
    "tipologia": "1 quarto",
    "x": 1846.9,
    "y": 401.6,
@@ -1347,6 +1411,7 @@
   },
   {
    "torre": "T65",
+   "codigo_bloco": "40165",
    "tipologia": "1 quarto",
    "x": 1908.5,
    "y": 391.5,
@@ -1368,6 +1433,7 @@
   },
   {
    "torre": "T66",
+   "codigo_bloco": "40166",
    "tipologia": "1 quarto",
    "x": 1850.2,
    "y": 440.7,
@@ -1389,6 +1455,7 @@
   },
   {
    "torre": "T67",
+   "codigo_bloco": "40167",
    "tipologia": "1 quarto",
    "x": 1905.7,
    "y": 440.7,

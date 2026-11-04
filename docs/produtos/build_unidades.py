@@ -33,6 +33,7 @@ PRECOS = os.path.join(ROOT, '3dmasterplan', 'data', 'precos.json')
 MODELO = os.path.join(AQUI, 'modelo_empreendimentos_unidades.csv')
 SAIDA = os.path.join(AQUI, 'empreendimentos_unidades_bracerum.csv')
 SAIDA_TORRES = os.path.join(AQUI, 'torres_residence.json')
+SAIDA_CODIGOS = os.path.join(AQUI, 'registro_codigos.csv')
 
 LAT_PARK = -25.7715                                   # PARK do build_refs.py (base do KX)
 KY = 110540
@@ -49,6 +50,33 @@ TIPO = {  # pé-direito comercial de cada tipologia
 VOL_TIPO = {'3 quartos': lambda v, a: v['t'] == 'torre' and a > 330,
             '2 quartos': lambda v, a: v['t'] == 'torre' and a <= 330,
             '1 quarto': lambda v, a: v['t'] == 'torre1'}
+
+
+# --- Padrão de códigos (docs/padrao-de-codigos.md): [categoria 1][subcategoria 2][número 4] ----------
+CATEGORIAS = {1: 'Hotel', 2: 'Cidade', 3: 'Loteamento', 4: 'Condomínios'}
+SUBCATEGORIAS = {
+    (1, 0): 'Bracerum Hotel',                     # número = andar 2 + unidade 2
+    (2, 1): 'Bracerum Market',                    # número = loja
+    (3, 1): 'Outlet Premium', (3, 2): 'Lotes industriais', (3, 3): 'Hangares',
+    (4, 1): 'Bracerum Residence', (4, 2): 'Bracerum Resort',
+}
+
+
+def codigo(cat, sub, num):
+    """Código de 7 dígitos. `num` é o número de 4 dígitos já montado (ex.: quadra 07 + lote 14 = 714)."""
+    assert (cat, sub) in SUBCATEGORIAS, (cat, sub)
+    assert 0 < num <= 9999, num
+    return f'{cat}{sub:02d}{num:04d}'
+
+
+def cod_residence(torre, andar, apto):         # T07, 3º andar, apto 02 → 4010732
+    assert 1 <= torre <= 99 and 1 <= andar <= 9 and 1 <= apto <= 9
+    return codigo(4, 1, torre * 100 + andar * 10 + apto)
+
+
+def cod_lote(q, l):                             # Q07.L014 → 3020714
+    assert 1 <= q <= 99 and 1 <= l <= 99
+    return codigo(3, 2, q * 100 + l)
 
 
 def preco_apto(area, cobertura):
@@ -103,7 +131,7 @@ def torres(cena):
         assert len(lista) == len(faixa), f'{k}: {len(lista)} torres na planta, {len(faixa)} no kit'
         lista.sort(key=lambda t: (round(t[0][1] / 20), t[0][0]))     # linha da prancha, depois coluna
         for n, ((x, y), a) in zip(faixa, lista):
-            out.append(dict(torre=f'T{n:02d}', tipologia=k, x=round(x, 1), y=round(y, 1), projecao_m2=round(a)))
+            out.append(dict(torre=f'T{n:02d}', codigo_bloco=f'401{n:02d}', tipologia=k, x=round(x, 1), y=round(y, 1), projecao_m2=round(a)))
     return sorted(out, key=lambda t: t['torre'])
 
 
@@ -112,7 +140,8 @@ def apartamentos(torre):
     for andar in range(1, 5):
         cob = andar == 4
         for i, area in enumerate(t['areas'], 1):
-            yield dict(codigo=f"RES {torre['torre']} – {andar}{i:02d}", apto=f'{andar}{i:02d}', andar=andar, coluna=i,
+            yield dict(cod7=cod_residence(int(torre['torre'][1:]), andar, i),
+                       codigo=f"RES {torre['torre']} – {andar}{i:02d}", apto=f'{andar}{i:02d}', andar=andar, coluna=i,
                        cobertura=cob, area=area, terraco=area if cob else 0.0, preco=preco_apto(area, cob))
 
 
@@ -157,6 +186,8 @@ def main():
         'Empreendimento Legado/Novo (Empreendimento)': 'Novo',
     }
 
+    registro = []                                     # todo código gerado, para o registro e a checagem
+
     # ---------------------------------------------------------------- Residence
     T = torres(cena)
     vgv, aptos = 0, []
@@ -167,6 +198,8 @@ def main():
         t['vgv'] = 0
         for a in apartamentos(t):
             aptos.append(a)
+            registro.append(dict(codigo=a['cod7'], cat=4, sub=1, nome=a['codigo'], ref=f"{t['torre']}-{a['apto']}",
+                                 lat=lat, lon=lon))
             t['vgv'] += a['preco']
             vgv += a['preco']
             vc, vd = tp['vagas']
@@ -176,7 +209,8 @@ def main():
                 'Segmento (Empreendimento)': 'Residencial', 'Tipo (Empreendimento)': 'Condomínio vertical',
                 'Área privativa (Empreendimento)': br(79927.84),
                 'Nome (Etapa)': 'Pré-lançamento (fases a definir)',
-                'Nome (Bloco)': f"Torre {t['torre']}", 'Código interno (Bloco)': t['torre'],
+                'Código interno (Empreendimento)': '401', 'Código interno (Etapa)': '401',
+                'Nome (Bloco)': f"Torre {t['torre']}", 'Código interno (Bloco)': a['cod7'][:5],
                 'Nome (Unidade)': a['codigo'], 'Andar (Unidade)': str(a['andar']),
                 'Descrição do andar (Unidade)': '4º andar (cobertura)' if a['cobertura'] else f"{a['andar']}º andar",
                 'Coluna (Unidade)': f"{a['coluna']:02d}", 'Posição (Unidade)': a['apto'],
@@ -187,7 +221,7 @@ def main():
                 'Área privativa total (Unidade)': br(a['area'] + a['terraco']),
                 'Valor (Unidade)': br(a['preco']), 'Valor VGV (Unidade)': br(a['preco']),
                 'Tipo (Unidade)': 'Apartamento',
-                'Código interno (Unidade)': a['codigo'],
+                'Código interno (Unidade)': a['cod7'],
                 'Referência Ordenação (Unidade)': f"{t['torre']}-{a['apto']}",
                 'Descrição do Lote (Unidade)': (f"{tp['quartos']} quarto(s), {tp['suites']} suíte(s); vagas: {vc} coberta"
                                                 + (f" + {vd} descoberta" if vd else '')
@@ -212,19 +246,45 @@ def main():
         vgv_lotes += valor
         x, y = centro(l['p'])
         lat, lon = geo.latlon(x, y)
+        q, n = l['id'].split('.L')
+        c7 = cod_lote(int(q[1:]), int(n))
+        registro.append(dict(codigo=c7, cat=3, sub=2, nome=l['nome'], ref=l['id'], lat=lat, lon=lon))
         linha(**comum, **{
             'Nome (Empreendimento)': 'Bracerum Park — Lotes industriais', 'Sigla (Empreendimento)': 'LTIND',
             'Situação Comercial (Empreendimento)': 'Em vendas', 'Situação da Obra (Empreendimento)': 'Não iniciada',
             'Segmento (Empreendimento)': 'Industrial', 'Tipo (Empreendimento)': 'Loteamento industrial',
-            'Nome (Etapa)': 'Fase 1', 'Nome (Bloco)': f"Quadra {l['q']}", 'Código interno (Bloco)': l['q'],
+            'Código interno (Empreendimento)': '302', 'Código interno (Etapa)': '302',
+            'Nome (Etapa)': 'Fase 1', 'Nome (Bloco)': f"Quadra {l['q']}", 'Código interno (Bloco)': c7[:5],
             'Nome (Unidade)': 'LTIND.' + l['id'], 'Tipologia (Unidade)': cats[l['cat']]['nome']['pt'],
             'Área do terreno (Unidade)': br(l['a']), 'Área total (Unidade)': br(l['a']),
             'Valor (Unidade)': br(valor), 'Valor VGV (Unidade)': br(valor), 'Tipo (Unidade)': 'Lote',
-            'Código interno (Unidade)': l['nome'], 'Referência Ordenação (Unidade)': l['id'],
-            'Descrição do Lote (Unidade)': (f"{cats[l['cat']]['nome']['pt']} (×{cats[l['cat']]['fator']}) · "
+            'Código interno (Unidade)': c7, 'Referência Ordenação (Unidade)': l['id'],
+            'Descrição do Lote (Unidade)': (f"{l['nome']} · {cats[l['cat']]['nome']['pt']} (×{cats[l['cat']]['fator']}) · "
                                             f"US$ {pm}/m² — janela {jan['curto']['pt']}, 1 a 8 lotes, 20% + 12x"),
             'Latitude (Unidade)': f"{lat:.6f}", 'Longitude (Unidade)': f"{lon:.6f}",
         })
+
+    # ---------------------------------------------------------------- só código (sem preço ainda)
+    # Hangares (7, ao longo do pátio do aeroporto) e casas do Resort (31 lotes): numeração = PROPOSTA,
+    # na ordem de leitura da prancha. Entram no registro, não no CSV do CRM (não há preço).
+    for sub, tag, nome in ((3, 'hangar', 'Hangar {:02d}'), (2, 'casa', 'Resort — lote {:02d}')):
+        cat = 3 if tag == 'hangar' else 4
+        vs = sorted((centro(v['p']) for v in cena['vol'] if v['t'] == tag), key=lambda c: (round(c[1] / 20), c[0]))
+        for n, (x, y) in enumerate(vs, 1):
+            lat, lon = geo.latlon(x, y)
+            registro.append(dict(codigo=codigo(cat, sub, n), cat=cat, sub=sub, nome=nome.format(n), ref='proposta',
+                                 lat=lat, lon=lon))
+
+    cods = [r['codigo'] for r in registro]
+    assert len(cods) == len(set(cods)), 'código repetido'
+    assert all(len(c) == 7 and c.isdigit() for c in cods)
+    with open(SAIDA_CODIGOS, 'w', encoding='utf-8-sig', newline='') as f:
+        w = csv.writer(f, delimiter=';', lineterminator='\r\n')
+        w.writerow(['Código', 'Categoria', 'Subcategoria', 'Unidade', 'Referência', 'Latitude', 'Longitude'])
+        for r in sorted(registro, key=lambda r: r['codigo']):
+            w.writerow([r['codigo'], f"{r['cat']} {CATEGORIAS[r['cat']]}", f"{r['sub']:02d} {SUBCATEGORIAS[(r['cat'], r['sub'])]}",
+                        r['nome'], r['ref'], f"{r['lat']:.6f}", f"{r['lon']:.6f}"])
+    print('Códigos:', dict(Counter(f"{r['cat']}{r['sub']:02d}" for r in registro)), '→', os.path.relpath(SAIDA_CODIGOS, ROOT))
 
     with open(SAIDA, 'w', encoding='utf-8-sig', newline='') as f:
         w = csv.writer(f, delimiter=';', lineterminator='\r\n')

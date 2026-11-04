@@ -147,6 +147,9 @@ creche e posto de saúde no entorno", "indústrias a 5 minutos"): tudo fica a me
 
 ## 6. CSV de unidades para o CRM
 
+**Códigos:** cada unidade leva o código de 7 dígitos do padrão em `docs/padrao-de-codigos.md`
+(`4010732` = Residence T07 apto 302; `3020714` = lote Q07.L014), na coluna `Código interno`.
+
 `docs/produtos/build_unidades.py` gera **`docs/produtos/empreendimentos_unidades_bracerum.csv`** no
 formato exato do modelo enviado (mesmas 126 colunas, `;`, UTF-8 com BOM, vírgula decimal), com
 **1.815 unidades**: 1.200 apartamentos + 615 lotes. Cada linha leva **o preço e a latitude/longitude**
