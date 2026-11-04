@@ -15,7 +15,7 @@ rotas) que as seis páginas internas baixavam e interpretavam à toa. Ele roda d
   estático, com ou sem barra final — os caminhos são relativos `../`). O site é servido pela **Vercel a partir do
   `main`**, que reúne o site, o linktree e a maquete `3dmasterplan/` (até 2026-11-04 a maquete só existia no
   branch `claude/zealous-shannon-p20inw` e sumiu do ar quando o `main` foi publicado — **o que for ao ar tem que
-  passar pelo `main`**, senão uma publicação apaga a outra); o `vercel.json` só garante `/linktree` sem barra (o arquivo do site continua servido como está). Quatro grupos pedidos pelo cliente:
+  passar pelo `main`**, senão uma publicação apaga a outra); o `vercel.json` garante `/linktree` sem barra e redireciona `/3dmasterplan` e `/3DMasterplan` para `/3dmasterplan/` (o arquivo do site continua servido como está). Quatro grupos pedidos pelo cliente:
   **01 Site** (cartão com foto + atalhos Masterplan/Tributação/Hotel/Resort/Select), **02 WhatsApp**
   (Cleber · PY e Sydney · BR, mensagem pré-preenchida no idioma ativo), **03 Redes sociais** e
   **04 Localização** (Google Maps + o mapa logístico da home).

@@ -1,4 +1,9 @@
 {
+  "redirects": [
+    { "source": "/3dmasterplan", "destination": "/3dmasterplan/", "permanent": true },
+    { "source": "/3DMasterplan", "destination": "/3dmasterplan/", "permanent": true },
+    { "source": "/3DMasterplan/", "destination": "/3dmasterplan/", "permanent": true }
+  ],
   "rewrites": [
     { "source": "/linktree", "destination": "/linktree/index.html" }
   ]
