@@ -127,7 +127,11 @@ rotas) que as seis páginas internas baixavam e interpretavam à toa. Ele roda d
   maquete calcula o valor de cada lote e de simulações; os dez exemplos da tabela conferem. **Os galpões
   ilustrativos ficam visíveis no modo de lotes** (pedido do cliente em 2026-10-20). Preços em
   `3dmasterplan/data/precos.json` (editar à mão quando sair tabela nova); lotes gerados por
-  `docs/3dmasterplan/build_lotes.py`.
+  `docs/3dmasterplan/build_lotes.py`. **Condição-base = 20% de sinal + 12 parcelas mensais** (o
+  preço de tabela); à vista = base −8%, 20% + 36x = base +8%, arredondados ao dólar por m² — no
+  `precos.json` cada trio é `[12x, vista, 36x]`. Planilha de consulta com as três condições, as
+  regras da compra, a tabela completa e um simulador:
+  `docs/lotes-p1/Bracerum_Park_P1_Condicoes_de_Pagamento_e_Precos.xlsx` (conferida com o PDF).
 - **Lotes do V14 (2026-10-29).** O `build_lotes.py` agora lê os **nomes oficiais escritos no PDF do V14**
   (`LTIND.Qxx.Lyyy.A0xxxx.ESQ….FORMA.FRENTES`): **615 lotes, 766.693 m²**, todas as áreas de contrato
   (nada mais medido com ≈) — bate com o quadro do V14. A Q38 juntou-se à Q39 (13 → 17 lotes) e a Q11
