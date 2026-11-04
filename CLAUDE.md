@@ -28,6 +28,24 @@ rotas) que as seis páginas internas baixavam e interpretavam à toa. Ele roda d
   `@bracerumpark`, Facebook (`profile.php?id=61594419791801`) e LinkedIn (`company/bracerumpark`). Os
   Instagrams pessoais de Cleber e Sydney saíram do linktree (continuam no footer do site).
 
+### Produtos P5 Residence e P7-A Outlet × V14 (2026-11-04)
+- O cliente mandou o kit comercial do **Bracerum Residence (P5)** — apresentação, tabela por tipologia,
+  tabela apto a apto, simulador e Controle de Unidades internos — e do **Bracerum Outlet (P7-A)** —
+  apresentação e guia de vendas —, mais o modelo de **carta de reserva** bilíngue e o **modelo de CSV
+  de unidades do CRM**. Registro, conferência e divergências em **`docs/produtos-residence-outlet.md`**.
+- **Os originais não vão para o repositório:** a Vercel publica o repo inteiro (inclusive `docs/`), e
+  simulador, Controle e contrato são "uso interno".
+- Residence = o "Bracerum Condo" da planta: 1.200 aptos, 67 torres, **VGV de tabela US$ 103.144.800**,
+  preço = arred. 50 (área × 1.150 + terraço × 460 + 6.800 nas coberturas); Controle e tabela apto a
+  apto batem nas 1.200 linhas. Outlet: ABL ≈ 35.514 m² em 3 fases, ativo US$ 33–50 mi; sem planta de
+  lojas.
+- **`docs/produtos/build_unidades.py`** gera `empreendimentos_unidades_bracerum.csv` (formato do CRM,
+  1.200 aptos + 615 lotes, com preço e lat/lon) e `torres_residence.json`. **A numeração T01–T67 no
+  mapa é proposta** (o kit não diz onde fica cada torre). Rodar de novo quando a janela de preço dos
+  lotes virar.
+- A maquete ainda mostra as torres de 1 quarto com 6 pavimentos (o P5 diz 4) e chama o produto de
+  "Condo" — corrigir quando ela for revista (§4 do documento).
+
 ### Masterplan V14 — planta mais nova, base da maquete 3D (2026-10-29)
 - **O cliente enviou o "Masterplan BRACERUM PARK V14 — 28/10/2026 — lotes identificados"** (mesma
   prancha e mesmas coordenadas do V12, com o **nome oficial de cada lote** escrito dentro dele:
