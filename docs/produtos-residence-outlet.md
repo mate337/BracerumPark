@@ -150,10 +150,11 @@ creche e posto de saúde no entorno", "indústrias a 5 minutos"): tudo fica a me
 **Códigos:** cada unidade leva o código de 7 dígitos do padrão em `docs/padrao-de-codigos.md`
 (`4010732` = Residence T07 apto 302; `3020714` = lote Q07.L014), na coluna `Código interno`.
 
-`docs/produtos/build_unidades.py` gera **`docs/produtos/empreendimentos_unidades_bracerum.csv`** no
-formato exato do modelo enviado (mesmas 126 colunas, `;`, UTF-8 com BOM, vírgula decimal), com
-**1.815 unidades**: 1.200 apartamentos + 615 lotes. Cada linha leva **o preço e a latitude/longitude**
-da unidade. Também gera `docs/produtos/torres_residence.json` (torre, tipologia, posição, VGV e
+`docs/produtos/build_unidades.py` gera **um CSV por categoria** (`docs/produtos/unidades_1_hotel.csv`
+a `unidades_4_condominios.csv`, lista no `docs/padrao-de-codigos.md`) no formato exato do modelo
+enviado (mesmas 126 colunas, `;`, UTF-8 com BOM, vírgula decimal), com **2.269 unidades**. Os 1.200
+apartamentos e os 615 lotes industriais levam **preço e latitude/longitude**; Hotel, Market, hangares,
+Hub, Resort e os lotes fora da oferta levam local, sem preço. Também gera `docs/produtos/torres_residence.json` (torre, tipologia, posição, VGV e
 distâncias da tabela do §1).
 
 - **Residence:** Empreendimento = Bracerum Residence (sigla RES) · Etapa = pré-lançamento · Bloco =
@@ -164,7 +165,7 @@ distâncias da tabela do §1).
   em que o script roda** (1 a 8 lotes, 20% + 12x). Lat/lon = centro do lote. Rodar de novo quando a
   janela virar (14/11/2026 e 01/04/2027).
 - **Em branco de propósito** (o CRM pede, os arquivos não trazem): matrícula/finca, CEP, datas de
-  lançamento e entrega, centro de custo, percentuais de participação, situação "ativo no painel".
+  lançamento e entrega, centro de custo, percentuais de participação.
 - **⚠️ Numeração das torres no mapa é proposta.** O kit só diz T01–T12 = 3q, T13–T51 = 2q, T52–T67 =
   1q; não diz onde fica cada uma. O script numera, dentro de cada tipologia, na ordem de leitura da
   prancha (de cima para baixo, da esquerda para a direita). Lat/lon de cada apto depende disso. Trocar

@@ -39,16 +39,18 @@ rotas) que as seis páginas internas baixavam e interpretavam à toa. Ele roda d
   preço = arred. 50 (área × 1.150 + terraço × 460 + 6.800 nas coberturas); Controle e tabela apto a
   apto batem nas 1.200 linhas. Outlet: ABL ≈ 35.514 m² em 3 fases, ativo US$ 33–50 mi; sem planta de
   lojas.
-- **`docs/produtos/build_unidades.py`** gera `empreendimentos_unidades_bracerum.csv` (formato do CRM,
-  1.200 aptos + 615 lotes, com preço e lat/lon) e `torres_residence.json`. **A numeração T01–T67 no
+- **`docs/produtos/build_unidades.py`** gera **um CSV do CRM por categoria** (`unidades_1_hotel.csv`
+  384 · `_2_cidade` 13 · `_3_loteamento` 641 · `_4_condominios` 1.231; preço só em Residence e lotes
+  industriais) e `torres_residence.json`. Lê o PDF do V14 (`pdftotext -bbox`) para Resort, hangares,
+  LJ1–LJ12, Q37 e Q11. **O Hotel é provisório** (12 andares × 32 studios estimados). **A numeração T01–T67 no
   mapa é proposta** (o kit não diz onde fica cada torre). Rodar de novo quando a janela de preço dos
   lotes virar.
 - **Padrão de códigos (2026-11-04): `docs/padrao-de-codigos.md`.** 7 dígitos = categoria (1 Hotel ·
   2 Cidade · 3 Loteamento · 4 Condomínios) + subcategoria (2) + número (4). Ex.: `1000101` Hotel andar
   01 unid. 01 · `3010005` Outlet Premium loja 05 · `3020714` lote Q07.L014 · `3030007` hangar 07 ·
-  `4010732` Residence T07 apto 302 · `4020012` Resort lote 12. Hangar é subcategoria do Loteamento
-  (não há categoria própria). O código nunca muda nem é reaproveitado. Registro completo (1.853
-  códigos) em `docs/produtos/registro_codigos.csv`, gerado pelo `build_unidades.py`.
+  `4010732` Residence T07 apto 302 · `4020412` Resort LT.RES.Q04.L12 · `3040003` Hub lote 03 ·
+  `2010013` supermercado. Hangar é subcategoria do Loteamento (não há categoria própria). O código
+  nunca muda nem é reaproveitado. Registro completo (2.269 códigos) em `docs/produtos/registro_codigos.csv`, gerado pelo `build_unidades.py`.
 - A maquete ainda mostra as torres de 1 quarto com 6 pavimentos (o P5 diz 4) e chama o produto de
   "Condo" — corrigir quando ela for revista (§4 do documento).
 

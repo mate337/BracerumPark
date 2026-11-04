@@ -22,7 +22,7 @@ direita). Trocar quando o cliente mandar a planta numerada.
 Uso:  python3 docs/produtos/build_unidades.py [--controle Controle_Unidades_...xlsx]
       (--controle confere cada apartamento contra o Controle interno, se ele estiver à mão)
 """
-import argparse, csv, datetime, json, math, os, sys
+import argparse, csv, datetime, glob, json, math, os, re, subprocess, sys
 from collections import Counter
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
@@ -31,7 +31,10 @@ SCENE = os.path.join(ROOT, '3dmasterplan', 'data', 'scene.json')
 LOTES = os.path.join(ROOT, '3dmasterplan', 'data', 'lotes.json')
 PRECOS = os.path.join(ROOT, '3dmasterplan', 'data', 'precos.json')
 MODELO = os.path.join(AQUI, 'modelo_empreendimentos_unidades.csv')
-SAIDA = os.path.join(AQUI, 'empreendimentos_unidades_bracerum.csv')
+PDF_V14 = (glob.glob(os.path.join(ROOT, 'docs', 'masterplan-v14', '*.pdf')) or [''])[0]
+SAIDAS = {1: 'unidades_1_hotel.csv', 2: 'unidades_2_cidade.csv', 3: 'unidades_3_loteamento.csv',
+          4: 'unidades_4_condominios.csv'}
+HOTEL_ANDARES, HOTEL_POR_ANDAR = 12, 32        # ESTIMATIVA: 30.000 m² ÷ lâmina de ~2.450 m² ≈ 12 pav.; 384 ÷ 12
 SAIDA_TORRES = os.path.join(AQUI, 'torres_residence.json')
 SAIDA_CODIGOS = os.path.join(AQUI, 'registro_codigos.csv')
 
@@ -57,7 +60,7 @@ CATEGORIAS = {1: 'Hotel', 2: 'Cidade', 3: 'Loteamento', 4: 'Condomínios'}
 SUBCATEGORIAS = {
     (1, 0): 'Bracerum Hotel',                     # número = andar 2 + unidade 2
     (2, 1): 'Bracerum Market',                    # número = loja
-    (3, 1): 'Outlet Premium', (3, 2): 'Lotes industriais', (3, 3): 'Hangares',
+    (3, 1): 'Outlet Premium', (3, 2): 'Lotes industriais', (3, 3): 'Hangares', (3, 4): 'Hub de serviços',
     (4, 1): 'Bracerum Residence', (4, 2): 'Bracerum Resort',
 }
 
@@ -77,6 +80,22 @@ def cod_residence(torre, andar, apto):         # T07, 3º andar, apto 02 → 401
 def cod_lote(q, l):                             # Q07.L014 → 3020714
     assert 1 <= q <= 99 and 1 <= l <= 99
     return codigo(3, 2, q * 100 + l)
+
+
+def rotulos_v14():
+    """Palavras do PDF do V14 com o centro em metros da prancha (1 pt a 1:1000 = 25,4/72 m)."""
+    if not PDF_V14:
+        sys.exit('falta docs/masterplan-v14/*.pdf')
+    t = subprocess.run(['pdftotext', '-bbox', PDF_V14, '-'], capture_output=True, text=True, check=True).stdout
+    k = 25.4 / 72
+    return [(w, (float(a) + float(c)) / 2 * k, (float(b) + float(d)) / 2 * k) for a, b, c, d, w in
+            re.findall(r'<word xMin="([\d.]+)" yMin="([\d.]+)" xMax="([\d.]+)" yMax="([\d.]+)">([^<]*)</word>', t)]
+
+
+def abaixo(rot, x, y, padrao, dmax=7):
+    """A palavra que casa com `padrao` logo abaixo de (x, y) — o rótulo de baixo de um par."""
+    c = [(abs(rx - x) + (ry - y), w) for w, rx, ry in rot if re.fullmatch(padrao, w) and 0 < ry - y < dmax and abs(rx - x) < 3]
+    return min(c)[1] if c else None
 
 
 def preco_apto(area, cobertura):
@@ -169,13 +188,13 @@ def main():
     geo = Geo(cena)
     cab = open(MODELO, encoding='utf-8-sig').read().strip().split(';')
     col = {nome: i for i, nome in enumerate(cab)}
-    linhas = []
+    linhas = {c: [] for c in SAIDAS}
 
-    def linha(**campos):
+    def linha(cat, **campos):
         r = [''] * len(cab)
         for k, v in campos.items():
             r[col[k]] = v
-        linhas.append(r)
+        linhas[cat].append(r)
 
     comum = {
         'Empresa (Empreendimento)': 'QATAR S.A. (Bracerum Park)',
@@ -203,7 +222,7 @@ def main():
             t['vgv'] += a['preco']
             vgv += a['preco']
             vc, vd = tp['vagas']
-            linha(**comum, **{
+            linha(4, **comum, **{
                 'Nome (Empreendimento)': 'Bracerum Residence', 'Sigla (Empreendimento)': 'RES',
                 'Situação Comercial (Empreendimento)': 'Pré-lançamento', 'Situação da Obra (Empreendimento)': 'Não iniciada',
                 'Segmento (Empreendimento)': 'Residencial', 'Tipo (Empreendimento)': 'Condomínio vertical',
@@ -220,7 +239,7 @@ def main():
                 'Outras áreas privativas (Unidade)': br(a['terraco']) if a['terraco'] else '',
                 'Área privativa total (Unidade)': br(a['area'] + a['terraco']),
                 'Valor (Unidade)': br(a['preco']), 'Valor VGV (Unidade)': br(a['preco']),
-                'Tipo (Unidade)': 'Apartamento',
+                'Tipo (Unidade)': 'Apartamento', 'Ativo no painel (Unidade)': 'Sim',
                 'Código interno (Unidade)': a['cod7'],
                 'Referência Ordenação (Unidade)': f"{t['torre']}-{a['apto']}",
                 'Descrição do Lote (Unidade)': (f"{tp['quartos']} quarto(s), {tp['suites']} suíte(s); vagas: {vc} coberta"
@@ -249,7 +268,7 @@ def main():
         q, n = l['id'].split('.L')
         c7 = cod_lote(int(q[1:]), int(n))
         registro.append(dict(codigo=c7, cat=3, sub=2, nome=l['nome'], ref=l['id'], lat=lat, lon=lon))
-        linha(**comum, **{
+        linha(3, **comum, **{
             'Nome (Empreendimento)': 'Bracerum Park — Lotes industriais', 'Sigla (Empreendimento)': 'LTIND',
             'Situação Comercial (Empreendimento)': 'Em vendas', 'Situação da Obra (Empreendimento)': 'Não iniciada',
             'Segmento (Empreendimento)': 'Industrial', 'Tipo (Empreendimento)': 'Loteamento industrial',
@@ -258,22 +277,151 @@ def main():
             'Nome (Unidade)': 'LTIND.' + l['id'], 'Tipologia (Unidade)': cats[l['cat']]['nome']['pt'],
             'Área do terreno (Unidade)': br(l['a']), 'Área total (Unidade)': br(l['a']),
             'Valor (Unidade)': br(valor), 'Valor VGV (Unidade)': br(valor), 'Tipo (Unidade)': 'Lote',
+            'Ativo no painel (Unidade)': 'Sim',
             'Código interno (Unidade)': c7, 'Referência Ordenação (Unidade)': l['id'],
             'Descrição do Lote (Unidade)': (f"{l['nome']} · {cats[l['cat']]['nome']['pt']} (×{cats[l['cat']]['fator']}) · "
                                             f"US$ {pm}/m² — janela {jan['curto']['pt']}, 1 a 8 lotes, 20% + 12x"),
             'Latitude (Unidade)': f"{lat:.6f}", 'Longitude (Unidade)': f"{lon:.6f}",
         })
 
-    # ---------------------------------------------------------------- só código (sem preço ainda)
-    # Hangares (7, ao longo do pátio do aeroporto) e casas do Resort (31 lotes): numeração = PROPOSTA,
-    # na ordem de leitura da prancha. Entram no registro, não no CSV do CRM (não há preço).
-    for sub, tag, nome in ((3, 'hangar', 'Hangar {:02d}'), (2, 'casa', 'Resort — lote {:02d}')):
-        cat = 3 if tag == 'hangar' else 4
-        vs = sorted((centro(v['p']) for v in cena['vol'] if v['t'] == tag), key=lambda c: (round(c[1] / 20), c[0]))
-        for n, (x, y) in enumerate(vs, 1):
-            lat, lon = geo.latlon(x, y)
-            registro.append(dict(codigo=codigo(cat, sub, n), cat=cat, sub=sub, nome=nome.format(n), ref='proposta',
-                                 lat=lat, lon=lon))
+    rot = rotulos_v14()
+    sem_preco = {'Ativo no painel (Unidade)': 'Não'}
+
+    def ll(x, y):
+        lat, lon = geo.latlon(x, y)
+        return {'Latitude (Unidade)': f"{lat:.6f}", 'Longitude (Unidade)': f"{lon:.6f}"}, lat, lon
+
+    # ---------------------------------------------------------------- 3 · lotes fora da oferta (Q37, Q11)
+    # Nomes oficiais escritos no V14: recinto alfandegado (Q37, 10 lotes) e Administração (Q11.L001).
+    fora = {'Q37': 'recinto alfandegado — fora da oferta', 'Q11': 'lote da Administração — fora da oferta'}
+    for w, x, y in sorted({(w, round(x, 1), round(y, 1)) for w, x, y in rot
+                           if re.fullmatch(r'LTIND\.Q(37|11)\.L\d{3}\.A\d{5}\..+', w)}):
+        _, q, l, a = w.split('.')[:4]
+        c7 = cod_lote(int(q[1:]), int(l[1:]))
+        if c7 in {r['codigo'] for r in registro}:
+            continue                                  # rótulo repetido no PDF
+        area = int(a[1:])
+        geo_, lat, lon = ll(x, y)
+        registro.append(dict(codigo=c7, cat=3, sub=2, nome=w, ref=f'{q}.{l}', lat=lat, lon=lon))
+        linha(3, **comum, **sem_preco, **geo_, **{
+            'Nome (Empreendimento)': 'Bracerum Park — Lotes industriais', 'Sigla (Empreendimento)': 'LTIND',
+            'Segmento (Empreendimento)': 'Industrial', 'Tipo (Empreendimento)': 'Loteamento industrial',
+            'Código interno (Empreendimento)': '302', 'Código interno (Etapa)': '302', 'Nome (Etapa)': 'Fase 1',
+            'Nome (Bloco)': f'Quadra {q}', 'Código interno (Bloco)': c7[:5],
+            'Nome (Unidade)': f'LTIND.{q}.{l}', 'Tipologia (Unidade)': 'Fora da oferta', 'Tipo (Unidade)': 'Lote',
+            'Área do terreno (Unidade)': br(area), 'Área total (Unidade)': br(area),
+            'Código interno (Unidade)': c7, 'Referência Ordenação (Unidade)': f'{q}.{l}',
+            'Descrição do Lote (Unidade)': f'{w} · {fora[q]}', 'Bloqueado via Integração (Unidade)': 'Sim',
+        })
+
+    # ---------------------------------------------------------------- 3 · hangares (numerados 01–07 no V14)
+    hang = []
+    for w, x, y in rot:
+        if w == 'HANGAR':
+            n = abaixo(rot, x, y, r'0[1-7]')
+            if n:
+                hang.append((int(n), x, y))
+    hang = sorted(set(hang))
+    assert [h[0] for h in hang] == list(range(1, 8)), hang
+    for n, x, y in hang:
+        c7 = codigo(3, 3, n)
+        geo_, lat, lon = ll(x, y)
+        registro.append(dict(codigo=c7, cat=3, sub=3, nome=f'Hangar {n:02d}', ref=f'HANGAR {n:02d}', lat=lat, lon=lon))
+        linha(3, **comum, **sem_preco, **geo_, **{
+            'Nome (Empreendimento)': 'Aeroporto de Cargas Bracerum — Hangares', 'Sigla (Empreendimento)': 'HNG',
+            'Segmento (Empreendimento)': 'Logístico', 'Tipo (Empreendimento)': 'Hangares',
+            'Código interno (Empreendimento)': '303', 'Código interno (Etapa)': '303', 'Nome (Etapa)': 'Fase 1',
+            'Nome (Bloco)': 'Pátio dos hangares', 'Código interno (Bloco)': c7[:5],
+            'Nome (Unidade)': f'Hangar {n:02d}', 'Tipo (Unidade)': 'Hangar', 'Tipologia (Unidade)': 'Hangar',
+            'Código interno (Unidade)': c7, 'Referência Ordenação (Unidade)': f'H{n:02d}',
+            'Descrição do Lote (Unidade)': ('Hangar no pátio do Aeroporto de Cargas (42.060 m² de pátio). Quadro do V14: '
+                                            'hangar + lounge + abastecimento = 7.686 m² no total; área por hangar e preço a definir'),
+        })
+
+    # ---------------------------------------------------------------- 3 · Hub de serviços (8 lotes, sem nome no V14)
+    hub = sorted((centro(v['p']) for v in cena['vol'] if v['t'] == 'hub de serviços'),
+                 key=lambda c: (round(c[1] / 20), c[0]))
+    assert len(hub) == 8
+    for n, (x, y) in enumerate(hub, 1):
+        c7 = codigo(3, 4, n)
+        geo_, lat, lon = ll(x, y)
+        registro.append(dict(codigo=c7, cat=3, sub=4, nome=f'Hub de serviços — lote {n:02d}', ref='proposta',
+                             lat=lat, lon=lon))
+        linha(3, **comum, **sem_preco, **geo_, **{
+            'Nome (Empreendimento)': 'Hub de serviços para indústrias', 'Sigla (Empreendimento)': 'HUB',
+            'Segmento (Empreendimento)': 'Serviços', 'Tipo (Empreendimento)': 'Loteamento de serviços',
+            'Código interno (Empreendimento)': '304', 'Código interno (Etapa)': '304', 'Nome (Etapa)': 'Fase 1',
+            'Nome (Bloco)': 'Hub de serviços', 'Código interno (Bloco)': c7[:5],
+            'Nome (Unidade)': f'HUB — lote {n:02d}', 'Tipo (Unidade)': 'Lote', 'Tipologia (Unidade)': 'Lote de serviços',
+            'Código interno (Unidade)': c7, 'Referência Ordenação (Unidade)': f'HUB{n:02d}',
+            'Descrição do Lote (Unidade)': ('Junto à pista, com Refeitório e Grêmio. Quadro do V14: 12.180 m² em 8 lotes; '
+                                            'o desenho não nomeia os lotes — numeração proposta, área e preço a definir'),
+        })
+
+    # ---------------------------------------------------------------- 4 · Bracerum Resort (31 lotes LT.RES.Qxx.Lyy)
+    resort = []
+    for w, x, y in rot:
+        m = re.fullmatch(r'Q0(\d)\.L(\d\d)', w)
+        if m:
+            a = abaixo(rot, x, y, r'[\d.]+m²')
+            resort.append((int(m[1]), int(m[2]), x, y, int(a[:-2].replace('.', ''))))
+    resort = sorted(set(resort))
+    assert len(resort) == 31, len(resort)
+    for q, l, x, y, area in resort:
+        c7 = codigo(4, 2, q * 100 + l)
+        geo_, lat, lon = ll(x, y)
+        nome = f'LT.RES.Q{q:02d}.L{l:02d}'
+        registro.append(dict(codigo=c7, cat=4, sub=2, nome=nome, ref=f'Q{q:02d}.L{l:02d}', lat=lat, lon=lon))
+        linha(4, **comum, **sem_preco, **geo_, **{
+            'Nome (Empreendimento)': 'Bracerum Resort', 'Sigla (Empreendimento)': 'RST',
+            'Segmento (Empreendimento)': 'Residencial', 'Tipo (Empreendimento)': 'Condomínio horizontal (casas)',
+            'Código interno (Empreendimento)': '402', 'Código interno (Etapa)': '402', 'Nome (Etapa)': 'Fase 1',
+            'Nome (Bloco)': f'Quadra Q{q:02d} (Resort)', 'Código interno (Bloco)': c7[:5],
+            'Nome (Unidade)': nome, 'Tipo (Unidade)': 'Lote', 'Tipologia (Unidade)': 'Lote residencial',
+            'Área do terreno (Unidade)': br(area), 'Área total (Unidade)': br(area),
+            'Código interno (Unidade)': c7, 'Referência Ordenação (Unidade)': f'Q{q:02d}.L{l:02d}',
+            'Descrição do Lote (Unidade)': 'Lote do condomínio fechado junto à pista, com lago, portaria e salão de festas; preço a definir',
+        })
+
+    # ---------------------------------------------------------------- 2 · Bracerum Market (LJ1–LJ12 + supermercado)
+    lojas = sorted({(int(w[2:]), round(x, 1), round(y, 1)) for w, x, y in rot if re.fullmatch(r'LJ\d+', w)})
+    assert [l[0] for l in lojas] == list(range(1, 13)), lojas
+    sx, sy = poi(cena, 'supermercado')
+    for n, x, y, nome, tipo in [(n, x, y, f'LJ{n}', 'Loja') for n, x, y in lojas] + [(13, sx, sy, 'Supermercado', 'Âncora')]:
+        c7 = codigo(2, 1, n)
+        geo_, lat, lon = ll(x, y)
+        registro.append(dict(codigo=c7, cat=2, sub=1, nome=f'Market — {nome}', ref=nome, lat=lat, lon=lon))
+        linha(2, **comum, **sem_preco, **geo_, **{
+            'Nome (Empreendimento)': 'Bracerum Market', 'Sigla (Empreendimento)': 'MKT',
+            'Segmento (Empreendimento)': 'Comercial', 'Tipo (Empreendimento)': 'Centro comercial de vizinhança',
+            'Código interno (Empreendimento)': '201', 'Código interno (Etapa)': '201', 'Nome (Etapa)': 'Fase 1',
+            'Nome (Bloco)': 'Supermercado + lojas', 'Código interno (Bloco)': c7[:5],
+            'Nome (Unidade)': f'MKT — {nome}', 'Tipo (Unidade)': tipo, 'Tipologia (Unidade)': tipo,
+            'Código interno (Unidade)': c7, 'Referência Ordenação (Unidade)': f'{n:02d}',
+            'Descrição do Lote (Unidade)': ('Supermercado + 12 lojas e docas: 4.606 m² no quadro do V14; área de cada '
+                                            'loja, venda ou locação e valor a definir'),
+        })
+
+    # ---------------------------------------------------------------- 1 · Bracerum Hotel (384 studios)
+    hx, hy = poi(cena, 'hotel')
+    for andar in range(1, HOTEL_ANDARES + 1):
+        for u in range(1, HOTEL_POR_ANDAR + 1):
+            c7 = codigo(1, 0, andar * 100 + u)
+            geo_, lat, lon = ll(hx, hy)
+            registro.append(dict(codigo=c7, cat=1, sub=0, nome=f'Hotel — andar {andar:02d}, studio {u:02d}',
+                                 ref='distribuição estimada', lat=lat, lon=lon))
+            linha(1, **comum, **sem_preco, **geo_, **{
+                'Nome (Empreendimento)': 'Bracerum Hotel', 'Sigla (Empreendimento)': 'HTL',
+                'Segmento (Empreendimento)': 'Hotelaria', 'Tipo (Empreendimento)': 'Hotel (384 studios)',
+                'Código interno (Empreendimento)': '100', 'Código interno (Etapa)': '100', 'Nome (Etapa)': 'Fase 1',
+                'Nome (Bloco)': f'Andar {andar:02d}', 'Código interno (Bloco)': c7[:5],
+                'Nome (Unidade)': f'HTL {andar:02d}{u:02d}', 'Andar (Unidade)': str(andar),
+                'Descrição do andar (Unidade)': f'{andar}º andar', 'Coluna (Unidade)': f'{u:02d}',
+                'Posição (Unidade)': f'{andar:02d}{u:02d}', 'Tipo (Unidade)': 'Studio', 'Tipologia (Unidade)': 'Studio',
+                'Código interno (Unidade)': c7, 'Referência Ordenação (Unidade)': f'{andar:02d}{u:02d}',
+                'Descrição do Lote (Unidade)': (f'DISTRIBUIÇÃO ESTIMADA ({HOTEL_ANDARES} andares × {HOTEL_POR_ANDAR} studios) — '
+                                                'o V14 só dá 384 studios em 30.000 m²; área, andares e preço a confirmar'),
+            })
 
     cods = [r['codigo'] for r in registro]
     assert len(cods) == len(set(cods)), 'código repetido'
@@ -284,12 +432,15 @@ def main():
         for r in sorted(registro, key=lambda r: r['codigo']):
             w.writerow([r['codigo'], f"{r['cat']} {CATEGORIAS[r['cat']]}", f"{r['sub']:02d} {SUBCATEGORIAS[(r['cat'], r['sub'])]}",
                         r['nome'], r['ref'], f"{r['lat']:.6f}", f"{r['lon']:.6f}"])
-    print('Códigos:', dict(Counter(f"{r['cat']}{r['sub']:02d}" for r in registro)), '→', os.path.relpath(SAIDA_CODIGOS, ROOT))
+    print('Códigos:', dict(sorted(Counter(f"{r['cat']}{r['sub']:02d}" for r in registro).items())), '→',
+          os.path.relpath(SAIDA_CODIGOS, ROOT))
 
-    with open(SAIDA, 'w', encoding='utf-8-sig', newline='') as f:
-        w = csv.writer(f, delimiter=';', lineterminator='\r\n')
-        w.writerow(cab)
-        w.writerows(linhas)
+    for c, nome in SAIDAS.items():
+        with open(os.path.join(AQUI, nome), 'w', encoding='utf-8-sig', newline='') as f:
+            w = csv.writer(f, delimiter=';', lineterminator='\r\n')
+            w.writerow(cab)
+            w.writerows(sorted(linhas[c], key=lambda r: r[col['Código interno (Unidade)']]))
+    print('Resort:', len(resort), 'lotes,', sum(r[4] for r in resort), 'm² (quadro do V14: 38.072 m²)')
 
     # ---------------------------------------------------------------- torres + distâncias
     pois = {k: poi(cena, k) for k in ('salão de eventos', 'supermercado', 'outlet', 'escola', 'ambulatório',
@@ -305,7 +456,8 @@ def main():
         print(f'  {k:10s} {len(ts):2d} torres {ts[0]["torre"]}–{ts[-1]["torre"]}  VGV US$ {sum(t["vgv"] for t in ts):,}')
     print(f'Lotes: {len(L)} lotes, {sum(l["a"] for l in L):,} m², janela {jan["id"]}, VGV US$ {vgv_lotes:,}')
     print(f'  por categoria: {dict(Counter(l["cat"] for l in L))}')
-    print(f'→ {os.path.relpath(SAIDA, ROOT)} ({len(linhas)} linhas)  · {os.path.relpath(SAIDA_TORRES, ROOT)}')
+    for c, nome in SAIDAS.items():
+        print(f'→ docs/produtos/{nome}: {len(linhas[c])} unidades')
 
     if args.controle:
         import openpyxl
