@@ -2,6 +2,11 @@
 
 As 55 fotos da pasta **"Imagens BracerumPark Finalizadas"** (Google Drive `1CETdiYdL13Jhh2twQe6kAF10yvMt1YF6`, mesma pasta do Desktop do usuário) separadas pelas 4 categorias do `docs/padrao-de-codigos.md`. 49 fotos únicas + 6 cópias exatas. Para organizar a pasta local: `docs/fotos/organizar-fotos.ps1` (gerado por `fotos_categorias.py`).
 
+**No Google Drive (04/11/2026):** pasta **"Fotos por categoria (Hotel · Cidade · Loteamento · Condomínios)"**
+(`1xoT8WKxaviFpVxYrD3CJb1M0iHJJJCpk`, dentro da pasta original) com **cópias** das 49 fotos únicas nas
+subpastas abaixo — os originais ficaram onde estavam e as 6 duplicadas não foram copiadas:
+https://drive.google.com/drive/folders/1xoT8WKxaviFpVxYrD3CJb1M0iHJJJCpk
+
 | Categoria | Pasta | Fotos |
 |---|---|---|
 | 1 Hotel | Bracerum Hotel | 11 |

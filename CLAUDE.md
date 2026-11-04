@@ -180,7 +180,8 @@ rotas) que as seis páginas internas baixavam e interpretavam à toa. Ele roda d
   ("Hotel - Recepção (dia).png"…), 49 únicos + 6 "(cópia)" idênticas. `docs/fotos/README.md` separa nas 4
   categorias do padrão de códigos e `docs/fotos/organizar-fotos.ps1` (gerado por `fotos_categorias.py`)
   organiza a pasta local do usuário (`OneDrive\Desktop\Imagens BracerumPark Finalizadas`): move, casa por nome
-  ou por tamanho, cópias para `_Duplicadas`, `-Simular` e `-Desfazer`. Residence, Market, Outlet e Hub não
+  ou por tamanho, cópias para `_Duplicadas`, `-Simular` e `-Desfazer`. **No Drive** já existe a versão organizada (cópias das 49 únicas, originais intactos): pasta
+  `1xoT8WKxaviFpVxYrD3CJb1M0iHJJJCpk`, dentro da original. Residence, Market, Outlet e Hub não
   têm foto.
 - Os arquivos antigos que ficaram sem uso (`assets/park/hotel-*`, `resort-lago-*`, `assets/renders/*`
   com vermelho/marca d'água OTIFF) continuam no repositório — **apagar só com o ok do cliente**.
