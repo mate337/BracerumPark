@@ -13,7 +13,9 @@ rotas) que as seis páginas internas baixavam e interpretavam à toa. Ele roda d
 ### Linktree (v6.4 — 2026-11-03)
 - `linktree/index.html` → **bracerumpark.com/linktree** (pasta com `index.html`, funciona em qualquer host
   estático, com ou sem barra final — os caminhos são relativos `../`). O site é servido pela **Vercel a partir do
-  `main`**; o `vercel.json` só garante `/linktree` sem barra (o arquivo do site continua servido como está). Quatro grupos pedidos pelo cliente:
+  `main`**, que reúne o site, o linktree e a maquete `3dmasterplan/` (até 2026-11-04 a maquete só existia no
+  branch `claude/zealous-shannon-p20inw` e sumiu do ar quando o `main` foi publicado — **o que for ao ar tem que
+  passar pelo `main`**, senão uma publicação apaga a outra); o `vercel.json` só garante `/linktree` sem barra (o arquivo do site continua servido como está). Quatro grupos pedidos pelo cliente:
   **01 Site** (cartão com foto + atalhos Masterplan/Tributação/Hotel/Resort/Select), **02 WhatsApp**
   (Cleber · PY e Sydney · BR, mensagem pré-preenchida no idioma ativo), **03 Redes sociais** e
   **04 Localização** (Google Maps + o mapa logístico da home).
@@ -25,6 +27,114 @@ rotas) que as seis páginas internas baixavam e interpretavam à toa. Ele roda d
 - **Redes sociais = só os perfis oficiais do Park** (pedido do cliente, 2026-11-03): Instagram
   `@bracerumpark`, Facebook (`profile.php?id=61594419791801`) e LinkedIn (`company/bracerumpark`). Os
   Instagrams pessoais de Cleber e Sydney saíram do linktree (continuam no footer do site).
+
+### Masterplan V14 — planta mais nova, base da maquete 3D (2026-10-29)
+- **O cliente enviou o "Masterplan BRACERUM PARK V14 — 28/10/2026 — lotes identificados"** (mesma
+  prancha e mesmas coordenadas do V12, com o **nome oficial de cada lote** escrito dentro dele:
+  `LTIND.Q07.L014.A01250.ESQNAO.RT.L` = quadra, lote, área de contrato, esquina, forma, frentes).
+  Registro, quadro de áreas literal e o que mudou em **`docs/masterplan-v14.md`**; o PDF está em
+  `docs/masterplan-v14/`. **Onde diverge do V12, vale o V14.**
+- **Principais mudanças:** **615 lotes, 766.693 m²** (Q01–Q42; Q37 recinto e Q11 Administração fora da
+  oferta); **Resort 31 lotes, 38.072 m²** (eram 141, 142.067 m²) na borda junto à pista; **Condo 67
+  torres, 1.200 aptos, 114.273 m²**; **Bracerum Club** 40.706 m² (piscina olímpica, tênis, padel, Salão
+  de Eventos); Outlet 61.850 m²; Supermercado + 12 lojas 4.606 m²; Bombeiros + Posto Policial +
+  Ambulatório + Escola/Creche + E.T.A. no vértice norte; Refeitório, Grêmio e **Hub de serviços** (8
+  lotes) junto à pista; Gate 1.210 m²; 1.986 autos + 500 motos. Hotel, Convenções e aeroporto iguais.
+- **A confirmar** (§5 do documento): Q04.L017 1.650 × 1.410 m²; tabela de preços nova para os 615 lotes
+  (a v3.1 é do V14-02); Q11 fora da oferta; "Bracerum Market" × "Bracerum Outlet" na faixa vertical.
+- **Só a maquete 3D foi atualizada.** O site continua sem mexer; quando for liberado, rever o §8 do
+  `docs/masterplan-v12.md` com os números do V14.
+
+### Masterplan V12 — fonte de verdade da implantação (2026-10-16)
+- **O cliente enviou a planta "BRACERUM PARK — VERSÃO 12 — 01-10-26"** (AutoCAD, vetorial, escala
+  1:1000). Registro completo, setor por setor, em **`docs/masterplan-v12.md`**; o PDF original, a
+  prancha renderizada, o mapa com os 33 setores numerados e a tabela de rótulos estão em
+  `docs/masterplan-v12/`. **Ler esse documento antes de mexer em qualquer número, pino ou texto que
+  fale de onde as coisas ficam no parque.** Onde diverge do Catálogo V15
+  (`assets/renders/masterplan-implantacao.jpg`, de onde saíram os números atuais do site) ou do R04,
+  vale o V12.
+- **Orientação:** o norte da prancha aponta para a **direita**. Topo = PY-19 (oeste) · direita =
+  Hotel/Convenções/Escola/Resort · baixo = pista · esquerda = aeroporto/ETE. O documento usa
+  acima/abaixo/esquerda/direita da prancha, que é como o cliente lê a planta.
+- **O que mudou desde o V15:** a **entrada** (Clube do Caminhoneiro + pátio de caminhões + posto em L
+  + quadra + Gate de 680 m²) saiu do canto superior esquerdo para o **meio da frente da PY-19**; entrou
+  o **Outlet** (57.750 m², em L, ao lado da entrada) e o **Supermercado** (4.334 m²); o shopping/
+  academia saiu; o **Centro Tecnológico + Espaço Business** (2.340 m²/piso) fica na esquina da Via
+  Costeira com o acesso do Resort; a **creche** (2.083 m²) foi para o bloco de serviços junto à pista,
+  com Refeitório e Resgate (7.748 m²); entraram **Escola** (2.775 m²/piso), **Condomínio Vertical**
+  (38 torres, 608 aptos, 49.704 m²), **Grêmio Recreativo** (2.975 m²) e um **canal de drenagem** com
+  ponte; a **ETA** separou-se da ETE (foi para junto da Escola); os lotes viraram quadras de
+  **20.000 m² (200 × 100 m)**, total **781.777 m²** (era 989.642 m² em quadras de 40.000 m²), riscadas
+  em módulos de 25 × 50 m; estacionamento cidade/hotel **2.036 vagas** (era 1.700). Hotel (384 studios,
+  30.000 m²), Convenções (13.500 m², 1.200 lugares), Resort (141 lotes, 142.067 m²) e aeroporto não
+  mudaram.
+- **O site ainda não foi atualizado para o V12** — a lista do que está desatualizado, com arquivo e
+  linha, está no §8 do documento. O ponto mais grave: o render de fundo do masterplan da home
+  (`assets/web/vista-aerea-park-02.jpg`) mostra o **layout do V15** (entrada no canto) — pino nenhum
+  conserta isso; precisa de vista aérea nova ou trocar o fundo.
+- **Respostas do cliente (2026-10-16)** — valem sobre qualquer dado anterior:
+  - **Pista: 1.460 m.** É o número público (substitui os 1.480 m de 16/09).
+  - **Fábricas Bracerum: "não colocaremos mais".** Sai o pino "Fábricas Bracerum" do masterplan. Os
+    outros textos sobre as fábricas do grupo (`bracerum.html`, "Steel Frame do grupo") ficam para
+    confirmar com o cliente antes de mexer — lista no §8 do documento.
+  - **Lotes: venda** (não locação), fracionável a partir de um módulo de 25 × 50 m (**1.250 m²**).
+  - **"Ambulatório" em tudo** — nunca "hospital" (a planta escreve hospital). As "enfermarias" que
+    o site cita são o mesmo espaço e trocam junto.
+  - **Itens "VALIDAR" do quadro estão validados:** Clube do Caminhoneiro 40.065 m², quadras/campos
+    5.000 m², quadras/quiosques + posto/salão/restaurante 7.250 m².
+- **Prompt da vista aérea do V12** (2026-10-16): `docs/prompt-aerea-v12/PROMPT-ASTRA-6-AEREA-V12.md`,
+  para o ChatGPT Astra-6 gerar a aérea nova (sem legenda, no lugar real), com 8 referências sem
+  texto. A principal é a **A**, câmera exata com os volumes lidos da planta, gerada por
+  `docs/prompt-aerea-v12/build_refs.py`. **Localização:** a planta só encaixa na única curva da PY-19
+  nesse trecho (−25,7715 / −57,7333, o mesmo ponto do `PARK` do site), com o parque a leste da
+  rodovia e ao sul da curva. Pelo OpenStreetMap essa curva é o km ~36,8 contado do início da PY-19
+  em Villeta; o cliente fala em km 35 (deve ser a origem da quilometragem — confirmar se ele souber
+  o marco). Torres do condomínio vertical: planta em H com 16 vagas → 4 pavimentos.
+- **Primeira aérea gerada pelo Astra-6** (2026-10-16, `docs/prompt-aerea-v12/gerada-v1-obliqua.webp`):
+  aprovada como base de estilo. A **variação 90°** (vista de cima, na mesma orientação — rodovia em
+  cima, pista embaixo) tem prompt próprio na seção 6 do mesmo documento e guia própria, a **A90**
+  (`ref-A90-zenital-volumes.png`, também gerada pelo `build_refs.py`; em 4K a 300 dpi como
+  `ref-A90-zenital-volumes-4k.png` 3840×2560 e `…-4k-16x9.png` 3840×2160, com a maquete numa grade de
+  0,5 m e o entorno desenhado na resolução final). É a candidata a fundo novo do
+  masterplan da home (pinos remarcados, quando o site for liberado) e o take B do filme.
+- **🚫 Não mexer no site até o usuário liberar** (pedido dele em 2026-10-16). O V12 e as respostas
+  ficam só registrados em `docs/` e aqui; nenhuma página, `home.js`, `i18n.js` ou asset publicado
+  muda por enquanto.
+
+### Masterplan 3D — aplicação fora do site (2026-10-19)
+- **`3dmasterplan/`** é uma maquete 3D interativa do **V14 de 28/10/2026** (era do V12 até 2026-10-29;
+  three.js 0.169.0 vendorizado, sem CDN): gira/aproxima/move, clique num dos **23 pontos do mapa** (os
+  21 da legenda do folheto do cliente, 2026-10-20, com nome e ordem dele, + 22 Bracerum Club e 23
+  Refeitório/Grêmio/Hub, que o V14 trouxe; cartão com números, fotos do site e link) ou em **lote**
+  (615, com nome oficial, feição e preço — ver abaixo), vista geral, de cima, tour, régua, rótulos, hora
+  do sol com sombra real, PT/EN/ES pela mesma chave `bp-lang` do site e links por área (`#hotel`,
+  `#lote-Q38.L001`, `#lotes-Q38-Q39`). Documentação completa em **`docs/3dmasterplan/README.md`**.
+- **Não está ligada ao site** (pedido de "aplicação fora do site" + a regra de não mexer no site).
+  Publicada junto, abre em `bracerumpark.com/3dmasterplan/` — **em minúsculas** (o cliente sugeriu
+  "/3DMasterplan"; com maiúsculas só por redirecionamento na hospedagem).
+- **Dados gerados** por `docs/3dmasterplan/build_data.py` (classe `Maquete14`, lê o PDF do V14), que
+  reaproveita o `build_refs.py` da vista aérea (mesmas alturas). As **alturas e a arquitetura são
+  estimativas** — a planta não define altura; a interface avisa. Textos e números dos cartões ficam em `AREAS` no `3dmasterplan/app.js`.
+- Usa imagens do site por `../assets/` — não mover a pasta para outro nível sem trocar a meta
+  `bp-assets`.
+- **Lotes à venda com preço (2026-10-20).** O cliente mandou a Política Comercial P1 (Tabela de Preços
+  v3.1, rev. 14/10/2026, versão pública) e o Mapa de Lotes MP14 do **Masterplan V14-02 (09/10/2026)** —
+  PDFs em `docs/lotes-p1/`. **A unidade de venda é o lote de ~1.250 m² (25 × 50 m), `LTIND.Qxx.Lyyy`:
+  612 lotes, 765.960 m², quadras Q01–Q42** (Q37 = recinto alfandegado, fora da oferta) — isso substitui
+  os "41 lotes" e a referência C?-L? da maquete. Categorias Vitrine/Business/Padrão/Interna (×1,15/1,10/
+  1,00/0,90), três janelas (Expo até 13/11/2026 a US$ 160/m² Padrão; Pós-Expo US$ 185; Fase 1 plena
+  US$ 220 a partir de 01/04/2027), faixas por quantidade e três pagamentos. O modo "Lotes à venda" da
+  maquete calcula o valor de cada lote e de simulações; os dez exemplos da tabela conferem. **Os galpões
+  ilustrativos ficam visíveis no modo de lotes** (pedido do cliente em 2026-10-20). Preços em
+  `3dmasterplan/data/precos.json` (editar à mão quando sair tabela nova); lotes gerados por
+  `docs/3dmasterplan/build_lotes.py`.
+- **Lotes do V14 (2026-10-29).** O `build_lotes.py` agora lê os **nomes oficiais escritos no PDF do V14**
+  (`LTIND.Qxx.Lyyy.A0xxxx.ESQ….FORMA.FRENTES`): **615 lotes, 766.693 m²**, todas as áreas de contrato
+  (nada mais medido com ≈) — bate com o quadro do V14. A Q38 juntou-se à Q39 (13 → 17 lotes) e a Q11
+  (Administração) saiu da oferta; Q37 continua fora. O cartão do lote mostra o nome oficial e a feição
+  (esquina/meio, retangular/poligonal, frentes). Os preços e a regra de categoria seguem a Tabela v3.1;
+  nenhum lote mudou de categoria e os quatro novos da Q38 são Interna. Rótulos duplicados do PDF e o
+  que confirmar: §4–5 de `docs/masterplan-v14.md` e `docs/3dmasterplan/README.md`.
 
 ### Fotos finalizadas do cliente (v6.3 — 2026-09-28)
 - **Fonte:** pasta do Google Drive "Imagens BracerumPark Finalizadas" (id `1CETdiYdL13Jhh2twQe6kAF10yvMt1YF6`),
@@ -212,9 +322,11 @@ noutra) — o decodificador está em `/tmp/pdf/dec.py` no histórico da sessão,
 web estão em `assets/web/` e `assets/park/`. São material-fonte do cliente: **não apagar sem
 perguntar**. O site entregue tem 2,05 MB na home.
 
+**Superado pelo Masterplan V12 (2026-10-16)** naquilo que diverge — ver `docs/masterplan-v12.md`.
 **Dados oficiais do R04** (usar estes, não os do catálogo V15 quando divergirem):
 terreno +1.800.000 m² · Resort 142.067 m² · parcelas industriais 987.304 m² · pista de 1.280 m ·
 auditório 1.200 pessoas · 12 setores principais.
+**Superado (2026-10-16): a pista é de 1.460 m** — ver Masterplan V12.
 **Resolvido (2026-09-16):** o cliente confirmou **1.480 m de pista** (o catálogo V15 vale sobre os
 1.280 m do R04) e que o **heliponto fica no pátio dos hangares**, não na cabeceira da pista — é o que
 mostra a filmagem aérea enviada. O pino "Hangares" do masterplan passou a citar o heliponto e o pino
@@ -285,4 +397,11 @@ Faltam (mencionados no `LEIA-ME.txt` original, ainda não enviados): `tecnologic
 
 ## Próximo passo
 
-Aguardando o usuário: (1) fotos próprias dos terminais privados, para substituir as ilustrativas; (2) o dado de anos de história da Bracerum como importadora de aço.
+Aguardando o usuário: (0) retorno sobre o **Masterplan 3D no V14** (`3dmasterplan/`) e se ele entra
+linkado no site; as confirmações do §5 de `docs/masterplan-v14.md` (Q04.L017 1.650 × 1.410 m²,
+tabela de preços para os 615 lotes, Q11 fora da oferta, "Market" × "Outlet"); (1) **ok para levar o
+masterplan ao site** — a lista do que muda está no §8 de `docs/masterplan-v12.md`, a rever com os
+números do V14; até lá, não mexer no site; (2) a
+vista aérea do V12 gerada pelo Astra-6 com `docs/prompt-aerea-v12/` (quando chegar, ela pode
+substituir a `vista-aerea-park-02.jpg` do masterplan — e os pinos precisam ser remarcados); (3) fotos próprias dos terminais privados, para
+substituir as ilustrativas; (4) o dado de anos de história da Bracerum como importadora de aço.
