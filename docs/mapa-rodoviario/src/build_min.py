@@ -21,7 +21,7 @@ ASU = (-25.2400, -57.5191)           # Aeroporto Internacional Silvio Pettirossi
 ASUNCION = (-25.2867, -57.6470)
 
 BASE = 5.0                       # 100% = caminho principal Terport–Villeta–Park
-WEIGHT = {"main": 1.0, "border": 0.8, "road1": 0.7, "road2": 0.3}
+WEIGHT = {"main": 1.0, "border": 0.5, "road1": 0.7, "road2": 0.3}
 OPAC = {"main": 1, "border": .45, "road1": .85, "road2": .6}
 BORDER_LEVELS = {2, 4, 8}        # país, departamento/província, distrito/município
 
@@ -30,9 +30,13 @@ def esc(s):
     return html.escape(s, quote=True)
 
 
+DASH = 'stroke-dasharray="9 6" stroke-linecap="butt"'   # divisa: tracejado, não pontilhado
+
+
 def stroke(kind, extra=""):
+    cap = "" if "linecap" in extra else 'stroke-linecap="round" '
     return (f'fill="none" stroke="{FG}" stroke-opacity="{OPAC[kind]}" stroke-width="{BASE * WEIGHT[kind]:.2f}" '
-            f'stroke-linecap="round" stroke-linejoin="round" {extra}')
+            f'{cap}stroke-linejoin="round" {extra}')
 
 
 def base(view, items):
@@ -55,7 +59,7 @@ def base(view, items):
            f'stroke-opacity=".6" stroke-width=".8"/>',
            # divisas: fora da água (a de país corre no meio do rio, que já a desenha)
            f'<path d="{d_of(merge_lines(g["border"], 0.6).difference(water.buffer(2)))}" '
-           f'{stroke("border", 'stroke-dasharray="1 8"')}/>',
+           f'{stroke("border", DASH)}/>',
            f'<path d="{d_of(merge_lines(g["road2"], 0.5))}" {stroke("road2")}/>',
            f'<path d="{d_of(merge_lines(g["road1"], 0.5))}" {stroke("road1")}/>']
     return "\n".join(out)
@@ -124,7 +128,7 @@ def inset_paraguay(countries, w=250, h=290):
 
 def legend():
     rows = [("main", "", "Terport · Villeta · Park"), ("road1", "", "Rotas principais"),
-            ("road2", "", "Rotas secundárias"), ("border", 'stroke-dasharray="1 8"', "Divisas")]
+            ("road2", "", "Rotas secundárias"), ("border", DASH, "Divisas")]
     x, y = 1490, 690
     out = [f'<rect x="{x - 20}" y="{y - 30}" width="400" height="{len(rows) * 28 + 40}" fill="{BG}"/>']
     for i, (k, ex, lbl) in enumerate(rows):
