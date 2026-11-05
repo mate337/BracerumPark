@@ -109,6 +109,14 @@ rotas) que as seis páginas internas baixavam e interpretavam à toa. Ele roda d
   `build_refs.py` na mesma pasta. Variações (nível do olho, hora azul, aérea), ajustes e checklist.
   A confirmar: quais são as duas lojas (o prompt usa café-padaria e lavanderia). Não mexe no site.
 
+### Prompt dos 02 escritórios (2026-11-05)
+- **`docs/prompt-escritorios/PROMPT-ASTRA-6-ESCRITORIOS.md`**: duas fotos de interiores no padrão da
+  foto de referência enviada pelo usuário (`ref-A-padrao-escritorio.jpg`: mesa nogueira com aço preto,
+  cadeiras de tela com estrutura branca, vidro com caixilho preto, átrio com jardineiras, ripado
+  iluminado, teto escuro). 01 = plataforma de trabalho no Centro Tecnológico; 02 = diretoria no Espaço
+  Business, com a paisagem do parque pela janela (`ref-B-vista-janela.jpg`). Gerar o 02 na mesma
+  conversa do 01. A confirmar: se os escritórios são mesmo desses prédios. Não mexe no site.
+
 ### Masterplan 3D — aplicação fora do site (2026-10-19)
 - **`3dmasterplan/`** é uma maquete 3D interativa do **V14 de 28/10/2026** (era do V12 até 2026-10-29;
   three.js 0.169.0 vendorizado, sem CDN): gira/aproxima/move, clique num dos **23 pontos do mapa** (os
