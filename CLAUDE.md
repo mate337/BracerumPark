@@ -101,6 +101,14 @@ rotas) que as seis páginas internas baixavam e interpretavam à toa. Ele roda d
   ficam só registrados em `docs/` e aqui; nenhuma página, `home.js`, `i18n.js` ou asset publicado
   muda por enquanto.
 
+### Prompt do Supermercado (2026-11-05)
+- **`docs/prompt-supermercado/PROMPT-ASTRA-6-SUPERMERCADO.md`**: foto de arquitetura do Supermercado
+  (Bracerum Market) + farmácia + 2 lojas sob uma marquise, para o ChatGPT Astra-6, no padrão das fotos
+  finalizadas do cliente (fim de tarde, concreto claro, ripado, beiral grafite). Quatro referências sem
+  texto e sem vermelho (A luz/acabamento, B arquitetura, C via, D planta-guia), geradas por
+  `build_refs.py` na mesma pasta. Variações (nível do olho, hora azul, aérea), ajustes e checklist.
+  A confirmar: quais são as duas lojas (o prompt usa café-padaria e lavanderia). Não mexe no site.
+
 ### Masterplan 3D — aplicação fora do site (2026-10-19)
 - **`3dmasterplan/`** é uma maquete 3D interativa do **V14 de 28/10/2026** (era do V12 até 2026-10-29;
   three.js 0.169.0 vendorizado, sem CDN): gira/aproxima/move, clique num dos **23 pontos do mapa** (os
