@@ -10,6 +10,22 @@ O site tem **7 páginas**: `index.html`, `tributacao.html`, `bracerum.html`, `ho
 rotas) que as seis páginas internas baixavam e interpretavam à toa. Ele roda depois do
 `script.js` porque usa `hasGsap`, `reduceMotion` e `tr()`.
 
+### Links dos folders e rastreamento (v6.5 — 2026-11-06)
+- **Seis links de folder** (`/FolderResidence/`, `/FolderPark/`, `/FolderResort/`, `/FolderBusinessCenter/`,
+  `/Foldermapadisponibilidade/`, `/FolderLP/`) ainda sem página própria. São **Routing Rules do projeto na
+  Vercel** (painel → Routing Rules, não o `vercel.json`): 307 temporário para a home, sem diferenciar
+  maiúsculas e com ou sem barra final, levando `?utm_source=folder&utm_medium=offline&utm_campaign=folder-<nome>&utm_content=<Caminho>`.
+  Quando a página de um folder existir, **apagar a regra dele** — a regra vem antes dos arquivos.
+- **`tracking.js`** (carregado com `defer` nas 7 páginas, no linktree e no `3dmasterplan`, via `../`):
+  carrega GA4 e Meta Pixel a partir do `CONFIG` no topo do arquivo (vazio = desligado), guarda a origem
+  (utm, gclid, fbclid, referrer, primeira e última visita) em `localStorage` `bp-attrib` — exposta por
+  `window.bpAttribution()` para a futura página de captura mandar ao **CVCRM** em campos ocultos — e mede
+  cliques (WhatsApp/telefone/e-mail viram `Contact` no Meta), seções vistas e rolagem. `?bpdebug=1` mostra
+  os eventos no console. Evento manual: `data-track="nome"` ou `window.bpTrack('nome', {...})`; o lead
+  deve disparar `bpTrack('generate_lead', …)` (vira `Lead` no Meta).
+- **LGPD:** os pixels do Google e do Meta gravam cookies de marketing; antes de campanha paga, pôr aviso de
+  consentimento.
+
 ### Linktree (v6.4 — 2026-11-03)
 - `linktree/index.html` → **bracerumpark.com/linktree** (pasta com `index.html`, funciona em qualquer host
   estático, com ou sem barra final — os caminhos são relativos `../`). O site é servido pela **Vercel a partir do
