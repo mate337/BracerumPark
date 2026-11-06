@@ -28,6 +28,14 @@ rotas) que as seis páginas internas baixavam e interpretavam à toa. Ele roda d
   `@bracerumpark`, Facebook (`profile.php?id=61594419791801`) e LinkedIn (`company/bracerumpark`). Os
   Instagrams pessoais de Cleber e Sydney saíram do linktree (continuam no footer do site).
 
+### Plantas humanizadas (2026-11-06)
+- `docs/plantas/` — planta humanizada (vista de cima, estilo maquete) da **casa de 2 dorm. + suíte**,
+  a partir da planta CAD enviada pelo usuário (`casa-planta-cad.png`), no mesmo estilo da planta do
+  apartamento que ele aprovou (`referencia-apto-humanizada.png`). Desenhada em código por
+  `build_planta_casa.py` (PIL/numpy, coordenadas lidas dos traços do CAD, ~49 px/m); saídas
+  `casa-planta-humanizada.{png,jpg}` e `casa-planta-humanizada-legenda.jpg` (com quadro de áreas).
+  Mobiliário é sugestão. **Não está no site.**
+
 ### Masterplan V14 — planta mais nova, base da maquete 3D (2026-10-29)
 - **O cliente enviou o "Masterplan BRACERUM PARK V14 — 28/10/2026 — lotes identificados"** (mesma
   prancha e mesmas coordenadas do V12, com o **nome oficial de cada lote** escrito dentro dele:
