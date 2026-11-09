@@ -23,14 +23,14 @@ rotas) que as seis páginas internas baixavam e interpretavam à toa. Ele roda d
 
 ### Maquete × CV CRM — disponibilidade ao vivo (2026-11-09)
 - **`api/lotes-status.js`** (primeira função da Vercel do projeto) lê o mapa de disponibilidade do
-  **CV CRM** (`bracerum.cvcrm.com.br`, empreendimento **3** = loteamento; 1 Hotel, 2 Cidade, 4 Condomínios)
+  **CV CRM** (`bracerum.cvcrm.com.br`, empreendimento **4** = loteamento; na API 3 = Hotel, 7 = Residence, 9 = Cidade)
   e devolve só `{lotes: {"Q07.L014": "r"|"v"|"b"}}`, com cache de 60 s na CDN. A **`3dmasterplan/`** pinta
   os lotes ocupados, tira-os da simulação e mostra a contagem na legenda; sem a função tudo fica à venda.
-  No CV os lotes têm o **mesmo nome da maquete** (`LTIND.Q01.L001`) — os 615 casam.
+  No CV a quadra vem no bloco ("Quadra Q02") e o lote na unidade ("L003") — os 615 casam.
 - Precisa de `CVCRM_TOKEN` (segredo) e `CVCRM_EMAIL` nas variáveis do projeto na Vercel. O `pacote_vercel.py`
   já leva a pasta `api/`. Detalhes e pendências em `docs/3dmasterplan/README.md` ("Disponibilidade ao vivo").
-- **Pendente:** a API do CV respondeu 401 ao token + e-mail testados em 2026-11-09 — conferir usuário,
-  permissão e o log `/cvio` no CV antes de publicar.
+- **Conferido com o CV real em 2026-11-09** (usuário CONEXAOSITECV, e-mail `matheus337.martins@gmail.com`,
+  com ponto): 626 unidades reconhecidas, `Q02.L003` reservado. Falta pôr as variáveis na Vercel e publicar.
 
 ### Cartões de visita digitais (v6.6 — 2026-11-09)
 - Página aberta pelo QR Code do cartão impresso, no mesmo padrão do linktree (independente, sem

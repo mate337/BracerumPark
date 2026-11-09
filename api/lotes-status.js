@@ -9,7 +9,8 @@
     CVCRM_TOKEN           token do usuário da API (Painel do Gestor → usuários → Token)   [segredo]
     CVCRM_EMAIL           e-mail desse usuário
     CVCRM_HOST            opcional, padrão bracerum.cvcrm.com.br
-    CVCRM_EMPREENDIMENTO  opcional, padrão 3 (Bracerum Park — Lotes industriais)
+    CVCRM_EMPREENDIMENTO  opcional, padrão 4 (Bracerum Park — Lotes industriais; no CV 3 = Hotel,
+                          7 = Residence/Condomínios, 9 = Cidade)
 
   Fonte: GET /api/v1/comercial/mapadisponibilidade/{id} (docs: desenvolvedor.cvcrm.com.br).
   Resposta pública, só o mínimo: { ok, atualizado, lotes: { "Q07.L014": "v", ... } }
@@ -41,10 +42,17 @@ function codigo(sit) {
   return undefined;
 }
 
-// "LTIND.Q07.L014", "Q07.L014", "LTIND.Q07.L014.A01250.ESQNAO.RT.L" -> "Q07.L014"
-function idLote(nome) {
-  const m = /Q(\d{2})\.L(\d{3})/i.exec(String(nome || ''));
-  return m ? `Q${m[1]}.L${m[2]}` : null;
+// Unidade do CV -> id da maquete ("Q07.L014"). No mapa de disponibilidade o CV manda a quadra no
+// bloco e o lote na unidade ({ bloco: "Quadra Q02", unidade: "L003" }); aceita também o nome inteiro
+// ("LTIND.Q07.L014", "Q07.L014", "LTIND.Q07.L014.A01250.ESQNAO.RT.L"). Hub, hangares etc. -> null.
+function idLote(u) {
+  if (typeof u === 'string') u = { unidade: u };
+  const nome = String(u.unidade || u.nome || '');
+  const m = /Q(\d{2})\.L(\d{3})/i.exec(nome);
+  if (m) return `Q${m[1]}.L${m[2]}`;
+  const q = /\bQ(?:uadra)?\s*(\d{1,2})\b/i.exec(String(u.bloco || ''));
+  const l = /^\s*L(?:ote)?\s*0*(\d{1,3})\s*$/i.exec(nome);
+  return q && l ? `Q${q[1].padStart(2, '0')}.L${l[1].padStart(3, '0')}` : null;
 }
 
 async function pagina(base, headers, pag) {
@@ -58,7 +66,7 @@ async function pagina(base, headers, pag) {
 
 async function lerCV() {
   const host = process.env.CVCRM_HOST || 'bracerum.cvcrm.com.br';
-  const emp = process.env.CVCRM_EMPREENDIMENTO || '3';
+  const emp = process.env.CVCRM_EMPREENDIMENTO || '4';
   const { CVCRM_EMAIL: email, CVCRM_TOKEN: token } = process.env;
   if (!email || !token) throw Object.assign(new Error('CVCRM_EMAIL/CVCRM_TOKEN não configurados'), { status: 503 });
   const base = `https://${host}/api/v1/comercial/mapadisponibilidade/${encodeURIComponent(emp)}`;
@@ -71,7 +79,7 @@ async function lerCV() {
     const d = await pagina(base, headers, pag);
     const dados = Array.isArray(d.dados) ? d.dados : [];
     for (const u of dados) {
-      const id = idLote(u.unidade || u.nome);
+      const id = idLote(u);
       if (!id) continue;
       total++;
       const sit = u.situacao_mapa_disponibilidade ?? u.situacao;

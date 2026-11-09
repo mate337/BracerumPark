@@ -159,16 +159,17 @@ novos fecham os 38.194 m². Ver `docs/masterplan-v14.md` §4.
 
 ## Disponibilidade ao vivo pelo CV CRM (2026-11-09)
 
-O CV CRM (`bracerum.cvcrm.com.br`) é o CRM das reservas. O loteamento é o **empreendimento 3**
-("Bracerum Park — Lotes industriais", sigla LTIND); os outros são 1 Hotel, 2 Cidade e 4 Condomínios.
-No CV cada lote é uma unidade com o **mesmo nome da maquete** (`LTIND.Q01.L001`, bloco "Quadra Q01").
+O CV CRM (`bracerum.cvcrm.com.br`) é o CRM das reservas. **Códigos internos dos empreendimentos na API**
+(não é a ordem da tela do CV): **4 = Bracerum Park — Lotes industriais**, 3 = Hotel, 7 = Residence/
+Condomínios, 9 = Cidade. No mapa de disponibilidade cada lote vem com a **quadra no bloco** ("Quadra Q02")
+e o **lote na unidade** ("L003"); a função junta os dois em `Q02.L003`, o id da maquete.
 O cadastro exportado (`unidades_3_loteamento.csv`, pasta "Lotes + Categorias" do Drive do cliente) tem
 641 unidades: os **615 lotes da maquete, todos casando pelo nome**, mais 26 que a maquete não vende
 (8 do Hub de serviços, 7 hangares, Q37 e Q11, marcados como "Fora da oferta").
 
 **Como funciona:**
 - `api/lotes-status.js` (função da Vercel, na raiz do repositório) lê
-  `GET /api/v1/comercial/mapadisponibilidade/3` do CV com o token e devolve só
+  `GET /api/v1/comercial/mapadisponibilidade/4` do CV com o token e devolve só
   `{ ok, atualizado, lotes: { "Q07.L014": "v" } }`: `r` reservado (inclui "em processo de reserva"),
   `v` vendido, `b` bloqueado/indisponível; lote ausente = disponível. Nome do comprador, corretor e
   documento **não saem** da função. A CDN guarda a resposta 60 s (`CDN-Cache-Control`), então o CV recebe
@@ -184,17 +185,19 @@ O cadastro exportado (`unidades_3_loteamento.csv`, pasta "Lotes + Categorias" do
 
 **Variáveis de ambiente do projeto na Vercel** (Settings → Environment Variables, Production):
 `CVCRM_TOKEN` (segredo — o próprio cliente cola no painel), `CVCRM_EMAIL` (e-mail do usuário dono do
-token), opcionais `CVCRM_HOST` (padrão `bracerum.cvcrm.com.br`) e `CVCRM_EMPREENDIMENTO` (padrão `3`).
+token), opcionais `CVCRM_HOST` (padrão `bracerum.cvcrm.com.br`) e `CVCRM_EMPREENDIMENTO` (padrão `4`).
 O token é gerado no Painel do Gestor do CV, no cadastro do usuário (botão "Token"); o perfil do usuário
 precisa de permissão para o endpoint do mapa de disponibilidade. Documentação da API:
 desenvolvedor.cvcrm.com.br.
 
-**Pendente (2026-11-09):** a primeira chamada real devolveu 401 ("Request sem token ou email de
-autorização") com o token salvo na sessão e o e-mail `matheus337.martins@gmail.com` — a mesma resposta
-de um token inventado. Conferir no CV: e-mail exato do usuário do token, token ativo e não vencido,
-permissão do perfil, e o log em `https://bracerum.cvcrm.com.br/cvio`. O formato real da resposta
-(campo `situacao` em texto, paginação `paginacao.total_de_paginas`) só foi visto na documentação; a
-função também aceita o código numérico (`situacao_mapa_disponibilidade` 1–5).
+**Conferido com o CV real (2026-11-09):** usuário de integração **CONEXAOSITECV**, e-mail
+`matheus337.martins@gmail.com` (com ponto — sem o ponto o CV responde 401). O mapa do empreendimento 4 tem
+641 unidades em 3 páginas de 300; a função reconhece 626 (os 615 lotes + Q37 + Q11; Hub e hangares ficam
+de fora) e devolveu `Q02.L003` reservado, a única reserva no CV naquele dia. `situacao` vem em texto
+minúsculo ("disponível", "reservada"). O 401 dos primeiros testes era o e-mail sem ponto e uma credencial
+salva sem o cabeçalho `token`.
+**Testar daqui:** o Node não usa o proxy da sessão sozinho —
+`NODE_USE_ENV_PROXY=1 NODE_EXTRA_CA_CERTS=/root/.ccr/ca-bundle.crt CVCRM_EMAIL=… CVCRM_TOKEN=proxy-injected node -e "require('./api/lotes-status.js')({}, {setHeader(){}, end: console.log})"`.
 
 A tabela de preços continua dizendo que a disponibilidade é confirmada na proposta — o texto do cartão
 não mudou.
