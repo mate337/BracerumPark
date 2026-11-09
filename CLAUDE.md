@@ -30,7 +30,8 @@ rotas) que as seis páginas internas baixavam e interpretavam à toa. Ele roda d
 - Precisa de `CVCRM_TOKEN` (segredo) e `CVCRM_EMAIL` nas variáveis do projeto na Vercel. O `pacote_vercel.py`
   já leva a pasta `api/`. Detalhes e pendências em `docs/3dmasterplan/README.md` ("Disponibilidade ao vivo").
 - **Conferido com o CV real em 2026-11-09** (usuário CONEXAOSITECV, e-mail `matheus337.martins@gmail.com`,
-  com ponto): 626 unidades reconhecidas, `Q02.L003` reservado. Falta pôr as variáveis na Vercel e publicar.
+  com ponto): 626 unidades reconhecidas, `Q02.L003` reservado. **No ar desde 2026-11-09** (`CVCRM_TOKEN`
+  sensível e `CVCRM_EMAIL` nas variáveis de Production da Vercel; `bracerumpark.com/api/lotes-status`).
 
 ### Cartões de visita digitais (v6.6 — 2026-11-09)
 - Página aberta pelo QR Code do cartão impresso, no mesmo padrão do linktree (independente, sem
