@@ -1043,6 +1043,76 @@ function pintaLotes() {                       // recolore pela situação do CV 
     for (let k = l._v0; k < l._v1; k += 3) { a.array[k] = c.r; a.array[k + 1] = c.g; a.array[k + 2] = c.b; }
   }
   a.needsUpdate = true;
+  pintaStatus();
+}
+/* Lotes ocupados à vista mesmo fora do modo de lotes: o chão do lote e o trecho do galpão ilustrativo
+   que fica em cima dele ganham a cor da situação. Os galpões cobrem de 3 a 17 lotes cada, então só o
+   pedaço sobre o lote ocupado muda de cor — o resto do galpão continua neutro. O trecho é um volume
+   por cima do galpão (0,15 m mais largo e 0,12 m mais alto, sem disputar a mesma face) e não entra no
+   clique: o apontar continua achando o galpão e o lote de baixo. */
+const camadaStatus = new THREE.Group();
+let matStatus = null, galpoes = null;
+function recorta(poly, [x0, y0, x1, y1]) {      // Sutherland–Hodgman: polígono × retângulo alinhado
+  const passa = [[(p) => p[0] >= x0, (a, b) => [x0, a[1] + (b[1] - a[1]) * (x0 - a[0]) / (b[0] - a[0])]],
+    [(p) => p[0] <= x1, (a, b) => [x1, a[1] + (b[1] - a[1]) * (x1 - a[0]) / (b[0] - a[0])]],
+    [(p) => p[1] >= y0, (a, b) => [a[0] + (b[0] - a[0]) * (y0 - a[1]) / (b[1] - a[1]), y0]],
+    [(p) => p[1] <= y1, (a, b) => [a[0] + (b[0] - a[0]) * (y1 - a[1]) / (b[1] - a[1]), y1]]];
+  for (const [dentro, corte] of passa) {
+    const out = [];
+    for (let i = 0; i < poly.length; i++) {
+      const a = poly[(i + poly.length - 1) % poly.length], b = poly[i];
+      if (dentro(b)) { if (!dentro(a)) out.push(corte(a, b)); out.push(b); } else if (dentro(a)) out.push(corte(a, b));
+    }
+    poly = out;
+    if (poly.length < 3) return [];
+  }
+  return poly;
+}
+function pintaStatus() {
+  camadaStatus.children.forEach((m) => m.geometry.dispose());
+  camadaStatus.clear();
+  const ocup = ST ? L.lotes.filter(stDe) : [];
+  if (!ocup.length) { invalidate(); return; }
+  if (!matStatus) {
+    const std = (map) => realcar(new THREE.MeshStandardMaterial({ roughness: 0.9, metalness: 0, vertexColors: true, map }));
+    matStatus = { chao: new THREE.MeshBasicMaterial({ vertexColors: true, transparent: true, opacity: 0.9, depthWrite: false,
+      toneMapped: false, side: THREE.DoubleSide }), w: std(TEX.metal()), r: std(TEX.roof()) };
+    galpoes = S.vol.filter((v) => v.t === 'galpão').map((v) => {
+      const xs = v.p.filter((_, i) => i % 2 === 0), ys = v.p.filter((_, i) => i % 2 === 1);
+      return { r: [Math.min(...xs) - 0.15, Math.min(...ys) - 0.15, Math.max(...xs) + 0.15, Math.max(...ys) + 0.15], h: v.h + 0.12 };
+    });
+  }
+  const pos = [], col = [], c = new THREE.Color(), aw = new Acc(), ar = new Acc(), ai = areaIdx.industrial ?? -1;
+  for (const l of ocup) {
+    c.set(ST_COR[stDe(l)]);
+    const w = l._pts.map((p) => toWorld(p[0], p[1]));
+    for (const tri of THREE.ShapeUtils.triangulateShape(w.map((p) => new THREE.Vector2(p[0], p[1])), [])) {
+      for (const k of tri) { pos.push(w[k][0], 0.18, w[k][1]); col.push(c.r, c.g, c.b); }
+    }
+    for (const g of galpoes) {
+      if (l._bb[2] < g.r[0] || l._bb[0] > g.r[2] || l._bb[3] < g.r[1] || l._bb[1] > g.r[3]) continue;
+      const pc = recorta(l._pts, g.r);
+      if (pc.length < 3) continue;
+      let pw = pc.map((p) => toWorld(p[0], p[1]));
+      if (Math.abs(area2(pw)) < 4) continue;
+      if (area2(pw) < 0) pw.reverse();
+      paredes(aw, pw, g.h, ai, [c.r, c.g, c.b]);
+      telhado(ar, pw, g.h, ai, [c.r, c.g, c.b]);
+    }
+  }
+  const gc = new THREE.BufferGeometry();
+  gc.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  gc.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
+  const chao = new THREE.Mesh(gc, matStatus.chao);
+  chao.renderOrder = 1;
+  camadaStatus.add(chao);
+  for (const [a, m] of [[aw, matStatus.w], [ar, matStatus.r]]) {
+    if (!a.p.length) continue;
+    const mesh = new THREE.Mesh(a.geom(), m);
+    mesh.receiveShadow = true;
+    camadaStatus.add(mesh);
+  }
+  camadaStatus.children.forEach((m) => { m.raycast = () => {}; });
   invalidate();
 }
 function aplicaStatus(d) {
@@ -1779,6 +1849,7 @@ async function iniciar() {
   preparaLotes();
   montaCamadaLotes();
   scene.add(camadaLotes);
+  scene.add(camadaStatus);
   progresso(0.95);
 
   setHora(+$('#tSun').value);

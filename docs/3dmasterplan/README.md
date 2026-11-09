@@ -179,6 +179,11 @@ O cadastro exportado (`unidades_3_loteamento.csv`, pasta "Lotes + Categorias" do
   cinza), a legenda conta os disponíveis por categoria e os ocupados por situação, o cartão do lote
   ocupado troca a simulação por "fale com a equipe comercial", e a simulação de vários lotes (quadra
   inteira, shift + clique, link `#lotes-…`) deixa os ocupados de fora.
+- **Visível sem abrir nada** (pedido do cliente, 2026-11-09): na vista normal, o chão do lote ocupado e o
+  trecho do galpão ilustrativo em cima dele já aparecem na cor da situação (`camadaStatus`,
+  `pintaStatus()` no `app.js`). Cada galpão cobre de 3 a 17 lotes, então só o pedaço sobre o lote
+  ocupado muda de cor: é o polígono do lote recortado pelo retângulo do galpão, levantado como um volume
+  0,15 m mais largo e 0,12 m mais alto, fora do clique.
 - **Sem a função** (file://, servidor local, CV fora do ar, variáveis não configuradas) a resposta não é
   `ok` e a maquete fica como antes: todos à venda. Nada quebra.
 - Teste sem o CV: `window.__bp.aplicaStatus({ ok: true, lotes: { 'Q10.L001': 'v' } })` no console.
