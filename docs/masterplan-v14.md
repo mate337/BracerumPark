@@ -112,3 +112,23 @@ O `build_lotes.py` resolve e avisa cada um:
    o V14 chama a faixa comercial vertical (o 06 do folheto) de "Bracerum Outlet".
 5. O V14 só desenha os lotes e a implantação: a arquitetura dos prédios do vértice norte, do Posto e do
    Hub na maquete é genérica, e **as alturas continuam estimativas**.
+
+## 6. V14 FINAL — "LIMPO SYDNEY" (plotado em 02/11/2026, recebido em 09/11/2026)
+
+PDF em `docs/masterplan-v14/BRACERUM_PARK_V14_FINAL_LIMPO_2026-11-02.pdf` — o cliente chamou de "a última
+versão do masterplan". Mesma prancha e mesmas coordenadas; o que muda em relação ao V14 de 28/10:
+
+- **Lotes industriais: 614 lotes, 766.690 m²** no quadro (era 615 / 766.693). A **Q38 foi redesenhada com
+  16 lotes** (eram 17): L001 1.501 · L002 e L003 872 · L004–L008 1.250 · L009 1.483 · L010 962 · L011 1.035 ·
+  L012 730 · L013 803 · L014 877 · L015 950 · L016 1.024 m². Q38 + Q39 = 38.190 m².
+- **Erros de rótulo no PDF:** os nomes completos de Q38.L014–L016 saíram como "Q38.L013" (quatro vezes; os
+  rótulos curtos e a posição dizem L013–L016); Q38.L002 e L003 estão como "A0872" (4 dígitos = 872 m²).
+- **Q04.L017** agora só traz **A01410** (1.410 m²), mas a quadra Q04 continua cotada em 21.650 m² e o total
+  do quadro só fecha com **1.650 m²** (soma dos 614 nomes com 1.650 = 766.689 m²). A planilha usa 1.650 e
+  marca para confirmar.
+- **Bracerum Outlet: 47.410 m²** (era 61.850). **"Bracerum Condo" passou a se chamar "Bracerum Residence"**
+  (114.273 m², 1.200 aptos — iguais).
+- Planilha para o cadastro no CRM (área privativa por unidade + fluxos de pagamento da Tabela v3.1):
+  `entregas/BracerumPark_Cidade_areas_e_pagamento_V14-final.xlsx`.
+- **A maquete 3D ainda está no V14 de 28/10** (615 lotes, Q38 com 17) — atualizar o `build_lotes.py` para
+  esta prancha quando o usuário pedir.
