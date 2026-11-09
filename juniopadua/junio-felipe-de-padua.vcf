@@ -1,0 +1,15 @@
+BEGIN:VCARD
+VERSION:3.0
+N:de Pádua;Junio;Felipe;;
+FN:Junio Felipe de Pádua
+ORG:Bracerum Park
+TITLE:Arquiteto
+TEL;TYPE=CELL,VOICE,pref:+5544999140995
+EMAIL;TYPE=INTERNET,WORK:arq@bracerum.com
+URL:https://bracerumpark.com/juniopadua
+URL;TYPE=Site:https://bracerumpark.com/
+X-SOCIALPROFILE;TYPE=instagram:https://www.instagram.com/bracerumpark/
+X-SOCIALPROFILE;TYPE=linkedin:https://py.linkedin.com/company/bracerumpark
+ADR;TYPE=WORK:;;Acceso Sur · Ruta PY19;Villeta;Departamento Central;;Paraguay
+NOTE:Bracerum Park — Villeta Industrial City\, Paraguay · Mercosur
+END:VCARD

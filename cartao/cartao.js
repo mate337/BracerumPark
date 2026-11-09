@@ -37,7 +37,7 @@
   };
   var LANGS = { pt: 'pt-BR', en: 'en', es: 'es' };
 
-  var nodes = document.querySelectorAll('[data-t]');
+  var nodes = document.querySelectorAll('[data-t],[data-en]');  // data-en/data-es: texto próprio do cartão (cargo)
   nodes.forEach(function (n) { n._pt = n.innerHTML; });
   var titlePt = document.title;
   var person = document.body.getAttribute('data-name') || '';
@@ -45,7 +45,10 @@
   function apply(lang) {
     if (!LANGS[lang]) lang = 'pt';
     var d = D[lang];
-    nodes.forEach(function (n) { var k = n.getAttribute('data-t'); n.innerHTML = (lang !== 'pt' && d[k]) || n._pt; });
+    nodes.forEach(function (n) {
+      var k = n.getAttribute('data-t');
+      n.innerHTML = (lang !== 'pt' && (n.getAttribute('data-' + lang) || d[k])) || n._pt;
+    });
     document.title = lang !== 'pt' && d.title ? person + d.title : titlePt;
     document.documentElement.lang = LANGS[lang];
     document.querySelectorAll('.js-wa').forEach(function (a) {

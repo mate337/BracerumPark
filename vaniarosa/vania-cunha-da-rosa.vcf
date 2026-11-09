@@ -1,12 +1,12 @@
 BEGIN:VCARD
 VERSION:3.0
-N:Savi;Sydney;;;
-FN:Sydney Savi
+N:da Rosa;Vania;Cunha;;
+FN:Vania Cunha da Rosa
 ORG:Bracerum Park
-TEL;TYPE=CELL,VOICE,pref:+5547988030200
-TEL;TYPE=CELL,VOICE:+595983030200
-EMAIL;TYPE=INTERNET,WORK:sydney@bracerum.com
-URL:https://bracerumpark.com/sydneysavi
+TITLE:Advogada
+TEL;TYPE=CELL,VOICE,pref:+595983522000
+EMAIL;TYPE=INTERNET,WORK:vania@bracerum.com
+URL:https://bracerumpark.com/vaniarosa
 URL;TYPE=Site:https://bracerumpark.com/
 X-SOCIALPROFILE;TYPE=instagram:https://www.instagram.com/bracerumpark/
 X-SOCIALPROFILE;TYPE=linkedin:https://py.linkedin.com/company/bracerumpark

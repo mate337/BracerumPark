@@ -14,29 +14,35 @@ rotas) que as seis páginas internas baixavam e interpretavam à toa. Ele roda d
 - **A conta GitHub `mate337` foi sinalizada ("flagged")** e não pode autorizar apps de terceiros: a Vercel
   perdeu o acesso ao repositório e **push no `main` não publica mais** (desde 6/11; o `tracking.js` ficou fora
   do ar até 9/11). Só o suporte do GitHub resolve.
-- Enquanto isso, publicar pela **Vercel CLI**: copiar os arquivos do git **sem** `docs/`, `scripts/`,
-  `workflows/`, `*.md`/`*.txt` e sem os originais do cliente não referenciados (arquivos soltos em `assets/`,
-  `assets/Bracerum {Hotel,Resort,Select}/`, `assets/SVG/`) — ~37 MB em vez de 161 MB, abaixo do limite do
-  plano Hobby —, gravar `.vercel/project.json` (`team_M5fGTN1hNkSvweDXEjfrauUl` /
-  `prj_XPkSGpHbPCKCOAeTdm0lqhmycyK9`) e rodar `vercel deploy --prod --yes --token proxyinjected --scope
-  team_M5fGTN1hNkSvweDXEjfrauUl` (o proxy da sessão injeta o token real de `api.vercel.com`). Conferir
-  depois que nenhuma página pede arquivo que ficou de fora. **Sempre publicar a partir do `main`.**
+- Enquanto isso, publicar pela **Vercel CLI** a partir do `main`: `python3 docs/pacote_vercel.py <pasta>`
+  monta a cópia enxuta (sem `docs/`, `scripts/`, `workflows/`, `*.md`/`*.txt` e sem os originais do cliente
+  não citados — ~37 MB em vez de 161 MB, abaixo do limite do plano Hobby) com o `.vercel/project.json`; depois,
+  na pasta, `vercel deploy --prod --yes --token proxyinjected --scope team_M5fGTN1hNkSvweDXEjfrauUl` (o proxy da
+  sessão injeta o token real de `api.vercel.com`; se expirou, pedir outro em vercel.com/account/tokens).
+  Conferir no ar que nenhuma página pede arquivo que ficou de fora.
 
 ### Cartões de visita digitais (v6.6 — 2026-11-09)
-- **bracerumpark.com/cleberpavao** e **bracerumpark.com/sydneysavi**: página aberta pelo QR Code do
-  cartão, no mesmo padrão do linktree (independente, sem `style.css`/`script.js`/`i18n.js`, mesma chave
-  `bp-lang`, PT/EN/ES, `tracking.js`). Conteúdo pedido: **WhatsApp e e-mail pessoais**; **Instagram,
-  LinkedIn e site do Park**. Mais um botão **"Salvar contato"** (vCard 3.0 com os dois telefones,
-  e-mail, site e redes — `data-track="save_contact"`).
+- Página aberta pelo QR Code do cartão impresso, no mesmo padrão do linktree (independente, sem
+  `style.css`/`script.js`/`i18n.js`, mesma chave `bp-lang`, PT/EN/ES, `tracking.js`). **Cinco cartões**,
+  com os dados dos cartões impressos enviados pelo cliente em 2026-11-09:
+  `/cleberpavao` (Business Development) · `/sydneysavi` (Sydney Marcos Savi, Business Development) ·
+  `/athospavao` (sem cargo no cartão) · `/juniopadua` (Junio Felipe de Pádua, Arquiteto) ·
+  `/vaniarosa` (Vania Cunha da Rosa, Advogada).
+- Conteúdo: nome, cargo, **WhatsApp e e-mail pessoais** e **Instagram, LinkedIn e site do Park**, mais o
+  botão **"Salvar contato"** (vCard 3.0 com cargo, telefones, e-mail, site e redes —
+  `data-track="save_contact"`). **Um botão de WhatsApp por número, o do Brasil primeiro (principal) e
+  o do Paraguai em seguida** (pedido do cliente); quem só tem um número (Junio só BR, Vania só PY)
+  mostra só esse. No vCard o primeiro número é o `pref`.
 - **Tudo é gerado** por `docs/build_cartoes.py` (lista `PESSOAS`): `<slug>/index.html`,
-  `<slug>/<nome-sobrenome>.vcf` e os QR Codes em `docs/cartoes/` (`qr-<slug>-ink.svg` para fundo claro,
+  `<slug>/<nome-completo>.vcf` e os QR Codes em `docs/cartoes/` (`qr-<slug>-ink.svg` para fundo claro,
   `-cream.svg` para fundo escuro, `.png` 1640 px; nível Q, URL limpa sem utm — o `tracking.js` já
-  registra a página de entrada). **Não editar o HTML gerado.** CSS/JS compartilhados em `cartao/`.
+  registra a página de entrada). **Não editar o HTML gerado.** CSS/JS compartilhados em `cartao/`; o
+  cargo traduz por `data-en`/`data-es` no próprio elemento.
 - **Cartão novo:** acrescentar a pessoa em `PESSOAS`, rodar o script (`pip install segno` para o QR) e
-  pôr o rewrite `/<slug>` no `vercel.json`. As URLs são em minúsculas; `/CleberPavao` e `/SydneySavi`
-  redirecionam.
-- WhatsApp de cada um = o mesmo número do footer/linktree (Cleber PY +595 985 516 065, Sydney BR
-  +55 47 98803-0200). **Cargo não aparece** — não foi informado; se o cliente mandar, entra no gerador.
+  pôr o rewrite `/<slug>` (e o redirect com maiúsculas) no `vercel.json`. Slug = primeiro nome + último
+  sobrenome, em minúsculas.
+- O e-mail geral `bracerumpark@bracerum.com` que aparece no rodapé do cartão impresso **não** está na
+  página (não foi pedido) — acrescentar no grupo "Bracerum Park" se o cliente quiser.
 
 ### Links dos folders e rastreamento (v6.5 — 2026-11-06)
 - **Seis links de folder** (`/FolderResidence/`, `/FolderPark/`, `/FolderResort/`, `/FolderBusinessCenter/`,

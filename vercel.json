@@ -4,12 +4,18 @@
     { "source": "/3DMasterplan", "destination": "/3dmasterplan/", "permanent": true },
     { "source": "/3DMasterplan/", "destination": "/3dmasterplan/", "permanent": true },
     { "source": "/CleberPavao", "destination": "/cleberpavao", "permanent": true },
-    { "source": "/SydneySavi", "destination": "/sydneysavi", "permanent": true }
+    { "source": "/SydneySavi", "destination": "/sydneysavi", "permanent": true },
+    { "source": "/AthosPavao", "destination": "/athospavao", "permanent": true },
+    { "source": "/JunioPadua", "destination": "/juniopadua", "permanent": true },
+    { "source": "/VaniaRosa", "destination": "/vaniarosa", "permanent": true }
   ],
   "rewrites": [
     { "source": "/linktree", "destination": "/linktree/index.html" },
     { "source": "/cleberpavao", "destination": "/cleberpavao/index.html" },
-    { "source": "/sydneysavi", "destination": "/sydneysavi/index.html" }
+    { "source": "/sydneysavi", "destination": "/sydneysavi/index.html" },
+    { "source": "/athospavao", "destination": "/athospavao/index.html" },
+    { "source": "/juniopadua", "destination": "/juniopadua/index.html" },
+    { "source": "/vaniarosa", "destination": "/vaniarosa/index.html" }
   ],
   "headers": [
     {

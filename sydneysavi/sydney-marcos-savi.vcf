@@ -1,0 +1,16 @@
+BEGIN:VCARD
+VERSION:3.0
+N:Savi;Sydney;Marcos;;
+FN:Sydney Marcos Savi
+ORG:Bracerum Park
+TITLE:Business Development
+TEL;TYPE=CELL,VOICE,pref:+5547988030200
+TEL;TYPE=CELL,VOICE:+595983030200
+EMAIL;TYPE=INTERNET,WORK:sydney@bracerum.com
+URL:https://bracerumpark.com/sydneysavi
+URL;TYPE=Site:https://bracerumpark.com/
+X-SOCIALPROFILE;TYPE=instagram:https://www.instagram.com/bracerumpark/
+X-SOCIALPROFILE;TYPE=linkedin:https://py.linkedin.com/company/bracerumpark
+ADR;TYPE=WORK:;;Acceso Sur · Ruta PY19;Villeta;Departamento Central;;Paraguay
+NOTE:Bracerum Park — Villeta Industrial City\, Paraguay · Mercosur
+END:VCARD

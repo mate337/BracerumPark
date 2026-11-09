@@ -6,7 +6,7 @@ Para cada pessoa em PESSOAS grava:
   <slug>/<nome-sobrenome>.vcf  o "Salvar contato" (vCard 3.0)
   docs/cartoes/qr-<slug>-{ink,cream}.svg  e  qr-<slug>.png   QR Codes para impressão
 
-WhatsApp e e-mail são da pessoa; Instagram, LinkedIn e site são do Park.
+WhatsApp (um botão por número, Brasil primeiro) e e-mail são da pessoa; Instagram, LinkedIn e site são do Park.
 CSS e JS ficam em cartao/ (compartilhados). Para um cartão novo: acrescentar
 a pessoa em PESSOAS, rodar  `python3 docs/build_cartoes.py`  e pôr o slug no
 vercel.json (rewrite igual aos outros). Requer `pip install segno` só para os QR.
@@ -18,23 +18,54 @@ from urllib.parse import quote
 ROOT = Path(__file__).resolve().parent.parent
 SITE = "https://bracerumpark.com"
 
+# Fonte: cartões impressos enviados pelo cliente em 2026-11-09.
+# phones: o primeiro é o principal (Brasil, quando a pessoa tem os dois). Todos são WhatsApp.
+# name: (primeira linha, segunda linha em itálico) · vcard_n: (sobrenome, nome, nomes do meio)
 PESSOAS = [
     {
         "slug": "cleberpavao",
         "first": "Cleber",
-        "last": "Pavão",
+        "name": ("Cleber", "Pavão"),
+        "vcard_n": ("Pavão", "Cleber", ""),
+        "role": {"pt": "Business Development", "en": "Business Development", "es": "Business Development"},
         "email": "cleber@bracerum.com",
-        # WhatsApp: o mesmo número do footer do site e do linktree.
-        "wa": {"phone": "595985516065", "label": "+595 985 516 065", "country": "py"},
-        "tels": [("+595985516065", "Paraguai"), ("+5511986516065", "Brasil")],
+        "phones": [("5511986516065", "+55 11 98651-6065", "br"), ("595985516065", "+595 985 516 065", "py")],
     },
     {
         "slug": "sydneysavi",
         "first": "Sydney",
-        "last": "Savi",
+        "name": ("Sydney Marcos", "Savi"),
+        "vcard_n": ("Savi", "Sydney", "Marcos"),
+        "role": {"pt": "Business Development", "en": "Business Development", "es": "Business Development"},
         "email": "sydney@bracerum.com",
-        "wa": {"phone": "5547988030200", "label": "+55 47 98803-0200", "country": "br"},
-        "tels": [("+5547988030200", "Brasil"), ("+595983030200", "Paraguai")],
+        "phones": [("5547988030200", "+55 47 98803-0200", "br"), ("595983030200", "+595 983 030 200", "py")],
+    },
+    {
+        "slug": "athospavao",
+        "first": "Athos",
+        "name": ("Athos", "Pavão"),
+        "vcard_n": ("Pavão", "Athos", ""),
+        "role": None,
+        "email": "athospavao@bracerum.com",
+        "phones": [("5511953409125", "+55 11 95340-9125", "br"), ("595983516065", "+595 983 516 065", "py")],
+    },
+    {
+        "slug": "juniopadua",
+        "first": "Junio",
+        "name": ("Junio Felipe", "de Pádua"),
+        "vcard_n": ("de Pádua", "Junio", "Felipe"),
+        "role": {"pt": "Arquiteto", "en": "Architect", "es": "Arquitecto"},
+        "email": "arq@bracerum.com",
+        "phones": [("5544999140995", "+55 44 99914-0995", "br")],
+    },
+    {
+        "slug": "vaniarosa",
+        "first": "Vania",
+        "name": ("Vania Cunha", "da Rosa"),
+        "vcard_n": ("da Rosa", "Vania", "Cunha"),
+        "role": {"pt": "Advogada", "en": "Lawyer", "es": "Abogada"},
+        "email": "vania@bracerum.com",
+        "phones": [("595983522000", "+595 983 522 000", "py")],
     },
 ]
 
@@ -57,29 +88,42 @@ LOSANGO = '<svg class="who__mark" viewBox="0 0 22 22" fill="none" stroke="curren
 def vcf_name(p):
     """cleber-pavao.vcf — é o nome com que o arquivo chega no Android."""
     import unicodedata
-    s = unicodedata.normalize("NFKD", f"{p['first']}-{p['last']}").encode("ascii", "ignore").decode()
-    return s.lower().replace(" ", "-") + ".vcf"
+    s = unicodedata.normalize("NFKD", " ".join(p["name"])).encode("ascii", "ignore").decode()
+    return "-".join(s.lower().split()) + ".vcf"
 
 
 def page(p):
-    name = f"{p['first']} {p['last']}"
+    name = " ".join(p["name"])
+    role = p.get("role")
     slug = p["slug"]
     url = f"{SITE}/{slug}"
     wa_text = quote(f"Olá, {p['first']}. Recebi seu cartão do Bracerum Park e gostaria de saber mais sobre o projeto.")
-    wa = p["wa"]
     e = escape
+    # Um botão de WhatsApp por número, o principal (Brasil) primeiro.
+    wa_links = "\n".join(f"""    <a class="link js-wa" data-phone="{num}" target="_blank" rel="noopener"
+       href="https://wa.me/{num}?text={wa_text}">
+      {ICO['wa']}
+      <span class="link__txt">
+        <span class="link__title">WhatsApp</span>
+        <span class="link__sub"><span data-t="{pais}">{COUNTRY_PT[pais]}</span> · {label}</span>
+      </span>
+      <span class="link__arrow" aria-hidden="true">↗</span>
+    </a>""" for num, label, pais in p["phones"])
+    role_html = (f'\n    <p class="who__role" data-en="{e(role["en"])}" data-es="{e(role["es"])}">{e(role["pt"])}</p>'
+                 if role else "")
+    who = f"{name} · {role['pt']}" if role else name
     return f"""<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>{e(name)} — Bracerum Park · Cartão digital</title>
-<meta name="description" content="{e(name)} · Bracerum Park, cidade industrial multiuso em Villeta, Paraguai. WhatsApp, e-mail, redes e site." />
+<meta name="description" content="{e(who)} · Bracerum Park, cidade industrial multiuso em Villeta, Paraguai. WhatsApp, e-mail, redes e site." />
 <meta name="theme-color" content="#0e0d0b" />
 <link rel="canonical" href="{url}" />
 <meta property="og:type" content="profile" />
 <meta property="og:url" content="{url}" />
-<meta property="og:title" content="{e(name)} · Bracerum Park" />
+<meta property="og:title" content="{e(who)} · Bracerum Park" />
 <meta property="og:description" content="Cartão digital — Bracerum Park, Villeta Industrial City · Paraguai · Mercosul." />
 <meta property="og:image" content="{SITE}/assets/web/og-linktree.jpg" />
 <meta property="og:image:width" content="1200" />
@@ -95,7 +139,7 @@ def page(p):
   editar os dados lá e rodar de novo, não aqui. Caminhos relativos "../":
   funcionam em /{slug} e em /{slug}/.
 -->
-<link rel="stylesheet" href="../cartao/cartao.css?v=1" />
+<link rel="stylesheet" href="../cartao/cartao.css?v=2" />
 <script src="../tracking.js?v=1" defer></script>
 </head>
 <body data-first="{e(p['first'])}" data-name="{e(name)}">
@@ -115,7 +159,7 @@ def page(p):
 
   <header class="who in" style="--i:1">
     {LOSANGO}
-    <h1 class="who__name">{e(p['first'])} <em>{e(p['last'])}</em></h1>
+    <h1 class="who__name">{e(p['name'][0])} <em>{e(p['name'][1])}</em></h1>{role_html}
     <p class="who__org">Bracerum Park</p>
     <p class="who__place" data-t="place">Villeta Industrial City — Paraguai · Mercosul</p>
   </header>
@@ -127,15 +171,7 @@ def page(p):
   <!-- 01 · CONTATO (pessoal) -->
   <section class="group in" style="--i:3" aria-labelledby="g1">
     <div class="group__head"><span class="group__n">01</span><h2 class="group__t" id="g1" data-t="g.contact">Contato</h2></div>
-    <a class="link js-wa" data-phone="{wa['phone']}" target="_blank" rel="noopener"
-       href="https://wa.me/{wa['phone']}?text={wa_text}">
-      {ICO['wa']}
-      <span class="link__txt">
-        <span class="link__title">WhatsApp</span>
-        <span class="link__sub"><span data-t="{wa['country']}">{COUNTRY_PT[wa['country']]}</span> · {wa['label']}</span>
-      </span>
-      <span class="link__arrow" aria-hidden="true">↗</span>
-    </a>
+{wa_links}
     <a class="link js-mail" data-mail="{e(p['email'])}" href="mailto:{e(p['email'])}?subject=Bracerum%20Park">
       {ICO['mail']}
       <span class="link__txt">
@@ -183,7 +219,7 @@ def page(p):
   </footer>
 </main>
 
-<script src="../cartao/cartao.js?v=1"></script>
+<script src="../cartao/cartao.js?v=2"></script>
 </body>
 </html>
 """
@@ -195,13 +231,15 @@ def vcard(p):
     lines = [
         "BEGIN:VCARD",
         "VERSION:3.0",
-        f"N:{esc(p['last'])};{esc(p['first'])};;;",
-        f"FN:{esc(p['first'] + ' ' + p['last'])}",
+        "N:" + ";".join(esc(x) for x in (p["vcard_n"][0], p["vcard_n"][1], p["vcard_n"][2], "", "")),
+        f"FN:{esc(' '.join(p['name']))}",
         "ORG:Bracerum Park",
     ]
-    for i, (tel, pais) in enumerate(p["tels"]):
+    if p.get("role"):
+        lines.append(f"TITLE:{esc(p['role']['pt'])}")
+    for i, (num, _label, _pais) in enumerate(p["phones"]):
         kind = "CELL,VOICE,pref" if i == 0 else "CELL,VOICE"
-        lines.append(f"TEL;TYPE={kind}:{tel}")
+        lines.append(f"TEL;TYPE={kind}:+{num}")
     lines += [
         f"EMAIL;TYPE=INTERNET,WORK:{p['email']}",
         f"URL:{SITE}/{p['slug']}",
