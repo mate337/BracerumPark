@@ -10,6 +10,18 @@ O site tem **7 páginas**: `index.html`, `tributacao.html`, `bracerum.html`, `ho
 rotas) que as seis páginas internas baixavam e interpretavam à toa. Ele roda depois do
 `script.js` porque usa `hasGsap`, `reduceMotion` e `tr()`.
 
+### ⚠️ Publicação sem GitHub (2026-11-09)
+- **A conta GitHub `mate337` foi sinalizada ("flagged")** e não pode autorizar apps de terceiros: a Vercel
+  perdeu o acesso ao repositório e **push no `main` não publica mais** (desde 6/11; o `tracking.js` ficou fora
+  do ar até 9/11). Só o suporte do GitHub resolve.
+- Enquanto isso, publicar pela **Vercel CLI**: copiar os arquivos do git **sem** `docs/`, `scripts/`,
+  `workflows/`, `*.md`/`*.txt` e sem os originais do cliente não referenciados (arquivos soltos em `assets/`,
+  `assets/Bracerum {Hotel,Resort,Select}/`, `assets/SVG/`) — ~37 MB em vez de 161 MB, abaixo do limite do
+  plano Hobby —, gravar `.vercel/project.json` (`team_M5fGTN1hNkSvweDXEjfrauUl` /
+  `prj_XPkSGpHbPCKCOAeTdm0lqhmycyK9`) e rodar `vercel deploy --prod --yes --token proxyinjected --scope
+  team_M5fGTN1hNkSvweDXEjfrauUl` (o proxy da sessão injeta o token real de `api.vercel.com`). Conferir
+  depois que nenhuma página pede arquivo que ficou de fora. **Sempre publicar a partir do `main`.**
+
 ### Cartões de visita digitais (v6.6 — 2026-11-09)
 - **bracerumpark.com/cleberpavao** e **bracerumpark.com/sydneysavi**: página aberta pelo QR Code do
   cartão, no mesmo padrão do linktree (independente, sem `style.css`/`script.js`/`i18n.js`, mesma chave
