@@ -5,6 +5,10 @@ guardada em `docs/masterplan-v14/BRACERUM_PARK_V14_2026-10-28_lotes_identificado
 prancha de 7.285 × 3.345 pt, vetorial, escala 1:1000 — a mesma prancha do V12). O PDF foi gravado com
 o pypdf: é o desenho do AutoCAD com o **nome oficial de cada lote** escrito dentro dele.
 
+> **Revisão de 02/11/2026** (enviada em 2026-11-09, `docs/masterplan-v14/BRACERUM_PARK_V14_2026-11-02.pdf`,
+> 19,9 MB, mesma prancha): é a fonte atual da maquete desde 2026-11-09. O que mudou está no §6 abaixo;
+> o PDF de 28/10 fica no repositório como registro.
+
 **Onde vale:** é a fonte da **Masterplan 3D** (`3dmasterplan/`, ver `docs/3dmasterplan/README.md`).
 **O site não foi atualizado** — continua valendo a regra de não mexer nele até o usuário liberar; a lista
 do que muda no site está no §8 de `docs/masterplan-v12.md` e precisa ser revista com este documento
@@ -104,7 +108,9 @@ O `build_lotes.py` resolve e avisa cada um:
 
 ## 5. A confirmar com o cliente
 
-1. **Q04.L017: 1.650 ou 1.410 m²?** (o app usa 1.650; a Tabela de Preços v3.1 usava 1.410).
+1. ~~**Q04.L017: 1.650 ou 1.410 m²?**~~ **Resolvido na rev. 02/11: 1.410 m²** (o rótulo de 1.650 saiu do PDF;
+   bate com a Tabela v3.1). Mas o quadro de áreas da rev. 02/11 ainda soma 766.690 m², que é a conta com
+   1.650 — os nomes dos 614 lotes somam **766.449 m²**. Confirmar qual total vale.
 2. **Tabela de preços para o V14** — a v3.1 é do V14-02 (612 lotes). O app aplica a mesma regra de
    categoria aos 615; os quatro lotes novos da Q38 caem em Interna.
 3. **Q11** fora da oferta (só Administração)?
@@ -112,3 +118,29 @@ O `build_lotes.py` resolve e avisa cada um:
    o V14 chama a faixa comercial vertical (o 06 do folheto) de "Bracerum Outlet".
 5. O V14 só desenha os lotes e a implantação: a arquitetura dos prédios do vértice norte, do Posto e do
    Hub na maquete é genérica, e **as alturas continuam estimativas**.
+
+## 6. Revisão de 02/11/2026 — o que mudou
+
+Comparado rótulo a rótulo com o PDF de 28/10 (`pdftotext -bbox`) e na planta renderizada:
+
+- **Quadro de áreas:** Lotes industriais **766.690 m² (614 lotes e vagas)** (eram 766.693 m², 615);
+  **Bracerum Outlet 47.410 m²** (eram 61.850 m²); **"Bracerum Condo" virou "Bracerum Residence"**
+  (114.273 m², 1.200 aptos — mesmo nome do empreendimento no CV CRM). Os outros itens do quadro não mudaram.
+- **Outlet desenhado loja por loja.** O de 28/10 era só a mancha "BRACERUM OUTLET 61.850 m²"; a revisão
+  desenha a faixa ao longo da Via Costeira (lojas de 9–11 m × 43 m, núcleos de 20 m a cada ~5% da prancha,
+  marquise de 5,4 m na frente) e a faixa vertical até o Supermercado (lojas de 83 × 9–13 m, duas docas,
+  bloco de acesso/sanitários). Cada célula do PDF corresponde a duas lojas do desenho comercial.
+- **Fases do Outlet** (desenho "Área vendável 1ª fase: 17.870 m², 57 lojas" e peça "Premium Outlet",
+  enviados pelo cliente em 2026-11-09): 1ª fase = a faixa de cima **depois do núcleo em 58,2%** da prancha e
+  a faixa vertical **até o bloco de acesso em ~29%**; as duas pontas (a metade esquerda da faixa de cima e
+  o fim da faixa vertical) são a **2ª fase, liberação futura**. Condição de lançamento da 1ª fase (peça do
+  cliente): US$ 1.150/m², 20% + 12x sem acréscimo ou 36x, à vista −8%, condição especial por volume.
+- **Q38 redesenhada:** 16 lotes (era 17; saiu a L017). Áreas novas: L001 1.501, L002 e L003 872, L004–L008
+  1.250, L009 1.483, L010 962, L011 1.035, L012 730, L013 803, L014 877, L015 950, L016 1.024 m² (total
+  17.359 m²). **Erro de digitação no PDF:** os nomes completos de L013 a L016 saíram todos como
+  "Q38.L013…ESQSIM.PO.N+L"; os rótulos curtos dizem L013–L016. Corrigido no `build_lotes.py` (`ERRATA`),
+  com esquina só na L016 — **confirmar**. As áreas de L002/L003 vêm com 4 dígitos ("A0872").
+- **Rótulos novos** sem efeito na maquete: "Centro de Convenções", "Hotel", "Anfiteatro", tipos de torre
+  do Residence ("01Q"/"02Q"/"03Q", "SL").
+- **CV CRM:** se o loteamento no CV ainda tem a Q38.L017 ou as áreas antigas da Q38/Q04.L017, atualizar lá
+  (a maquete ignora unidade do CV que não existe nela).

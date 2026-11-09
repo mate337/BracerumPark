@@ -1,5 +1,5 @@
 /* Masterplan 3D — Bracerum Park
-   Maquete interativa do Masterplan V14 (28/10/2026). Os dados vêm de data/scene.json e data/lotes.json,
+   Maquete interativa do Masterplan V14 (rev. 02/11/2026). Os dados vêm de data/scene.json e data/lotes.json,
    gerados por docs/3dmasterplan/build_data.py e build_lotes.py — posições, contornos, lotes e metragens
    saem da planta; as alturas são estimativas (o V14 não define altura de nada).
 
@@ -28,12 +28,12 @@ const T = {
     'ui.noWebgl': 'Este navegador não abriu a maquete 3D.',
     'ui.noWebglText': 'A visualização precisa de WebGL. Tente outro navegador ou um computador — enquanto isso, a imagem mostra o masterplan.',
     'ui.toSiteMp': 'Ver o masterplan no site', 'ui.backAria': 'Bracerum Park — voltar ao site', 'ui.title': 'Masterplan',
-    'ui.version': 'Masterplan V14 · 28/10/2026', 'ui.back': 'Voltar ao site', 'ui.h1a': 'A cidade industrial', 'ui.h1b': 'em volume',
+    'ui.version': 'Masterplan V14 · rev. 02/11/2026', 'ui.back': 'Voltar ao site', 'ui.h1a': 'A cidade industrial', 'ui.h1b': 'em volume',
     'f.area': 'área total', 'f.front': 'de frente para a PY-19', 'f.lots': 'lotes à venda', 'f.runway': 'pista de pouso',
     'ui.areas': 'Conheça o Bracerum Park',
-    'ui.note': 'Maquete ilustrativa do Masterplan V14 (28/10/2026): posições, lotes e metragens da planta; categorias e preços da Política Comercial P1 (Tabela v3.1). Alturas e arquitetura são estimativas — o projeto não define altura dos prédios.',
+    'ui.note': 'Maquete ilustrativa do Masterplan V14 (rev. 02/11/2026): posições, lotes e metragens da planta; categorias e preços da Política Comercial P1 (Tabela v3.1). Alturas e arquitetura são estimativas — o projeto não define altura dos prédios.',
     'ui.close': 'Fechar', 'ui.prev': 'Anterior', 'ui.next': 'Próxima', 'ui.toolsAria': 'Ferramentas da maquete',
-    'ui.north': 'Norte para cima', 'ui.credit': 'Masterplan V14 (28/10/2026) · preços: Tabela P1 v3.1 · alturas estimadas · entorno', 'ui.stage': 'Maquete 3D do Bracerum Park',
+    'ui.north': 'Norte para cima', 'ui.credit': 'Masterplan V14 (rev. 02/11/2026) · preços: Tabela P1 v3.1 · alturas estimadas · entorno', 'ui.stage': 'Maquete 3D do Bracerum Park',
     't.areas': 'Pontos', 't.home': 'Vista geral', 't.top': 'De cima', 't.rotate': 'Girar', 't.tour': 'Tour', 't.measure': 'Medir',
     't.labels': 'Rótulos', 't.sun': 'Hora do sol', 't.full': 'Tela cheia',
     'hint.desk': 'Arraste para girar · botão direito para mover · role para aproximar · clique num ponto ou num lote',
@@ -44,8 +44,9 @@ const T = {
     'card.nophoto': 'Ainda não há imagens desta área — o volume é uma estimativa a partir da planta.',
     'card.photo': 'Foto', 'tip.open': 'clique para ver',
     't.lots': 'Lotes à venda',
-    'lots.eyebrow': 'Política Comercial P1 · Tabela {v}', 'lots.title': 'Lotes à venda', 'lots.sub': '{n} lotes · {a} m² · Masterplan V14 (28/10/2026)',
+    'lots.eyebrow': 'Política Comercial P1 · Tabela {v}', 'lots.title': 'Lotes à venda', 'lots.sub': '{n} lotes · {a} m² · Masterplan V14 (rev. 02/11/2026)',
     'lots.window': 'Janela de preço', 'lots.pay': 'Pagamento', 'lots.legendHead': 'Preço por m² · 1 a 8 lotes · 20% + 12x', 'lots.lots': 'lotes',
+    'f2.tag': 'FASE 2', 'f2.sub': 'LIBERAÇÃO FUTURA',
     'lots.recinto': 'Q37 · recinto alfandegado, fora da oferta', 'lots.see': 'Ver lotes e preços',
     'lots.howto': 'Clique num lote para ver o valor. Shift + clique soma lotes à simulação; o preço por m² cai a partir de 9 lotes.',
     'lots.howtoTouch': 'Toque num lote para ver o valor. Para somar lotes, use “Somar lotes” no cartão.',
@@ -73,12 +74,12 @@ const T = {
     'ui.noWebgl': 'This browser could not open the 3D model.',
     'ui.noWebglText': 'The viewer needs WebGL. Try another browser or a computer — meanwhile, the image shows the master plan.',
     'ui.toSiteMp': 'See the master plan on the site', 'ui.backAria': 'Bracerum Park — back to the site', 'ui.title': 'Master plan',
-    'ui.version': 'Master plan V14 · 2026-10-28', 'ui.back': 'Back to the site', 'ui.h1a': 'The industrial city', 'ui.h1b': 'in three dimensions',
+    'ui.version': 'Master plan V14 · rev. 2026-11-02', 'ui.back': 'Back to the site', 'ui.h1a': 'The industrial city', 'ui.h1b': 'in three dimensions',
     'f.area': 'total area', 'f.front': 'of frontage on the PY-19', 'f.lots': 'lots for sale', 'f.runway': 'airstrip',
     'ui.areas': 'Discover Bracerum Park',
-    'ui.note': 'Illustrative model of Master plan V14 (2026-10-28): positions, lots and areas from the plan; categories and prices from Commercial Policy P1 (price list v3.1). Heights and architecture are estimates — the project does not define building heights.',
+    'ui.note': 'Illustrative model of Master plan V14 (rev. 2026-11-02): positions, lots and areas from the plan; categories and prices from Commercial Policy P1 (price list v3.1). Heights and architecture are estimates — the project does not define building heights.',
     'ui.close': 'Close', 'ui.prev': 'Previous', 'ui.next': 'Next', 'ui.toolsAria': 'Model tools',
-    'ui.north': 'North up', 'ui.credit': 'Master plan V14 (2026-10-28) · prices: P1 price list v3.1 · estimated heights · surroundings', 'ui.stage': 'Bracerum Park 3D model',
+    'ui.north': 'North up', 'ui.credit': 'Master plan V14 (rev. 2026-11-02) · prices: P1 price list v3.1 · estimated heights · surroundings', 'ui.stage': 'Bracerum Park 3D model',
     't.areas': 'Points', 't.home': 'Overview', 't.top': 'Top view', 't.rotate': 'Rotate', 't.tour': 'Tour', 't.measure': 'Measure',
     't.labels': 'Labels', 't.sun': 'Time of day', 't.full': 'Full screen',
     'hint.desk': 'Drag to rotate · right button to pan · scroll to zoom · click a point or a lot',
@@ -89,8 +90,9 @@ const T = {
     'card.nophoto': 'No images of this area yet — the volume is an estimate based on the plan.',
     'card.photo': 'Photo', 'tip.open': 'click to open',
     't.lots': 'Lots for sale',
-    'lots.eyebrow': 'Commercial Policy P1 · Price list {v}', 'lots.title': 'Lots for sale', 'lots.sub': '{n} lots · {a} m² · Master plan V14 (2026-10-28)',
+    'lots.eyebrow': 'Commercial Policy P1 · Price list {v}', 'lots.title': 'Lots for sale', 'lots.sub': '{n} lots · {a} m² · Master plan V14 (rev. 2026-11-02)',
     'lots.window': 'Price window', 'lots.pay': 'Payment', 'lots.legendHead': 'Price per m² · 1 to 8 lots · 20% + 12x', 'lots.lots': 'lots',
+    'f2.tag': 'PHASE 2', 'f2.sub': 'FUTURE RELEASE',
     'lots.recinto': 'Q37 · customs bonded area, not for sale', 'lots.see': 'See lots and prices',
     'lots.howto': 'Click a lot to see its price. Shift + click adds lots to the quote; the price per m² drops from 9 lots up.',
     'lots.howtoTouch': 'Tap a lot to see its price. To add lots, use “Add lots” on the card.',
@@ -118,12 +120,12 @@ const T = {
     'ui.noWebgl': 'Este navegador no abrió la maqueta 3D.',
     'ui.noWebglText': 'La visualización necesita WebGL. Pruebe otro navegador o una computadora — mientras tanto, la imagen muestra el masterplan.',
     'ui.toSiteMp': 'Ver el masterplan en el sitio', 'ui.backAria': 'Bracerum Park — volver al sitio', 'ui.title': 'Masterplan',
-    'ui.version': 'Masterplan V14 · 28/10/2026', 'ui.back': 'Volver al sitio', 'ui.h1a': 'La ciudad industrial', 'ui.h1b': 'en volumen',
+    'ui.version': 'Masterplan V14 · rev. 02/11/2026', 'ui.back': 'Volver al sitio', 'ui.h1a': 'La ciudad industrial', 'ui.h1b': 'en volumen',
     'f.area': 'superficie total', 'f.front': 'de frente sobre la PY-19', 'f.lots': 'lotes en venta', 'f.runway': 'pista de aterrizaje',
     'ui.areas': 'Conozca Bracerum Park',
-    'ui.note': 'Maqueta ilustrativa del Masterplan V14 (28/10/2026): posiciones, lotes y superficies del plano; categorías y precios de la Política Comercial P1 (lista v3.1). Alturas y arquitectura son estimaciones — el proyecto no define la altura de los edificios.',
+    'ui.note': 'Maqueta ilustrativa del Masterplan V14 (rev. 02/11/2026): posiciones, lotes y superficies del plano; categorías y precios de la Política Comercial P1 (lista v3.1). Alturas y arquitectura son estimaciones — el proyecto no define la altura de los edificios.',
     'ui.close': 'Cerrar', 'ui.prev': 'Anterior', 'ui.next': 'Siguiente', 'ui.toolsAria': 'Herramientas de la maqueta',
-    'ui.north': 'Norte arriba', 'ui.credit': 'Masterplan V14 (28/10/2026) · precios: lista P1 v3.1 · alturas estimadas · entorno', 'ui.stage': 'Maqueta 3D de Bracerum Park',
+    'ui.north': 'Norte arriba', 'ui.credit': 'Masterplan V14 (rev. 02/11/2026) · precios: lista P1 v3.1 · alturas estimadas · entorno', 'ui.stage': 'Maqueta 3D de Bracerum Park',
     't.areas': 'Puntos', 't.home': 'Vista general', 't.top': 'Desde arriba', 't.rotate': 'Girar', 't.tour': 'Recorrido', 't.measure': 'Medir',
     't.labels': 'Rótulos', 't.sun': 'Hora del sol', 't.full': 'Pantalla completa',
     'hint.desk': 'Arrastre para girar · botón derecho para mover · rueda para acercar · haga clic en un punto o un lote',
@@ -134,8 +136,9 @@ const T = {
     'card.nophoto': 'Todavía no hay imágenes de esta área — el volumen es una estimación a partir del plano.',
     'card.photo': 'Foto', 'tip.open': 'clic para ver',
     't.lots': 'Lotes en venta',
-    'lots.eyebrow': 'Política Comercial P1 · Lista {v}', 'lots.title': 'Lotes en venta', 'lots.sub': '{n} lotes · {a} m² · Masterplan V14 (28/10/2026)',
+    'lots.eyebrow': 'Política Comercial P1 · Lista {v}', 'lots.title': 'Lotes en venta', 'lots.sub': '{n} lotes · {a} m² · Masterplan V14 (rev. 02/11/2026)',
     'lots.window': 'Ventana de precio', 'lots.pay': 'Pago', 'lots.legendHead': 'Precio por m² · 1 a 8 lotes · 20% + 12x', 'lots.lots': 'lotes',
+    'f2.tag': 'FASE 2', 'f2.sub': 'LANZAMIENTO FUTURO',
     'lots.recinto': 'Q37 · recinto aduanero, fuera de la oferta', 'lots.see': 'Ver lotes y precios',
     'lots.howto': 'Haga clic en un lote para ver el valor. Shift + clic suma lotes a la simulación; el precio por m² baja desde 9 lotes.',
     'lots.howtoTouch': 'Toque un lote para ver el valor. Para sumar lotes, use “Sumar lotes” en la tarjeta.',
@@ -161,7 +164,7 @@ const T = {
 };
 
 /* Os pontos do mapa: os 21 da legenda do folheto do cliente ("Conheça o BracerumPark", 2026-10-20),
-   na ordem e com os nomes dele, mais dois que o Masterplan V14 (28/10/2026) trouxe e a legenda não
+   na ordem e com os nomes dele, mais dois que o Masterplan V14 (rev. 02/11/2026) trouxe e a legenda não
    tem (22 Bracerum Club, 23 Refeitório/Grêmio/Hub). Posições e números do V14. Polígono e âncora em %
    da prancha (x da esquerda, y do topo), altura do pino (m), distância da câmera ao chegar. */
 const AREAS = [
@@ -201,19 +204,20 @@ const AREAS = [
   { id: 'outlet', poly: [[48.9, 8.8], [69.6, 8.8], [69.6, 15.9], [48.9, 15.9]], at: [57.6, 12.6], ph: 32, dist: 800,
     name: { pt: 'Bracerum Outlet', en: 'Bracerum Outlet', es: 'Bracerum Outlet' },
     kpis: [
-      { n: 61850, u: 'm²', l: { pt: 'Bracerum Outlet, em L na frente da rodovia', en: 'L-shaped Bracerum Outlet facing the highway', es: 'Bracerum Outlet en L frente a la ruta' } },
-      { n: 433, u: 'm', l: { pt: 'de frente para a Via Costeira', en: 'of frontage on the Via Costeira', es: 'de frente sobre la Vía Costera' } }],
-    text: { pt: 'Comércio na frente da PY-19, ao lado da entrada, com vitrine para quem passa na rodovia. A arquitetura ainda não foi definida — os volumes são ilustrativos.',
-      en: 'Retail on the PY-19 frontage, next to the entrance, in full view of highway traffic. The architecture has not been defined yet — the volumes are illustrative.',
-      es: 'Comercio frente a la PY-19, junto a la entrada, a la vista de quien pasa por la ruta. La arquitectura aún no está definida — los volúmenes son ilustrativos.' },
+      { n: 47410, u: 'm²', l: { pt: 'Bracerum Outlet (Premium Outlet), em L na frente da rodovia', en: 'L-shaped Bracerum Outlet (Premium Outlet) facing the highway', es: 'Bracerum Outlet (Premium Outlet) en L frente a la ruta' } },
+      { n: 57, u: { pt: 'lojas', en: 'stores', es: 'tiendas' }, l: { pt: 'na 1ª fase, 17.870 m² de área vendável', en: 'in phase 1, 17,870 m² of sellable area', es: 'en la 1ª fase, 17.870 m² de área vendible' } },
+      { v: () => `${usd(1150)}/m²`, l: { pt: 'condição de lançamento: 20% + 12x sem acréscimo, ou 36x; à vista, 8% de desconto', en: 'launch terms: 20% down + 12 interest-free installments, or 36; 8% off for cash', es: 'condición de lanzamiento: 20% + 12 cuotas sin recargo, o 36; al contado, 8% de descuento' } }],
+    text: { pt: 'Comércio na frente da PY-19, ao lado da entrada, com vitrine para quem passa na rodovia. A 1ª fase são as lojas da frente — a faixa junto à Via Costeira e o começo da faixa que desce para o Supermercado, com doca e sanitários. As duas pontas, em cinza hachurado, são a 2ª fase, de liberação futura. Volumes conforme a planta; a fachada é ilustrativa.',
+      en: 'Retail on the PY-19 frontage, next to the entrance, in full view of highway traffic. Phase 1 is the front row of stores — the strip along the Via Costeira and the top of the strip running down to the supermarket, with loading dock and restrooms. The two ends, in hatched grey, are phase 2, to be released later. Footprints follow the plan; the façade is illustrative.',
+      es: 'Comercio frente a la PY-19, junto a la entrada, a la vista de quien pasa por la ruta. La 1ª fase son las tiendas del frente — la franja junto a la Vía Costera y el inicio de la franja que baja al Supermercado, con muelle de carga y sanitarios. Las dos puntas, en gris rayado, son la 2ª fase, de lanzamiento futuro. Volúmenes según el plano; la fachada es ilustrativa.' },
     photos: ['park/select-comercial-dia.jpg', 'park/select-fachada-brises.jpg', 'park/select-comercial-noite.jpg'], link: 'select.html' },
   { id: 'market', poly: [[65.6, 15.9], [69.6, 15.9], [69.6, 40.0], [65.6, 40.0]], at: [67.4, 27.0], ph: 30, dist: 640,
     name: { pt: 'Bracerum Market', en: 'Bracerum Market', es: 'Bracerum Market' },
     kpis: [
-      { t: { pt: 'faixa comercial ao longo do acesso ao Condo, da Via Costeira até o Supermercado', en: 'retail strip along the Condo access road, from the Via Costeira to the supermarket', es: 'franja comercial a lo largo del acceso al Condo, de la Vía Costera al Supermercado' } }],
-    text: { pt: 'A faixa comercial desce da Via Costeira até o Supermercado, entre a área industrial e o Bracerum Condo. A arquitetura ainda não foi definida — os volumes são ilustrativos.',
-      en: 'The retail strip runs down from the Via Costeira to the supermarket, between the industrial area and Bracerum Condo. The architecture has not been defined yet — the volumes are illustrative.',
-      es: 'La franja comercial baja de la Vía Costera hasta el Supermercado, entre el área industrial y el Bracerum Condo. La arquitectura aún no está definida — los volúmenes son ilustrativos.' },
+      { t: { pt: 'faixa comercial ao longo do acesso ao Residence, da Via Costeira até o Supermercado', en: 'retail strip along the Residence access road, from the Via Costeira to the supermarket', es: 'franja comercial a lo largo del acceso al Residence, de la Vía Costera al Supermercado' } }],
+    text: { pt: 'A faixa comercial desce da Via Costeira até o Supermercado, entre a área industrial e o Bracerum Residence. A arquitetura ainda não foi definida — os volumes são ilustrativos.',
+      en: 'The retail strip runs down from the Via Costeira to the supermarket, between the industrial area and Bracerum Residence. The architecture has not been defined yet — the volumes are illustrative.',
+      es: 'La franja comercial baja de la Vía Costera hasta el Supermercado, entre el área industrial y el Bracerum Residence. La arquitectura aún no está definida — los volúmenes son ilustrativos.' },
     photos: ['park/select-comercial-dia.jpg', 'park/select-market-interior.jpg'], link: 'select.html' },
   { id: 'tecnologico', poly: [[73.0, 10.5], [78.2, 10.5], [78.2, 19.8], [73.0, 19.8]], at: [75.5, 16.6], ph: 40, dist: 420,
     name: { pt: 'Centro Tecnológico', en: 'Technology Center', es: 'Centro Tecnológico' },
@@ -247,9 +251,9 @@ const AREAS = [
     kpis: [
       { n: 8121, u: 'm²', l: { pt: 'escola e creche', en: 'school and daycare', es: 'escuela y guardería' } },
       { t: { pt: 'escola em arco, creche e campo à frente', en: 'arc-shaped school, daycare and a pitch in front', es: 'escuela en arco, guardería y cancha al frente' } }],
-    text: { pt: 'No vértice norte do parque, ao lado do posto de saúde e do Bracerum Condo — para os filhos de quem mora e trabalha no Bracerum Park.',
-      en: 'At the northern tip of the park, next to the health post and Bracerum Condo — for the children of people who live and work at Bracerum Park.',
-      es: 'En el vértice norte del parque, junto al puesto de salud y al Bracerum Condo — para los hijos de quienes viven y trabajan en Bracerum Park.' },
+    text: { pt: 'No vértice norte do parque, ao lado do posto de saúde e do Bracerum Residence — para os filhos de quem mora e trabalha no Bracerum Park.',
+      en: 'At the northern tip of the park, next to the health post and Bracerum Residence — for the children of people who live and work at Bracerum Park.',
+      es: 'En el vértice norte del parque, junto al puesto de salud y al Bracerum Residence — para los hijos de quienes viven y trabajan en Bracerum Park.' },
     photos: [] },
   { id: 'resort', poly: [[65.5, 64.3], [77.4, 64.3], [77.4, 67.3], [66.8, 84.6], [65.5, 84.6]], at: [69.8, 72.6], ph: 30, dist: 620,
     name: { pt: 'Bracerum Resort', en: 'Bracerum Resort', es: 'Bracerum Resort' },
@@ -262,7 +266,7 @@ const AREAS = [
     photos: ['web/fotos/resort-lago.jpg', 'web/fotos/resort-casas-rua.jpg', 'web/fotos/resort-casa.jpg'], link: 'resort.html' },
   { id: 'condo', poly: [[69.4, 20.3], [80.7, 20.3], [80.7, 39.4], [86.6, 39.4], [86.6, 50.3], [82.5, 60], [78, 63.6], [65.5, 63.6], [65.5, 51], [69.4, 51]],
     at: [76.2, 40.6], ph: 44, dist: 820,
-    name: { pt: 'Bracerum Condo', en: 'Bracerum Condo', es: 'Bracerum Condo' },
+    name: { pt: 'Bracerum Residence', en: 'Bracerum Residence', es: 'Bracerum Residence' },
     kpis: [
       { n: 1200, u: { pt: 'apartamentos', en: 'apartments', es: 'departamentos' }, l: { pt: 'em 67 torres · 114.273 m²', en: 'in 67 towers · 114,273 m²', es: 'en 67 torres · 114.273 m²' } },
       { n: 16, u: { pt: 'torres', en: 'towers', es: 'torres' }, l: { pt: 'de 1 quarto (384 unidades)', en: 'of one-bedroom units (384)', es: 'de 1 dormitorio (384 unidades)' } },
@@ -360,9 +364,9 @@ const AREAS = [
       { n: 40706, u: 'm²', l: { pt: 'clube de esporte e lazer', en: 'sports and leisure club', es: 'club de deporte y recreación' } },
       { n: 3200, u: 'm²', l: { pt: 'Salão de Eventos', en: 'event hall', es: 'Salón de Eventos' } },
       { t: { pt: 'dois campos society, poliesportiva, tênis, pádel e beach tennis, piscinas com deck, bar e playground', en: 'two five-a-side pitches, multi-sport court, tennis, padel and beach tennis, pools with decks, bar and playground', es: 'dos canchas de fútbol 7, polideportiva, tenis, pádel y beach tennis, piscinas con deck, bar y juegos infantiles' } }],
-    text: { pt: 'Novo no Masterplan V14: o clube fica entre o Bracerum Condo e a Via Costeira, com as quadras de um lado, as piscinas e o bar no meio e o Salão de Eventos na ponta.',
-      en: 'New in Master plan V14: the club sits between Bracerum Condo and the Via Costeira, with the courts on one side, the pools and bar in the middle and the event hall at the tip.',
-      es: 'Nuevo en el Masterplan V14: el club está entre el Bracerum Condo y la Vía Costera, con las canchas de un lado, las piscinas y el bar en el medio y el Salón de Eventos en la punta.' },
+    text: { pt: 'Novo no Masterplan V14: o clube fica entre o Bracerum Residence e a Via Costeira, com as quadras de um lado, as piscinas e o bar no meio e o Salão de Eventos na ponta.',
+      en: 'New in Master plan V14: the club sits between Bracerum Residence and the Via Costeira, with the courts on one side, the pools and bar in the middle and the event hall at the tip.',
+      es: 'Nuevo en el Masterplan V14: el club está entre el Bracerum Residence y la Vía Costera, con las canchas de un lado, las piscinas y el bar en el medio y el Salón de Eventos en la punta.' },
     photos: ['web/fotos/amen-piscina-quincho.jpg', 'web/fotos/amen-quadra.jpg', 'park/amen-salao-eventos.jpg'] },
   { id: 'servicos', poly: [[48.3, 80.8], [65.9, 80.8], [65.9, 85], [63.9, 90], [48.3, 90]], at: [55.0, 84.4], ph: 30, dist: 520,
     name: { pt: 'Refeitório, Grêmio e Hub de serviços', en: 'Canteen, recreation club and services hub', es: 'Comedor, Club Recreativo y Hub de servicios' },
@@ -388,7 +392,8 @@ function pontoDoVolume(tag, x, y) {
   switch (tag) {
     case 'posto e portaria': return x < 40.3 ? 'portaria' : x < 43.6 ? 'posto' : x < 46.9 ? 'clube' : 'portaria';
     case 'outlet': return y < 15.9 ? 'outlet' : 'market';
-    case 'supermercado': case 'docas': return 'supermercado';
+    case 'supermercado': return 'supermercado';
+    case 'docas': return y > 35 ? 'supermercado' : 'market';
     case 'galpão': return 'industrial';
     case 'recinto': case 'hangar': return 'hangares';
     case 'centro tecnológico': return 'tecnologico';
@@ -487,6 +492,13 @@ const TEX = {
     g.fillStyle = '#f0f0ee'; g.fillRect(0, 0, w, h);
     g.fillStyle = '#d2d5d6'; g.fillRect(29, 0, 6, h);
   }, 12, 12),
+  hachura: () => canvasTex(64, 64, (g, w, h) => {                   // 2ª fase do Outlet: cinza hachurado a 45°
+    g.fillStyle = '#d6d2ca'; g.fillRect(0, 0, w, h);
+    g.strokeStyle = '#a7a298'; g.lineWidth = 7;
+    g.beginPath();
+    for (let k = -w; k <= w * 2; k += w / 2) { g.moveTo(k, h); g.lineTo(k + h, 0); }
+    g.stroke();
+  }, 6, 6),
   casca: () => canvasTex(128, 128, (g, w, h) => {                   // malha da casca (gridshell)
     g.clearRect(0, 0, w, h);
     g.fillStyle = 'rgba(226,232,233,0.62)'; g.fillRect(0, 0, w, h);
@@ -613,6 +625,7 @@ function volumes() {
   const accs = {};
   const acc = (k) => (accs[k] ||= new Acc());
   for (const v of S.vol) {
+    if (v.t === 'outlet fase 2') continue;      // desenhado à parte, em faseDois()
     let pts = pairs(v.p).map((p) => toWorld(p[0], p[1]));
     if (area2(pts) < 0) pts.reverse();
     const xs = pts.map((q) => q[0]), zs = pts.map((q) => q[1]);
@@ -633,6 +646,38 @@ function volumes() {
   for (const [k, a] of Object.entries(accs)) {
     const mesh = new THREE.Mesh(a.geom(), M[k] || M.w_plain);
     mesh.castShadow = true; mesh.receiveShadow = true;
+    g.add(mesh); pickables.push(mesh);
+  }
+  return g;
+}
+
+/* Bracerum Outlet — 2ª fase, "liberação futura" (Premium Outlet, folheto do cliente de 2026-11-09): as duas
+   pontas do L não entram na venda da 1ª fase. Ficam sem prédio, numa laje baixa cinza hachurada com
+   contorno, como no folheto, e com o rótulo "Fase 2 · liberação futura". */
+function faseDois() {
+  const g = new THREE.Group();
+  const aw = new Acc(), ar = new Acc(), ai = areaIdx.outlet ?? -1, cor = [1, 1, 1];
+  for (const v of S.vol.filter((x) => x.t === 'outlet fase 2')) {
+    let pts = pairs(v.p).map((p) => toWorld(p[0], p[1]));
+    if (area2(pts) < 0) pts.reverse();
+    paredes(aw, pts, v.h, ai, [0.78, 0.76, 0.72], 0, false);
+    telhado(ar, pts, v.h, ai, cor);
+    const borda = new THREE.Mesh(fita(pts, 1.4, v.h + 0.05), new THREE.MeshBasicMaterial({ color: '#6f6a60', toneMapped: false }));
+    borda.raycast = () => {};
+    g.add(borda);
+    const xs = pts.map((p) => p[0]), zs = pts.map((p) => p[1]);
+    const el = document.createElement('span');
+    el.className = 'qtag qtag--f2';
+    el.innerHTML = `<b data-i18n="f2.tag">${esc(t('f2.tag'))}</b><small data-i18n="f2.sub">${esc(t('f2.sub'))}</small>`;
+    el.setAttribute('aria-hidden', 'true');
+    $('#pins').appendChild(el);
+    qtags.push({ el, sempre: true, p: new THREE.Vector3((Math.min(...xs) + Math.max(...xs)) / 2, v.h + 2, (Math.min(...zs) + Math.max(...zs)) / 2) });
+  }
+  const std = (o) => realcar(new THREE.MeshStandardMaterial({ roughness: 0.95, metalness: 0, vertexColors: true, ...o }));
+  for (const [a, m] of [[aw, std({ color: '#d9d5cd' })], [ar, std({ map: TEX.hachura() })]]) {
+    if (!a.p.length) continue;
+    const mesh = new THREE.Mesh(a.geom(), m);
+    mesh.receiveShadow = true;
     g.add(mesh); pickables.push(mesh);
   }
   return g;
@@ -1135,9 +1180,9 @@ async function carregaStatus() {
   } catch (e) { /* sem a função: segue com todos à venda */ }
 }
 function posicionaQuadras() {
-  if (!modoLotes) return;
   const w = innerWidth, h = innerHeight, mostra = camera.position.distanceTo(controls.target) < 3800;
   for (const q of qtags) {
+    if (!modoLotes && !q.sempre) continue;
     vtmp.copy(q.p).project(camera);
     const ok = mostra && vtmp.z < 1 && Math.abs(vtmp.x) < 1.05 && Math.abs(vtmp.y) < 1.05;
     q.el.style.opacity = ok ? 1 : 0;
@@ -1168,7 +1213,7 @@ function modoLotesOn(on, voo = true) {
     if (!selected) try { history.replaceState(null, '', '#lotes'); } catch (e) { /* file:// */ }
     dica(COARSE ? 'lots.howtoTouch' : 'lots.howto', 9000);
   } else {
-    qtags.forEach((q) => { q.el.style.opacity = 0; });
+    qtags.forEach((q) => { if (!q.sempre) q.el.style.opacity = 0; });
     if (!selected) try { history.replaceState(null, '', location.pathname + location.search); } catch (e) { /* file:// */ }
     dica(null);
   }
@@ -1843,6 +1888,7 @@ async function iniciar() {
 
   scene.add(await chao());
   scene.add(volumes());
+  scene.add(faseDois());
   scene.add(casca());
   scene.add(arvores());
   scene.add(lotLayer);

@@ -21,12 +21,25 @@ rotas) que as seis páginas internas baixavam e interpretavam à toa. Ele roda d
   sessão injeta o token real de `api.vercel.com`; se expirou, pedir outro em vercel.com/account/tokens).
   Conferir no ar que nenhuma página pede arquivo que ficou de fora.
 
+### Masterplan V14 rev. 02/11/2026 na maquete (2026-11-09)
+- O cliente mandou o **V14 revisado (02/11/2026)** — `docs/masterplan-v14/BRACERUM_PARK_V14_2026-11-02.pdf`, agora a
+  fonte do `build_data.py`/`build_lotes.py`. Mudou: **614 lotes** (Q38 com 16, áreas novas; errata dos nomes
+  L013–L016), Q04.L017 = 1.410 m², **Outlet 47.410 m² desenhado loja por loja**, "Condo" → **"Residence"**.
+  Registro em `docs/masterplan-v14.md` §6.
+- **Outlet com fases** (desenho "Área vendável 1ª fase 17.870 m², 57 lojas" e peça "Premium Outlet" do cliente):
+  1ª fase em volumes, loja por loja; as duas pontas = **2ª fase, cinza hachurado** com rótulo "Fase 2 ·
+  liberação futura". **Q04** (faixa atrás do Outlet) em grade, um galpão por lote. Detalhes em
+  `docs/3dmasterplan/README.md` ("Revisão do V14 de 02/11/2026").
+- **A confirmar:** total do quadro (766.690 m² usa a Q04.L017 de 1.650; os nomes somam 766.449 m²); errata da
+  Q38; o "praça de alimentação" citado pelo cliente — não está rotulado no V14; o pino 06 "Bracerum Market"
+  fica na faixa vertical, que os desenhos do cliente tratam como perna do Outlet.
+
 ### Maquete × CV CRM — disponibilidade ao vivo (2026-11-09)
 - **`api/lotes-status.js`** (primeira função da Vercel do projeto) lê o mapa de disponibilidade do
   **CV CRM** (`bracerum.cvcrm.com.br`, empreendimento **4** = loteamento; na API 3 = Hotel, 7 = Residence, 9 = Cidade)
   e devolve só `{lotes: {"Q07.L014": "r"|"v"|"b"}}`, com cache de 60 s na CDN. A **`3dmasterplan/`** pinta
   os lotes ocupados, tira-os da simulação e mostra a contagem na legenda; sem a função tudo fica à venda.
-  No CV a quadra vem no bloco ("Quadra Q02") e o lote na unidade ("L003") — os 615 casam.
+  No CV a quadra vem no bloco ("Quadra Q02") e o lote na unidade ("L003") — os lotes da maquete casam.
 - Precisa de `CVCRM_TOKEN` (segredo) e `CVCRM_EMAIL` nas variáveis do projeto na Vercel. O `pacote_vercel.py`
   já leva a pasta `api/`. Detalhes e pendências em `docs/3dmasterplan/README.md` ("Disponibilidade ao vivo").
 - **Conferido com o CV real em 2026-11-09** (usuário CONEXAOSITECV, e-mail `matheus337.martins@gmail.com`,

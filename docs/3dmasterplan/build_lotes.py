@@ -4,7 +4,8 @@
 
     python3 docs/3dmasterplan/build_lotes.py      # da raiz; depois do build_data.py (usa o mesmo cache)
 
-Fonte: "Masterplan BRACERUM PARK V14 — 28/10/2026 — lotes identificados" (docs/masterplan-v14/). O PDF é
+Fonte: "Masterplan BRACERUM PARK V14", revisão de 02/11/2026 (docs/masterplan-v14/BRACERUM_PARK_V14_2026-11-02.pdf;
+a de 28/10 fica ao lado, como registro). O PDF é
 vetorial e traz, dentro de cada lote, o nome oficial completo, com a área de contrato:
 LTIND.Q07.L014.A01250.ESQNAO.RT.L (quadra, lote, área, esquina, forma, frentes). Este script:
   1. lê os nomes e a posição de cada um (pdftotext -bbox);
@@ -16,7 +17,8 @@ LTIND.Q07.L014.A01250.ESQNAO.RT.L (quadra, lote, área, esquina, forma, frentes)
      baixo — e, entre duas áreas para o mesmo lote, fica com a que bate com a área medida no desenho;
   4. aplica a categoria de preço pela regra escrita na Tabela de Preços P1 (docs/lotes-p1/).
 A quadra Q37 (recinto alfandegado) e a Q11 (lote da Administração) têm nome de lote, mas ficam fora da oferta:
-sem elas, a conta dá os 615 lotes e 766.693 m² do quadro de áreas do V14.
+sem elas, a conta dá os 614 lotes e 766.690 m² do quadro de áreas do V14 de 02/11 (eram 615 e 766.693 m² no de
+28/10: a Q38 perdeu um lote e foi redesenhada).
 
 Os preços NÃO estão aqui: ficam em 3dmasterplan/data/precos.json, editado à mão quando sair tabela nova.
 """
@@ -34,7 +36,7 @@ import build_data as bd                                             # noqa: E402
 br = bd.br
 
 OUT = os.path.join(ROOT, '3dmasterplan', 'data', 'lotes.json')
-FORA_DA_OFERTA = {'Q37': 'recinto alfandegado', 'Q11': 'administração'}   # o quadro do V14 conta 615 lotes sem a Q11
+FORA_DA_OFERTA = {'Q37': 'recinto alfandegado', 'Q11': 'administração'}   # o quadro do V14 conta 614 lotes sem a Q11
 PX_POR_PT = 80 / 72                                                 # a planta é renderizada a 80 dpi
 
 
@@ -52,11 +54,26 @@ def categoria(q, l):
     return 'I'                                       # Q01, Q05, Q11, Q12, Q18, Q31, Q38–Q42, Q19 L1–8, Q25 L9–16
 
 
+# Erros de digitação do V14 rev. 02/11/2026: na fileira de baixo da Q38 os rótulos curtos dizem L012…L016,
+# mas os quatro nomes completos de L013 a L016 saíram todos como "Q38.L013…ESQSIM.PO.N+L" (só a área muda).
+# Corrigido pelo rótulo curto de cada lote; esquina só no último, junto à Q39 (como no V14 de 28/10).
+# A CONFIRMAR com o cliente.
+ERRATA = {
+    'LTIND.Q38.L013.A00803.ESQSIM.PO.N+L': 'LTIND.Q38.L013.A00803.ESQNAO.PO.L',
+    'LTIND.Q38.L013.A00877.ESQSIM.PO.N+L': 'LTIND.Q38.L014.A00877.ESQNAO.PO.L',
+    'LTIND.Q38.L013.A00950.ESQSIM.PO.N+L': 'LTIND.Q38.L015.A00950.ESQNAO.PO.L',
+    'LTIND.Q38.L013.A01024.ESQSIM.PO.N+L': 'LTIND.Q38.L016.A01024.ESQSIM.PO.N+L',
+    'LTIND.Q38.L002.A0872.ESQNAO.PO.L+O': 'LTIND.Q38.L002.A00872.ESQNAO.PO.L+O',     # área com 4 dígitos
+    'LTIND.Q38.L003.A0872.ESQNAO.PO.L+O': 'LTIND.Q38.L003.A00872.ESQNAO.PO.L+O',
+}
+
+
 def nomes():
     """Os rótulos LTIND.Qxx.Lyyy.A0xxxx.ESQ….FORMA.FRENTES com o centro em px da planta, na ordem do PDF."""
     html = subprocess.run(['pdftotext', '-bbox', bd.PLANTA, '-'], capture_output=True, text=True, check=True).stdout
     out = []
     for a, b, c, d, t in re.findall(r'<word xMin="([\d.]+)" yMin="([\d.]+)" xMax="([\d.]+)" yMax="([\d.]+)">([^<]*)</word>', html):
+        t = ERRATA.get(t, t)
         p = t.split('.')
         if t.startswith('LTIND.') and len(p) == 7:
             out.append(dict(nome=t, q=p[1], l=int(p[2][1:]), a=int(p[3][1:]),
@@ -191,7 +208,7 @@ def main():
     for a in avisos:
         print('  aviso:', a)
     with open(OUT, 'w', encoding='utf-8') as fh:
-        json.dump({'fonte': 'Masterplan BRACERUM PARK V14 — 28/10/2026 — lotes identificados · categorias: Política Comercial P1, Tabela v3.1',
+        json.dump({'fonte': 'Masterplan BRACERUM PARK V14 — rev. 02/11/2026 — lotes identificados · categorias: Política Comercial P1, Tabela v3.1',
                    'quadras': quadras, 'lotes': lotes}, fh, ensure_ascii=False, separators=(',', ':'))
     print(f'  {os.path.relpath(OUT, ROOT)}: {os.path.getsize(OUT) / 1024:.0f} KB')
 

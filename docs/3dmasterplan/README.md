@@ -157,6 +157,23 @@ novos fecham os 38.194 m². Ver `docs/masterplan-v14.md` §4.
 3. A **Q11** (Administração) tem nome de lote no PDF e entrava como Interna na tabela v3.1, mas o
    quadro do V14 não a conta. O app a deixa fora da oferta.
 
+## Revisão do V14 de 02/11/2026 (2026-11-09)
+
+A maquete passou a ser gerada do **V14 rev. 02/11/2026** (`BRACERUM_PARK_V14_2026-11-02.pdf`; o que mudou na
+planta: §6 de `docs/masterplan-v14.md`). Na maquete:
+- **614 lotes** (a Q38 tem 16, com as áreas novas; errata dos nomes L013–L016 no `build_lotes.py`) e Q04.L017
+  com 1.410 m².
+- **Bracerum Outlet loja por loja** (`build_data.py`, bloco "comércio"): cada célula branca do PDF na região
+  do L vira um volume; o vão da linha preta é a divisão entre lojas. Núcleos de 20 m com 11 m de altura,
+  lojas com 9 m, a doca da 1ª fase com 7 m. Limites da 1ª fase em `F1_X = 58,6` e `F1_Y = 28,5` (% da
+  prancha). A **2ª fase** sai como dois retângulos `outlet fase 2` (laje de 0,8 m) que o `app.js` desenha à
+  parte (`faseDois()`): cinza hachurado a 45° com contorno e o rótulo "Fase 2 · liberação futura" sempre
+  visível. O `dividir()` (blocos ilustrativos de 52 m) não é mais usado.
+- **Q04 em grade** (pedido do cliente): a faixa de 17 lotes atrás do Outlet tem um galpão por lote, com vão
+  de 3 m, em vez das duas barras compridas.
+- Cartão do Outlet com 47.410 m², 57 lojas / 17.870 m² na 1ª fase e a condição de lançamento; "Bracerum Condo"
+  virou "Bracerum Residence"; datas da interface "rev. 02/11/2026".
+
 ## Disponibilidade ao vivo pelo CV CRM (2026-11-09)
 
 O CV CRM (`bracerum.cvcrm.com.br`) é o CRM das reservas. **Códigos internos dos empreendimentos na API**
@@ -164,7 +181,7 @@ O CV CRM (`bracerum.cvcrm.com.br`) é o CRM das reservas. **Códigos internos do
 Condomínios, 9 = Cidade. No mapa de disponibilidade cada lote vem com a **quadra no bloco** ("Quadra Q02")
 e o **lote na unidade** ("L003"); a função junta os dois em `Q02.L003`, o id da maquete.
 O cadastro exportado (`unidades_3_loteamento.csv`, pasta "Lotes + Categorias" do Drive do cliente) tem
-641 unidades: os **615 lotes da maquete, todos casando pelo nome**, mais 26 que a maquete não vende
+641 unidades: os **615 lotes da maquete de então (V14 de 28/10), todos casando pelo nome**, mais 26 que a maquete não vende
 (8 do Hub de serviços, 7 hangares, Q37 e Q11, marcados como "Fora da oferta").
 
 **Como funciona:**

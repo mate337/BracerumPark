@@ -36,7 +36,7 @@ sys.path.insert(0, os.path.join(ROOT, 'docs', 'prompt-aerea-v12'))
 import build_refs as br                                            # noqa: E402
 
 OUT = os.path.join(ROOT, '3dmasterplan', 'data')
-PLANTA = os.path.join(ROOT, 'docs', 'masterplan-v14', 'BRACERUM_PARK_V14_2026-10-28_lotes_identificados.pdf')
+PLANTA = os.path.join(ROOT, 'docs', 'masterplan-v14', 'BRACERUM_PARK_V14_2026-11-02.pdf')
 TEX_W = 4096                       # largura da textura do parque (0,63 m/px)
 CTX_MPP = 2.5                      # m/px do entorno
 RES = 1.0                          # grade de alturas (só para oclusão e para afastar árvores de prédio)
@@ -159,6 +159,14 @@ class Maquete14(Maquete3D):
                 continue
             if d < 30:
                 self.retangulo(X0 + 8, Y0 + 5, X1 - 8, Y1 - 5, 10, 'galpão'); continue
+            if d < 60 and w > 300:
+                # Q04, a faixa de 17 lotes de 25 × 50 m atrás do Outlet (pedido do cliente, 2026-11-09):
+                # um galpão por lote, com vão entre eles — lê-se como grade de unidades, não como barra
+                x = X0 - 2
+                while x + 20 <= X1 + 2:
+                    self.retangulo(x + 1.5, Y0 + 8, min(x + 25, X1 + 2) - 1.5, Y1 - 12, 10, 'galpão')
+                    x += 25
+                continue
             mx = 14 if w > 120 else 8
             ya, yb = (8, 26) if n % 2 == 0 else (26, 8)
             bx0, bx1, by0, by1 = X0 + mx, X1 - mx, Y0 + ya, Y1 - yb
@@ -235,14 +243,36 @@ class Maquete14(Maquete3D):
         self.extrudar(sel(86.3, 32.8, 86.7, 33.2, 500, 650), 5, 'bar')
         self.extrudar(sel(80.7, 30, 81, 36.2, 150, 250), 4, 'vestiário')
 
-        # comércio: Bracerum Outlet em L (sem prédio desenhado), supermercado + lojas e docas
-        self.retangulo_pct(49.8, 12.0, 64.8, 14.4, 8, 'outlet')
-        self.retangulo_pct(66.6, 15.5, 68.2, 38.0, 8, 'outlet')
+        # comércio: Bracerum Outlet (Premium Outlet) em L. O V14 de 02/11/2026 desenha as lojas: cada
+        # célula branca entre as linhas pretas vira um volume (o vão da linha é a divisão entre lojas).
+        # 1ª fase à venda = "Área vendável 1ª fase: 17.870 m², 57 lojas" (desenho do cliente, 2026-11-09):
+        # a faixa de cima depois do núcleo de 58,2% e a faixa vertical até o bloco de acesso em 29%; cada
+        # célula do PDF são duas lojas do desenho comercial. As duas pontas são a 2ª fase ("liberação
+        # futura"): sem prédio, uma laje baixa hachurada (app.js, faseDois()).
+        F1_X, F1_Y = 58.6, 28.5
+        cel = [c for c in sel(48.5, 11, 69.5, 43.3, 60, 2000) if c['fill'] >= 0.6 and max(c['bw'], c['bh']) <= 120
+               and min(c['bw'], c['bh']) >= 7.5]
+        topo = [c for c in cel if c['cy'] < 16.2 and c['bh'] > 20]               # lojas e núcleos da faixa de cima
+        vert = [c for c in cel if c['cy'] >= 16.2 and c['cx'] >= 65.5]          # faixa vertical
+        f1 = [c for c in topo if c['cx'] > F1_X] + [c for c in vert if c['cy'] <= F1_Y]
+        f2 = [[c for c in topo if c['cx'] <= F1_X], [c for c in vert if c['cy'] > F1_Y]]
+        doca = [c for c in f1 if 22 <= c['bw'] <= 27 and 40 <= c['bh'] <= 48]
+        self.extrudar([c for c in f1 if c not in doca and c['bw'] >= 19 and c['bw'] <= 22 and c['bh'] > 35], 11, 'outlet')
+        self.extrudar([c for c in f1 if c not in doca and not (19 <= c['bw'] <= 22 and c['bh'] > 35)], 9, 'outlet')
+        self.extrudar(doca, 7, 'docas')
+        for grupo in f2:                                                       # retângulo que envolve a ponta
+            if not grupo:
+                continue
+            x0 = min(c['sl'][1].start for c in grupo) / br.K; x1 = max(c['sl'][1].stop for c in grupo) / br.K
+            y0 = min(c['sl'][0].start for c in grupo) / br.K; y1 = max(c['sl'][0].stop for c in grupo) / br.K
+            self.retangulo(x0, y0, x1, y1, 0.8, 'outlet fase 2')
+        self.outlet_f1 = sum(c['area'] for c in f1)
+        print(f'  Outlet: 1ª fase {len(f1)} células, {self.outlet_f1:,.0f} m² · 2ª fase {sum(map(len, f2))} células, '
+              f'{sum(c["area"] for g in f2 for c in g):,.0f} m²')
         self.extrudar(sel(66.4, 46, 67, 47, 4000, 5000), 9, 'supermercado')
-        self.extrudar(sel(65.8, 40.5, 66.3, 41.3, 900, 1200), 7, 'docas')
 
-        # entrada: posto em L, Gate-1, Gate-2 e apoio do pátio de caminhões
-        self.extrudar(sel(39, 13, 49, 20, 150, 1700, 0.3), 6, 'posto e portaria')
+        # entrada: posto em L, Gate-1, Gate-2 e apoio do pátio de caminhões (até 48,5%: depois começa o Outlet)
+        self.extrudar(sel(39, 13, 48.5, 20, 150, 1700, 0.3), 6, 'posto e portaria')
 
         # aeroporto, recinto alfandegado (10 lotes, um galpão em cada) e infraestrutura (como no V12)
         self.extrudar(sel(6, 65.5, 14, 68.3, 450, 1500), 12, 'hangar')
@@ -390,12 +420,7 @@ def main():
     geo = br.Geo(data, sheet)
     print('volumes…')
     maq = Maquete14(plano, sheet, res=RES).montar()
-    vol = []
-    for v in maq.vol:
-        if v['t'] == 'outlet':
-            vol += dividir(v, 52, 9)
-        else:
-            vol.append(v)
+    vol = list(maq.vol)                       # o Outlet já vem loja por loja do V14 de 02/11 (não precisa de dividir())
     for k, n in sorted(maq.conta.items()):
         print(f'  {k:32s} {n}')
     print('árvores…')
@@ -417,7 +442,7 @@ def main():
 
     nlat, nlon = geo.latlon(W / 2, H / 2)
     cena = {
-        'fonte': 'BRACERUM PARK — Masterplan V14 (28/10/2026, lotes identificados), escala 1:1000',
+        'fonte': 'BRACERUM PARK — Masterplan V14 (rev. 02/11/2026), escala 1:1000',
         'sheet': [round(W, 2), round(H, 2)],
         'north': [round(math.cos(geo.A), 5), round(math.sin(geo.A), 5)],     # direção do norte na prancha
         'A': round(geo.A, 6),
