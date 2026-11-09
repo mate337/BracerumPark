@@ -2,9 +2,21 @@
   "redirects": [
     { "source": "/3dmasterplan", "destination": "/3dmasterplan/", "permanent": true },
     { "source": "/3DMasterplan", "destination": "/3dmasterplan/", "permanent": true },
-    { "source": "/3DMasterplan/", "destination": "/3dmasterplan/", "permanent": true }
+    { "source": "/3DMasterplan/", "destination": "/3dmasterplan/", "permanent": true },
+    { "source": "/CleberPavao", "destination": "/cleberpavao", "permanent": true },
+    { "source": "/SydneySavi", "destination": "/sydneysavi", "permanent": true }
   ],
   "rewrites": [
-    { "source": "/linktree", "destination": "/linktree/index.html" }
+    { "source": "/linktree", "destination": "/linktree/index.html" },
+    { "source": "/cleberpavao", "destination": "/cleberpavao/index.html" },
+    { "source": "/sydneysavi", "destination": "/sydneysavi/index.html" }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)\\.vcf",
+      "headers": [
+        { "key": "Content-Type", "value": "text/vcard; charset=utf-8" }
+      ]
+    }
   ]
 }

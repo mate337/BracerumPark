@@ -1,0 +1,15 @@
+BEGIN:VCARD
+VERSION:3.0
+N:Pavão;Cleber;;;
+FN:Cleber Pavão
+ORG:Bracerum Park
+TEL;TYPE=CELL,VOICE,pref:+595985516065
+TEL;TYPE=CELL,VOICE:+5511986516065
+EMAIL;TYPE=INTERNET,WORK:cleber@bracerum.com
+URL:https://bracerumpark.com/cleberpavao
+URL;TYPE=Site:https://bracerumpark.com/
+X-SOCIALPROFILE;TYPE=instagram:https://www.instagram.com/bracerumpark/
+X-SOCIALPROFILE;TYPE=linkedin:https://py.linkedin.com/company/bracerumpark
+ADR;TYPE=WORK:;;Acceso Sur · Ruta PY19;Villeta;Departamento Central;;Paraguay
+NOTE:Bracerum Park — Villeta Industrial City\, Paraguay · Mercosur
+END:VCARD

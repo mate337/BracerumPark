@@ -10,6 +10,22 @@ O site tem **7 páginas**: `index.html`, `tributacao.html`, `bracerum.html`, `ho
 rotas) que as seis páginas internas baixavam e interpretavam à toa. Ele roda depois do
 `script.js` porque usa `hasGsap`, `reduceMotion` e `tr()`.
 
+### Cartões de visita digitais (v6.6 — 2026-11-09)
+- **bracerumpark.com/cleberpavao** e **bracerumpark.com/sydneysavi**: página aberta pelo QR Code do
+  cartão, no mesmo padrão do linktree (independente, sem `style.css`/`script.js`/`i18n.js`, mesma chave
+  `bp-lang`, PT/EN/ES, `tracking.js`). Conteúdo pedido: **WhatsApp e e-mail pessoais**; **Instagram,
+  LinkedIn e site do Park**. Mais um botão **"Salvar contato"** (vCard 3.0 com os dois telefones,
+  e-mail, site e redes — `data-track="save_contact"`).
+- **Tudo é gerado** por `docs/build_cartoes.py` (lista `PESSOAS`): `<slug>/index.html`,
+  `<slug>/<nome-sobrenome>.vcf` e os QR Codes em `docs/cartoes/` (`qr-<slug>-ink.svg` para fundo claro,
+  `-cream.svg` para fundo escuro, `.png` 1640 px; nível Q, URL limpa sem utm — o `tracking.js` já
+  registra a página de entrada). **Não editar o HTML gerado.** CSS/JS compartilhados em `cartao/`.
+- **Cartão novo:** acrescentar a pessoa em `PESSOAS`, rodar o script (`pip install segno` para o QR) e
+  pôr o rewrite `/<slug>` no `vercel.json`. As URLs são em minúsculas; `/CleberPavao` e `/SydneySavi`
+  redirecionam.
+- WhatsApp de cada um = o mesmo número do footer/linktree (Cleber PY +595 985 516 065, Sydney BR
+  +55 47 98803-0200). **Cargo não aparece** — não foi informado; se o cliente mandar, entra no gerador.
+
 ### Links dos folders e rastreamento (v6.5 — 2026-11-06)
 - **Seis links de folder** (`/FolderResidence/`, `/FolderPark/`, `/FolderResort/`, `/FolderBusinessCenter/`,
   `/Foldermapadisponibilidade/`, `/FolderLP/`) ainda sem página própria. São **Routing Rules do projeto na
