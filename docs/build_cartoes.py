@@ -119,7 +119,7 @@ def page(p):
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>{e(name)} — Bracerum Park · Cartão digital</title>
 <meta name="description" content="{e(who)} · Bracerum Park, cidade industrial multiuso em Villeta, Paraguai. WhatsApp, e-mail, redes e site." />
-<meta name="theme-color" content="#0e0d0b" />
+<meta name="theme-color" content="#000000" />
 <link rel="canonical" href="{url}" />
 <meta property="og:type" content="profile" />
 <meta property="og:url" content="{url}" />
@@ -139,17 +139,15 @@ def page(p):
   editar os dados lá e rodar de novo, não aqui. Caminhos relativos "../":
   funcionam em /{slug} e em /{slug}/.
 -->
-<link rel="stylesheet" href="../cartao/cartao.css?v=2" />
+<link rel="stylesheet" href="../cartao/cartao.css?v=3" />
 <script src="../tracking.js?v=1" defer></script>
 </head>
 <body data-first="{e(p['first'])}" data-name="{e(name)}">
 
-<div class="bg" aria-hidden="true"><img src="../assets/web/fotos/park-aereo-rio-1000.jpg" srcset="../assets/web/fotos/park-aereo-rio-1000.jpg 1000w, ../assets/web/fotos/park-aereo-rio.jpg 1600w" sizes="100vw" alt="" fetchpriority="high" /></div>
-
 <main class="wrap">
 
   <div class="top in">
-    <a class="top__brand" href="../" aria-label="Bracerum Park — site"><img src="../assets/logo/logo-horizontal-cream.svg" alt="Bracerum Park" /></a>
+    <a class="top__brand" href="../" aria-label="Bracerum Park — site"><img src="../assets/logo/logo-horizontal-white.svg" alt="Bracerum Park" /></a>
     <div class="lang" role="group" aria-label="Idioma / Language / Idioma">
       <button type="button" data-lang="pt" aria-pressed="true">PT</button>
       <button type="button" data-lang="en" aria-pressed="false">EN</button>

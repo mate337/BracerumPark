@@ -1,15 +1,15 @@
 /* =====================================================================
    Cartão de visita digital — Bracerum Park
    Compartilhado por /cleberpavao, /sydneysavi e os próximos cartões.
-   Mesmos tokens do site e do linktree (ink/paper/sand/brown,
-   Helvetica + Noto Serif, cantos quadrados). Não carrega style.css:
+   Preto e branco puro, sem foto de fundo (pedido do cliente em 2026-11-09);
+   mesma tipografia e cantos quadrados do site (Helvetica + Noto Serif). Não carrega style.css:
    quem chega aqui leu um QR Code, no celular, e precisa dos botões já.
    ===================================================================== */
 :root{
-  --ink:#0e0d0b; --ink-2:#191713; --ink-3:#24211c;
-  --paper:#f7f3ea; --sand:#cbb88f; --brown:#473315;
-  --t:#f7f3ea; --t-soft:rgba(247,243,234,.66); --t-mute:rgba(247,243,234,.42);
-  --line:rgba(247,243,234,.16);
+  --ink:#000; --ink-2:#0d0d0d; --ink-3:#1a1a1a;
+  --paper:#fff; --accent:#fff;
+  --t:#fff; --t-soft:rgba(255,255,255,.7); --t-mute:rgba(255,255,255,.5);
+  --line:rgba(255,255,255,.2);
   --serif:"Noto Serif",Georgia,"Times New Roman",serif;
   --sans:"Helvetica Neue",Helvetica,Arial,sans-serif;
   --ease:cubic-bezier(.19,.8,.22,1);
@@ -24,15 +24,7 @@ body{
 img,svg{display:block;max-width:100%}
 a{color:inherit;text-decoration:none}
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
-:focus-visible{outline:2px solid var(--sand);outline-offset:3px}
-
-/* Fundo: vista aérea do parque, esmaecendo para o ink */
-.bg{position:fixed;inset:0 0 auto;height:min(70svh,640px);z-index:0;overflow:hidden;pointer-events:none}
-.bg img{width:100%;height:100%;object-fit:cover;object-position:52% 40%;opacity:.5;transform:scale(1.06);
-  animation:bgIn 2.4s var(--ease) both}
-.bg::after{content:"";position:absolute;inset:0;
-  background:linear-gradient(180deg,rgba(14,13,11,.4) 0%,rgba(14,13,11,.62) 40%,var(--ink) 100%)}
-@keyframes bgIn{from{opacity:0;transform:scale(1.14)}to{opacity:.5;transform:scale(1.06)}}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
 
 .wrap{position:relative;z-index:1;width:100%;max-width:540px;margin:0 auto;
   padding:calc(18px + env(safe-area-inset-top)) 20px calc(36px + env(safe-area-inset-bottom))}
@@ -40,18 +32,18 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 /* Topo: marca à esquerda, idioma à direita */
 .top{display:flex;align-items:center;justify-content:space-between;gap:16px}
 .top__brand img{width:auto;height:30px}
-.lang{display:flex;gap:2px;border:1px solid var(--line);padding:3px;background:rgba(14,13,11,.4);backdrop-filter:blur(6px)}
+.lang{display:flex;gap:2px;border:1px solid var(--line);padding:3px;background:var(--ink)}
 .lang button{font:700 .64rem/1 var(--sans);letter-spacing:.1em;padding:8px 10px;color:var(--t-mute);transition:background .3s,color .3s}
 .lang button:hover{color:var(--t)}
 .lang button[aria-pressed="true"]{background:var(--paper);color:var(--ink)}
 
 /* Identidade */
 .who{padding:clamp(56px,15svh,128px) 0 30px}
-.who__mark{width:22px;height:22px;color:var(--sand)}
+.who__mark{width:22px;height:22px;color:var(--accent)}
 .who__name{margin-top:22px;font:400 clamp(2.5rem,12vw,3.5rem)/1.02 var(--serif);letter-spacing:-.01em}
 .who__name em{font-style:italic;display:block}
 .who__role{margin-top:14px;font:400 1.2rem/1.35 var(--serif);color:var(--t)}
-.who__org{margin-top:18px;font-size:.72rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--sand)}
+.who__org{margin-top:18px;font-size:.72rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--accent)}
 .who__place{margin-top:6px;font:400 1rem/1.45 var(--serif);color:var(--t-soft)}
 
 /* Salvar contato (.vcf) — a ação principal de um cartão */
@@ -63,38 +55,37 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   transition:background .45s var(--ease),color .45s var(--ease);
 }
 .save svg{width:20px;height:20px;flex:0 0 20px}
-.save:hover{background:var(--sand);border-color:var(--sand)}
+.save:hover{background:#d6d6d6;border-color:#d6d6d6}
 .save:active{transform:translateY(1px)}
 
 /* Grupos */
 .group{margin-top:34px}
 .group__head{display:flex;align-items:baseline;gap:12px;padding-bottom:12px;border-bottom:1px solid var(--line);margin-bottom:10px}
-.group__n{font:700 .66rem/1 var(--sans);letter-spacing:.16em;color:var(--sand)}
+.group__n{font:700 .66rem/1 var(--sans);letter-spacing:.16em;color:var(--accent)}
 .group__t{font:700 .7rem/1 var(--sans);letter-spacing:.18em;text-transform:uppercase;color:var(--t-soft)}
 
 .link{
   position:relative;display:flex;align-items:center;gap:16px;
   padding:17px 18px;margin-top:8px;min-height:66px;
-  border:1px solid var(--line);background:rgba(25,23,19,.72);
-  backdrop-filter:blur(4px);
+  border:1px solid var(--line);background:var(--ink-2);
   transition:background .45s var(--ease),color .45s var(--ease),border-color .45s var(--ease);
 }
 .link:hover{background:var(--paper);color:var(--ink);border-color:var(--paper)}
 .link:active{transform:translateY(1px)}
-.link__ico{flex:0 0 22px;width:22px;height:22px;color:var(--sand);transition:color .45s var(--ease)}
-.link:hover .link__ico{color:var(--brown)}
+.link__ico{flex:0 0 22px;width:22px;height:22px;color:var(--accent);transition:color .45s var(--ease)}
+.link:hover .link__ico{color:var(--ink)}
 .link__txt{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
 .link__title{font:400 1.12rem/1.2 var(--serif)}
 .link__title em{font-style:italic}
 .link__sub{font-size:.8rem;line-height:1.35;color:var(--t-mute);overflow-wrap:anywhere;transition:color .45s var(--ease)}
-.link:hover .link__sub{color:rgba(20,17,12,.6)}
+.link:hover .link__sub{color:rgba(0,0,0,.6)}
 .link__arrow{flex:0 0 auto;font-size:1.05rem;transition:transform .45s var(--ease)}
 .link:hover .link__arrow{transform:translateX(4px)}
 
 /* Site — cartão com foto */
 .link--hero{flex-direction:column;align-items:stretch;gap:0;padding:0;overflow:hidden}
 .link--hero .shot{position:relative;aspect-ratio:16/8;overflow:hidden;background:var(--ink-3)}
-.link--hero .shot img{width:100%;height:100%;object-fit:cover;object-position:50% 55%;transition:transform 1.2s var(--ease)}
+.link--hero .shot img{width:100%;height:100%;object-fit:cover;object-position:50% 55%;filter:grayscale(1);transition:transform 1.2s var(--ease)}
 .link--hero:hover .shot img{transform:scale(1.05)}
 .link--hero .row{display:flex;align-items:center;gap:16px;padding:17px 18px}
 
@@ -107,6 +98,6 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .in{animation:rise .9s var(--ease) both;animation-delay:calc(var(--i,0) * 70ms + 150ms)}
 @keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){
-  .in,.bg img{animation:none}
+  .in{animation:none}
   .link,.link__arrow,.shot img,.save{transition:none}
 }
