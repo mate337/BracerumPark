@@ -283,6 +283,14 @@ body.modo-lotes .pin3d{display:none}
 .legend em{font:500 1rem/1 var(--serif);font-style:normal;white-space:nowrap;font-variant-numeric:tabular-nums}
 .legend em small{display:inline;font:400 .7rem var(--sans);color:var(--t-light-soft)}
 .legend__fora{grid-template-columns:16px 1fr!important;color:var(--t-light-soft)}
+.legend__st{grid-template-columns:16px 1fr!important}
+.lotpanel__live{display:flex;align-items:center;gap:8px;margin:12px 0 0;font-size:.72rem;color:var(--t-light-soft)}
+.lotpanel__live i{width:7px;height:7px;flex:none;background:#5f8a4a;animation:stPulso 2.4s ease-in-out infinite}
+@keyframes stPulso{50%{opacity:.35}}
+@media (prefers-reduced-motion:reduce){.lotpanel__live i{animation:none}}
+.calc__st{margin:0 0 16px;font-size:.86rem;line-height:1.5}
+.tip .tip__st{display:block;margin-top:2px;font-size:.74rem;font-weight:600}
+.tip .tip__st .sw{width:10px;height:10px;margin-right:6px}
 .legend__fora .sw{background:repeating-linear-gradient(45deg,#c9c4b8 0 3px,#e3dfd5 3px 6px)}
 .sw{display:inline-block;width:14px;height:14px;border:1px solid rgba(20,17,12,.35);vertical-align:-2px;margin-right:8px}
 .legend .sw{margin-right:0}

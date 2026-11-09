@@ -157,8 +157,47 @@ novos fecham os 38.194 m². Ver `docs/masterplan-v14.md` §4.
 3. A **Q11** (Administração) tem nome de lote no PDF e entrava como Interna na tabela v3.1, mas o
    quadro do V14 não a conta. O app a deixa fora da oferta.
 
-**Disponibilidade:** a tabela diz que a disponibilidade é confirmada na proposta; o app não marca lote
-vendido ou reservado. Se o cliente quiser, dá para pôr um campo `status` em `lotes.json`.
+## Disponibilidade ao vivo pelo CV CRM (2026-11-09)
+
+O CV CRM (`bracerum.cvcrm.com.br`) é o CRM das reservas. O loteamento é o **empreendimento 3**
+("Bracerum Park — Lotes industriais", sigla LTIND); os outros são 1 Hotel, 2 Cidade e 4 Condomínios.
+No CV cada lote é uma unidade com o **mesmo nome da maquete** (`LTIND.Q01.L001`, bloco "Quadra Q01").
+O cadastro exportado (`unidades_3_loteamento.csv`, pasta "Lotes + Categorias" do Drive do cliente) tem
+641 unidades: os **615 lotes da maquete, todos casando pelo nome**, mais 26 que a maquete não vende
+(8 do Hub de serviços, 7 hangares, Q37 e Q11, marcados como "Fora da oferta").
+
+**Como funciona:**
+- `api/lotes-status.js` (função da Vercel, na raiz do repositório) lê
+  `GET /api/v1/comercial/mapadisponibilidade/3` do CV com o token e devolve só
+  `{ ok, atualizado, lotes: { "Q07.L014": "v" } }`: `r` reservado (inclui "em processo de reserva"),
+  `v` vendido, `b` bloqueado/indisponível; lote ausente = disponível. Nome do comprador, corretor e
+  documento **não saem** da função. A CDN guarda a resposta 60 s (`CDN-Cache-Control`), então o CV recebe
+  no máximo ~1 consulta por minuto (o limite é 200/min).
+- A maquete chama `/api/lotes-status` ao abrir, a cada 2 min com a aba visível e quando a aba volta a
+  ficar visível. Lote ocupado muda de cor (reservado marrom-escuro, vendido quase preto, indisponível
+  cinza), a legenda conta os disponíveis por categoria e os ocupados por situação, o cartão do lote
+  ocupado troca a simulação por "fale com a equipe comercial", e a simulação de vários lotes (quadra
+  inteira, shift + clique, link `#lotes-…`) deixa os ocupados de fora.
+- **Sem a função** (file://, servidor local, CV fora do ar, variáveis não configuradas) a resposta não é
+  `ok` e a maquete fica como antes: todos à venda. Nada quebra.
+- Teste sem o CV: `window.__bp.aplicaStatus({ ok: true, lotes: { 'Q10.L001': 'v' } })` no console.
+
+**Variáveis de ambiente do projeto na Vercel** (Settings → Environment Variables, Production):
+`CVCRM_TOKEN` (segredo — o próprio cliente cola no painel), `CVCRM_EMAIL` (e-mail do usuário dono do
+token), opcionais `CVCRM_HOST` (padrão `bracerum.cvcrm.com.br`) e `CVCRM_EMPREENDIMENTO` (padrão `3`).
+O token é gerado no Painel do Gestor do CV, no cadastro do usuário (botão "Token"); o perfil do usuário
+precisa de permissão para o endpoint do mapa de disponibilidade. Documentação da API:
+desenvolvedor.cvcrm.com.br.
+
+**Pendente (2026-11-09):** a primeira chamada real devolveu 401 ("Request sem token ou email de
+autorização") com o token salvo na sessão e o e-mail `matheus337.martins@gmail.com` — a mesma resposta
+de um token inventado. Conferir no CV: e-mail exato do usuário do token, token ativo e não vencido,
+permissão do perfil, e o log em `https://bracerum.cvcrm.com.br/cvio`. O formato real da resposta
+(campo `situacao` em texto, paginação `paginacao.total_de_paginas`) só foi visto na documentação; a
+função também aceita o código numérico (`situacao_mapa_disponibilidade` 1–5).
+
+A tabela de preços continua dizendo que a disponibilidade é confirmada na proposta — o texto do cartão
+não mudou.
 
 ## Os pontos do mapa
 

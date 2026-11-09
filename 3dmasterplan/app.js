@@ -56,6 +56,9 @@ const T = {
     'lot.cash': 'Pagamento único na assinatura', 'lot.tier': 'Faixa de {de} a {ate} lotes na operação.', 'lot.tierUp': 'Faixa de {de} lotes ou mais na operação.',
     'lot.next': 'A partir de {n} lotes, {c} cai para {p}/m².', 'lot.add': 'Somar lotes', 'lot.adding': 'Somando: clique nos lotes para incluir ou tirar',
     'lot.block': 'Quadra {q} inteira ({n} lotes)', 'lot.clear': 'Limpar', 'lot.remove': 'Tirar {id} da simulação', 'lot.propose': 'Pedir proposta',
+    'st.r': 'Reservado', 'st.v': 'Vendido', 'st.b': 'Indisponível', 'st.d': 'disponíveis',
+    'st.live': 'Disponibilidade ao vivo · CV CRM · {h}', 'st.txt': 'Este lote está {s} e não entra na simulação. Fale com a equipe comercial sobre os lotes disponíveis ao redor.',
+    'st.skip': '{n} lote(s) reservado(s), vendido(s) ou indisponível(is) ficaram fora da simulação.', 'st.ask': 'Falar com a equipe comercial',
     'lot.notes': 'Valor = preço por m² × área do lote, em dólares, IVA não incluído. Vale a tabela vigente na data da assinatura; a disponibilidade de cada lote é confirmada pela Bracerum na proposta.',
     'lot.expoNote': 'Preço de lançamento para reservas assinadas até 13/11/2026, dentro da cota de 64 lotes.',
     'lot.approxNote': 'Lote de formato irregular: a área foi medida no mapa de lotes e pode diferir alguns m² da área de contrato, que vem no nome oficial do lote.',
@@ -98,6 +101,9 @@ const T = {
     'lot.cash': 'Single payment on signing', 'lot.tier': 'Bracket of {de} to {ate} lots in the deal.', 'lot.tierUp': 'Bracket of {de} lots or more in the deal.',
     'lot.next': 'From {n} lots, {c} drops to {p}/m².', 'lot.add': 'Add lots', 'lot.adding': 'Adding: click lots to include or remove them',
     'lot.block': 'Whole block {q} ({n} lots)', 'lot.clear': 'Clear', 'lot.remove': 'Remove {id} from the quote', 'lot.propose': 'Request a proposal',
+    'st.r': 'Reserved', 'st.v': 'Sold', 'st.b': 'Unavailable', 'st.d': 'available',
+    'st.live': 'Live availability · CV CRM · {h}', 'st.txt': 'This lot is {s} and is left out of the quote. Talk to the sales team about the available lots around it.',
+    'st.skip': '{n} reserved, sold or unavailable lot(s) were left out of the quote.', 'st.ask': 'Talk to the sales team',
     'lot.notes': 'Price = price per m² × lot area, in US dollars, VAT not included. The price list in force on the signing date applies; Bracerum confirms each lot’s availability in the proposal.',
     'lot.expoNote': 'Launch price for reservations signed by 13 Nov 2026, within the quota of 64 lots.',
     'lot.approxNote': 'Irregular lot: the area was measured on the lot map and may differ by a few m² from the contract area, which is part of the lot’s official name.',
@@ -140,6 +146,9 @@ const T = {
     'lot.cash': 'Pago único a la firma', 'lot.tier': 'Franja de {de} a {ate} lotes en la operación.', 'lot.tierUp': 'Franja de {de} lotes o más en la operación.',
     'lot.next': 'Desde {n} lotes, {c} baja a {p}/m².', 'lot.add': 'Sumar lotes', 'lot.adding': 'Sumando: haga clic en los lotes para incluir o quitar',
     'lot.block': 'Manzana {q} entera ({n} lotes)', 'lot.clear': 'Limpiar', 'lot.remove': 'Quitar {id} de la simulación', 'lot.propose': 'Pedir propuesta',
+    'st.r': 'Reservado', 'st.v': 'Vendido', 'st.b': 'No disponible', 'st.d': 'disponibles',
+    'st.live': 'Disponibilidad en vivo · CV CRM · {h}', 'st.txt': 'Este lote está {s} y no entra en la simulación. Hable con el equipo comercial sobre los lotes disponibles alrededor.',
+    'st.skip': '{n} lote(s) reservado(s), vendido(s) o no disponible(s) quedaron fuera de la simulación.', 'st.ask': 'Hablar con el equipo comercial',
     'lot.notes': 'Valor = precio por m² × superficie del lote, en dólares, IVA no incluido. Vale la lista vigente a la fecha de la firma; Bracerum confirma la disponibilidad de cada lote en la propuesta.',
     'lot.expoNote': 'Precio de lanzamiento para reservas firmadas hasta el 13/11/2026, dentro del cupo de 64 lotes.',
     'lot.approxNote': 'Lote de forma irregular: la superficie se midió en el mapa de lotes y puede diferir algunos m² de la superficie de contrato, que figura en el nombre oficial del lote.',
@@ -942,6 +951,14 @@ let janela = 'expo', pagto = '12x';
 const IPAG = { '12x': 0, vista: 1, '36x': 2 };
 const camadaLotes = new THREE.Group();
 const qtags = [];
+/* Situação de cada lote vinda do CV CRM por /api/lotes-status (função da Vercel, api/lotes-status.js).
+   ST = { 'Q07.L014': 'r' | 'v' | 'b' }; lote ausente = disponível. Sem a função (file://, falha do CV,
+   variáveis não configuradas) ST fica null e a maquete se comporta como antes: todos à venda. */
+let ST = null, stHora = null;
+const ST_COR = { r: '#5e4219', v: '#1d1a16', b: '#bdb7aa' };
+const stDe = (l) => (ST && ST[l.id]) || null;
+const livre = (l) => !stDe(l);
+const nomeSt = (c) => t('st.' + c);
 
 function hojeISO() {
   const d = new Date();
@@ -996,7 +1013,7 @@ function montaCamadaLotes() {
       for (const k of tri) { pos.push(w[k][0], 0.16, w[k][1]); col.push(c.r, c.g, c.b); }
     }
   };
-  for (const l of L.lotes) poe(l._pts, P.categorias[l.cat].cor);
+  for (const l of L.lotes) { l._v0 = col.length; poe(l._pts, P.categorias[l.cat].cor); l._v1 = col.length; }
   for (const q of L.quadras) if (q.fora) poe(q._pts, '#c9c4b8');
   const g = new THREE.BufferGeometry();
   g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
@@ -1006,6 +1023,7 @@ function montaCamadaLotes() {
   m.renderOrder = 1;
   m.raycast = () => {};
   camadaLotes.add(m);
+  camadaLotes.userData.malha = m;
   camadaLotes.visible = false;
   for (const q of L.quadras) {               // rótulo de cada quadra (Q01…Q42), só no modo lotes
     const el = document.createElement('span');
@@ -1015,6 +1033,36 @@ function montaCamadaLotes() {
     $('#pins').appendChild(el);
     qtags.push({ el, p: new THREE.Vector3(q._c[0], 4, q._c[1]) });
   }
+}
+function pintaLotes() {                       // recolore pela situação do CV (ou pela categoria, se livre)
+  const m = camadaLotes.userData.malha;
+  if (!m) return;
+  const a = m.geometry.attributes.color, c = new THREE.Color();
+  for (const l of L.lotes) {
+    c.set(ST_COR[stDe(l)] || P.categorias[l.cat].cor);
+    for (let k = l._v0; k < l._v1; k += 3) { a.array[k] = c.r; a.array[k + 1] = c.g; a.array[k + 2] = c.b; }
+  }
+  a.needsUpdate = true;
+  invalidate();
+}
+function aplicaStatus(d) {
+  if (!d || !d.ok || typeof d.lotes !== 'object') return;
+  const novo = {};
+  for (const [id, c] of Object.entries(d.lotes)) if (L.porId.has(id) && ST_COR[c]) novo[id] = c;
+  ST = novo; stHora = d.atualizado ? new Date(d.atualizado) : new Date();
+  pintaLotes();
+  if (P) painelLotes();
+  if (selected?.kind === 'lot' && escolhidos.length) {
+    const fica = escolhidos.length > 1 ? escolhidos.filter(livre) : escolhidos;
+    if (fica.length !== escolhidos.length) escolheLotes(fica, false); else mostraCartaoLotes();
+  }
+}
+async function carregaStatus() {
+  if (location.protocol === 'file:') return;
+  try {
+    const r = await fetch('/api/lotes-status', { cache: 'no-store' });
+    if (r.ok) aplicaStatus(await r.json());
+  } catch (e) { /* sem a função: segue com todos à venda */ }
 }
 function posicionaQuadras() {
   if (!modoLotes) return;
@@ -1057,6 +1105,10 @@ function modoLotesOn(on, voo = true) {
   invalidate();
 }
 function escolheLotes(lista, voo = true) {
+  if (lista.length > 1 && ST) {
+    const fora = lista.filter((l) => !livre(l)).length;
+    if (fora) { lista = lista.filter(livre); dica('st.skip', 6000, { n: fora }); }
+  }
   escolhidos = lista;
   if (!lista.length) { limpaSelecao(); return; }
   selected = { kind: 'lot', i: areaIdx.industrial };
@@ -1093,7 +1145,7 @@ function lotesDoHash(h) {
   return h.replace(/^lotes?-/, '').split('-').flatMap((id) => (/^Q\d\d$/.test(id) ? L.quadras.find((q) => q.q === id)?._lotes || [] : [L.porId.get(id)])).filter(Boolean);
 }
 function cliqueLote(l, juntar) {
-  if (juntar && escolhidos.length) {
+  if (juntar && escolhidos.length && (escolhidos.includes(l) || livre(l))) {
     escolheLotes(escolhidos.includes(l) ? escolhidos.filter((x) => x !== l) : [...escolhidos, l], false);
   } else escolheLotes([l]);
 }
@@ -1226,7 +1278,27 @@ function feicao(nome) {
   const frente = lados.length ? subst(t(lados.length > 1 ? 'lot.frentes' : 'lot.frente'), { f: lista }) : '';
   return [t(esq === 'ESQSIM' ? 'lot.esquina' : 'lot.meio'), t(forma === 'PO' ? 'lot.poligonal' : 'lot.retangular'), frente].filter(Boolean).join(' · ');
 }
+function mostraCartaoIndisponivel(l) {
+  const st = stDe(l);
+  $('#cardMedia').innerHTML = '';
+  $('#cardEyebrow').textContent = subst(t('lot.eyebrow'), { q: l.q });
+  $('#cardTitle').textContent = 'LTIND.' + l.id;
+  $('#cardKpis').innerHTML = [
+    `<div><dt><i class="sw" style="background:${ST_COR[st]}"></i>${esc(nomeSt(st))}</dt><dd>${esc(stHora ? subst(t('st.live'), { h: horaSt() }) : '')}</dd></div>`,
+    `<div><dt>${esc(`${l.ex ? '' : '≈ '}${fmt(l.a)} m²`)}</dt><dd>${esc(nomeCat(l.cat))}</dd></div>`,
+    ...(l.nome ? [`<div class="solo"><dd>${esc(feicao(l.nome))}</dd></div>`] : [])].join('');
+  const assunto = `${t('st.ask')} — LTIND.${l.id}`;
+  $('#cardCalc').innerHTML = `<p class="calc__st">${esc(subst(t('st.txt'), { s: nomeSt(st).toLowerCase() }))}</p>
+    <a class="btn calc__cta" href="mailto:${P.contato.emails.join(',')}?subject=${encodeURIComponent(assunto)}">${esc(t('st.ask'))} <span aria-hidden="true">→</span></a>`;
+  $('#cardText').textContent = '';
+  $('#cardNote').textContent = l.nome ? subst(t('lot.nomeOficial'), { n: l.nome }) : '';
+  $('#cardActions').innerHTML = `<p class="contact">${esc(P.contato.nomes)} · ${P.contato.emails.map(esc).join(' · ')}</p>`;
+  $('#cardNav').hidden = true;
+  abreCartao();
+}
+const horaSt = () => stHora.toLocaleTimeString(lang === 'pt' ? 'pt-BR' : lang, { hour: '2-digit', minute: '2-digit' });
 function mostraCartaoLotes() {
+  if (escolhidos.length === 1 && !livre(escolhidos[0])) { mostraCartaoIndisponivel(escolhidos[0]); return; }
   const lista = escolhidos, c = calcula(lista), um = lista.length === 1 ? lista[0] : null;
   const quadras = [...new Set(lista.map((l) => l.q))];
   $('#cardMedia').innerHTML = '';
@@ -1263,7 +1335,7 @@ function mostraCartaoLotes() {
     ${chips}
     <div class="calc__btns">
       <button type="button" class="linkbtn" data-acao="somar" aria-pressed="${somar}">${esc(t(somar ? 'lot.adding' : 'lot.add'))}</button>
-      ${q && q._lotes.length > lista.length ? `<button type="button" class="linkbtn" data-acao="quadra" data-q="${q.q}">${esc(subst(t('lot.block'), { q: q.q, n: q._lotes.length }))}</button>` : ''}
+      ${q && q._lotes.filter(livre).length > lista.length ? `<button type="button" class="linkbtn" data-acao="quadra" data-q="${q.q}">${esc(subst(t('lot.block'), { q: q.q, n: q._lotes.filter(livre).length }))}</button>` : ''}
       ${lista.length > 1 ? `<button type="button" class="linkbtn" data-acao="limpar">${esc(t('lot.clear'))}</button>` : ''}
     </div>`;
   $('#cardText').textContent = t('lot.notes') + (janela === 'expo' ? ' ' + t('lot.expoNote') : '');
@@ -1295,8 +1367,8 @@ function mostraRecinto(q) {
 }
 function painelLotes() {
   if (!P) return;
-  const cont = {};
-  L.lotes.forEach((l) => { cont[l.cat] = (cont[l.cat] || 0) + 1; });
+  const cont = {}, sts = { r: 0, v: 0, b: 0 };
+  L.lotes.forEach((l) => { const st = stDe(l); if (st) sts[st]++; else cont[l.cat] = (cont[l.cat] || 0) + 1; });
   $('#lotPanel').innerHTML = `
     <p class="eyebrow">${esc(subst(t('lots.eyebrow'), { v: P.tabela }))}</p>
     <h2 class="lotpanel__title">${esc(t('lots.title'))}</h2>
@@ -1305,9 +1377,12 @@ function painelLotes() {
     <p class="calc__when">${esc(tr(P.janelas.find((j) => j.id === janela).quando))}</p>
     <p class="lotpanel__head">${esc(t('lots.legendHead'))}</p>
     <ul class="legend">${['V', 'B', 'P', 'I'].map((k) => `<li><i class="sw" style="background:${P.categorias[k].cor}"></i>
-      <span><b>${esc(nomeCat(k))}</b> ×${P.categorias[k].fator}<small>${fmt(cont[k] || 0)} ${esc(t('lots.lots'))}</small></span>
+      <span><b>${esc(nomeCat(k))}</b> ×${P.categorias[k].fator}<small>${fmt(cont[k] || 0)} ${esc(t('lots.lots'))}${ST ? ' ' + esc(t('st.d')) : ''}</small></span>
       <em>${usd(P.precos[janela][k][0][0])}<small>/m²</small></em></li>`).join('')}
+      ${ST ? ['r', 'v', 'b'].filter((k) => sts[k]).map((k) => `<li class="legend__st"><i class="sw" style="background:${ST_COR[k]}"></i>
+      <span><b>${esc(nomeSt(k))}</b><small>${fmt(sts[k])} ${esc(t('lots.lots'))}</small></span></li>`).join('') : ''}
       <li class="legend__fora"><i class="sw"></i><span>${esc(t('lots.recinto'))}</span></li></ul>
+    ${ST ? `<p class="lotpanel__live"><i aria-hidden="true"></i>${esc(subst(t('st.live'), { h: horaSt() }))}</p>` : ''}
     <p class="lotpanel__how">${esc(t(COARSE ? 'lots.howtoTouch' : 'lots.howto'))}</p>`;
 }
 
@@ -1370,7 +1445,10 @@ function hoverEm(cx, cy) {
   if (a.lot) {
     setHover(-1); hoverLote(a.lot);
     const l = a.lot, pg = P.pagamentos.find((p) => p.id === pagto), jn = P.janelas.find((j) => j.id === janela);
-    tip.innerHTML = `<small>LTIND.${esc(l.id)}</small><b>${esc(nomeCat(l.cat))} · ${l.ex ? '' : '≈ '}${fmt(l.a)} m²</b>${usd(precoM2(l.cat, 1) * l.a)} <span class="tip__m">${esc(tr(jn.curto))} · ${esc(tr(pg.nome))}</span>`;
+    const st = stDe(l);
+    tip.innerHTML = `<small>LTIND.${esc(l.id)}</small><b>${esc(nomeCat(l.cat))} · ${l.ex ? '' : '≈ '}${fmt(l.a)} m²</b>` + (st
+      ? `<span class="tip__st"><i class="sw" style="background:${ST_COR[st]}"></i>${esc(nomeSt(st))}</span>`
+      : `${usd(precoM2(l.cat, 1) * l.a)} <span class="tip__m">${esc(tr(jn.curto))} · ${esc(tr(pg.nome))}</span>`);
   } else if (a.recinto) {
     setHover(-1); hoverLote(null);
     const adm = a.recinto.fora !== 'recinto alfandegado';
@@ -1454,11 +1532,11 @@ function pararTour() {
 
 /* ------------------------------------------------------------------ interface */
 let hintTimer = 0;
-function dica(chave, ms = 0) {
+function dica(chave, ms = 0, o = null) {
   const el = $('#hint');
   clearTimeout(hintTimer);
   if (!chave) { el.classList.add('is-off'); return; }
-  el.textContent = t(chave); el.dataset.k = chave;
+  el.textContent = o ? subst(t(chave), o) : t(chave); el.dataset.k = chave; el.dataset.o = o ? JSON.stringify(o) : '';
   el.classList.remove('is-off');
   if (ms) hintTimer = setTimeout(() => el.classList.add('is-off'), ms);
 }
@@ -1482,7 +1560,7 @@ function aplicaIdioma() {
   if (selected?.kind === 'lot') mostraCartaoLotes();
   if (selected?.kind === 'recinto') mostraRecinto(selected.q);
   const k = $('#hint').dataset.k;
-  if (k && !$('#hint').classList.contains('is-off')) $('#hint').textContent = t(k);
+  if (k && !$('#hint').classList.contains('is-off')) { const o = $('#hint').dataset.o; $('#hint').textContent = o ? subst(t(k), JSON.parse(o)) : t(k); }
   invalidate();
 }
 function progresso(f) { $('#loaderBar').style.width = Math.round(f * 100) + '%'; }
@@ -1505,7 +1583,7 @@ function ligaInterface() {
     if (b.dataset.tiraq) { escolheLotes(escolhidos.filter((l) => l.q !== b.dataset.tiraq), false); return; }
     const acao = b.dataset.acao;
     if (acao === 'somar') { somar = !somar; mostraCartaoLotes(); dica(somar ? 'lot.adding' : null, 6000); }
-    else if (acao === 'quadra') escolheLotes(L.quadras.find((q) => q.q === b.dataset.q)._lotes);
+    else if (acao === 'quadra') escolheLotes(L.quadras.find((q) => q.q === b.dataset.q)._lotes.filter(livre));
     else if (acao === 'limpar') limpaSelecao();
     else if (acao === 'modo-lotes') { limpaSelecao(); modoLotesOn(true); }
   };
@@ -1723,8 +1801,12 @@ async function iniciar() {
     else if (areaIdx[APELIDO[h] || h] != null) { vistaGeral(1); escolheArea(areaIdx[APELIDO[h] || h]); }
     else { vistaGeral(2600); dica(COARSE ? 'hint.touch' : 'hint.desk', 9000); }
   }, 250);
-  window.__bp = { scene, camera, controls, renderer, escolheArea, escolheLotes, modoLotesOn, calcula, vistaGeral, vistaCima, setHora, S, L, P, U,
-    estado: () => ({ janela, pagto, escolhidos: escolhidos.map((l) => l.id), modoLotes }) };
+  // situação dos lotes no CV CRM: ao abrir e a cada 2 min com a aba visível (a CDN segura 60 s)
+  carregaStatus();
+  setInterval(() => { if (!document.hidden) carregaStatus(); }, 120000);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) carregaStatus(); });
+  window.__bp = { scene, camera, controls, renderer, escolheArea, escolheLotes, modoLotesOn, calcula, vistaGeral, vistaCima, setHora, aplicaStatus, S, L, P, U,
+    estado: () => ({ janela, pagto, escolhidos: escolhidos.map((l) => l.id), modoLotes, status: ST }) };
 }
 
 iniciar().catch((err) => {

@@ -21,6 +21,17 @@ rotas) que as seis páginas internas baixavam e interpretavam à toa. Ele roda d
   sessão injeta o token real de `api.vercel.com`; se expirou, pedir outro em vercel.com/account/tokens).
   Conferir no ar que nenhuma página pede arquivo que ficou de fora.
 
+### Maquete × CV CRM — disponibilidade ao vivo (2026-11-09)
+- **`api/lotes-status.js`** (primeira função da Vercel do projeto) lê o mapa de disponibilidade do
+  **CV CRM** (`bracerum.cvcrm.com.br`, empreendimento **3** = loteamento; 1 Hotel, 2 Cidade, 4 Condomínios)
+  e devolve só `{lotes: {"Q07.L014": "r"|"v"|"b"}}`, com cache de 60 s na CDN. A **`3dmasterplan/`** pinta
+  os lotes ocupados, tira-os da simulação e mostra a contagem na legenda; sem a função tudo fica à venda.
+  No CV os lotes têm o **mesmo nome da maquete** (`LTIND.Q01.L001`) — os 615 casam.
+- Precisa de `CVCRM_TOKEN` (segredo) e `CVCRM_EMAIL` nas variáveis do projeto na Vercel. O `pacote_vercel.py`
+  já leva a pasta `api/`. Detalhes e pendências em `docs/3dmasterplan/README.md` ("Disponibilidade ao vivo").
+- **Pendente:** a API do CV respondeu 401 ao token + e-mail testados em 2026-11-09 — conferir usuário,
+  permissão e o log `/cvio` no CV antes de publicar.
+
 ### Cartões de visita digitais (v6.6 — 2026-11-09)
 - Página aberta pelo QR Code do cartão impresso, no mesmo padrão do linktree (independente, sem
   `style.css`/`script.js`/`i18n.js`, mesma chave `bp-lang`, PT/EN/ES, `tracking.js`). **Visual próprio: preto
