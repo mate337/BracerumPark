@@ -36,6 +36,14 @@ rotas) que as seis páginas internas baixavam e interpretavam à toa. Ele roda d
   **"Bracerum Outlet Premium"**, em L — a maquete tem agora **22 pontos** (numeração andou uma casa a partir do
   Centro Tecnológico). "Bracerum Market" ficou só no Supermercado + 12 lojas.
 
+### Capas e logos por produto (2026-11-10)
+- **`docs/capas-e-logos/`**: logo (SVG + PNG claro/escuro + quadrado 1080) e capas (folder cortado e
+  fotos sem texto) de **Residence, Outlet Premium, Loteamentos e Hotel**, para cadastro no CV CRM etc.
+  Gerado por `docs/build_capas_logos.py` a partir dos folders impressos do Drive (baixados pelo link
+  público — passam do limite de 10 MB do conector). Residence e Outlet **não têm logo-símbolo**: o logo é
+  o título tipográfico da capa do folder, copiado em vetor. O logo atual do Park é o "BRACERUM / P A R K"
+  da pasta "00 - Logos" do Drive; o de `assets/logo/` é o anterior ("Paraguay 2026"). Pendências no README.
+
 ### Maquete × CV CRM — disponibilidade ao vivo (2026-11-09)
 - **`api/lotes-status.js`** (primeira função da Vercel do projeto) lê o mapa de disponibilidade do
   **CV CRM** (`bracerum.cvcrm.com.br`, empreendimento **4** = loteamento; na API 3 = Hotel, 7 = Residence, 9 = Cidade)
