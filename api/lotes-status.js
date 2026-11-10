@@ -51,7 +51,8 @@ function idLote(u) {
   const m = /Q(\d{2})\.L(\d{3})/i.exec(nome);
   if (m) return `Q${m[1]}.L${m[2]}`;
   const q = /\bQ(?:uadra)?\s*(\d{1,2})\b/i.exec(String(u.bloco || ''));
-  const l = /^\s*L(?:ote)?\s*0*(\d{1,3})\s*$/i.exec(nome);
+  // O CV usa os dois jeitos: "L003" e só "003" (a maioria das quadras desde 10/11/2026).
+  const l = /^\s*(?:L(?:ote)?\s*)?0*(\d{1,3})\s*$/i.exec(nome);
   return q && l ? `Q${q[1].padStart(2, '0')}.L${l[1].padStart(3, '0')}` : null;
 }
 
