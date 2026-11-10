@@ -5,10 +5,10 @@ Gerado por `build_tabela_cv.py` (rodar de novo se mudar preço ou estrutura). N�
 
 | Arquivo | O que é | Unidades | Valor total |
 |---|---|---|---|
-| `cv_residence_aptos_valores.csv` | **Importação no CV** — Residence Aptos (empreendimento 7) | 1.452 | US$ 111.994.800 |
-| `cv_residence_casas_valores.csv` | **Importação no CV** — Residence Casas, lotes Q01–Q04 do Resort (empr. 7) | 31 · 20.046 m² | US$ 23.052.900 |
-| `cv_outlet_premium_1a_fase_valores.csv` | **Importação no CV** — Premium Outlet 1ª fase (empr. 9) | 57 · 17.870 m² | US$ 20.550.500 |
-| `cv_outlet_supermercado_lojas_valores.csv` | **Importação no CV** — Supermercado + LJ1–LJ12 (empr. 9) | 13 · 5.326 m² | US$ 6.124.900 |
+| `importar_no_cv/cv_residence_aptos_valores.csv` | **Importação no CV** — Residence Aptos (empreendimento 7) | 1.452 | US$ 111.994.800 |
+| `importar_no_cv/cv_residence_casas_valores.csv` | **Importação no CV** — Residence Casas, lotes Q01–Q04 do Resort (empr. 7) | 31 · 20.046 m² | US$ 23.052.900 |
+| `importar_no_cv/cv_outlet_premium_1a_fase_valores.csv` | **Importação no CV** — Premium Outlet 1ª fase (empr. 9) | 57 · 17.870 m² | US$ 20.550.500 |
+| `importar_no_cv/cv_outlet_supermercado_lojas_valores.csv` | **Importação no CV** — Supermercado + LJ1–LJ12 (empr. 9) | 13 · 5.326 m² | US$ 6.124.900 |
 | `Bracerum_Tabela_de_Valores_CV_2026-11.xlsx` | Tabela legível das quatro, com fórmulas, e a lista de mudanças dos aptos | | |
 | `cv_residence_aptos_mudancas.csv` | Conferência: as 504 unidades de aptos que mudam no CV (252 novas + 252 alteradas) | | |
 | `premium-outlet-1a-fase-cliente.png` | Desenho "Premium Outlet — 1ª fase" do cliente (fonte das lojas) | | |
@@ -39,7 +39,10 @@ unidade; unidade nova vai sem id.
 - **Supermercado + LJ1–LJ12** — medidos no PDF vetorial do V14 rev. 02/11 (1:1000): supermercado 55,49 × 83,01 m
   = **4.606 m²** (o número do quadro é só do supermercado); lojas na faixa de 10,02 m ao lado, módulos de 6,00 m →
   **60 m² cada** (entre LJ6 e LJ7 há uma passagem de 11 m, sem loja). Unidades já existentes no CV (com id).
-- Só unidades vendáveis. Hub de serviços, hangares, Q37 e Q11 estão no empreendimento 4 (loteamento), não aqui.
+- **Só o que vai para o CV, só o que está à venda.** A pasta `importar_no_cv/` tem apenas os quatro CSVs de importação;
+  o `build_tabela_cv.py` recusa gravar qualquer linha de terreno de uso do parque (Hub, hangares, Q37, Q11, ETE/ETA,
+  manutenção, equipamentos) ou parte comum do Outlet (doca, sanitários, acessos, passagem, 2ª fase), e linha sem área
+  ou sem valor. Conferido em 2026-11-10: 1.553 linhas, nenhuma fora da venda.
 
 ## Pendente
 

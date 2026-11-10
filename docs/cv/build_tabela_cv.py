@@ -21,7 +21,7 @@ Fontes:
 
 Uso: python3 docs/cv/build_tabela_cv.py   (grava os CSV e o resumo em docs/cv/)
 """
-import csv, json, os
+import csv, json, os, re
 from collections import OrderedDict
 
 AQUI = os.path.dirname(os.path.abspath(__file__))
@@ -148,8 +148,23 @@ for b in etapa_casas['blocos']:
 assert len(casas) == 31
 
 
+# Só vai para o CV o que está à venda: nada de terreno de uso do parque (Hub de serviços, hangares, recinto
+# alfandegado Q37, Administração Q11, ETE/ETA, manutenção, equipamentos públicos) nem partes comuns do Outlet
+# (doca, sanitários, acessos, passagem) ou a 2ª fase. Cada linha precisa ter área e valor.
+NAO_VENDAVEL = re.compile(r'hub|hangar|\bQ37\b|\bQ11\b|E\.?T\.?[EA]\b|doca|sanit|acesso|passagem|fase 2|2ª fase|'
+                          r'administra|recinto|manuten|subesta|refeit|gr[eê]mio|escola|creche|bombeir|policial|'
+                          r'ambulat|gate|portaria|fora da oferta', re.I)
+PASTA_CV = os.path.join(AQUI, 'importar_no_cv')
+os.makedirs(PASTA_CV, exist_ok=True)
+
+
 def grava(nome, linhas):
-    with open(os.path.join(AQUI, nome), 'w', encoding='utf-8-sig', newline='') as f:
+    for r in linhas:
+        txt = ' '.join(r[c] for c in ('Nome (Bloco)', 'Nome (Unidade)', 'Tipologia (Unidade)', 'Descrição do Lote (Unidade)'))
+        assert not NAO_VENDAVEL.search(txt), f'{nome}: unidade não vendável na planilha do CV — {txt}'
+        assert float(r['Valor (Unidade)'].replace(',', '.')) > 0, f'{nome}: {r["Nome (Unidade)"]} sem valor'
+        assert float(r['Área privativa m² (Unidade)'].replace(',', '.')) > 0, f'{nome}: {r["Nome (Unidade)"]} sem área'
+    with open(os.path.join(PASTA_CV, nome), 'w', encoding='utf-8-sig', newline='') as f:
         w = csv.writer(f, delimiter=';', quoting=csv.QUOTE_MINIMAL, lineterminator='\r\n')
         w.writerow(CABECALHO)
         for r in linhas:
@@ -190,7 +205,7 @@ _area = [int(b) for b in _bruto]
 for i in sorted(range(57), key=lambda i: _bruto[i] - _area[i], reverse=True)[:OUTLET_F1_M2 - sum(_area)]:
     _area[i] += 1
 assert sum(_area) == OUTLET_F1_M2
-FAIXA = ['frente'] * 18 + ['trás'] * 18 + ['coluna da doca'] * 8 + ['coluna externa'] * 13
+FAIXA = ['frente'] * 18 + ['trás'] * 18 + ['coluna interna'] * 8 + ['coluna externa'] * 13
 
 emp9 = SNAP['9']
 etapa9 = emp9['etapas'][0]

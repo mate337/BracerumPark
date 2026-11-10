@@ -17,7 +17,8 @@ rotas) que as seis páginas internas baixavam e interpretavam à toa. Ele roda d
   cobertura duplex; vale sobre o cadastro antigo de 1.200 do CV), **Residence Casas** (31 lotes), **Premium Outlet
   1ª fase** (57 lojas, 17.870 m², áreas medidas no desenho do cliente, OUT-01…57, bloco novo) e **Supermercado
   (4.606 m²) + LJ1–LJ12 (60 m² cada)** medidos no V14. O id do CV vai em "Id (Unidade)"; unidade nova vai sem id.
-  Detalhes, numeração do Outlet e pendências em `docs/cv/README.md`.
+  **Só o que está à venda vai para os CSVs** (pasta `docs/cv/importar_no_cv/`; o script barra terreno de uso do
+  parque e parte comum do Outlet). Detalhes, numeração do Outlet e pendências em `docs/cv/README.md`.
 - **CV, empreendimento 4:** Hub (8), hangares (7), Q37 (10) e Q11 (1) estão "disponível", não bloqueados; e o
   loteamento ainda tem a Q38.L017 e as áreas da Q38 de 28/10.
 
