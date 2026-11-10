@@ -101,7 +101,7 @@ barra fixa no celular (tabela + WhatsApp) / botão de WhatsApp no desktop.
 com `email` + `token` das variáveis da Vercel (as mesmas do `/api/lotes-status`: `CVCRM_EMAIL`,
 `CVCRM_TOKEN`). O usuário da API precisa da permissão **Leads > Cadastrar/Alterar Lead** — o acesso
 de leitura a leads foi conferido em 2026-11-10 (`GET …/leads?email=` responde "Lead não
-encontrado", não 401/403); **o primeiro POST real ainda não foi feito** (ver §6).
+encontrado", não 401/403) e o primeiro POST real foi feito em 2026-11-10 (idlead 6, ver §6).
 
 O que vai para o CV:
 
@@ -150,6 +150,10 @@ e os CSVs de importação do CV (Drive), `3dmasterplan/data/precos.json` (Tabela
   versão leve.
 
 ## 6. Publicar
+
+**Publicado em 2026-11-10** (deploy do `main` pela CLI; as 6 Routing Rules trocadas e promovidas; lead de
+teste idlead 6 conferido no CV — apagar lá). Observação: as regras pegam o caminho exato impresso nos
+folders (`/FolderPark/`, com ou sem barra); outra grafia de maiúsculas (`/FOLDERPARK`) dá 404. Para refazer:
 
 1. `python3 docs/build_lps.py` (regera as 6 páginas e as imagens `assets/lp/og-*.jpg`).
 2. Levar ao `main` e publicar pela Vercel CLI (`docs/pacote_vercel.py`, ver CLAUDE.md) — `lp/`,

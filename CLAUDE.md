@@ -36,9 +36,14 @@ rotas) que as seis páginas internas baixavam e interpretavam à toa. Ele roda d
   Resort) · 9 Bracerum Outlet** — o "9 = Cidade" anotado antes estava errado.
 - Preço dos lotes e faixa de urgência leem `3dmasterplan/data/precos.json` (a janela vira sozinha);
   disponibilidade pelo `/api/lotes-status`.
-- **Para ir ao ar:** publicar do `main` e **trocar as 6 Routing Rules** do painel (hoje mandam
-  `/Folder…` para a home) para a LP com a condição `missing: query utm_source` (senão laço) — passo a
-  passo em `docs/landing-pages.md` §6. Até lá, os QR Codes continuam caindo na home.
+- **No ar desde 2026-11-10.** As 6 Routing Rules do painel agora mandam `/FolderPark/` etc. para a LP
+  (`/folderpark/?utm_source=folder&utm_medium=offline&utm_campaign=folder-park&utm_content=FolderPark`),
+  com a condição **`missing: query utm_source`** — sem ela a regra pegaria a própria LP e entraria em laço.
+  Lead de teste conferido no CV (idlead 6, "TESTE LP Claude - apagar": empreendimento 4, origem "Outras
+  publicidades", mídia `folder-park`, tags e anotação certas) — **apagar no CV**.
+- **O CV mudou o nome das unidades em 10/11:** a maioria das quadras passou de "L014" para "014". O
+  `api/lotes-status.js` só reconhecia 133 de 633 e os reservados sumiam da maquete — corrigido (aceita os
+  dois); 626 reconhecidas, Q02.L001/L003/L004 reservados.
 
 ### Masterplan V14 rev. 02/11/2026 na maquete (2026-11-09)
 - O cliente mandou o **V14 revisado (02/11/2026)** — `docs/masterplan-v14/BRACERUM_PARK_V14_2026-11-02.pdf`, agora a
@@ -94,10 +99,9 @@ rotas) que as seis páginas internas baixavam e interpretavam à toa. Ele roda d
 
 ### Links dos folders e rastreamento (v6.5 — 2026-11-06)
 - **Seis links de folder** (`/FolderResidence/`, `/FolderPark/`, `/FolderResort/`, `/FolderBusinessCenter/`,
-  `/Foldermapadisponibilidade/`, `/FolderLP/`) ainda sem página própria. São **Routing Rules do projeto na
-  Vercel** (painel → Routing Rules, não o `vercel.json`): 307 temporário para a home, sem diferenciar
-  maiúsculas e com ou sem barra final, levando `?utm_source=folder&utm_medium=offline&utm_campaign=folder-<nome>&utm_content=<Caminho>`.
-  Quando a página de um folder existir, **apagar a regra dele** — a regra vem antes dos arquivos.
+  `/Foldermapadisponibilidade/`, `/FolderLP/`). São **Routing Rules do projeto na Vercel** (painel → Routing
+  Rules, não o `vercel.json`): 307 levando `?utm_source=folder&utm_medium=offline&utm_campaign=folder-<nome>&utm_content=<Caminho>`.
+  **Desde 2026-11-10 apontam para as LPs** (ver "Landing pages dos folders" acima), não mais para a home.
 - **`tracking.js`** (carregado com `defer` nas 7 páginas, no linktree e no `3dmasterplan`, via `../`):
   carrega GA4 e Meta Pixel a partir do `CONFIG` no topo do arquivo (vazio = desligado), guarda a origem
   (utm, gclid, fbclid, referrer, primeira e última visita) em `localStorage` `bp-attrib` — exposta por
