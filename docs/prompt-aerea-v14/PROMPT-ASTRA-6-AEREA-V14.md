@@ -296,3 +296,84 @@ referencial e mesma escala), então ele **não depende da Overpass API**. Planta
 `build_data.py` e rodar de novo.
 
 Entorno das referências A e D: © colaboradores do OpenStreetMap (ODbL).
+
+## 6. Variação 90° (vista de cima)
+
+A primeira oblíqua do V14 (`gerada-v14-obliqua.webp`, 2026-11-10) saiu boa: segue a guia A, com o outlet
+em L, o centro tecnológico em folhas, o hotel com a cobertura, o residencial baixo, o clube, o resort com
+o lago, o recinto e o hub. A variação 90° é a **mesma imagem vista de cima**, com a câmera apontada reto
+para baixo e a **mesma orientação** (rodovia em cima, pista embaixo, hotel à direita) — o "Vista 90º" do
+filme e a candidata a fundo novo do masterplan da home (pinos remarcados, quando o site for liberado).
+
+A guia é a **A90 do V14**: a mesma maquete da guia A vista de cima, com as sombras vindo do canto superior
+esquerdo, como a luz da imagem gerada. Mesmo quadro da A90 do V12, em três tamanhos:
+
+| Arquivo | Tamanho | Para quê |
+|---|---|---|
+| `ref-A90-zenital-volumes-v14-4k.png` | 3840 × 2560 (3:2), 300 dpi | **A que anexar** |
+| `ref-A90-zenital-volumes-v14-4k-16x9.png` | 3840 × 2160 (16:9), 300 dpi | Tela, vídeo e o fundo do masterplan; com ela, troque "Formato paisagem 3:2" por "Formato 16:9" |
+| `ref-A90-zenital-volumes-v14.png` | 1536 × 1024 (3:2) | Versão leve |
+
+O entorno da guia em volta do parque vem ampliado do entorno da maquete 3D (2,5 m/px) e sai borrado: é
+de propósito só uma indicação — o entorno da imagem final segue a oblíqua gerada.
+
+### Na mesma conversa
+
+Na conversa em que a oblíqua do V14 foi gerada, anexe a **A90** (de preferência a 4K) e cole:
+
+```text
+Agora faça uma variação 90° desta imagem: exatamente a mesma cidade industrial, com a mesma arquitetura, os mesmos materiais, a mesma vegetação e a mesma luz dourada, mas vista de cima, com a câmera apontada reto para baixo (vista zenital, 90°), como uma foto de drone a grande altura ou de satélite de altíssima resolução. Formato paisagem 3:2, no maior tamanho disponível.
+
+Se houver uma imagem anexada (guia de cima), use-a como base: ela mostra o enquadramento, a orientação e a posição de cada volume, quadra, via, lago e da pista vistos de cima. Os blocos cinza e brancos são volumes provisórios e as sombras indicam a altura; não copie as cores chapadas nem o entorno simplificado. Para o desenho exato, siga a planta B que já está na conversa. Onde a imagem anterior divergir da planta, vale a planta: 6 colunas por 7 fileiras de quadras; o canal de drenagem entre a primeira e a segunda coluna; os dois boulevards com palmeiras (o central, que sai da portaria, e o transversal no meio da grade); a fileira de 17 galpões pequenos atrás do outlet; os 67 prédios residenciais baixos em quarteirões quadrados com pátios e espelhos d'água; o clube triangular na borda diagonal, com a piscina olímpica; o resort pequeno com o lago-piscina perto do fim da pista; os 10 armazéns do recinto alfandegado ao lado do heliponto.
+
+Orientação: a mesma da imagem anterior, como se a câmera tivesse subido até apontar para baixo. A Ruta PY-19 cruza o alto da imagem de ponta a ponta e faz uma curva suave no alto, à direita; a pista de pouso fica embaixo; o outlet em L fica à direita da entrada; centro tecnológico, hotel com o centro de convenções, residencial, clube e escola ficam à direita; o aeroporto de cargas e a estação de esgoto ficam à esquerda. Não gire a imagem para o norte ficar em cima.
+
+Sem perspectiva aparente: quadras retangulares, ruas paralelas, sem horizonte e sem céu, quase nenhuma fachada. Vê-se telhados com as faixas de iluminação zenital, a cobertura ondulada de malha branca do centro de convenções, pátios de caminhões, carros, copas de árvores, piscinas, quadras e sombras. O parque inteiro ocupa quase toda a largura, com uma margem do entorno real em volta: acima da rodovia, pasto com palmeiras, uma estrada de terra e os silos da agroindústria vizinha junto à curva; abaixo da pista, o banhado com um córrego sinuoso e ilhas de mata.
+
+Luz: a mesma luz dourada, vinda do canto superior esquerdo, com o sol a uns 35°. Sombras suaves, projetadas para baixo e para a direita, que mostram a altura dos prédios sem esconder ruas e pátios.
+
+Continua valendo tudo o que era proibido: nenhum texto, número, legenda, logotipo, rosa dos ventos, escala, moldura ou ícone; nada vermelho, laranja ou rosa. Não é mapa nem desenho: é uma fotografia aérea.
+```
+
+### Em conversa nova
+
+Anexe, nesta ordem: a **oblíqua gerada** (`gerada-v14-obliqua.webp`), a **A90** e a **B** (e, se couber,
+E a H). Cole o prompt acima trocando o primeiro parágrafo por: "Crie uma única imagem fotorrealista: a
+vista de cima, com a câmera apontada reto para baixo (vista zenital, 90°), da cidade industrial da imagem
+1 — a mesma arquitetura, os mesmos materiais, a mesma vegetação e a mesma luz, só que vista de cima, como
+uma foto de drone a grande altura ou de satélite de altíssima resolução. Formato paisagem 3:2, no maior
+tamanho disponível. A imagem 2 é a guia de cima e a imagem 3 é a planta oficial."
+
+### Ajustes da vista de cima
+
+Os ajustes da seção 3 (texto, vermelho, morros) continuam valendo. Os próprios da vista de cima:
+
+**Saiu inclinada (aparece céu, horizonte ou fachada)**
+```text
+A câmera tem que estar exatamente a 90°, apontada reto para baixo: sem horizonte, sem céu e sem fachadas visíveis — só telhados, pátios, copas e sombras. Mantenha todo o resto.
+```
+
+**A orientação girou**
+```text
+A orientação tem que ser a da imagem anterior: a rodovia no alto da imagem, a pista embaixo, o hotel, o residencial e o clube à direita, o aeroporto à esquerda. Corrija só a orientação; o resto fica igual.
+```
+
+**Ficou com cara de mapa ou de planta ilustrada**
+```text
+Isto tem que ser uma fotografia aérea fotorrealista, não um mapa nem uma planta ilustrada: textura real de telhado metálico, asfalto, grama, copas de árvores e água, com sombras naturais. Mantenha a implantação e o enquadramento.
+```
+
+**As sombras estão escondendo ruas e pátios**
+```text
+Deixe as sombras mais curtas e mais suaves, com o sol mais alto (uns 45°), para não esconder ruas e pátios. O resto fica igual.
+```
+
+### Checklist da vista de cima
+
+- [ ] Câmera reta para baixo: sem céu, sem horizonte, sem fachadas.
+- [ ] Mesma orientação da oblíqua: rodovia em cima, pista embaixo, hotel, residencial e clube à direita, aeroporto à esquerda.
+- [ ] Quadras retangulares e ruas paralelas, sem perspectiva; grade de 6 × 7 com o canal e os dois boulevards.
+- [ ] Entrada no meio da frente; outlet em L com a fileira de galpões pequenos atrás.
+- [ ] Residencial em quarteirões quadrados com pátios; clube triangular com a piscina olímpica; resort com o lago-piscina.
+- [ ] Recinto alfandegado ao lado do heliponto; 7 hangares.
+- [ ] Nada escrito, nada vermelho.

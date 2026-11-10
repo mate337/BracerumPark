@@ -6,6 +6,8 @@
 
 Escreve em docs/prompt-aerea-v14/:
   ref-A-camera-volumes-v14.png  a câmera da aérea aprovada (gerada-v1, 16/10) com os volumes do V14
+  ref-A90-zenital-volumes-v14*.png  a mesma maquete vista de cima (variação 90°), na orientação da prancha:
+                                1536 x 1024, 4K 3:2 (3840 x 2560) e 4K 16:9 (3840 x 2160), os 4K a 300 dpi
   ref-B-planta-v14.png          a planta V14 vista de cima, sem nenhum texto
   ref-C-aerea-aprovada.jpg      a aérea aprovada (V12): referência de estilo, cor, luz e entorno
   ref-D-situacao.jpg            o terreno no entorno real, de cima
@@ -47,6 +49,7 @@ import build_data as bd                                            # noqa: E402
 
 APROVADA = os.path.join(ROOT, 'docs', 'prompt-aerea-v12', 'gerada-v1-obliqua.webp')
 ENTORNO = os.path.join(ROOT, '3dmasterplan', 'data', 'entorno.webp')
+PARQUE = os.path.join(ROOT, '3dmasterplan', 'data', 'parque.webp')      # a prancha inteira, entorno em 0,63 m/px
 # câmera da aérea aprovada (ajuste por mínimos quadrados; ver a docstring)
 CAMERA = dict(Xc=908, Yc=2877, Zc=2345, yaw=6.1, pitch=41.4, hfov=41.4, w=1536, h=1024, ss=2)
 COLAGENS = {   # arquivo: (fotos, colunas, linhas, altura do quadro)
@@ -93,6 +96,27 @@ def chao(guia):
     return base.convert('RGB')
 
 
+def entorno_pronto(data, geo, plano_guia, box=br.CTX_BOX, mpp=br.MPP, larguras=None):
+    """Faz o papel de br.entorno() na vista de cima sem baixar o OpenStreetMap: o entorno pronto da maquete
+    3D (entorno.webp, 2,5 m/px; parque.webp, a prancha inteira a 0,63 m/px) recortado em `box`, com a
+    planta da guia por cima. `data`, `geo` e `larguras` ficam só pela assinatura."""
+    x0, y0, x1, y1 = box
+    W, H = int((x1 - x0) / mpp), int((y1 - y0) / mpp)
+    ex0, ey0 = br.CTX_BOX[:2]
+    ent = Image.open(ENTORNO).convert('RGB')
+    m = (br.CTX_BOX[2] - br.CTX_BOX[0]) / ent.width
+    img = ent.resize((W, H), Image.BICUBIC, box=((x0 - ex0) / m, (y0 - ey0) / m, (x1 - ex0) / m, (y1 - ey0) / m))
+    img = img.convert('RGBA')
+    sw, sh = plano_guia.shape[1] / br.K, plano_guia.shape[0] / br.K           # prancha em metros
+    pq = Image.open(PARQUE).convert('RGBA').resize((round(sw / mpp), round(sh / mpp)), Image.LANCZOS)
+    img.alpha_composite(pq, (round(-x0 / mpp), round(-y0 / mpp)))
+    p = Image.fromarray(plano_guia, 'RGBA')
+    s = 1 / (br.K * mpp)
+    img.alpha_composite(p.resize((round(p.size[0] * s), round(p.size[1] * s)), Image.LANCZOS),
+                        (round(-x0 / mpp), round(-y0 / mpp)))
+    return img.convert('RGB')
+
+
 def main():
     os.makedirs(br.CACHE, exist_ok=True)
     print('planta V14…')
@@ -116,6 +140,15 @@ def main():
         print(f'  {k:32s} {n}')
     print('render da câmera…')
     br.render(maq, c, **CAMERA).save(os.path.join(HERE, 'ref-A-camera-volumes-v14.png'), optimize=True)
+    print('vista de cima (grade de 0,5 m, sombras)…')
+    br.entorno = entorno_pronto                    # render_zenital desenha o entorno por br.entorno()
+    maq90 = MaqueteAerea(plano, sheet, res=br.RES90).montar()
+    for nome, cam, dpi in (('ref-A90-zenital-volumes-v14.png', br.CAMERA90, None),
+                           ('ref-A90-zenital-volumes-v14-4k.png', br.CAMERA90_4K, br.DPI_4K),
+                           ('ref-A90-zenital-volumes-v14-4k-16x9.png', br.CAMERA90_4K_169, br.DPI_4K)):
+        print('  ' + nome)
+        im = br.render_zenital(maq90, None, None, guia, sheet, **cam)
+        im.save(os.path.join(HERE, nome), optimize=True, **({'dpi': (dpi, dpi)} if dpi else {}))
 
     print('referências de estilo e fotos do cliente…')
     Image.open(APROVADA).convert('RGB').save(os.path.join(HERE, 'ref-C-aerea-aprovada.jpg'), quality=92)
