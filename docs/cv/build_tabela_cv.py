@@ -226,6 +226,13 @@ for n, (r, area, fx) in enumerate(zip(_ret, _area, FAIXA), 1):
 # Supermercado + LJ1–LJ12 (Masterplan V14 rev. 02/11/2026, medido no PDF vetorial, escala 1:1000): o
 # supermercado é o retângulo de 55,49 × 83,01 m = 4.606 m² (o número do quadro); as 12 lojas ficam na faixa
 # de 10,02 m ao lado dele, em módulos de 6,00 m (LJ1–LJ6, uma passagem de 11 m, LJ7–LJ12) → 60 m² cada.
+PRECO_SUPER_M2 = 1950   # US$/m² só do Supermercado (cliente, 2026-11-10); as lojas LJ1–LJ12 seguem a US$ 1.150/m²
+
+
+def preco_m2(bloco):
+    return PRECO_SUPER_M2 if bloco == 'Supermercado' else PRECO_M2
+
+
 SUPER = [('Supermercado', 'Supermercado', 4606, '55,49 × 83,01 m', 'Âncora — supermercado de 4.606 m² (Masterplan V14)')]
 SUPER += [('Lojas', f'LJ{i}', 60, '10,02 × 6,00 m', f'Loja LJ{i} do bloco do Supermercado — 60 m² (Masterplan V14)')
           for i in range(1, 13)]
@@ -235,8 +242,8 @@ for bloco, nome, area, dim, desc in SUPER:
     mercado.append(linha(emp9, etapa9['nome'], bloco, u['idunidade'], nome, **{
         'Tipologia (Unidade)': u['tipologia'], 'Área privativa m² (Unidade)': num(area),
         'Área privativa total (Unidade)': num(area), 'Dimensões (Unidade)': dim,
-        'Valor (Unidade)': num(area * PRECO_M2), 'Tipo (Unidade)': 'Âncora' if bloco == 'Supermercado' else 'Loja',
-        'Descrição do Lote (Unidade)': desc + ' — US$ 1.150/m²',
+        'Valor (Unidade)': num(area * preco_m2(bloco)), 'Tipo (Unidade)': 'Âncora' if bloco == 'Supermercado' else 'Loja',
+        'Descrição do Lote (Unidade)': desc + f' — US$ {preco_m2(bloco):,}/m²'.replace(',', '.'),
     }))
 assert len(cv9) == 13 and len(mercado) == 13
 
@@ -364,11 +371,11 @@ if Workbook:
     ws = wb.create_sheet('Supermercado e lojas')
     ws.append(['Supermercado + lojas LJ1–LJ12 · tabela de valores (nov/2026)'])
     ws['A1'].font = Font(bold=True, size=13)
-    ws.append(['US$ 1.150/m². Áreas medidas no Masterplan V14 rev. 02/11/2026 (PDF vetorial, 1:1000).'])
+    ws.append(['Supermercado a US$ 1.950/m²; lojas LJ1–LJ12 a US$ 1.150/m². Áreas medidas no Masterplan V14 rev. 02/11/2026 (PDF vetorial, 1:1000).'])
     ws.append([])
     cab(ws, 4, ['Unidade', 'Dimensões', 'Área', 'US$/m²', 'Valor'], [14, 18, 12, 10, 15])
     for bloco, nome, area, dim, desc in SUPER:
-        ws.append([nome, dim, area, PRECO_M2, f'=C{ws.max_row + 1}*D{ws.max_row + 1}'])
+        ws.append([nome, dim, area, preco_m2(bloco), f'=C{ws.max_row + 1}*D{ws.max_row + 1}'])
     ws.append(['Total', '', f'=SUM(C5:C{ws.max_row})', '', f'=SUM(E5:E{ws.max_row})'])
     for c in ws[ws.max_row]:
         c.font = Font(bold=True)

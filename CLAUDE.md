@@ -12,7 +12,8 @@ rotas) que as seis páginas internas baixavam e interpretavam à toa. Ele roda d
 
 ### Tabela de valores para o CV — Residence e Outlet (2026-11-10)
 - `docs/cv/` (gerado por `build_tabela_cv.py`): CSVs no **modelo de importação de unidades do CV** (o
-  `unidades_*.csv` da pasta "BRACERUM PARK - CV" do Drive, 126 colunas, `;`), **tudo a US$ 1.150/m²** (cliente):
+  `unidades_*.csv` da pasta "BRACERUM PARK - CV" do Drive, 126 colunas, `;`), **US$ 1.150/m²**, menos o
+  **Supermercado, a US$ 1.950/m²** (cliente, 2026-11-10):
   **Residence Aptos** (1.452 pelo PDF de investidores P5 — 1 e 2 quartos com 5 andares sem cobertura, 3 quartos com
   cobertura duplex; vale sobre o cadastro antigo de 1.200 do CV), **Residence Casas** (31 lotes), **Premium Outlet
   1ª fase** (57 lojas, 17.870 m², áreas medidas no desenho do cliente, OUT-01…57, bloco novo) e **Supermercado
