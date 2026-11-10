@@ -10,6 +10,16 @@ O site tem **7 páginas**: `index.html`, `tributacao.html`, `bracerum.html`, `ho
 rotas) que as seis páginas internas baixavam e interpretavam à toa. Ele roda depois do
 `script.js` porque usa `hasGsap`, `reduceMotion` e `tr()`.
 
+### Tabela de valores do Residence para o CV (2026-11-10)
+- `docs/cv/` (gerado por `build_tabela_cv.py`): CSVs no **modelo de importação de unidades do CV** (o
+  `unidades_*.csv` da pasta "BRACERUM PARK - CV" do Drive, 126 colunas, `;`) com os valores do **Residence Aptos**
+  (1.452 aptos pelo PDF "Apresentação para investidores P5" — vale sobre o cadastro antigo de 1.200 do CV, pelo
+  cliente) e do **Residence Casas** (31 lotes a **US$ 1.150/m²**, definido pelo cliente). O id do CV vai na coluna
+  "Id (Unidade)"; as 252 unidades novas do 5º andar vão sem id. Detalhes e pendências em `docs/cv/README.md`.
+- **Outlet + Supermercado/lojas:** pendente a área de cada loja (o CV tem 0 m² e não tem as 57 lojas do Outlet).
+- **CV, empreendimento 4:** Hub (8), hangares (7), Q37 (10) e Q11 (1) estão "disponível", não bloqueados; e o
+  loteamento ainda tem a Q38.L017 e as áreas da Q38 de 28/10.
+
 ### ⚠️ Publicação sem GitHub (2026-11-09)
 - **A conta GitHub `mate337` foi sinalizada ("flagged")** e não pode autorizar apps de terceiros: a Vercel
   perdeu o acesso ao repositório e **push no `main` não publica mais** (desde 6/11; o `tracking.js` ficou fora
