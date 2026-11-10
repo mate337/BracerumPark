@@ -36,6 +36,14 @@ rotas) que as seis páginas internas baixavam e interpretavam à toa. Ele roda d
   **"Bracerum Outlet Premium"**, em L — a maquete tem agora **22 pontos** (numeração andou uma casa a partir do
   Centro Tecnológico). "Bracerum Market" ficou só no Supermercado + 12 lojas.
 
+### Prompt da vista aérea do V14 (2026-11-10)
+- **`docs/prompt-aerea-v14/PROMPT-ASTRA-6-AEREA-V14.md`**: aérea do parque inteiro no V14 rev. 02/11 para o
+  ChatGPT Astra-6, **no padrão da aérea aprovada de 16/10** (`gerada-v1-obliqua.webp`, anexada como ref. C de
+  estilo, cor, luz e entorno — menos o lado direito, que é do V12). A guia A usa a **câmera ajustada ao
+  enquadramento da aérea aprovada** (não a da guia do V12) com os volumes da `Maquete14`; o Outlet sai com as
+  duas fases construídas. Gerado por `build_refs_v14.py`, que usa o `3dmasterplan/data/entorno.webp` (não
+  depende da Overpass, bloqueada na rede da sessão).
+
 ### Maquete × CV CRM — disponibilidade ao vivo (2026-11-09)
 - **`api/lotes-status.js`** (primeira função da Vercel do projeto) lê o mapa de disponibilidade do
   **CV CRM** (`bracerum.cvcrm.com.br`, empreendimento **4** = loteamento; na API 3 = Hotel, 7 = Residence, 9 = Cidade)
