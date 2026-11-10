@@ -36,6 +36,13 @@ rotas) que as seis páginas internas baixavam e interpretavam à toa. Ele roda d
   **"Bracerum Outlet Premium"**, em L — a maquete tem agora **22 pontos** (numeração andou uma casa a partir do
   Centro Tecnológico). "Bracerum Market" ficou só no Supermercado + 12 lojas.
 
+### Contrato de Reserva — guia para o CV (2026-11-10)
+- Modelo bilíngue do jurídico + **exemplo preenchido e comentado** (reserva 4, LTIND.Q02.L003) em
+  **`docs/contrato-reserva/`** (README = guia de preenchimento). **Empreendedora = QATAR S.A. (Bracerum Park), RUC
+  80142167-5** — a Bracerum do Brasil (CNPJ 38.659.873/0001-83) não é parte, e as contas dela não vão no Anexo V.
+  Pendentes do cliente: representante da QATAR, dados da Finca, conta da QATAR, endereço de notificação, prazos e
+  valores em aberto (§2 do README).
+
 ### Maquete × CV CRM — disponibilidade ao vivo (2026-11-09)
 - **`api/lotes-status.js`** (primeira função da Vercel do projeto) lê o mapa de disponibilidade do
   **CV CRM** (`bracerum.cvcrm.com.br`, empreendimento **4** = loteamento; na API 3 = Hotel, 7 = Residence, 9 = Cidade)
