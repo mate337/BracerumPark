@@ -114,7 +114,7 @@ O `build_lotes.py` resolve e avisa cada um:
 2. **Tabela de preços para o V14** — a v3.1 é do V14-02 (612 lotes). O app aplica a mesma regra de
    categoria aos 615; os quatro lotes novos da Q38 caem em Interna.
 3. **Q11** fora da oferta (só Administração)?
-4. **"Bracerum Market" × "Bracerum Outlet"** — a legenda do folheto tem "Bracerum Market" em 06 e 13;
+4. ~~**"Bracerum Market" × "Bracerum Outlet"**~~ **Resolvido (2026-11-10): a faixa vertical é o Bracerum Outlet Premium.** — a legenda do folheto tem "Bracerum Market" em 06 e 13;
    o V14 chama a faixa comercial vertical (o 06 do folheto) de "Bracerum Outlet".
 5. O V14 só desenha os lotes e a implantação: a arquitetura dos prédios do vértice norte, do Posto e do
    Hub na maquete é genérica, e **as alturas continuam estimativas**.

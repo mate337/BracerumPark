@@ -163,9 +163,10 @@ const T = {
   },
 };
 
-/* Os pontos do mapa: os 21 da legenda do folheto do cliente ("Conheça o BracerumPark", 2026-10-20),
-   na ordem e com os nomes dele, mais dois que o Masterplan V14 (rev. 02/11/2026) trouxe e a legenda não
-   tem (22 Bracerum Club, 23 Refeitório/Grêmio/Hub). Posições e números do V14. Polígono e âncora em %
+/* Os pontos do mapa: os da legenda do folheto do cliente ("Conheça o BracerumPark", 2026-10-20), na ordem e
+   com os nomes dele, mais dois que o Masterplan V14 (rev. 02/11/2026) trouxe e a legenda não tem (Bracerum
+   Club e Refeitório/Grêmio/Hub). O 06 do folheto, "Bracerum Market", saiu em 2026-11-10: era a perna vertical
+   do Bracerum Outlet Premium (05), que virou um ponto só, em L — daí 22 pontos. Posições e números do V14. Polígono e âncora em %
    da prancha (x da esquerda, y do topo), altura do pino (m), distância da câmera ao chegar. */
 const AREAS = [
   { id: 'entrada', poly: [[39.2, 3.2], [48.9, 3.2], [48.9, 9.4], [39.2, 9.4]], at: [42.3, 6.0], ph: 34, dist: 520,
@@ -201,24 +202,17 @@ const AREAS = [
       en: 'Two gates control the industrial area: Gate-1 opens straight onto the central boulevard, which crosses the park to the runway; Gate-2 is on the other side of the yard, by the fuel station.',
       es: 'Dos portones controlan el área industrial: el Gate-1 abre directo al bulevar central, que atraviesa el parque hasta la pista; el Gate-2 está del otro lado del patio, junto a la estación de servicio.' },
     photos: ['web/fotos/portaria.jpg'] },
-  { id: 'outlet', poly: [[48.9, 8.8], [69.6, 8.8], [69.6, 15.9], [48.9, 15.9]], at: [57.6, 12.6], ph: 32, dist: 800,
-    name: { pt: 'Bracerum Outlet', en: 'Bracerum Outlet', es: 'Bracerum Outlet' },
+  // o "Bracerum Market" do folheto (06) era a perna vertical deste mesmo L — o cliente corrigiu em 2026-11-10
+  { id: 'outlet', poly: [[48.9, 8.8], [69.6, 8.8], [69.6, 40.0], [65.6, 40.0], [65.6, 15.9], [48.9, 15.9]], at: [60.5, 12.6], ph: 32, dist: 1050,
+    name: { pt: 'Bracerum Outlet Premium', en: 'Bracerum Outlet Premium', es: 'Bracerum Outlet Premium' },
     kpis: [
-      { n: 47410, u: 'm²', l: { pt: 'Bracerum Outlet (Premium Outlet), em L na frente da rodovia', en: 'L-shaped Bracerum Outlet (Premium Outlet) facing the highway', es: 'Bracerum Outlet (Premium Outlet) en L frente a la ruta' } },
+      { n: 47410, u: 'm²', l: { pt: 'em L: ao longo da Via Costeira e descendo até o Supermercado', en: 'L-shaped: along the Via Costeira and down to the supermarket', es: 'en L: a lo largo de la Vía Costera y bajando hasta el Supermercado' } },
       { n: 57, u: { pt: 'lojas', en: 'stores', es: 'tiendas' }, l: { pt: 'na 1ª fase, 17.870 m² de área vendável', en: 'in phase 1, 17,870 m² of sellable area', es: 'en la 1ª fase, 17.870 m² de área vendible' } },
       { v: () => `${usd(1150)}/m²`, l: { pt: 'condição de lançamento: 20% + 12x sem acréscimo, ou 36x; à vista, 8% de desconto', en: 'launch terms: 20% down + 12 interest-free installments, or 36; 8% off for cash', es: 'condición de lanzamiento: 20% + 12 cuotas sin recargo, o 36; al contado, 8% de descuento' } }],
     text: { pt: 'Comércio na frente da PY-19, ao lado da entrada, com vitrine para quem passa na rodovia. A 1ª fase são as lojas da frente — a faixa junto à Via Costeira e o começo da faixa que desce para o Supermercado, com doca e sanitários. As duas pontas, em cinza hachurado, são a 2ª fase, de liberação futura. Volumes conforme a planta; a fachada é ilustrativa.',
       en: 'Retail on the PY-19 frontage, next to the entrance, in full view of highway traffic. Phase 1 is the front row of stores — the strip along the Via Costeira and the top of the strip running down to the supermarket, with loading dock and restrooms. The two ends, in hatched grey, are phase 2, to be released later. Footprints follow the plan; the façade is illustrative.',
       es: 'Comercio frente a la PY-19, junto a la entrada, a la vista de quien pasa por la ruta. La 1ª fase son las tiendas del frente — la franja junto a la Vía Costera y el inicio de la franja que baja al Supermercado, con muelle de carga y sanitarios. Las dos puntas, en gris rayado, son la 2ª fase, de lanzamiento futuro. Volúmenes según el plano; la fachada es ilustrativa.' },
     photos: ['park/select-comercial-dia.jpg', 'park/select-fachada-brises.jpg', 'park/select-comercial-noite.jpg'], link: 'select.html' },
-  { id: 'market', poly: [[65.6, 15.9], [69.6, 15.9], [69.6, 40.0], [65.6, 40.0]], at: [67.4, 27.0], ph: 30, dist: 640,
-    name: { pt: 'Bracerum Market', en: 'Bracerum Market', es: 'Bracerum Market' },
-    kpis: [
-      { t: { pt: 'faixa comercial ao longo do acesso ao Residence, da Via Costeira até o Supermercado', en: 'retail strip along the Residence access road, from the Via Costeira to the supermarket', es: 'franja comercial a lo largo del acceso al Residence, de la Vía Costera al Supermercado' } }],
-    text: { pt: 'A faixa comercial desce da Via Costeira até o Supermercado, entre a área industrial e o Bracerum Residence. A arquitetura ainda não foi definida — os volumes são ilustrativos.',
-      en: 'The retail strip runs down from the Via Costeira to the supermarket, between the industrial area and Bracerum Residence. The architecture has not been defined yet — the volumes are illustrative.',
-      es: 'La franja comercial baja de la Vía Costera hasta el Supermercado, entre el área industrial y el Bracerum Residence. La arquitectura aún no está definida — los volúmenes son ilustrativos.' },
-    photos: ['park/select-comercial-dia.jpg', 'park/select-market-interior.jpg'], link: 'select.html' },
   { id: 'tecnologico', poly: [[73.0, 10.5], [78.2, 10.5], [78.2, 19.8], [73.0, 19.8]], at: [75.5, 16.6], ph: 40, dist: 420,
     name: { pt: 'Centro Tecnológico', en: 'Technology Center', es: 'Centro Tecnológico' },
     kpis: [
@@ -382,18 +376,18 @@ const AREAS = [
 // apelidos dos endereços antigos (#condominio etc.)
 const APELIDO = { condominio: 'condo', aeroporto: 'hangares', infra: 'ete' };
 // quando os rótulos se sobrepõem, ganha quem vem antes nesta lista
-const PRIORIDADE = ['hotel', 'eventos', 'condo', 'industrial', 'entrada', 'outlet', 'resort', 'club', 'pista', 'tecnologico', 'hangares', 'market',
+const PRIORIDADE = ['hotel', 'eventos', 'condo', 'industrial', 'entrada', 'outlet', 'resort', 'club', 'pista', 'tecnologico', 'hangares',
   'supermercado', 'escola', 'servicos', 'ambulatorio', 'bombeiros', 'clube', 'posto', 'portaria', 'heliponto', 'ete', 'administracao'];
 // ordem de teste do clique no chão: do mais específico ao mais amplo
 const HIT_ORDER = ['posto', 'clube', 'portaria', 'entrada', 'tecnologico', 'eventos', 'hotel', 'bombeiros', 'ambulatorio', 'escola', 'club',
-  'outlet', 'supermercado', 'market', 'resort', 'condo', 'servicos', 'administracao', 'ete', 'heliponto', 'hangares', 'pista', 'industrial'];
+  'outlet', 'supermercado', 'resort', 'condo', 'servicos', 'administracao', 'ete', 'heliponto', 'hangares', 'pista', 'industrial'];
 // a que ponto pertence cada volume da maquete (x e y do centro do volume em % da prancha)
 function pontoDoVolume(tag, x, y) {
   switch (tag) {
     case 'posto e portaria': return x < 40.3 ? 'portaria' : x < 43.6 ? 'posto' : x < 46.9 ? 'clube' : 'portaria';
-    case 'outlet': return y < 15.9 ? 'outlet' : 'market';
+    case 'outlet': return 'outlet';
     case 'supermercado': return 'supermercado';
-    case 'docas': return y > 35 ? 'supermercado' : 'market';
+    case 'docas': return y > 35 ? 'supermercado' : 'outlet';
     case 'galpão': return 'industrial';
     case 'recinto': case 'hangar': return 'hangares';
     case 'centro tecnológico': return 'tecnologico';

@@ -31,8 +31,10 @@ rotas) que as seis páginas internas baixavam e interpretavam à toa. Ele roda d
   liberação futura". **Q04** (faixa atrás do Outlet) em grade, um galpão por lote. Detalhes em
   `docs/3dmasterplan/README.md` ("Revisão do V14 de 02/11/2026").
 - **A confirmar:** total do quadro (766.690 m² usa a Q04.L017 de 1.650; os nomes somam 766.449 m²); errata da
-  Q38; o "praça de alimentação" citado pelo cliente — não está rotulado no V14; o pino 06 "Bracerum Market"
-  fica na faixa vertical, que os desenhos do cliente tratam como perna do Outlet.
+  Q38; o "praça de alimentação" citado pelo cliente — não está rotulado no V14.
+- **"Bracerum Market" do folheto (06) = Bracerum Outlet Premium** (cliente, 2026-11-10): virou um ponto só,
+  **"Bracerum Outlet Premium"**, em L — a maquete tem agora **22 pontos** (numeração andou uma casa a partir do
+  Centro Tecnológico). "Bracerum Market" ficou só no Supermercado + 12 lojas.
 
 ### Maquete × CV CRM — disponibilidade ao vivo (2026-11-09)
 - **`api/lotes-status.js`** (primeira função da Vercel do projeto) lê o mapa de disponibilidade do
@@ -180,9 +182,9 @@ rotas) que as seis páginas internas baixavam e interpretavam à toa. Ele roda d
 
 ### Masterplan 3D — aplicação fora do site (2026-10-19)
 - **`3dmasterplan/`** é uma maquete 3D interativa do **V14 de 28/10/2026** (era do V12 até 2026-10-29;
-  three.js 0.169.0 vendorizado, sem CDN): gira/aproxima/move, clique num dos **23 pontos do mapa** (os
-  21 da legenda do folheto do cliente, 2026-10-20, com nome e ordem dele, + 22 Bracerum Club e 23
-  Refeitório/Grêmio/Hub, que o V14 trouxe; cartão com números, fotos do site e link) ou em **lote**
+  three.js 0.169.0 vendorizado, sem CDN): gira/aproxima/move, clique num dos **22 pontos do mapa** (os
+  da legenda do folheto do cliente, 2026-10-20, com nome e ordem dele — o 06 "Market" virou parte do Outlet
+  Premium em 2026-11-10 —, + Bracerum Club e Refeitório/Grêmio/Hub, que o V14 trouxe; cartão com números, fotos do site e link) ou em **lote**
   (615, com nome oficial, feição e preço — ver abaixo), vista geral, de cima, tour, régua, rótulos, hora
   do sol com sombra real, PT/EN/ES pela mesma chave `bp-lang` do site e links por área (`#hotel`,
   `#lote-Q38.L001`, `#lotes-Q38-Q39`). Documentação completa em **`docs/3dmasterplan/README.md`**.

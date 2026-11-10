@@ -226,21 +226,22 @@ não mudou.
 
 ## Os pontos do mapa
 
-Os **21 primeiros** são os da legenda "Conheça o BracerumPark" do folheto do cliente (2026-10-20), com
-o nome e a ordem dele: 01 Entrada Parque · 02 Posto de Gasolina · 03 Clube do Caminhoneiro · 04
-Portaria · 05 Bracerum Outlet · 06 Bracerum Market · 07 Centro tecnológico · 08 Hotel · 09 Centro de
-eventos · 10 Escola · 11 Bracerum Resort · 12 Bracerum Condo · 13 Bracerum Market · 14 Ambulatório ·
-15 Bombeiro Civil · 16 Lotes industriais · 17 Pista de Pouso · 18 Hangares · 19 Heliponto · 20 ETE/ETA
-· 21 Administração Parque. A seção "Tempos & Distâncias" do folheto ficou de fora, a pedido. Os
-**dois últimos** são coisas do V14 que a legenda não tem: **22 Bracerum Club** (40.706 m², com o Salão
-de Eventos) e **23 Refeitório, Grêmio e Hub de serviços** (junto à pista).
+São **22**. Vêm da legenda "Conheça o BracerumPark" do folheto do cliente (2026-10-20), com o nome e a
+ordem dele: 01 Entrada Parque · 02 Posto de Gasolina · 03 Clube do Caminhoneiro · 04 Portaria · 05 Bracerum
+Outlet Premium · 06 Centro tecnológico · 07 Hotel · 08 Centro de eventos · 09 Escola · 10 Bracerum Resort ·
+11 Bracerum Residence · 12 Bracerum Market · 13 Ambulatório · 14 Bombeiro Civil · 15 Lotes industriais ·
+16 Pista de Pouso · 17 Hangares · 18 Heliponto · 19 ETE/ETA · 20 Administração Parque — mais os **dois**
+que o V14 trouxe e a legenda não tem: **21 Bracerum Club** (40.706 m², com o Salão de Eventos) e **22
+Refeitório, Grêmio e Hub de serviços** (junto à pista). A seção "Tempos & Distâncias" do folheto ficou de
+fora, a pedido.
 
-As posições seguem o V14. Nele, o Ambulatório (14, Posto de Saúde de 4.113 m²) e o Bombeiro Civil (15,
-Corpo de Bombeiros de 620 m² com o Posto Policial de 506 m² ao lado) ficam no vértice norte — isso
-resolve a dúvida que o folheto deixava. O Resort (11) passou para a borda leste, junto à pista (31
-lotes), e o Condo (12) ocupa o miolo da ponta norte.
+**Resolvido (2026-11-10):** o folheto tinha "Bracerum Market" duas vezes (06 e 13). O cliente confirmou
+que a faixa comercial vertical (o 06) **é o Bracerum Outlet Premium** — a perna do L. Os dois pontos viraram
+um só, "Bracerum Outlet Premium", com o polígono em L (as duas faixas, as duas fases); daí a numeração andar
+uma casa a partir do Centro Tecnológico. "Bracerum Market" ficou só no Supermercado + 12 lojas (12).
+"Condo" virou "Residence" com o V14 de 02/11.
 
-**A confirmar com o cliente:** a legenda tem "Bracerum Market" duas vezes (06 e 13). O 13 é o
-Supermercado + 12 lojas; o 06 ficou na faixa comercial vertical, onde o folheto põe o número — mas o
-V14 chama essa faixa de "Bracerum Outlet". O desenho do folheto também estava um número atrás da
-legenda a partir do 09 (a maquete segue a legenda).
+As posições seguem o V14. Nele, o Ambulatório (Posto de Saúde de 4.113 m²) e o Bombeiro Civil (Corpo de
+Bombeiros de 620 m² com o Posto Policial de 506 m² ao lado) ficam no vértice norte. O Resort passou para a
+borda leste, junto à pista (31 lotes), e o Residence ocupa o miolo da ponta norte. O desenho do folheto
+estava um número atrás da legenda a partir do 09 (a maquete segue a legenda).
