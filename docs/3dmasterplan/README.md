@@ -178,7 +178,7 @@ planta: §6 de `docs/masterplan-v14.md`). Na maquete:
 
 O CV CRM (`bracerum.cvcrm.com.br`) é o CRM das reservas. **Códigos internos dos empreendimentos na API**
 (não é a ordem da tela do CV): **4 = Bracerum Park — Lotes industriais**, 3 = Hotel, 7 = Residence/
-Condomínios, 9 = Cidade. No mapa de disponibilidade cada lote vem com a **quadra no bloco** ("Quadra Q02")
+Condomínios, 9 = Bracerum Outlet (conferido em 2026-11-10). No mapa de disponibilidade cada lote vem com a **quadra no bloco** ("Quadra Q02")
 e o **lote na unidade** ("L003"); a função junta os dois em `Q02.L003`, o id da maquete.
 O cadastro exportado (`unidades_3_loteamento.csv`, pasta "Lotes + Categorias" do Drive do cliente) tem
 641 unidades: os **615 lotes da maquete de então (V14 de 28/10), todos casando pelo nome**, mais 26 que a maquete não vende

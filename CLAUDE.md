@@ -21,6 +21,25 @@ rotas) que as seis páginas internas baixavam e interpretavam à toa. Ele roda d
   sessão injeta o token real de `api.vercel.com`; se expirou, pedir outro em vercel.com/account/tokens).
   Conferir no ar que nenhuma página pede arquivo que ficou de fora.
 
+### Landing pages dos folders + lead no CV CRM (v6.7 — 2026-11-10)
+- **Seis LPs**, uma por QR Code de folder: `folderpark/`, `folderresidence/`, `folderresort/`,
+  `folderbusinesscenter/`, `foldermapadisponibilidade/`, `folderlp/`. **Geradas por
+  `docs/build_lps.py`** (textos PT/EN/ES no mesmo lugar, `T(pt, en, es)`) — **não editar o HTML gerado**.
+  CSS/JS compartilhados em `lp/` (independente do `style.css`, como o linktree); fotos dos folders
+  (baixadas do Drive "capas-e-logos") em `assets/lp/`. Estudo, sequência de cada página, fontes dos
+  números e o que confirmar: **`docs/landing-pages.md`**.
+- O formulário (2 etapas) manda para **`api/lead.js`**, que cadastra o lead no CV
+  (`POST /api/v1/comercial/leads`, mesmas `CVCRM_EMAIL`/`CVCRM_TOKEN`), com empreendimento pelo produto,
+  origem/mídia pelos utm do `tracking.js` e uma anotação com tudo. `?dry=1` mostra o corpo sem enviar.
+  Se o CV falhar, a página oferece mandar o pedido pelo WhatsApp e a função loga o lead.
+- **Empreendimentos no CV (conferido 2026-11-10): 3 Hotel · 4 Lotes · 7 Residence (aptos e casas do
+  Resort) · 9 Bracerum Outlet** — o "9 = Cidade" anotado antes estava errado.
+- Preço dos lotes e faixa de urgência leem `3dmasterplan/data/precos.json` (a janela vira sozinha);
+  disponibilidade pelo `/api/lotes-status`.
+- **Para ir ao ar:** publicar do `main` e **trocar as 6 Routing Rules** do painel (hoje mandam
+  `/Folder…` para a home) para a LP com a condição `missing: query utm_source` (senão laço) — passo a
+  passo em `docs/landing-pages.md` §6. Até lá, os QR Codes continuam caindo na home.
+
 ### Masterplan V14 rev. 02/11/2026 na maquete (2026-11-09)
 - O cliente mandou o **V14 revisado (02/11/2026)** — `docs/masterplan-v14/BRACERUM_PARK_V14_2026-11-02.pdf`, agora a
   fonte do `build_data.py`/`build_lotes.py`. Mudou: **614 lotes** (Q38 com 16, áreas novas; errata dos nomes
@@ -38,7 +57,7 @@ rotas) que as seis páginas internas baixavam e interpretavam à toa. Ele roda d
 
 ### Maquete × CV CRM — disponibilidade ao vivo (2026-11-09)
 - **`api/lotes-status.js`** (primeira função da Vercel do projeto) lê o mapa de disponibilidade do
-  **CV CRM** (`bracerum.cvcrm.com.br`, empreendimento **4** = loteamento; na API 3 = Hotel, 7 = Residence, 9 = Cidade)
+  **CV CRM** (`bracerum.cvcrm.com.br`, empreendimento **4** = loteamento; na API 3 = Hotel, 7 = Residence, 9 = Outlet)
   e devolve só `{lotes: {"Q07.L014": "r"|"v"|"b"}}`, com cache de 60 s na CDN. A **`3dmasterplan/`** pinta
   os lotes ocupados, tira-os da simulação e mostra a contagem na legenda; sem a função tudo fica à venda.
   No CV a quadra vem no bloco ("Quadra Q02") e o lote na unidade ("L003") — os lotes da maquete casam.

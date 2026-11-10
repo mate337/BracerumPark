@@ -15,7 +15,25 @@
     { "source": "/sydneysavi", "destination": "/sydneysavi/index.html" },
     { "source": "/athospavao", "destination": "/athospavao/index.html" },
     { "source": "/juniopadua", "destination": "/juniopadua/index.html" },
-    { "source": "/vaniarosa", "destination": "/vaniarosa/index.html" }
+    { "source": "/vaniarosa", "destination": "/vaniarosa/index.html" },
+    { "source": "/folderpark", "destination": "/folderpark/index.html" },
+    { "source": "/FolderPark", "destination": "/folderpark/index.html" },
+    { "source": "/FolderPark/", "destination": "/folderpark/index.html" },
+    { "source": "/folderresidence", "destination": "/folderresidence/index.html" },
+    { "source": "/FolderResidence", "destination": "/folderresidence/index.html" },
+    { "source": "/FolderResidence/", "destination": "/folderresidence/index.html" },
+    { "source": "/folderresort", "destination": "/folderresort/index.html" },
+    { "source": "/FolderResort", "destination": "/folderresort/index.html" },
+    { "source": "/FolderResort/", "destination": "/folderresort/index.html" },
+    { "source": "/folderbusinesscenter", "destination": "/folderbusinesscenter/index.html" },
+    { "source": "/FolderBusinessCenter", "destination": "/folderbusinesscenter/index.html" },
+    { "source": "/FolderBusinessCenter/", "destination": "/folderbusinesscenter/index.html" },
+    { "source": "/foldermapadisponibilidade", "destination": "/foldermapadisponibilidade/index.html" },
+    { "source": "/Foldermapadisponibilidade", "destination": "/foldermapadisponibilidade/index.html" },
+    { "source": "/Foldermapadisponibilidade/", "destination": "/foldermapadisponibilidade/index.html" },
+    { "source": "/folderlp", "destination": "/folderlp/index.html" },
+    { "source": "/FolderLP", "destination": "/folderlp/index.html" },
+    { "source": "/FolderLP/", "destination": "/folderlp/index.html" }
   ],
   "headers": [
     {

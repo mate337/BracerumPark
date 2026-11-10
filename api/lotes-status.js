@@ -10,7 +10,7 @@
     CVCRM_EMAIL           e-mail desse usuário
     CVCRM_HOST            opcional, padrão bracerum.cvcrm.com.br
     CVCRM_EMPREENDIMENTO  opcional, padrão 4 (Bracerum Park — Lotes industriais; no CV 3 = Hotel,
-                          7 = Residence/Condomínios, 9 = Cidade)
+                          7 = Residence/Condomínios, 9 = Bracerum Outlet)
 
   Fonte: GET /api/v1/comercial/mapadisponibilidade/{id} (docs: desenvolvedor.cvcrm.com.br).
   Resposta pública, só o mínimo: { ok, atualizado, lotes: { "Q07.L014": "v", ... } }
