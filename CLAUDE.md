@@ -10,13 +10,14 @@ O site tem **7 páginas**: `index.html`, `tributacao.html`, `bracerum.html`, `ho
 rotas) que as seis páginas internas baixavam e interpretavam à toa. Ele roda depois do
 `script.js` porque usa `hasGsap`, `reduceMotion` e `tr()`.
 
-### Tabela de valores do Residence para o CV (2026-11-10)
+### Tabela de valores para o CV — Residence e Outlet (2026-11-10)
 - `docs/cv/` (gerado por `build_tabela_cv.py`): CSVs no **modelo de importação de unidades do CV** (o
-  `unidades_*.csv` da pasta "BRACERUM PARK - CV" do Drive, 126 colunas, `;`) com os valores do **Residence Aptos**
-  (1.452 aptos pelo PDF "Apresentação para investidores P5" — vale sobre o cadastro antigo de 1.200 do CV, pelo
-  cliente) e do **Residence Casas** (31 lotes a **US$ 1.150/m²**, definido pelo cliente). O id do CV vai na coluna
-  "Id (Unidade)"; as 252 unidades novas do 5º andar vão sem id. Detalhes e pendências em `docs/cv/README.md`.
-- **Outlet + Supermercado/lojas:** pendente a área de cada loja (o CV tem 0 m² e não tem as 57 lojas do Outlet).
+  `unidades_*.csv` da pasta "BRACERUM PARK - CV" do Drive, 126 colunas, `;`), **tudo a US$ 1.150/m²** (cliente):
+  **Residence Aptos** (1.452 pelo PDF de investidores P5 — 1 e 2 quartos com 5 andares sem cobertura, 3 quartos com
+  cobertura duplex; vale sobre o cadastro antigo de 1.200 do CV), **Residence Casas** (31 lotes), **Premium Outlet
+  1ª fase** (57 lojas, 17.870 m², áreas medidas no desenho do cliente, OUT-01…57, bloco novo) e **Supermercado
+  (4.606 m²) + LJ1–LJ12 (60 m² cada)** medidos no V14. O id do CV vai em "Id (Unidade)"; unidade nova vai sem id.
+  Detalhes, numeração do Outlet e pendências em `docs/cv/README.md`.
 - **CV, empreendimento 4:** Hub (8), hangares (7), Q37 (10) e Q11 (1) estão "disponível", não bloqueados; e o
   loteamento ainda tem a Q38.L017 e as áreas da Q38 de 28/10.
 

@@ -1,30 +1,49 @@
-# Tabela de valores para o CV CRM — Bracerum Residence (2026-11-10)
+# Tabela de valores para o CV CRM — Residence e Outlet (2026-11-10)
 
 Gerado por `build_tabela_cv.py` (rodar de novo se mudar preço ou estrutura). Não vai para o site
-(`pacote_vercel.py` não leva `docs/`).
+(`pacote_vercel.py` não leva `docs/`). **Tudo a US$ 1.150/m²** (definido pelo cliente em 2026-11-10).
 
-| Arquivo | O que é |
-|---|---|
-| `cv_residence_aptos_valores.csv` | **Importação no CV** — 1.452 aptos, no modelo `unidades_*.csv` da pasta "BRACERUM PARK - CV" do Drive (126 colunas, `;`, UTF-8 com BOM, números com vírgula decimal). |
-| `cv_residence_casas_valores.csv` | **Importação no CV** — os 31 lotes residenciais (Q01–Q04 do Resort). |
-| `cv_residence_aptos_mudancas.csv` | Conferência: as 504 unidades que mudam no CV (252 novas + 252 alteradas). |
-| `Bracerum_Residence_Tabela_de_Valores_2026-11.xlsx` | Tabela legível: aptos por tipologia, casas lote a lote e as mudanças. |
-| `cv_unidades_2026-11-10.json` | Retrato do cadastro do CV (empreendimentos 7 e 9) lido da API em 2026-11-10 — de onde saem os ids. |
+| Arquivo | O que é | Unidades | Valor total |
+|---|---|---|---|
+| `cv_residence_aptos_valores.csv` | **Importação no CV** — Residence Aptos (empreendimento 7) | 1.452 | US$ 111.994.800 |
+| `cv_residence_casas_valores.csv` | **Importação no CV** — Residence Casas, lotes Q01–Q04 do Resort (empr. 7) | 31 · 20.046 m² | US$ 23.052.900 |
+| `cv_outlet_premium_1a_fase_valores.csv` | **Importação no CV** — Premium Outlet 1ª fase (empr. 9) | 57 · 17.870 m² | US$ 20.550.500 |
+| `cv_outlet_supermercado_lojas_valores.csv` | **Importação no CV** — Supermercado + LJ1–LJ12 (empr. 9) | 13 · 5.326 m² | US$ 6.124.900 |
+| `Bracerum_Tabela_de_Valores_CV_2026-11.xlsx` | Tabela legível das quatro, com fórmulas, e a lista de mudanças dos aptos | | |
+| `cv_residence_aptos_mudancas.csv` | Conferência: as 504 unidades de aptos que mudam no CV (252 novas + 252 alteradas) | | |
+| `premium-outlet-1a-fase-cliente.png` | Desenho "Premium Outlet — 1ª fase" do cliente (fonte das lojas) | | |
+| `premium-outlet-1a-fase-numerado.png` | O mesmo desenho com a numeração OUT-01…OUT-57 usada no CV | | |
+| `cv_unidades_2026-11-10.json` | Retrato do cadastro do CV (empreendimentos 7 e 9) lido da API — de onde saem os ids | | |
+
+Formato: o modelo `unidades_*.csv` da pasta "BRACERUM PARK - CV" do Drive (126 colunas, `;`, UTF-8 com BOM,
+números com vírgula decimal). A coluna **Id (Unidade)** leva o id do CV para a importação **atualizar** a
+unidade; unidade nova vai sem id.
 
 ## Regras
 
-- **Aptos** — Apresentação para investidores P5 (nov/2026), que **vale sobre o cadastro antigo do CV** (o cliente
-  confirmou em 2026-11-10): 1.452 aptos em 67 torres. US$ 1.150/m² do apartamento com as vagas, arredondado à
-  centena; a cobertura soma o terraço (US$ 460/m²) e mais US$ 6.800 do gourmet. Confere com a tabela da pág. 12:
-  1q 55.400 / 56.600 · 2q 78.500 · 3q 112.000 · cobertura 163.600 → **US$ 111.994.800**.
-- **Casas** — US$ 1.150/m² do lote (cliente, 2026-11-10): 31 lotes, 20.046 m² → **US$ 23.052.900**.
-- A coluna **Id (Unidade)** leva o id do CV para a importação **atualizar** a unidade. As 252 unidades do 5º andar
-  das torres de 1 e 2 quartos (T13–T67) vão **sem id** (unidade nova). As antigas "coberturas" do 4º andar dessas
-  torres viram apartamento comum — o PDF diz que as torres de 1 e 2 quartos não têm cobertura.
+- **Aptos** — Apresentação para investidores P5 (nov/2026), que vale sobre o cadastro antigo do CV (cliente,
+  2026-11-10): torres de 1 e 2 quartos com **5 andares, sem cobertura** (a antiga cobertura virou mais um piso);
+  torres de 3 quartos com 4 andares e a **cobertura duplex** no 4º (ocupa 2 pisos). US$ 1.150/m² do apartamento
+  com as vagas, arredondado à centena; a cobertura soma o terraço (US$ 460/m²) e US$ 6.800 do gourmet — confere
+  com a tabela da pág. 12 (55.400 / 56.600 / 78.500 / 112.000 / 163.600). As 252 unidades do 5º andar (T13–T67)
+  vão **sem id**; as 252 "coberturas" de 4º andar dessas torres viram apartamento comum.
+- **Casas** — 31 lotes, áreas do CV = Masterplan V14.
+- **Premium Outlet 1ª fase** — não existe lista de lojas: cada loja do desenho do cliente é um terreno à venda
+  (57 lojas, 17.870 m², o número do desenho "Área vendável 1ª fase"). A área de cada loja foi **medida no próprio
+  desenho** (eixo a eixo das linhas) com uma escala única que fecha os 17.870 m² (0,83 m/px); o desenho está em
+  escala — as larguras alternam como na planta V14. Arredondado ao m² pelo maior resto. **É área de desenho:
+  confirmar no plano de mensura.** Ficam fora: doca, sanitários, acessos e a 2ª fase (liberação futura).
+  As 57 lojas não existiam no CV — entram num bloco novo, "Premium Outlet — 1ª fase", sem id.
+  Numeração (o cliente não numerou): fileira da frente 01–18, fileira de trás 19–36, coluna da doca 37–44,
+  coluna externa 45–57 (mapa numerado acima).
+- **Supermercado + LJ1–LJ12** — medidos no PDF vetorial do V14 rev. 02/11 (1:1000): supermercado 55,49 × 83,01 m
+  = **4.606 m²** (o número do quadro é só do supermercado); lojas na faixa de 10,02 m ao lado, módulos de 6,00 m →
+  **60 m² cada** (entre LJ6 e LJ7 há uma passagem de 11 m, sem loja). Unidades já existentes no CV (com id).
 - Só unidades vendáveis. Hub de serviços, hangares, Q37 e Q11 estão no empreendimento 4 (loteamento), não aqui.
 
 ## Pendente
 
-- **Outlet + Supermercado e lojas (empreendimento 9)** — falta a área de cada loja (no CV as 13 unidades estão com
-  0 m²) e as 57 lojas da 1ª fase do Outlet nem estão cadastradas. Preço da 1ª fase: US$ 1.150/m².
-- No CV, a tipologia "2 quartos — cobertura" e "1 quarto — cobertura" fica sem uso depois da importação.
+- Importação não testada no CV — conferir se o CV cria unidade nova pela planilha (252 aptos + 57 lojas sem id).
+- Tipologias "2 quartos — cobertura" e "1 quarto — cobertura" ficam sem uso no CV depois da importação.
+- Empreendimento 4: Hub (8), hangares (7), Q37 (10) e Q11 (1) estão "disponível" — bloquear; Q38.L017 e as áreas
+  da Q38 ainda são as de 28/10.
