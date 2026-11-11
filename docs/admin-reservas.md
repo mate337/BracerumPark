@@ -61,6 +61,16 @@ final diz o que o CV recusou e manda **terminar a reserva no CV** pelo lead. A a
 segurados (CPF mascarado) com **"Liberar o lote"** (`situacao: "Disponivel"`), que só funciona em bloqueio
 com CPF — os bloqueios comuns (ex.: quadras da FSB) não são tocados.
 
+**"Reservar agora"** (2026-11-11): cada lote segurado tem, na aba Reservas, a escolha da tabela e o botão
+"Reservar agora" (`acao: "efetivar"`): acha o cliente pelo CPF do bloqueio e cria a reserva com as condições
+da tabela. Se o CV recusar por o lote estar bloqueado, o painel libera o bloqueio, reserva e, se a reserva
+ainda falhar, segura o lote de novo para o mesmo CPF — o lote nunca fica livre no meio.
+
+**Primeiro uso real (11/11):** lead #9 e cliente #5 deram certo; a reserva voltou com "O campo valor_parcela
+deve ser um decimal" (o painel mandava `36000`) e os lotes Q32.L002/L004/L006 ficaram segurados para o CPF —
+por isso apareciam "bloqueados" no CV. Corrigido: o valor da parcela vai como decimal (`"36000.00"`; se o CV
+ainda recusar, tenta como número com casas) — função `criarReserva()` em `api/admin.js`.
+
 **Recomendado no CV** (o artigo acima mostra como): criar um motivo próprio, por exemplo **"Em negociação —
 Feira"**, com cor de fundo própria (aparece assim no Mapa de Disponibilidade do CV), e pôr o nome dele em
 `CVCRM_FEIRA_MOTIVO` na Vercel.

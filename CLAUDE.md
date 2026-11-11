@@ -36,6 +36,9 @@ rotas) que as seis páginas internas baixavam e interpretavam à toa. Ele roda d
 - **Vários lotes por atendimento (2026-11-11):** tocar no lote marca/desmarca (mapa, lista, busca, "marcar a quadra");
   barra fixa "Avançar para reserva"; um lead + um cliente + **uma reserva por lote**. Validação do formulário com aviso
   no topo — o "nada acontece" relatado era o formulário parado por CPF inválido/nome sem sobrenome, sem aviso claro.
+- **`valor_parcela` decimal (2026-11-11):** no primeiro uso real o CV recusou a reserva ("deve ser um decimal") e
+  os lotes Q32.L002/L004/L006 ficaram segurados (bloqueados) para o CPF. Agora vai `"36000.00"`; e cada lote em
+  negociação tem **"Reservar agora"** na aba Reservas (`acao: efetivar`), que transforma o bloqueio em reserva.
 
 ### Landing pages dos folders + lead no CV CRM (v6.7 — 2026-11-10)
 - **Seis LPs**, uma por QR Code de folder: `folderpark/`, `folderresidence/`, `folderresort/`,

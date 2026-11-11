@@ -274,3 +274,5 @@ body.com-barra .toast{bottom:calc(var(--safe-b) + 140px)}
 @media (prefers-reduced-motion:reduce){.alerta{animation:none}}
 .field.is-err .field__err{color:var(--brown)}
 .steps li span{min-width:0}
+.efetivar{display:grid;grid-template-columns:1fr auto;gap:8px}
+.efetivar .btn{width:auto;min-height:52px;padding:0 16px}

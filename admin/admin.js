@@ -691,6 +691,8 @@
       ${S.neg.map((n) => `<article class="rcard"><div class="rcard__top"><span class="rcard__lote">LTIND.${esc(n.lote)}</span>
         <span class="rcard__sit">Em negociação</span></div>
         <p class="rcard__meta"><span>CPF ${esc(n.doc)}</span>${n.desde ? `<span>desde ${esc(String(n.desde).slice(0, 16).split(' ').map((x, i) => (i ? x : x.split('-').reverse().join('/'))).join(' '))}</span>` : ''}<span>${esc(n.motivo || '')}</span></p>
+        ${S.est ? `<div class="efetivar"><select class="field__in" data-tab="${esc(n.lote)}" aria-label="Tabela da reserva de ${esc(n.lote)}">${S.est.tabelas.filter((t) => precoDe(n.lote, t.id)).map((t) => `<option value="${t.id}"${t.id === S.est.padrao ? ' selected' : ''}>${esc(t.nome.replace(/^Lançamento\s+/i, ''))} · ${usd(precoDe(n.lote, t.id)[0])}</option>`).join('')}</select>
+          <button class="btn btn--ink" type="button" data-efetivar="${esc(n.lote)}">Reservar agora</button></div>` : ''}
         <div class="rcard__acts"><button class="linkbtn" type="button" data-liberar="${esc(n.lote)}">Liberar o lote</button></div></article>`).join('')}
       <div class="list__head"><h3>Reservas</h3><span>no CV</span></div>` : '';
     const aviso = S.resAviso ? `<p class="form__err">${esc(S.resAviso)}</p>` : '';
@@ -707,6 +709,17 @@
       </article>`).join('');
   }
   $('#resList').addEventListener('click', async (e) => {
+    const ef = e.target.closest('[data-efetivar]');
+    if (ef) {
+      const lote = ef.dataset.efetivar, tab = Number($(`[data-tab="${lote}"]`).value);
+      if (!confirm(`Criar a reserva de ${lote} no CV, para o cliente do CPF que segurou o lote, na tabela "${tabNome(tab)}"?`)) return;
+      ef.disabled = true; ef.textContent = 'Reservando…';
+      const d = await api('efetivar', { lote, tabela: tab });
+      if (!d.ok) { ef.disabled = false; ef.textContent = 'Reservar agora'; toast(d.erro || 'Não reservou.'); return; }
+      toast(`${d.lote}: reserva #${d.idreserva || '?'} criada no CV (Nova Reserva).`);
+      S.res = null; carregaReservas(); carregar(true);
+      return;
+    }
     const lb = e.target.closest('[data-liberar]');
     if (lb) {
       if (!confirm(`Liberar o lote ${lb.dataset.liberar}? Ele volta a ficar disponível para qualquer cliente.`)) return;

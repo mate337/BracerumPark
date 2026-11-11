@@ -266,6 +266,20 @@ async function segurar(un, v, idlead, sessao) {
   return dataBR(ate);
 }
 
+// POST da reserva. O CV valida valor_parcela como DECIMAL: um inteiro em JSON (183750) volta "O campo
+// valor_parcela deve ser um decimal" (visto em produção em 2026-11-11). Manda "183750.00"; se ainda assim o
+// CV reclamar de decimal, tenta uma vez como número.
+async function criarReserva({ idpessoa, idunidade, tabela, condicoes }) {
+  const c = cfg();
+  const corpo = (fmt) => ({
+    idpessoa_cv: idpessoa, idempreendimento_cv: c.emp, idunidade_cv: idunidade, idcorretor_cv: c.corretor, idtabela: tabela,
+    condicoes: condicoes.map((x) => ({ ...x, valor_parcela: fmt(Number(x.valor_parcela)) })),
+  });
+  let r = await cv('POST', '/v1/comercial/reservas', corpo((n) => n.toFixed(2)));
+  if (!r.ok && /decimal/i.test(msgCv(r.d))) r = await cv('POST', '/v1/comercial/reservas', corpo((n) => Math.round(n * 100) / 100));
+  return r;
+}
+
 async function reservar(b, sessao) {
   const c = cfg();
   const v = validar(b);
@@ -343,9 +357,7 @@ async function reservar(b, sessao) {
     const res = { lote: x.lote, total: x.total };
     let motivo = falhaCliente;
     if (!falhaCliente) {
-      r = await cv('POST', '/v1/comercial/reservas', {
-        idpessoa_cv: idpessoa, idempreendimento_cv: c.emp, idunidade_cv: x.un.u, idcorretor_cv: c.corretor, idtabela: v.tabela, condicoes: x.condicoes,
-      });
+      r = await criarReserva({ idpessoa, idunidade: x.un.u, tabela: v.tabela, condicoes: x.condicoes });
       if (r.ok) {
         res.modo = 'reserva';
         res.idreserva = r.d.idreserva || r.d.idreserva_cv || r.d.idproposta_cv || await acharReserva(v.cpf, x.un.u);
@@ -403,6 +415,45 @@ async function negociacoes() {
     out.push({ lote, motivo: x.motivo, desde: x.desde, doc: x.doc.replace(/^(\d{3})\d{5}(\d{3})$/, '$1.***.**$2') });
   }
   return out.sort((a, b) => String(b.desde).localeCompare(String(a.desde)));
+}
+
+// Lote segurado em negociação → reserva de verdade, para o cliente do CPF do bloqueio, na tabela escolhida.
+async function efetivar(b, sessao) {
+  const lote = limpa(b.lote, 12).toUpperCase(), tabela = Number(b.tabela) || cfg().tabela;
+  const [m, t] = await Promise.all([mapa(), tabelas()]);
+  const un = m.get(lote);
+  if (!un) throw erro(404, `Lote ${lote} não encontrado`);
+  if (un.s !== 'n') throw erro(409, `O lote ${lote} não está em negociação (situação: ${un.sit})`);
+  const tab = t.lista.find((x) => x.id === tabela), preco = (t.porLote.get(lote) || {})[tabela];
+  if (!tab || !preco) throw erro(422, `Sem preço na tabela escolhida para ${lote}`);
+  const idpessoa = await acharCliente(un.doc);
+  if (!idpessoa) throw erro(404, 'O CPF do bloqueio não tem cliente cadastrado no CV — cadastre o cliente e tente de novo');
+  const condicoes = [];
+  for (const [nome, q, valor, venc] of preco[1]) {
+    const ids = await idSerie(nome);
+    if (!ids) throw erro(502, `Série "${nome}" sem correspondência no CV`);
+    condicoes.push({ idserie_cv: ids, quantidade_parcelas: q, valor_parcela: valor, primeiro_vencimento: venc, retirar_comissao: 'N' });
+  }
+  // o bloqueio "reservado para o doc" deve aceitar a reserva desse cliente; se o CV recusar por indisponível,
+  // libera, reserva e — se ainda assim falhar — segura de novo para o mesmo CPF
+  let r = await criarReserva({ idpessoa, idunidade: un.u, tabela, condicoes });
+  let liberou = false;
+  if (!r.ok && /indispon|bloque/i.test(msgCv(r.d))) {
+    const l = await cv('POST', '/v1/cadastros/empreendimentos/unidades/bloquear', { idunidade: String(un.u), situacao: 'Disponivel' });
+    liberou = l.ok;
+    if (l.ok) r = await criarReserva({ idpessoa, idunidade: un.u, tabela, condicoes });
+  }
+  if (!r.ok) {
+    const motivo = msgCv(r.d);
+    if (liberou) {
+      try { await segurar(un, { cpf: un.doc, nome: `cliente #${idpessoa}`, empresa: '-' }, null, sessao); }
+      catch (e) { throw erro(502, `Reserva não criada: ${motivo} · e não consegui segurar o lote de novo: ${e.message}`); }
+    }
+    throw erro(502, `Reserva não criada: ${motivo}`);
+  }
+  const idreserva = r.d.idreserva || r.d.idreserva_cv || r.d.idproposta_cv || await acharReserva(un.doc, un.u);
+  console.log('[admin] efetivou', JSON.stringify({ lote, idreserva, idpessoa, tabela, quem: sessao.quem || null }));
+  return { lote, idreserva, idpessoa, total: preco[0], tabela: tab };
 }
 
 async function liberar(b) {
@@ -466,6 +517,7 @@ module.exports = async (req, res) => {
         avisos: [r, n].filter((x) => x.status === 'rejected').map((x) => x.reason.message) });
     }
     if (b.acao === 'liberar') return fim(200, { ok: true, ...(await liberar(b)) });
+    if (b.acao === 'efetivar') return fim(200, { ok: true, ...(await efetivar(b, sessao)) });
     if (b.acao === 'cancelar') return fim(200, { ok: true, ...(await cancelar(b)) });
     return fim(400, { ok: false, erro: 'ação' });
   } catch (e) {
