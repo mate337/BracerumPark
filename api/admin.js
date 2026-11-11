@@ -42,6 +42,8 @@ const cfg = () => ({
   imobiliaria: Number(process.env.CVCRM_FEIRA_IMOBILIARIA || 1),
   tabela: Number(process.env.CVCRM_FEIRA_TABELA || 3),
   midia: process.env.CVCRM_FEIRA_MIDIA || 'expo-py-br',
+  motivo: process.env.CVCRM_FEIRA_MOTIVO || 'Estratégia Comercial',   // motivo de bloqueio cadastrado no CV
+  dias: Math.max(1, Math.min(30, Number(process.env.CVCRM_FEIRA_DIAS || 3))),
 });
 const SESSAO_H = 16;
 
@@ -119,7 +121,11 @@ function lerMapa(d, out) {
     const id = idLote(u);
     if (!id) continue;
     const s = codigo(u.situacao);
-    out.set(id, { u: u.idunidade, s: s === undefined ? 'b' : s, sit: u.situacao, bloco: u.idbloco });
+    const doc = String(u.documento_bloqueio || '').replace(/\D/g, '');
+    // bloqueio "reservado para o doc" (ajuda.cvcrm.com.br, artigo 157000357227) = lote segurado em negociação
+    const st = s === undefined ? 'b' : s;
+    out.set(id, { u: u.idunidade, s: st === 'b' && doc ? 'n' : st, sit: u.situacao, bloco: u.idbloco,
+      doc, motivo: u.motivo_bloqueio || null, desde: u.data_bloqueio || null });
   }
 }
 async function mapa() {                        // todas as unidades: a 1ª página diz quantas faltam, o resto vem junto
@@ -241,6 +247,23 @@ async function acharReserva(cpf, idunidade) {
   return lst.length ? Number(lst[0][1].idproposta_cv || lst[0][0]) : null;
 }
 
+const dataBR = (d) => d.toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo', day: '2-digit', month: '2-digit', year: 'numeric' });
+// Segura o lote em negociação para o CPF: bloqueio temporário com "reservar a unidade para (doc)" e liberação
+// automática em N dias (POST /v1/cadastros/empreendimentos/unidades/bloquear). Só aquela pessoa pode ser
+// reservada nele no CV; para todo o resto (painel, maquete, LPs) o lote fica indisponível.
+async function segurar(un, v, idlead, sessao) {
+  const c = cfg();
+  const ate = new Date(Date.now() + c.dias * 86400e3);
+  const corpo = {
+    idunidade: String(un.u), situacao: 'Bloqueada', motivo_bloqueio: c.motivo,
+    descricao_motivo_bloqueio: limpa(`Em negociação na feira — ${v.nome} (${v.empresa}) — lead #${idlead || '-'}${sessao.quem ? ` — atendente ${sessao.quem}` : ''}`, 250),
+    documento_bloqueio: v.cpf, data_desbloqueio: dataBR(ate), hora_desbloqueio: '23:59:00',
+  };
+  const r = await cv('POST', '/v1/cadastros/empreendimentos/unidades/bloquear', corpo);
+  if (!r.ok) throw erro(502, `Não segurou o lote: ${msgCv(r.d)}`);
+  return dataBR(ate);
+}
+
 async function reservar(b, sessao) {
   const c = cfg();
   const v = validar(b);
@@ -289,29 +312,41 @@ async function reservar(b, sessao) {
   passos.push({ etapa: 'lead', id: idlead });
 
   // 3. cliente
-  let idpessoa = await acharCliente(v.cpf);
-  let novo = false;
-  if (!idpessoa) {
-    r = await cv('POST', '/v1/cadastros/clientes', {
-      idpessoa_int: `BPFEIRA-${v.cpf}`, nome: v.nome, documento_tipo: 'cpf', documento: v.cpf, email: v.email,
-      telefone: v.tel, ddi_telefone: `+${v.ddi}`, celular: v.tel, ddi_celular: `+${v.ddi}`,
-      trabalho_nome_empresa: v.empresa, observacoes: limpa(`Cadastrado na feira (lead ${idlead || '-'}), empresa ${v.empresa}`, 300),
-    });
-    if (!r.ok) throw erro(502, `Cliente não cadastrado: ${msgCv(r.d)}`, { etapa: 'cliente', passos, idlead });
-    idpessoa = r.d.idpessoa_cv || r.d.idpessoa || await acharCliente(v.cpf);
-    novo = true;
-  }
-  if (!idpessoa) throw erro(502, 'Cliente cadastrado, mas o CV não devolveu o id', { etapa: 'cliente', passos, idlead });
-  passos.push({ etapa: 'cliente', id: idpessoa, novo });
+  let idpessoa = null, novo = false, idreserva = null;
+  try {
+    idpessoa = await acharCliente(v.cpf);
+    if (!idpessoa) {
+      r = await cv('POST', '/v1/cadastros/clientes', {
+        idpessoa_int: `BPFEIRA-${v.cpf}`, nome: v.nome, documento_tipo: 'cpf', documento: v.cpf, email: v.email,
+        telefone: v.tel, ddi_telefone: `+${v.ddi}`, celular: v.tel, ddi_celular: `+${v.ddi}`,
+        trabalho_nome_empresa: v.empresa, observacoes: limpa(`Cadastrado na feira (lead ${idlead || '-'}), empresa ${v.empresa}`, 300),
+      });
+      if (!r.ok) throw erro(502, `Cliente não cadastrado: ${msgCv(r.d)}`, { etapa: 'cliente', passos, idlead });
+      idpessoa = r.d.idpessoa_cv || r.d.idpessoa || await acharCliente(v.cpf);
+      novo = true;
+    }
+    if (!idpessoa) throw erro(502, 'Cliente cadastrado, mas o CV não devolveu o id', { etapa: 'cliente', passos, idlead });
+    passos.push({ etapa: 'cliente', id: idpessoa, novo });
 
-  // 4. reserva
-  r = await cv('POST', '/v1/comercial/reservas', {
-    idpessoa_cv: idpessoa, idempreendimento_cv: c.emp, idunidade_cv: un.u, idcorretor_cv: c.corretor,
-    idtabela: v.tabela, condicoes,
-  });
-  if (!r.ok) throw erro(r.status === 400 && /indispon/i.test(msgCv(r.d)) ? 409 : 502, `Reserva não criada: ${msgCv(r.d)}`, { etapa: 'reserva', passos, idlead, idpessoa });
-  const idreserva = r.d.idreserva || r.d.idreserva_cv || r.d.idproposta_cv || await acharReserva(v.cpf, un.u);
-  passos.push({ etapa: 'reserva', id: idreserva });
+    // 4. reserva
+    r = await cv('POST', '/v1/comercial/reservas', {
+      idpessoa_cv: idpessoa, idempreendimento_cv: c.emp, idunidade_cv: un.u, idcorretor_cv: c.corretor,
+      idtabela: v.tabela, condicoes,
+    });
+    if (!r.ok) throw erro(r.status === 400 && /indispon/i.test(msgCv(r.d)) ? 409 : 502, `Reserva não criada: ${msgCv(r.d)}`, { etapa: 'reserva', passos, idlead, idpessoa });
+    idreserva = r.d.idreserva || r.d.idreserva_cv || r.d.idproposta_cv || await acharReserva(v.cpf, un.u);
+    passos.push({ etapa: 'reserva', id: idreserva });
+
+  } catch (e) {
+    // Cliente ou reserva recusados (ex.: permissão do perfil no CV). O lead já existe: em vez de deixar o lote
+    // livre, segura-o em negociação para o CPF e devolve o motivo — a reserva é feita depois, no CV.
+    if (e.status === 409) throw e;
+    let ate;
+    try { ate = await segurar(un, v, idlead, sessao); } catch (x) { e.message += ` · ${x.message}`; throw e; }
+    passos.push({ etapa: 'negociacao', ate });
+    console.log('[admin] negociação', JSON.stringify({ lote: v.lote, idlead, idpessoa, ate, motivo: e.message, quem: sessao.quem || null }));
+    return { modo: 'negociacao', lote: v.lote, unidade: un.u, idlead, idpessoa, ate, aviso: e.message, total, tabela: tab, condicao: resumoCond, passos };
+  }
 
   // 5. lead associado à reserva (situação "Com Reserva")
   let associado = false;
@@ -321,7 +356,7 @@ async function reservar(b, sessao) {
     if (!a.ok) console.error('[admin] associar lead à reserva:', a.status, msgCv(a.d));
   }
   console.log('[admin] reserva', JSON.stringify({ lote: v.lote, idlead, idpessoa, idreserva, quem: sessao.quem || null }));
-  return { lote: v.lote, unidade: un.u, idlead, idpessoa, cliente_novo: novo, idreserva, associado, total, tabela: tab, condicao: resumoCond };
+  return { modo: 'reserva', lote: v.lote, unidade: un.u, idlead, idpessoa, cliente_novo: novo, idreserva, associado, total, tabela: tab, condicao: resumoCond };
 }
 
 async function reservas() {
@@ -343,6 +378,27 @@ async function reservas() {
   }
   out.sort((a, b) => b.idreserva - a.idreserva);
   return { reservas: out };
+}
+
+async function negociacoes() {
+  const m = await mapa();
+  const out = [];
+  for (const [lote, x] of m) {
+    if (x.s !== 'n') continue;
+    out.push({ lote, motivo: x.motivo, desde: x.desde, doc: x.doc.replace(/^(\d{3})\d{5}(\d{3})$/, '$1.***.**$2') });
+  }
+  return out.sort((a, b) => String(b.desde).localeCompare(String(a.desde)));
+}
+
+async function liberar(b) {
+  const lote = limpa(b.lote, 12).toUpperCase();
+  const un = (await mapa()).get(lote);
+  if (!un) throw erro(404, `Lote ${lote} não encontrado`);
+  if (un.s !== 'n') throw erro(409, `O lote ${lote} não está segurado em negociação (situação: ${un.sit})`);
+  const r = await cv('POST', '/v1/cadastros/empreendimentos/unidades/bloquear', { idunidade: String(un.u), situacao: 'Disponivel' });
+  if (!r.ok) throw erro(502, `Não liberou: ${msgCv(r.d)}`);
+  console.log('[admin] liberou', lote);
+  return { lote };
 }
 
 async function cancelar(b) {
@@ -388,7 +444,13 @@ module.exports = async (req, res) => {
 
     if (b.acao === 'estado') return fim(200, { ok: true, ...(await estado()) });
     if (b.acao === 'reservar') return fim(200, { ok: true, ...(await reservar(b, sessao)) });
-    if (b.acao === 'reservas') return fim(200, { ok: true, ...(await reservas()) });
+    if (b.acao === 'reservas') {
+      const [r, n] = await Promise.allSettled([reservas(), negociacoes()]);   // uma lista não derruba a outra
+      if (r.status === 'rejected' && n.status === 'rejected') throw r.reason;
+      return fim(200, { ok: true, reservas: r.status === 'fulfilled' ? r.value.reservas : null, negociacoes: n.status === 'fulfilled' ? n.value : null,
+        avisos: [r, n].filter((x) => x.status === 'rejected').map((x) => x.reason.message) });
+    }
+    if (b.acao === 'liberar') return fim(200, { ok: true, ...(await liberar(b)) });
     if (b.acao === 'cancelar') return fim(200, { ok: true, ...(await cancelar(b)) });
     return fim(400, { ok: false, erro: 'ação' });
   } catch (e) {

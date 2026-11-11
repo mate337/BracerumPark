@@ -30,6 +30,9 @@ rotas) que as seis páginas internas baixavam e interpretavam à toa. Ele roda d
   e cancela as da feira. **Não toca no site nem na maquete** (lê `3dmasterplan/data/lotes.json`).
 - Tudo em **`docs/admin-reservas.md`** (fluxo, variáveis, falhas, testes). **A gravação real no CV não foi
   testada** (bloqueada nesta sessão) — o primeiro uso deve ser uma reserva de teste, conferida e cancelada.
+- **Rede de segurança (2026-11-11):** se o CV recusar cliente ou reserva, o lote é **segurado em negociação para o
+  CPF** (bloqueio "reservar a unidade para (doc)", artigo 157000357227 da ajuda do CV, liberação automática em 3 dias)
+  e aparece "Em negociação" no painel, com "Liberar o lote" na aba Reservas.
 
 ### Landing pages dos folders + lead no CV CRM (v6.7 — 2026-11-10)
 - **Seis LPs**, uma por QR Code de folder: `folderpark/`, `folderresidence/`, `folderresort/`,

@@ -36,6 +36,25 @@ do site nem da maquete: é uma página à parte (`admin/`) e uma função à par
 que a equipe fez à mão em 10/11 (reserva 7, Q03.010: corretor "Feira EXPO PY BR", tabela 3, sinal 1x
 em 13/11 + 12 mensais a partir de 15/12, lead em "Com Reserva").
 
+## Rede de segurança: lote "em negociação" (bloqueio para o CPF)
+
+Se o CV recusar o **cliente** ou a **reserva** depois que o lead já entrou (o caso mais provável é falta de
+permissão do perfil), o painel não deixa o lote livre: **segura-o em negociação para o CPF** do interessado,
+com o recurso do CV descrito em "Como Cadastrar Motivos de Bloqueio de Unidade"
+(ajuda.cvcrm.com.br/support/solutions/articles/157000357227) — bloqueio com "Reservar a Unidade para
+(Doc)" e liberação automática. Pela API: `POST /api/v1/cadastros/empreendimentos/unidades/bloquear` com
+`situacao: "Bloqueada"`, `motivo_bloqueio` (`CVCRM_FEIRA_MOTIVO`, padrão "Estratégia Comercial"),
+descrição "Em negociação na feira — nome (empresa) — lead #… — atendente …", `documento_bloqueio` = CPF,
+`data_desbloqueio` = hoje + `CVCRM_FEIRA_DIAS` (padrão 3) às 23:59. No CV, só esse cliente pode ser reservado
+no lote; no painel ele aparece **"Em negociação"** (cor própria) e na maquete/LPs como indisponível. A tela
+final diz o que o CV recusou e manda **terminar a reserva no CV** pelo lead. A aba Reservas lista os lotes
+segurados (CPF mascarado) com **"Liberar o lote"** (`situacao: "Disponivel"`), que só funciona em bloqueio
+com CPF — os bloqueios comuns (ex.: quadras da FSB) não são tocados.
+
+**Recomendado no CV** (o artigo acima mostra como): criar um motivo próprio, por exemplo **"Em negociação —
+Feira"**, com cor de fundo própria (aparece assim no Mapa de Disponibilidade do CV), e pôr o nome dele em
+`CVCRM_FEIRA_MOTIVO` na Vercel.
+
 ## Se algo falhar
 
 - **Lote tomado** no meio do atendimento (outra pessoa reservou): o CV recusa, o painel diz e oferece
@@ -58,6 +77,8 @@ em 13/11 + 12 mensais a partir de 15/12, lead em "Com Reserva").
 | `CVCRM_FEIRA_TABELA` | opcional, tabela marcada de início, padrão `3` (Expo 20%+12x) |
 | `CVCRM_FEIRA_MIDIA` | opcional, padrão `expo-py-br` |
 | `CVCRM_EMPREENDIMENTO` | opcional, padrão `4` (loteamento) |
+| `CVCRM_FEIRA_MOTIVO` | opcional, motivo do bloqueio "em negociação" (nome de um motivo cadastrado no CV), padrão `Estratégia Comercial` |
+| `CVCRM_FEIRA_DIAS` | opcional, dias até o CV liberar sozinho o lote segurado, padrão `3` (1–30) |
 
 O perfil do usuário da integração no CV precisa de permissão para **Leads, Clientes e Reservas**
 (criar e cancelar). O bloqueio de unidades e o cadastro de leads já foram usados com ele; criar
@@ -77,6 +98,9 @@ memória por 10 min e o estado sai em ~0,5 s).
 - Interface no Chromium como iPhone 13, iPhone SE, Pixel 7 e desktop: sem rolagem lateral, fluxo
   completo até "Reserva feita" (com a gravação simulada), erros de campo, falha na etapa da reserva,
   lote tomado, sessão expirada.
+- A rede de segurança e o "liberar", com um CV simulado (sem rede): reserva ok → `modo: reserva`; reserva
+  ou cliente recusados → bloqueio para o CPF com os campos acima → `modo: negociacao`; bloqueio também
+  recusado → erro com os dois motivos; lote tomado (409) → nada é bloqueado; "liberar" recusa bloqueio sem CPF.
 - **Não testado:** a gravação real (lead + cliente + reserva + cancelamento) — o modo automático da
   sessão bloqueou criar registros no CV de produção. **Primeiro uso real:** fazer uma reserva de teste
   num lote Interna (ex.: Q42.L016) com dados de teste, conferir no CV (lead, cliente, reserva "Nova

@@ -8,7 +8,7 @@
   const API = '/api/admin';
   const LOTES = '../3dmasterplan/data/lotes.json';
   const CAT = { V: 'Vitrine', B: 'Business', P: 'Padrão', I: 'Interna' };
-  const ST = { d: 'Disponível', r: 'Reservado', v: 'Vendido', b: 'Indisponível' };
+  const ST = { d: 'Disponível', r: 'Reservado', n: 'Em negociação', v: 'Vendido', b: 'Indisponível' };
   const DDI = [['55', 'BR +55'], ['595', 'PY +595'], ['54', 'AR +54'], ['598', 'UY +598'], ['1', 'US +1'], ['', 'Outro']];
 
   const $ = (s, el = document) => el.querySelector(s);
@@ -113,7 +113,7 @@
 
   function contagem() {
     const c = { d: 0, r: 0, v: 0, b: 0 };
-    for (const id of S.geo.ids) c[stDe(id)]++;
+    for (const id of S.geo.ids) { const st = stDe(id) || 'd'; c[st === 'n' ? 'r' : st]++; }   // negociação conta com reservado
     $('#counts').innerHTML = ['d', 'r', 'v', 'b'].map((k) => `<div><b>${fmt(c[k])}</b><span><i class="sw sw--${k}"></i>${ST[k]}${k === 'd' || k === 'r' ? '' : ''}</span></div>`).join('');
   }
 
@@ -504,7 +504,22 @@
           <button class="btn btn--ghost" type="button" data-acao="form">Voltar aos dados</button></div>` : '<p class="note">Não feche esta tela — leva alguns segundos.</p>'}`;
     }
 
-    if (S.passo === 'ok') {
+    if (S.passo === 'ok' && S.ultimo.modo === 'negociacao') {
+      const r = S.ultimo;
+      $('#sheetTitle').textContent = 'Lote em negociação';
+      $('#sheetBack').hidden = true;
+      body.innerHTML = `
+        <div class="done"><div class="done__ic" aria-hidden="true">✓</div>
+          <h3>LTIND.${esc(r.lote)}</h3>
+          <p>${esc(r.nome)} · ${esc(r.tabela && r.tabela.nome || '')} · ${usd(r.total)}</p>
+          <dl><div><dt>Lead</dt><dd>#${r.idlead || '—'}</dd></div><div><dt>Segurado até</dt><dd>${esc(r.ate)} 23:59</dd></div></dl>
+        </div>
+        <p class="form__err">O CV não aceitou criar a reserva agora: <i>${esc(String(r.aviso || '').replace(/[.\s]+$/, ''))}</i>.
+          O lote ficou <b>segurado em negociação para o CPF</b> deste cliente até ${esc(r.ate)} — saiu da venda no painel e
+          na maquete, e no CV só ele pode ser reservado nele. <b>Termine a reserva no CV</b> pelo lead #${r.idlead || '—'}.</p>
+        <div class="btns"><button class="btn btn--ink" type="button" data-acao="nova">Nova reserva</button>
+          <button class="btn btn--ghost" type="button" data-acao="verres">Ver reservas e negociações</button></div>`;
+    } else if (S.passo === 'ok') {
       const r = S.ultimo;
       $('#sheetTitle').textContent = 'Reserva feita';
       $('#sheetBack').hidden = true;
@@ -578,7 +593,7 @@
       if (d.status === 409) carregar(true);
       return;
     }
-    if (S.est && S.est.lotes[d.lote]) S.est.lotes[d.lote].s = 'r';
+    if (S.est && S.est.lotes[d.lote]) S.est.lotes[d.lote].s = d.modo === 'negociacao' ? 'n' : 'r';
     S.form = { ddi: f.ddi };                       // limpa os dados pessoais para o próximo atendimento
     store.del('bp-admin-form', sessionStorage);
     S.errosForm = {};
@@ -604,7 +619,9 @@
     if (!S.res) $('#resList').innerHTML = '<p class="empty">Carregando as reservas do CV…</p>';
     const d = await api('reservas');
     if (!d.ok) { if (d.status !== 401) $('#resList').innerHTML = `<p class="empty">${esc(d.erro || 'O CV não respondeu.')}</p>`; return; }
-    S.res = d.reservas;
+    S.res = d.reservas || [];
+    S.neg = d.negociacoes || [];
+    S.resAviso = (d.avisos || []).join(' · ');
     renderReservas();
   }
   const ativa = (r) => !/cancel|vencid|distrato/i.test(r.situacao);
@@ -612,9 +629,16 @@
     if (!S.res) return;
     const so = $('#soFeira').checked;
     const lst = S.res.filter((r) => (!so || r.feira));
-    $('#resN').textContent = S.res.filter((r) => r.feira && ativa(r)).length || '';
-    if (!lst.length) { $('#resList').innerHTML = `<p class="empty">${so ? 'Nenhuma reserva da feira ainda.' : 'Nenhuma reserva no loteamento.'}</p>`; return; }
-    $('#resList').innerHTML = lst.map((r) => `
+    $('#resN').textContent = (S.res.filter((r) => r.feira && ativa(r)).length + (S.neg || []).length) || '';
+    const neg = (S.neg || []).length ? `<div class="list__head"><h3>Em negociação</h3><span>lote segurado para o CPF</span></div>
+      ${S.neg.map((n) => `<article class="rcard"><div class="rcard__top"><span class="rcard__lote">LTIND.${esc(n.lote)}</span>
+        <span class="rcard__sit">Em negociação</span></div>
+        <p class="rcard__meta"><span>CPF ${esc(n.doc)}</span>${n.desde ? `<span>desde ${esc(String(n.desde).slice(0, 16).split(' ').map((x, i) => (i ? x : x.split('-').reverse().join('/'))).join(' '))}</span>` : ''}<span>${esc(n.motivo || '')}</span></p>
+        <div class="rcard__acts"><button class="linkbtn" type="button" data-liberar="${esc(n.lote)}">Liberar o lote</button></div></article>`).join('')}
+      <div class="list__head"><h3>Reservas</h3><span>no CV</span></div>` : '';
+    const aviso = S.resAviso ? `<p class="form__err">${esc(S.resAviso)}</p>` : '';
+    if (!lst.length) { $('#resList').innerHTML = aviso + neg + `<p class="empty">${so ? 'Nenhuma reserva da feira ainda.' : 'Nenhuma reserva no loteamento.'}</p>`; return; }
+    $('#resList').innerHTML = aviso + neg + lst.map((r) => `
       <article class="rcard">
         <div class="rcard__top"><span class="rcard__lote">${esc(/^Q\d/.test(r.lote) ? 'LTIND.' + r.lote : r.lote)}</span>
           <span class="rcard__sit${ativa(r) ? '' : ' is-cancel'}">${esc(r.situacao)}</span></div>
@@ -626,6 +650,16 @@
       </article>`).join('');
   }
   $('#resList').addEventListener('click', async (e) => {
+    const lb = e.target.closest('[data-liberar]');
+    if (lb) {
+      if (!confirm(`Liberar o lote ${lb.dataset.liberar}? Ele volta a ficar disponível para qualquer cliente.`)) return;
+      lb.disabled = true;
+      const d = await api('liberar', { lote: lb.dataset.liberar });
+      if (!d.ok) { lb.disabled = false; toast(d.erro || 'Não liberou.'); return; }
+      toast(`${d.lote} liberado — disponível de novo.`);
+      S.res = null; carregaReservas(); carregar(true);
+      return;
+    }
     const b = e.target.closest('[data-cancelar]');
     if (!b) return;
     if (!confirm(`Cancelar a reserva #${b.dataset.cancelar} (${b.dataset.lote}) no CV? O lote volta a ficar disponível.`)) return;
