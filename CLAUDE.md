@@ -50,6 +50,19 @@ rotas) que as seis páginas internas baixavam e interpretavam à toa. Ele roda d
   Ficaram os clientes de teste #7 e #8 (`BPFEIRA-…`) — a API não apaga cliente; apagar no CV se quiser.
   Intocados: bloqueios das quadras FSB/Bracerum (96), reserva 7 (Cesar Neves) e o cliente #5 (usuário da integração).
 
+### Preços do CV × materiais de investidores (2026-11-11)
+- O cliente mandou as apresentações de nov/2026 (P1 Lotes, P4 Resort, P5 Residence, P7 Market, P7A Outlet,
+  P8 Business Center, P10 Hotel + Condições Comerciais Lotes MP14); texto em `docs/cv-precos/materiais/`.
+  **Casas do Resort: US$ 1.950/m² de casa (80% do lote), com o lote.** Registro completo em **`docs/cv-precos.md`**.
+- Conferido o CV inteiro: **lotes e Residence certos**; **Outlet com os preços invertidos entre as lojas nas 3
+  tabelas** (52 de 57); **Resort cobrado como lote × 1.150** (23,05 × 31,27 mi); 252 aptos do 4º andar com
+  "valor" de cobertura; 11 lotes da Q38 com áreas antigas. Valores certos em
+  `docs/cv-precos/Correcoes_CV_precos_2026-11-11.xlsx`; reconferir com `docs/cv_conferencia_precos.py`.
+- **A API não corrige preço:** tabela de preço é só leitura (v1 e v3); unidade só pelos IDs `_int` de ERP (nulos
+  aqui) ou pela v3 com senha. Correções são no painel do gestor.
+- Decisões de 11/11: Resort mantém a **área do lote** no cadastro; **Q04.L017 = 1.650 m²** (maquete atualizada);
+  Hotel fora por enquanto.
+
 ### Landing pages dos folders + lead no CV CRM (v6.7 — 2026-11-10)
 - **Seis LPs**, uma por QR Code de folder: `folderpark/`, `folderresidence/`, `folderresort/`,
   `folderbusinesscenter/`, `foldermapadisponibilidade/`, `folderlp/`. **Geradas por

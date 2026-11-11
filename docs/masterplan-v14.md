@@ -110,7 +110,9 @@ O `build_lotes.py` resolve e avisa cada um:
 
 1. ~~**Q04.L017: 1.650 ou 1.410 m²?**~~ **Resolvido na rev. 02/11: 1.410 m²** (o rótulo de 1.650 saiu do PDF;
    bate com a Tabela v3.1). Mas o quadro de áreas da rev. 02/11 ainda soma 766.690 m², que é a conta com
-   1.650 — os nomes dos 614 lotes somam **766.449 m²**. Confirmar qual total vale.
+   1.650 — os nomes dos 614 lotes somam **766.449 m²**. **Decidido pelo cliente em 11/11/2026: 1.650 m²**
+   (é o que o CV tem e o que dá os 766.689 m² dos materiais de investidores); a maquete passou a usar 1.650
+   (`ERRATA` do `build_lotes.py`). Ver `docs/cv-precos.md`.
 2. **Tabela de preços para o V14** — a v3.1 é do V14-02 (612 lotes). O app aplica a mesma regra de
    categoria aos 615; os quatro lotes novos da Q38 caem em Interna.
 3. **Q11** fora da oferta (só Administração)?

@@ -162,7 +162,8 @@ novos fecham os 38.194 m². Ver `docs/masterplan-v14.md` §4.
 A maquete passou a ser gerada do **V14 rev. 02/11/2026** (`BRACERUM_PARK_V14_2026-11-02.pdf`; o que mudou na
 planta: §6 de `docs/masterplan-v14.md`). Na maquete:
 - **614 lotes** (a Q38 tem 16, com as áreas novas; errata dos nomes L013–L016 no `build_lotes.py`) e Q04.L017
-  com 1.410 m².
+  com 1.410 m² — **trocado para 1.650 m² em 11/11/2026** por decisão do cliente (`ERRATA` no `build_lotes.py`;
+  total 766.689 m², o mesmo do CV e dos materiais de investidores).
 - **Bracerum Outlet loja por loja** (`build_data.py`, bloco "comércio"): cada célula branca do PDF na região
   do L vira um volume; o vão da linha preta é a divisão entre lojas. Núcleos de 20 m com 11 m de altura,
   lojas com 9 m, a doca da 1ª fase com 7 m. Limites da 1ª fase em `F1_X = 58,6` e `F1_Y = 28,5` (% da

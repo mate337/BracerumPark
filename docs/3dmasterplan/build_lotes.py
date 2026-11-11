@@ -18,7 +18,7 @@ LTIND.Q07.L014.A01250.ESQNAO.RT.L (quadra, lote, área, esquina, forma, frentes)
   4. aplica a categoria de preço pela regra escrita na Tabela de Preços P1 (docs/lotes-p1/).
 A quadra Q37 (recinto alfandegado) e a Q11 (lote da Administração) têm nome de lote, mas ficam fora da oferta:
 sem elas, a conta dá os 614 lotes e 766.690 m² do quadro de áreas do V14 de 02/11 (eram 615 e 766.693 m² no de
-28/10: a Q38 perdeu um lote e foi redesenhada).
+28/10: a Q38 perdeu um lote e foi redesenhada). Com o Q04.L017 em 1.650 m² (ERRATA), os nomes somam 766.689 m².
 
 Os preços NÃO estão aqui: ficam em 3dmasterplan/data/precos.json, editado à mão quando sair tabela nova.
 """
@@ -65,6 +65,9 @@ ERRATA = {
     'LTIND.Q38.L013.A01024.ESQSIM.PO.N+L': 'LTIND.Q38.L016.A01024.ESQSIM.PO.N+L',
     'LTIND.Q38.L002.A0872.ESQNAO.PO.L+O': 'LTIND.Q38.L002.A00872.ESQNAO.PO.L+O',     # área com 4 dígitos
     'LTIND.Q38.L003.A0872.ESQNAO.PO.L+O': 'LTIND.Q38.L003.A00872.ESQNAO.PO.L+O',
+    # Q04.L017: a rev. 02/11 escreve 1.410 m², mas o cliente decidiu 1.650 m² em 11/11/2026 (é o que o CV
+    # tem e o que dá o total de 766.689 m² dos materiais de investidores de nov/2026).
+    'LTIND.Q04.L017.A01410.ESQNAO.RT.L': 'LTIND.Q04.L017.A01650.ESQNAO.RT.L',
 }
 
 

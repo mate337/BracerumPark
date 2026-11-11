@@ -1,0 +1,364 @@
+                                                                        CONDIÇÕES COMERCIAIS — LOTES INDUSTRIAIS · FASE 1
+B R A C E R U M                  P A R K
+
+Condições Comerciais — Lotes Industriais
+Fase 1 · Rev. 16/10/2026 · Política Comercial de Lotes P1 v2.0 e Contrato de Reserva revisado · janelas de preço: Lançamento —
+Expo Paraguai-Brasil (base US$ 160/m², até 13/11/2026), Pós-Expo (US$ 185/m², até 31/03/2027) e Fase 1 plena (US$ 220/m², a
+partir de 01/04/2027) · lotes identificados pelo nome do masterplan V14 de 28/10/2026 · Preços em US$/m², sem IVA · Base:
+masterplan V14 de 28/10/2026
+
+UNIDADE E PREÇO-BASE
+A unidade de comercialização é o lote nomeado no masterplan, de cerca de 1.250 m² (25 × 50 m); quadra regular
+de 20.000 m² = 16 lotes, vendidos inteiros e contíguos, sem ágio de esquina. Preço-base por janela (1 a 8 lotes,
+localização Padrão, Fase 1, condição-padrão de pagamento): US$ 160/m² no Lançamento — Expo Paraguai-Brasil
+(até 13/11/2026), US$ 185/m² no Pós-Expo (14/11/2026 a 31/03/2027) e US$ 220/m² na Fase 1 plena (a partir de
+01/04/2027); a virada é automática pela data. O preço final resulta da multiplicação da base vigente pelos fatores
+abaixo, nunca abaixo do piso da janela: US$ 110, 128 ou 150/m² (68% da base; seção 5).
+
+1. FATOR DE QUANTIDADE (LOTES POR OPERAÇÃO)
+ Faixa                                  1                           2                         3                            4
+
+ Lotes                                1a8                       9 a 16                     17 a 32                     33 ou mais
+
+                                até 10.000 (meia                                                                 > 40.000 (mais de 2
+ Área (m²)                                              até 20.000 (1 quadra)       até 40.000 (2 quadras)
+                                     quadra)                                                                          quadras)
+
+ Fator                                1,00                       0,86                       0,78                         0,72
+
+
+
+2. FATOR DE LOCALIZAÇÃO (MAPA DE QUADRAS)
+ Fase 1 plena · Categoria                                   Fator         Faixa 1          Faixa 2           Faixa 3           Faixa 4
+
+ Vitrine — PY-19 e via costeira (Q02, Q03, Q04)              1,15           253             218               197               182
+
+ Business — coluna leste (Q10, Q17, Q36, metade de
+                                                             1,10           242             208               189               174
+ Q24 e Q30)
+
+ Padrão — quadras regulares do miolo do parque               1,00           220             189               172               158
+
+ Interna — faixa oeste (Q01, Q05, Q12, Q18, Q31 e os
+ lotes L001–L008 de Q19 e Q25) e linha sul (Q38–             0,90           198             170               154              150 ▲
+ Q42)
+Tabela Fase 1 plena (base US$ 220/m², a partir de 01/04/2027): preços em US$/m², Fase 1, condição-padrão, arredondados; ▲ célula
+travada no piso de US$ 150/m². Categoria de cada quadra no Mapa de Quadras V14. Tabelas do Lançamento — Expo e do Pós-Expo na
+seção 5.
+
+3. FATOR DE FASE
+ Fase                                                        Marco                                                         Fator
+
+ Fase 1                               Lançamento — infraestrutura primária em execução                                     1,00
+
+ Fase 2                              Vias, energia e água entregues no setor (meta: mês 13)                                1,10
+
+ Fase 3                                      Parque em operação, âncoras instaladas                                        1,20
+A cada 20% do estoque total vendido, aplica-se +3% ao preço, comunicado publicamente. A proposta mantém o preço por 30 dias. A escada
+de lançamento (US$ 160 → 185 → 220/m², seção 5) antecede o fator de fase e se esgota em 31/03/2027. O preço contratado não sofre
+fator de fase nem gatilho; as parcelas são reajustadas anualmente pelo índice estabelecido pelo Banco Central do Paraguai (item 12.4 do
+contrato).
+
+4. CONDIÇÕES DE PAGAMENTO
+ Condição                               Fator                                            Descrição
+
+ À vista                                0,92                   Pagamento integral na assinatura do Contrato de Reserva
+
+                                                       Sinal de 20% na assinatura do Contrato de Reserva e saldo em 12 parcelas
+ Padrão                                 1,00
+                                                                              mensais — preço de tabela
+
+B R A C E R U M               P A R K                                                                                                    1
+                                                                     CONDIÇÕES COMERCIAIS — LOTES INDUSTRIAIS · FASE 1
+
+ Condição                              Fator                                            Descrição
+
+ 36 meses                               1,08                          Sinal de 20% e saldo em 36 parcelas mensais
+Valores em dólares americanos, pagos por transferência para a conta da empreendedora (Anexo V do contrato), sem escrow; admitido o
+pagamento em guaranis ao câmbio vendedor do Banco Central do Paraguai (item 12.2). IVA não incluído (item 23.2). Parcelas reajustadas
+anualmente pelo índice estabelecido pelo Banco Central do Paraguai (item 12.4). Escritura pública somente após a quitação integral do
+preço (item 22.1). Contrato bilíngue português/espanhol (prevalece o espanhol), lei paraguaia.
+
+5. JANELAS DE PREÇO — LANÇAMENTO NA EXPO (ATÉ 13/11/2026) E PÓS-EXPO
+Escada de lançamento (Política P1 v2.0): Lançamento — Expo Paraguai-Brasil, até 13/11/2026, base US$
+160/m² e piso US$ 110/m²; Pós-Expo, de 14/11/2026 a 31/03/2027, base US$ 185/m² e piso US$ 128/m²; Fase
+1 plena, a partir de 01/04/2027, base US$ 220/m² e piso US$ 150/m² (tabela da seção 2). Mesmos fatores de
+quantidade, localização e pagamento — só a base muda. A virada é automática pela data e anunciada
+publicamente. Cota de lançamento: 64 lotes (80.000 m²), dos quais 32 reservados às âncoras de pré-lançamento;
+esgotada a cota, a janela de lançamento encerra antes do prazo. Durante o lançamento, o desconto especial fica
+suspenso.
+
+ Lançamento — Expo · Categoria                              Fator        Faixa 1         Faixa 2         Faixa 3         Faixa 4
+
+ Vitrine — PY-19 e via costeira (Q02, Q03, Q04)              1,15          184             158             143             132
+
+ Business — coluna leste (Q10, Q17, Q36, metade de
+                                                             1,10          176             151             137             127
+ Q24 e Q30)
+
+ Padrão — quadras regulares do miolo do parque               1,00          160             138             125             115
+
+ Interna — faixa oeste (Q01, Q05, Q12, Q18, Q31 e os
+ lotes L001–L008 de Q19 e Q25) e linha sul (Q38–             0,90          144             124             112           110 ▲
+ Q42)
+Lançamento — Expo Paraguai-Brasil, até 13/11/2026 (base US$ 160/m²): preços em US$/m², Fase 1, condição-padrão, arredondados; ▲
+célula travada no piso de US$ 110/m². Na tabela seguinte, Pós-Expo.
+
+ Pós-Expo · Categoria                                       Fator        Faixa 1         Faixa 2         Faixa 3         Faixa 4
+
+ Vitrine — PY-19 e via costeira (Q02, Q03, Q04)              1,15          213             183             166             153
+
+ Business — coluna leste (Q10, Q17, Q36, metade de
+                                                             1,10          204             175             159             147
+ Q24 e Q30)
+
+ Padrão — quadras regulares do miolo do parque               1,00          185             159             144             133
+
+ Interna — faixa oeste (Q01, Q05, Q12, Q18, Q31 e os
+ lotes L001–L008 de Q19 e Q25) e linha sul (Q38–             0,90          167             143             130           128 ▲
+ Q42)
+Pós-Expo, de 14/11/2026 a 31/03/2027 (base US$ 185/m²): preços em US$/m², Fase 1, condição-padrão, arredondados; ▲ célula travada
+no piso de US$ 128/m². Padrão, 1 a 8 lotes, por condição de pagamento — Lançamento: à vista 147 · 12 parcelas 160 · 36 parcelas 173;
+Pós-Expo: 170 · 185 · 200; Fase 1 plena: 202 · 220 · 238.
+
+Reserva na Expo: a Carta de Reserva (sinal de 1% do preço) assinada até 13/11/2026 garante o preço de
+lançamento por 30 dias e converte-se em Contrato de Reserva e Direito de Aquisição Futura com sinal de 20%
+(ou pagamento integral à vista) até 13/12/2026; não convertida, o lote retorna ao estoque e o preço de
+lançamento se perde — sem exceção; a equipe de vendas não prorroga o prazo. Pagamento: sinal e parcelas por
+transferência para a conta da própria empreendedora (Anexo V), sem escrow.
+
+Preço contratado: fixado em USD no Contrato de Reserva; não sofre fator de fase nem gatilho de +3%; as
+parcelas são reajustadas anualmente pelo índice estabelecido pelo Banco Central do Paraguai (item 12.4).
+Inadimplência (Cláusula 24ª): juros de mora de 1% ao mês e multa de 2%; atraso superior a 30 dias →
+notificação com prazo de cura de 15 dias úteis → vencimento antecipado ou resolução, com retenção de 25%
+dos valores pagos + multa compensatória de 10% do preço (itens 26.3 e 27.1); na desistência, retenção de 25%
+(item 26.4). Estoque: os 614 lotes do quadro oficial, ressalvada a reserva estratégica da diretoria (até 20% de
+cada categoria); venda em bloco a investidor institucional, a partir de duas quadras, fora da tabela, com o
+conselho. Depois de 31/03/2027: Fase 1 plena (base US$ 220/m²); Fase 2 (meta: mês 13, novembro de 2027) ×
+
+B R A C E R U M               P A R K                                                                                                   2
+                                                         CONDIÇÕES COMERCIAIS — LOTES INDUSTRIAIS · FASE 1
+1,10; Fase 3 × 1,20; gatilho de +3% a cada 20% vendido. Comissão de 5% sobre o valor da venda, paga
+proporcionalmente ao recebimento.
+
+
+
+
+B R A C E R U M          P A R K                                                                         3
+                                                                    CONDIÇÕES COMERCIAIS — LOTES INDUSTRIAIS · FASE 1
+6. EXEMPLOS DE CÁLCULO (FASE 1) — FASE 1 PLENA × LANÇAMENTO NA EXPO
+                                                                                                                     Lançamento
+                                                                                                                       — Expo
+ Operação                                   Lote                Cálculo              US$/m²           Total
+                                                                                                                      (US$/m² ·
+                                                                                                                        total)
+
+                                                                                                                       160,00
+ 1 lote, padrão — LTIND.Q07.L014          Padrão        220 × 1,00 × 1,00 × 1,00      220,00       US$ 275.000
+                                                                                                                       200.000
+
+ 4 lotes, à vista                                                                                                      169,28
+                                          Vitrine       220 × 1,00 × 1,15 × 0,92      232,76      US$ 1.163.800
+ LTIND.Q02.L001 a L004                                                                                                 846.400
+
+ 8 lotes, 36 meses                                                                                                      172,80
+                                          Padrão        220 × 1,00 × 1,00 × 1,08      237,60      US$ 2.376.000
+ LTIND.Q13.L001 a L008                                                                                                1.728.000
+
+ 1 quadra (16 lotes), padrão                                                                                            137,60
+                                          Padrão        220 × 0,86 × 1,00 × 1,00      189,20      US$ 3.784.000
+ Q14 (LTIND.Q14.L001 a L016)                                                                                          2.752.000
+
+ 1 quadra (16 lotes), padrão                                                                                            158,24
+                                          Vitrine       220 × 0,86 × 1,15 × 1,00      217,58      US$ 4.351.600
+ Q03 (LTIND.Q03.L001 a L016)                                                                                          3.164.800
+
+ 1 quadra (16 lotes), padrão                                                                                            151,36
+                                         Business       220 × 0,86 × 1,10 × 1,00      208,12      US$ 4.162.400
+ Q24 (LTIND.Q24.L001 a L016)                                                                                          3.027.200
+
+ 2 quadras (32 lotes), padrão
+                                                                                                                        112,32
+ Q41 + Q42 (LTIND.Q41.L001 a L016;        Interna       220 × 0,78 × 0,90 × 1,00      154,44      US$ 6.177.600
+                                                                                                                      4.492.800
+ LTIND.Q42.L001 a L016)
+
+ 4 quadras (64 lotes), padrão
+                                                                                                                        115,20
+ Q20 a Q23 (LTIND.Q20.L001 a              Padrão        220 × 0,72 × 1,00 × 1,00      158,40     US$ 12.672.000
+                                                                                                                      9.216.000
+ LTIND.Q23.L016)
+
+ 6 quadras (96 lotes), 36 meses
+                                                                                                                       124,42
+ Q26–Q28 e Q32–Q34 (L001 a L016           Padrão        220 × 0,72 × 1,00 × 1,08      171,07     US$ 20.528.640
+                                                                                                                     14.929.920
+ de cada quadra)
+US$/m² e Total pela Fase 1 plena (base US$ 220/m², a partir de 01/04/2027); última coluna: Lançamento — Expo (base US$ 160/m²,
+reserva até 13/11/2026 convertida em Contrato de Reserva até 13/12/2026). Quadra Padrão (Q14) com desconto especial de 10 p.p.: US$
+170,28/m² = US$ 3.405.600 (no lançamento, o desconto especial fica suspenso).
+
+7. RESERVA E PROPOSTA
+Proposta com validade de 30 dias. Reserva formalizada em Carta de Reserva, mediante sinal de 1% do valor da
+compra, que retira o lote da oferta por 30 dias, é dedutível do sinal contratual e não é restituível em caso de
+desistência. Contrato de Reserva e Direito de Aquisição Futura assinado dentro do prazo de reserva, com sinal de
+20% (ou pagamento integral à vista); na Expo, a reserva converte-se em Contrato de Reserva até 13/12/2026, sob
+pena de perda do preço de lançamento. Depois: Contrato de Compra e Venda, cumpridas as condições suspensivas
+(licenças e individualização do lote, item 9.1), com entrega formal do lote quando a venda for parcelada (item 8.4);
+Escritura Pública somente após a quitação integral (item 22.1). Lotes da linha sul (Q38–Q42) estão sujeitos a limite
+de altura de edificação informado na ficha técnica. A Q37 é o recinto alfandegado, fora do estoque industrial.
+Coluna Business (Q10, Q17, Q36, metade de Q24 e Q30): indústrias limpas e de baixo ruído (Regulamento Interno,
+art. 3.5).
+
+8. IDENTIFICAÇÃO DO LOTE
+Todos os lotes industriais têm nome próprio na prancha do masterplan V14 de 28/10/2026: código no texto (ex.:
+lote LTIND.Q07.L014) e nome completo na proposta, na Carta de Reserva, no contrato e na ficha (ex.:
+LTIND.Q07.L014.A01250.ESQNAO.RT.L). 614 lotes disponíveis (766.689 m², quadro oficial); a antiga reserva da
+Fábrica Bracerum (Q10 e Q04 L010–L017) foi incorporada ao estoque, e a Q37 (recinto alfandegado) fica fora do
+estoque industrial. Sem ágio de esquina. Área contratual: Área Estimada no Contrato de Reserva; a Área
+Definitiva é a do plano de mensura aprovado na individualização, com tolerância de até 5% sem ajuste de preço
+(Cláusula 20ª). Valores lote a lote na Tabela lote a lote (Bracerum_Park_P1_Tabela_Lote_a_Lote_PT_MP14, .pdf
+e .xlsx, no Material de Apoio de vendas).
+
+
+
+B R A C E R U M               P A R K                                                                                                 4
+                                                         CONDIÇÕES COMERCIAIS — LOTES INDUSTRIAIS · FASE 1
+Como ler o nome do lote — exemplo: LTIND.Q02.L001.A01250.ESQSIM.RT.S+O
+
+ Trecho            Significa       Como ler
+
+ LTIND             Tipo            Lote industrial
+
+ Q02               Quadra          Quadra Q02 (Q01 a Q42; antiga grade B1)
+
+ L001              Lote            Lote 001 da quadra
+
+ A01250            Área nominal    A + área em m² com 5 dígitos: 01250 = 1.250 m²
+
+ ESQSIM / ESQNAO   Esquina         ESQSIM = lote de esquina · ESQNAO = meio de quadra
+
+ RT / PO           Forma           RT = retangular · PO = poligonal (demais formas)
+
+ S+O               Frentes         Lados com frente para via: N = norte, S = sul, L = leste, O = oeste
+
+
+
+
+B R A C E R U M        P A R K                                                                           5
+                                                                     CONDIÇÕES COMERCIAIS — LOTES INDUSTRIAIS · FASE 1
+USO INTERNO — EQUIPE DE VENDAS
+
+Regras de aplicação da tabela
+ALÇADAS
+ Decisão                                           Quem aprova                                   Regra
+
+ Fatores de quantidade, localização e fase     Tabela (automático)         Nunca negociados. O vendedor aplica; não altera.
+
+                                                                         Cota de 64 lotes (32 reservados às âncoras); a reserva
+ Janela de lançamento — Expo (base US$         Tabela (automático),        da Expo vale 30 dias e converte-se em Contrato de
+ 160/m²)                                         até 13/11/2026          Reserva com sinal de 20% até 13/12/2026; a equipe de
+                                                                                     vendas não prorroga o prazo.
+
+                                                                            Dentro das três condições da tabela (à vista, 12
+ Condição de pagamento                           Gerente comercial
+                                                                                        parcelas, 36 parcelas).
+
+                                                                            Só a partir de 9 lotes; até 10 p.p. sobre o preço já
+                                                                          fatorado; sempre acima do piso da janela; suspenso
+ Desconto especial                                   Diretoria
+                                                                            durante o lançamento; lote de esquina fora; com
+                                                                                          justificativa e validade.
+
+ Preço abaixo do piso, venda em bloco,
+ mudança de categoria de quadra,                     Conselho                    Operação estruturada, fora da tabela.
+ ampliação da cota de lançamento
+
+
+
+PISO DE PREÇO
+Piso único por janela para qualquer lote, categoria, faixa e condição de pagamento — 68% da base vigente: US$
+110/m² no Lançamento — Expo, US$ 128/m² no Pós-Expo e US$ 150/m² na Fase 1 plena . Em cada tabela, só a
+célula Interna, 33 lotes ou mais, é alcançada pelo piso (▲). Proposta abaixo do piso só com aprovação do conselho;
+nenhuma outra alçada a aprova. No lançamento, o menor valor efetivo possível é US$ 101/m² (Interna, 33 lotes
+ou mais, à vista).
+
+COMO MONTAR A PROPOSTA
+1. Identificar os lotes pelo código (LTIND.Qxx.Lyyy) e a categoria da quadra no Mapa de Quadras V14 oficial;
+confirmar a disponibilidade no Controle de Unidades e copiar da Tabela lote a lote o nome completo de cada lote
+para a proposta (ex.: LTIND.Q07.L014.A01250.ESQNAO.RT.L). 2. Contar os lotes da operação (mesmo comprador
+ou grupo econômico, mesmo instrumento — sem fracionar para subir de faixa). 3. Aplicar os fatores no simulador
+oficial (planilha Metas de Vendas P1 MP14); nunca calcular à mão. 4. Escolher a condição de pagamento com o
+cliente (à vista, 12 ou 36 parcelas). 5. Emitir a proposta com validade de 30 dias, assinada pelo gerente comercial.
+6. Carta de Reserva com sinal de 1% do valor da compra; Contrato de Reserva (sinal de 20% ou pagamento integral
+à vista) dentro dos 30 dias da reserva; Contrato de Compra e Venda após as licenças e a individualização do lote;
+escritura na quitação. Até 13/11/2026 (Lançamento — Expo): aplicar a base de US$ 160/m² com os mesmos
+fatores; a reserva da Expo converte-se em Contrato de Reserva até 13/12/2026, sob pena de perda do preço de
+lançamento.
+
+IDENTIFICAÇÃO DO LOTE NA PROPOSTA — EXEMPLO
+ Campo da proposta                     Exemplo
+
+ Lote (código)                         LTIND.Q07.L014
+
+ Nome no masterplan                    LTIND.Q07.L014.A01250.ESQNAO.RT.L
+
+ Quadra · categoria                    Q07 (antiga C2) · Padrão × 1,00
+
+                                       1.250 m² nominal (A01250) = Área Estimada no contrato; a Área Definitiva é a do plano
+ Área
+                                       de mensura aprovado na individualização (Cláusula 20ª)
+
+ Esquina · forma · frentes             Meio de quadra (ESQNAO) · retangular (RT) · frente leste (L)
+
+
+
+B R A C E R U M              P A R K                                                                                               6
+                                                                  CONDIÇÕES COMERCIAIS — LOTES INDUSTRIAIS · FASE 1
+
+ Campo da proposta                     Exemplo
+
+                                       Lançamento — Expo (até 13/11/2026): US$ 160/m² → US$ 200.000 na condição-padrão
+ Preço (1 lote, Fase 1, 1 a 8 lotes)   (sinal de 20% + 12 parcelas); US$ 184.000 à vista · Pós-Expo: US$ 185/m² → US$ 231.250
+                                       · Fase 1 plena (a partir de 01/04/2027): US$ 220/m² → US$ 275.000; US$ 253.000 à vista
+
+ Situação                              Disponível (Controle de Unidades, coluna “Nome no masterplan”)
+
+
+Outros exemplos: lote de esquina Vitrine LTIND.Q02.L001 (LTIND.Q02.L001.A01250.ESQSIM.RT.S+O), 1.250 m²,
+US$ 316.250 — mesmo US$ 253/m² do meio de quadra (Lançamento: US$ 230.000, a US$ 184/m²); lote
+poligonal Interna LTIND.Q01.L001 (LTIND.Q01.L001.A00801.ESQSIM.PO.S+O), 801 m², US$ 158.598 (US$ 198/m²;
+Lançamento: US$ 115.344, a US$ 144/m²). Quadra inteira: Q07 (LTIND.Q07.L001 a L016).
+
+ARGUMENTOS E CUIDADOS
+Vender o pacote, não o metro quadrado: Maquila (tributo único de 1%), Ley de Inversiones (isenções na entrada),
+Certificado de Origem Mercosul, cidade completa (hotel, outlet, supermercado, escola, hub de serviços, clube,
+moradia e Aeroporto de Cargas Bracerum) e execução própria pela Bracerum Fábrica. A subida de preço por fase
+e o gatilho de +3% a cada 20% vendido são públicos e reais — usá-los como argumento de urgência, nunca como
+ameaça. Preço: o lote a US$ 220/m² fica dentro da faixa dos condomínios industriais do Sul do Brasil (US$ 160–
+360/m², 39% abaixo do topo) e a quadra a US$ 189/m² fica 47% abaixo do topo dessa faixa, com a infraestrutura
+de cidade que os parques paraguaios (US$ 55–100/m²) não têm. Urgência: quem reserva na Expo, até 13/11/2026,
+paga a base de US$ 160 — 27% abaixo da Fase 1 plena — e trava o preço em USD (parcelas com reajuste anual
+pelo índice do Banco Central do Paraguai); depois, US$ 185/m² no Pós-Expo (+15,6%) e US$ 220/m² a partir de
+01/04/2027, com Fase 2 (+10%) e gatilhos de +3% a cada 20% vendido. O Lançamento na Expo é condição de
+entrada por prazo curto, não desconto de negociação; nunca dizer que o preço “caiu” ou “subiu por falta/excesso
+de demanda”. Lotes das quadras Q38 a Q42 (linha sul): informar o limite de altura antes da reserva. Coluna
+Business (Q10, Q17, Q36, metade de Q24 e Q30): apenas indústrias limpas e de baixo ruído. Recusar operações
+cujo objetivo evidente seja contornar regras de origem ou defesa comercial (circunvenção), em especial
+transformação de aço e alumínio.
+
+METAS E FUNIL
+Meta oficial: cenário Acelerado da Política P1 v2.0 — esgotamento dos 614 lotes (766.689 m²) em 24 meses
+contados da Expo Paraguai-Brasil (11/11/2026), com cerca de 53% vendido nos primeiros 12 meses: T1 49 lotes ·
+T2 86 · T3 98 · T4 92 · T5 80 · T6 72 · T7 68 · T8 69; VGV de ~US$ 144 milhões à tabela plena; preço médio realizado
+de US$ 188/m² (plena), US$ 155/m² (Pós-Expo) e US$ 134/m² (Expo). Lançamento: cota de 64 lotes (80.000 m²),
+com 32 reservados às âncoras de pré-lançamento, fechadas antes de 11/11/2026. Funil de referência por mês: 40
+a 50 visitas qualificadas → 12 a 15 propostas emitidas → 5 a 7 reservas. Vitrine e Business: vender no máximo 40%
+nos primeiros 12 meses; a Interna é o estoque prioritário para operadores logísticos e venda em bloco. Comissão
+de vendas: 5% sobre o valor da venda, paga proporcionalmente ao recebimento.
+
+
+
+
+B R A C E R U M                 P A R K                                                                                         7
+
