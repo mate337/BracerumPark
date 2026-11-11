@@ -9,6 +9,8 @@ Google Drive e abre o WhatsApp do Sydney Savi com a mensagem pronta.
 - Planilha: **"Leads Corretores"** no Drive do Matheus
   (`1LavGFK7SC9TeXokO8Zkaj9-vXuzX9lYOWOF71WC2WgY`), primeira aba.
 - WhatsApp de destino: Sydney Savi, **+55 47 98803-0200** (`5547988030200`, o mesmo `WA_BR` das outras LPs).
+- **Publicada em 2026-11-11.** Planilha ainda **não ligada** (falta o Apps Script → `CORRETORES_PLANILHA_URL`);
+  até lá os cadastros ficam só no log da Vercel e na conversa do WhatsApp.
 
 ## Fluxo
 
