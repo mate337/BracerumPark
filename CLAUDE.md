@@ -41,6 +41,10 @@ rotas) que as seis páginas internas baixavam e interpretavam à toa. Ele roda d
   negociação tem **"Reservar agora"** na aba Reservas (`acao: efetivar`), que transforma o bloqueio em reserva.
   **Repetiu com `"36000.00"`:** o CV quer float literal no JSON — agora vai `36000.00` escrito no texto do JSON.
   O erro não aparece mais na tela: o lote fica bloqueado com nome/CPF/telefone/e-mail/empresa/lead/cliente na descrição.
+- **Limpeza dos testes (11/11):** liberados os 8 lotes segurados nos testes (Q32 L002/004/006/009/010, Q21
+  L003/004/005); leads de teste 6, 9, 10 e 11 em "Descarte" (motivo Desistência, explicação "lead de teste").
+  Ficaram os clientes de teste #7 e #8 (`BPFEIRA-…`) — a API não apaga cliente; apagar no CV se quiser.
+  Intocados: bloqueios das quadras FSB/Bracerum (96), reserva 7 (Cesar Neves) e o cliente #5 (usuário da integração).
 
 ### Landing pages dos folders + lead no CV CRM (v6.7 — 2026-11-10)
 - **Seis LPs**, uma por QR Code de folder: `folderpark/`, `folderresidence/`, `folderresort/`,
@@ -61,7 +65,7 @@ rotas) que as seis páginas internas baixavam e interpretavam à toa. Ele roda d
   (`/folderpark/?utm_source=folder&utm_medium=offline&utm_campaign=folder-park&utm_content=FolderPark`),
   com a condição **`missing: query utm_source`** — sem ela a regra pegaria a própria LP e entraria em laço.
   Lead de teste conferido no CV (idlead 6, "TESTE LP Claude - apagar": empreendimento 4, origem "Outras
-  publicidades", mídia `folder-park`, tags e anotação certas) — **apagar no CV**.
+  publicidades", mídia `folder-park`, tags e anotação certas) — **descartado em 11/11**.
 - **O CV mudou o nome das unidades em 10/11:** a maioria das quadras passou de "L014" para "014". O
   `api/lotes-status.js` só reconhecia 133 de 633 e os reservados sumiam da maquete — corrigido (aceita os
   dois); 626 reconhecidas, Q02.L001/L003/L004 reservados.
