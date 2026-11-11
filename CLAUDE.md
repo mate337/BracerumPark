@@ -47,6 +47,10 @@ rotas) que as seis páginas internas baixavam e interpretavam à toa. Ele roda d
 - **Conferido com o CV real em 2026-11-09** (usuário CONEXAOSITECV, e-mail `matheus337.martins@gmail.com`,
   com ponto): 626 unidades reconhecidas, `Q02.L003` reservado. **No ar desde 2026-11-09** (`CVCRM_TOKEN`
   sensível e `CVCRM_EMAIL` nas variáveis de Production da Vercel; `bracerumpark.com/api/lotes-status`).
+- **2026-11-11:** o CV passou a ter os 614 lotes do V14 de 02/11 e a unidade veio como "016" (sem "L") — a função
+  aceita os dois. **Quadras compradas bloqueadas no CV pela API:** Q02, Q06, Q07, Q13, Q14 (**FSB**) e Q24
+  (**Bracerum**), 96 lotes, motivo "Solicitação da Diretoria"; na maquete aparecem como Indisponível. O nome do
+  comprador fica só na descrição do bloqueio, dentro do CV — a função não o publica.
 
 ### Cartões de visita digitais (v6.6 — 2026-11-09)
 - Página aberta pelo QR Code do cartão impresso, no mesmo padrão do linktree (independente, sem

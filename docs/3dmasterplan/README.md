@@ -212,6 +212,13 @@ O token é gerado no Painel do Gestor do CV, no cadastro do usuário (botão "To
 precisa de permissão para o endpoint do mapa de disponibilidade. Documentação da API:
 desenvolvedor.cvcrm.com.br.
 
+**Formato do CV desde 2026-11-11:** o cliente reorganizou o loteamento no CV (614 lotes, como o V14 de 02/11)
+e a unidade passou a vir só com o número ("016" em vez de "L016"); o `idLote()` aceita os dois.
+**Quadras compradas (2026-11-11):** Q02, Q06, Q07, Q13 e Q14 (FSB) e Q24 (Bracerum) — 96 lotes — bloqueadas no
+CV pela API (`POST /api/v1/cadastros/empreendimentos/unidades/bloquear`, motivo "Solicitação da Diretoria",
+descrição "Quadra Qxx comprada pela …", sem data de desbloqueio). A maquete mostra como **Indisponível**.
+O usuário CONEXAOSITECV tem permissão para bloquear; para desbloquear, a mesma chamada com `"situacao": "Disponivel"`.
+
 **Conferido com o CV real (2026-11-09):** usuário de integração **CONEXAOSITECV**, e-mail
 `matheus337.martins@gmail.com` (com ponto — sem o ponto o CV responde 401). O mapa do empreendimento 4 tem
 641 unidades em 3 páginas de 300; a função reconhece 626 (os 615 lotes + Q37 + Q11; Hub e hangares ficam
