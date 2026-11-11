@@ -10,7 +10,7 @@
     CVCRM_EMAIL           e-mail desse usuário
     CVCRM_HOST            opcional, padrão bracerum.cvcrm.com.br
     CVCRM_EMPREENDIMENTO  opcional, padrão 4 (Bracerum Park — Lotes industriais; no CV 3 = Hotel,
-                          7 = Residence/Condomínios, 9 = Cidade)
+                          7 = Residence/Condomínios, 9 = Bracerum Outlet)
 
   Fonte: GET /api/v1/comercial/mapadisponibilidade/{id} (docs: desenvolvedor.cvcrm.com.br).
   Resposta pública, só o mínimo: { ok, atualizado, lotes: { "Q07.L014": "v", ... } }
@@ -43,8 +43,7 @@ function codigo(sit) {
 }
 
 // Unidade do CV -> id da maquete ("Q07.L014"). No mapa de disponibilidade o CV manda a quadra no
-// bloco e o lote na unidade: { bloco: "Quadra Q02", unidade: "003" } (desde 2026-11-11; antes "L003" —
-// os dois valem); aceita também o nome inteiro
+// bloco e o lote na unidade ({ bloco: "Quadra Q02", unidade: "L003" }); aceita também o nome inteiro
 // ("LTIND.Q07.L014", "Q07.L014", "LTIND.Q07.L014.A01250.ESQNAO.RT.L"). Hub, hangares etc. -> null.
 function idLote(u) {
   if (typeof u === 'string') u = { unidade: u };
@@ -52,6 +51,7 @@ function idLote(u) {
   const m = /Q(\d{2})\.L(\d{3})/i.exec(nome);
   if (m) return `Q${m[1]}.L${m[2]}`;
   const q = /\bQ(?:uadra)?\s*(\d{1,2})\b/i.exec(String(u.bloco || ''));
+  // O CV usa os dois jeitos: "L003" e só "003" (a maioria das quadras desde 10/11/2026).
   const l = /^\s*(?:L(?:ote)?\s*)?0*(\d{1,3})\s*$/i.exec(nome);
   return q && l ? `Q${q[1].padStart(2, '0')}.L${l[1].padStart(3, '0')}` : null;
 }
