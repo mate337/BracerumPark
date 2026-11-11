@@ -7,6 +7,7 @@
   'use strict';
   const API = '/api/admin';
   const LOTES = '../3dmasterplan/data/lotes.json';
+  const MAX_SEL = 20;
   const CAT = { V: 'Vitrine', B: 'Business', P: 'Padrão', I: 'Interna' };
   const ST = { d: 'Disponível', r: 'Reservado', n: 'Em negociação', v: 'Vendido', b: 'Indisponível' };
   const DDI = [['55', 'BR +55'], ['595', 'PY +595'], ['54', 'AR +54'], ['598', 'UY +598'], ['1', 'US +1'], ['', 'Outro']];
@@ -21,7 +22,7 @@
     del(k, s = localStorage) { try { s.removeItem(k); } catch (e) { /* idem */ } },
   };
 
-  const S = { token: null, exp: 0, quem: '', geo: null, est: null, quadra: null, lote: null, cond: null,
+  const S = { token: null, exp: 0, quem: '', geo: null, est: null, quadra: null, sel: [], cond: null,
     passo: 'lote', form: store.get('bp-admin-form', sessionStorage) || { ddi: '55' }, enviando: false, res: null, ultimo: null };
 
   /* ------------------------------------------------------------------ API */
@@ -102,7 +103,14 @@
     const h = new Date(d.atualizado).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
     live(`CV ao vivo · ${h}`, 'is-on');
     pinta(); contagem(); renderLista();
-    if (S.lote && S.passo === 'lote' && !$('#sheet').hidden) renderSheet();
+    const saiu = S.sel.filter((id) => stDe(id) !== 'd');
+    if (saiu.length && !S.enviando) {
+      S.sel = S.sel.filter((id) => !saiu.includes(id));
+      toast(`${saiu.join(', ')} deixou de estar disponível e saiu da seleção.`);
+      pinta(); renderLista();
+    }
+    barra();
+    if (!$('#sheet').hidden && S.passo === 'lotes') renderSheet();
   }
   function live(txt, cls) {
     $('#liveTxt').textContent = txt;
@@ -172,7 +180,7 @@
     if (!S.geo) return;
     for (const el of svg.querySelectorAll('.lote')) {
       const s = stDe(el.dataset.id) || 'd';
-      el.setAttribute('class', `lote s-${s}${el.dataset.id === S.lote ? ' is-sel' : ''}`);
+      el.setAttribute('class', `lote s-${s}${S.sel.includes(el.dataset.id) ? ' is-sel' : ''}`);
     }
     rotulosLotes();
   }
@@ -287,7 +295,7 @@
     if (lote) {
       const l = S.geo.lotes.get(lote.dataset.id);
       if (S.quadra !== l.q) { abreQuadra(l.q); return; }
-      abreLote(l.id);
+      alterna(l.id);
     }
   }
 
@@ -328,10 +336,13 @@
     }
     const Q = S.geo.quadras.get(S.quadra), n = S.est ? livres(Q) : null;
     $('#mapTitle').innerHTML = `<b>Quadra ${Q.q}</b> · ${n == null ? '…' : `${n} de ${Q.lotes.length} livres`}`;
-    lista(`<div class="list__head"><h3>Lotes da ${Q.q}</h3><span>toque para reservar</span></div>
+    const livresQ = Q.lotes.filter((id) => stDe(id) === 'd'), todosMarcados = livresQ.length && livresQ.every((id) => S.sel.includes(id));
+    lista(`<div class="list__head"><h3>Lotes da ${Q.q}</h3>${livresQ.length ? `<button class="linkbtn" type="button" data-acao="todaQ">${todosMarcados ? 'Desmarcar a quadra' : `Marcar os ${livresQ.length} livres`}</button>` : '<span>nenhum livre</span>'}</div>
+      <p class="note">Toque nos lotes para marcar — dá para escolher vários, de quadras diferentes.</p>
       <div class="rows">${Q.lotes.map((id) => {
-        const l = S.geo.lotes.get(id), s = stDe(id), p = precoDe(id, S.cond || (S.est && S.est.padrao));
-        return `<button class="row${s && s !== 'd' ? ' is-off' : ''}" type="button" data-lote="${id}">
+        const l = S.geo.lotes.get(id), s = stDe(id), p = precoDe(id, S.cond || (S.est && S.est.padrao)), on = S.sel.includes(id);
+        return `<button class="row${s && s !== 'd' ? ' is-off' : ''}${on ? ' is-on' : ''}" type="button" data-lote="${id}" aria-pressed="${on}">
+          <span class="row__ck" aria-hidden="true"></span>
           <span class="row__id">${id.slice(4)}</span>
           <span class="row__info"><b>${fmt(l.a)} m² · ${CAT[l.cat] || ''}</b>${p ? usd(p[0]) : '&nbsp;'}</span>
           <span class="row__st"><i class="sw sw--${s || 'd'}"></i>${s ? ST[s] : '…'}</span></button>`;
@@ -341,8 +352,15 @@
     const b = e.target.closest('button');
     if (!b) return;
     if (b.dataset.q) { abreQuadra(b.dataset.q); $('#map').scrollIntoView({ behavior: 'smooth', block: 'start' }); }
-    else if (b.dataset.lote) abreLote(b.dataset.lote);
+    else if (b.dataset.lote) alterna(b.dataset.lote);
     else if (b.dataset.acao === 'recarregar') carregar();
+    else if (b.dataset.acao === 'todaQ') {
+      const livresQ = S.geo.quadras.get(S.quadra).lotes.filter((id) => stDe(id) === 'd');
+      const todos = livresQ.every((id) => S.sel.includes(id));
+      S.sel = todos ? S.sel.filter((id) => !livresQ.includes(id)) : [...new Set([...S.sel, ...livresQ])].slice(0, MAX_SEL);
+      if (!todos && S.sel.length === MAX_SEL) toast(`Até ${MAX_SEL} lotes por reserva.`);
+      pinta(); renderLista(); barra();
+    }
   });
 
   // busca: "Q07 L14", "7-14", "q7", "LTIND.Q07.L014"
@@ -356,84 +374,117 @@
     abreQuadra(q);
     if (m[2]) {
       const id = `${q}.L${m[2].padStart(3, '0')}`;
-      if (S.geo.lotes.has(id)) abreLote(id); else toast(`A ${q} não tem o lote L${m[2].padStart(3, '0')}`);
+      if (!S.geo.lotes.has(id)) toast(`A ${q} não tem o lote L${m[2].padStart(3, '0')}`);
+      else if (!S.sel.includes(id)) alterna(id);
     }
     $('#q').blur();
   });
 
-  /* ------------------------------------------------------------------ gaveta do lote */
+  /* ------------------------------------------------------------------ seleção e barra */
   const sheet = $('#sheet');
-  function abreLote(id) {
-    S.lote = id; S.passo = 'lote';
-    if (S.est && !(precoDe(id, S.cond))) S.cond = S.est.padrao;
-    pinta();
+  function alterna(id) {
+    const s = stDe(id);
+    if (S.sel.includes(id)) S.sel = S.sel.filter((x) => x !== id);
+    else if (s && s !== 'd') { toast(`LTIND.${id} está ${ST[s].toLowerCase()} no CV.`); return; }
+    else if (!s) { toast('Aguardando a situação do CV…'); return; }
+    else if (S.sel.length >= MAX_SEL) { toast(`Até ${MAX_SEL} lotes por reserva.`); return; }
+    else S.sel = [...S.sel, id];
+    pinta(); renderLista(); barra();
+  }
+  function somaSel(t) {                          // total e séries somadas dos lotes marcados, na tabela t
+    let total = 0; const ser = new Map(); let falta = 0;
+    for (const id of S.sel) {
+      const p = precoDe(id, t);
+      if (!p) { falta++; continue; }
+      total += p[0];
+      for (const [n, q, v, venc] of p[1]) {
+        const k = `${n}|${q}|${venc}`;
+        ser.set(k, { n, q, venc, v: (ser.get(k) || { v: 0 }).v + v });
+      }
+    }
+    return { total, series: [...ser.values()], falta };
+  }
+  const serieTxt = (series) => series.map(({ n, q, v, venc }) => (q === 1 ? `${n === 'SINAL' ? 'Sinal' : n.toLowerCase()} ${usd(v)} em ${venc}` : `${q}× ${usd(v)} a partir de ${venc}`)).join(' + ');
+  function barra() {
+    const b = $('#selbar'), n = S.sel.length;
+    b.hidden = !n || !sheet.hidden;
+    document.body.classList.toggle('com-barra', !b.hidden);
+    if (!n) return;
+    const sm = somaSel(S.cond || (S.est && S.est.padrao));
+    $('#selTxt').innerHTML = `<b>${n} ${n > 1 ? 'lotes' : 'lote'}</b> · ${sm.total ? usd(sm.total) : '…'}<small>${esc(S.sel.slice(0, 4).join(' · '))}${n > 4 ? ` +${n - 4}` : ''}</small>`;
+  }
+  $('#selLimpar').addEventListener('click', () => { S.sel = []; pinta(); renderLista(); barra(); });
+  $('#selIr').addEventListener('click', () => abreCarrinho());
+
+  /* ------------------------------------------------------------------ gaveta: lotes → dados → revisar → envio */
+  function abreCarrinho() {
+    if (!S.sel.length) return;
+    if (S.est && !S.est.tabelas.some((t) => t.id === Number(S.cond))) S.cond = S.est.padrao;
+    S.passo = 'lotes';
     sheet.hidden = false;
     document.body.style.overflow = 'hidden';
+    barra();
     renderSheet();
   }
   function fechaSheet(forca) {
     if (S.enviando && !forca) return;
     sheet.hidden = true;
     document.body.style.overflow = '';
-    if (S.passo === 'ok') { S.passo = 'lote'; }
-    S.lote = null;
-    pinta();
+    if (S.passo === 'ok') { S.sel = []; S.passo = 'lotes'; }
+    pinta(); renderLista(); barra();
   }
   sheet.addEventListener('click', (e) => { if (e.target.closest('[data-fechar]')) fechaSheet(); });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !sheet.hidden) fechaSheet(); });
   $('#sheetBack').addEventListener('click', () => {
     if (S.enviando) return;
-    S.passo = { form: 'lote', revisar: 'form', erro: 'revisar' }[S.passo] || 'lote';
+    S.passo = { form: 'lotes', revisar: 'form', erro: 'revisar' }[S.passo] || 'lotes';
     renderSheet();
   });
-
-  function condicaoTxt(p) {
-    if (!p) return '';
-    return p[1].map(([n, q, v, venc]) => (q === 1 ? `${n === 'SINAL' ? 'Sinal' : n.toLowerCase()} ${usd(v)} em ${venc}` : `${q}× ${usd(v)} a partir de ${venc}`)).join(' + ');
-  }
   const tabNome = (t) => ((S.est && S.est.tabelas.find((x) => x.id === Number(t))) || {}).nome || `Tabela ${t}`;
+  const qtd = () => `${S.sel.length} ${S.sel.length > 1 ? 'lotes' : 'lote'}`;
 
   function renderSheet() {
-    const id = S.lote, l = S.geo.lotes.get(id), s = stDe(id);
-    const body = $('#sheetBody');
-    $('#sheetEyebrow').textContent = `Quadra ${l.q} · lote ${id.slice(5)}`;
+    const body = $('#sheetBody'), n = S.sel.length, sm = somaSel(S.cond);
+    const quadras = [...new Set(S.sel.map((id) => id.slice(0, 3)))];
+    $('#sheetEyebrow').textContent = `${qtd()} · ${quadras.length > 1 ? `quadras ${quadras.join(', ')}` : `quadra ${quadras[0] || ''}`}`;
     $('#sheetBack').hidden = !['form', 'revisar', 'erro'].includes(S.passo);
     sheet.querySelector('.sheet__x').hidden = S.passo === 'enviando';
-    const p = precoDe(id, S.cond);
 
-    if (S.passo === 'lote') {
-      $('#sheetTitle').textContent = `LTIND.${id}`;
-      const conds = S.est ? S.est.tabelas.filter((t) => precoDe(id, t.id)) : [];
+    if (S.passo === 'lotes') {
+      $('#sheetTitle').textContent = n > 1 ? `Reservar ${n} lotes` : `Reservar LTIND.${S.sel[0] || ''}`;
+      if (!n) { body.innerHTML = '<p class="empty">Nenhum lote marcado.</p>'; return; }
+      const conds = S.est ? S.est.tabelas.filter((t) => S.sel.every((id) => precoDe(id, t.id))) : [];
       body.innerHTML = `
-        <dl class="facts">
-          <div><dt>Área</dt><dd>${fmt(l.a)} m²</dd></div>
-          <div><dt>Categoria</dt><dd>${CAT[l.cat] || '—'}</dd></div>
-          <div><dt>Situação no CV</dt><dd><span class="stchip"><i class="sw sw--${s || 'd'}"></i>${s ? ST[s] : 'carregando…'}</span></dd></div>
-          <div><dt>Preço por m²</dt><dd>${p ? usd(p[0] / l.a) : '—'}</dd></div>
-        </dl>
+        <div class="rows">${S.sel.map((id) => {
+          const l = S.geo.lotes.get(id), p = precoDe(id, S.cond);
+          return `<div class="row row--sel"><span class="row__id">${id}</span>
+            <span class="row__info"><b>${fmt(l.a)} m² · ${CAT[l.cat] || ''}</b>${p ? usd(p[0]) : '—'}</span>
+            <button class="row__x" type="button" data-tira="${id}" aria-label="Tirar ${id} da seleção">×</button></div>`;
+        }).join('')}</div>
         ${conds.length ? `<fieldset class="conds"><legend class="field__lab" style="margin-bottom:8px">Condição de pagamento (tabelas do CV)</legend>
-          ${conds.map((t) => { const pp = precoDe(id, t.id); return `<label class="cond"><input type="radio" name="cond" value="${t.id}"${Number(S.cond) === t.id ? ' checked' : ''} />
-            <span><span class="cond__nome">${esc(t.nome.replace(/^Lançamento\s+/i, ''))}</span><span class="cond__total">${usd(pp[0])}</span>
-            <span class="cond__det">${esc(condicaoTxt(pp))}</span></span></label>`; }).join('')}</fieldset>`
-          : `<p class="empty">${S.est ? 'Sem preço no CV para este lote.' : 'Carregando preços do CV…'}</p>`}
-        ${s === 'd' ? `<button class="btn btn--ink" type="button" data-acao="form">Reservar este lote <span aria-hidden="true">→</span></button>`
-          : `<p class="form__err">${s ? `Este lote está <b>${ST[s].toLowerCase()}</b> no CV — escolha outro.` : 'Aguardando a situação do CV…'}</p>`}
-        <p class="note"><a href="../3dmasterplan/#lote-${id}" target="_blank" rel="noopener">Ver o lote na maquete 3D ↗</a> · ${esc(l.nome || '')}</p>`;
-      body.querySelectorAll('input[name=cond]').forEach((r) => r.addEventListener('change', () => { S.cond = Number(r.value); renderLista(); }));
+          ${conds.map((t) => { const x = somaSel(t.id); return `<label class="cond"><input type="radio" name="cond" value="${t.id}"${Number(S.cond) === t.id ? ' checked' : ''} />
+            <span><span class="cond__nome">${esc(t.nome.replace(/^Lançamento\s+/i, ''))}</span><span class="cond__total">${usd(x.total)}</span>
+            <span class="cond__det">${esc(serieTxt(x.series))}${n > 1 ? ' — soma dos lotes' : ''}</span></span></label>`; }).join('')}</fieldset>`
+          : `<p class="empty">${S.est ? 'Sem preço no CV para estes lotes.' : 'Carregando preços do CV…'}</p>`}
+        ${n > 1 ? '<p class="note">Valores por lote da tabela do CV (faixa de 1 a 8 lotes). Desconto por volume, se houver, é negociado no CV.</p>' : ''}
+        <button class="btn btn--ink" type="button" data-acao="form"${sm.falta || !conds.length ? ' disabled' : ''}>Continuar <span aria-hidden="true">→</span></button>
+        <button class="btn btn--ghost" type="button" data-fechar>Escolher mais lotes</button>`;
+      body.querySelectorAll('input[name=cond]').forEach((r) => r.addEventListener('change', () => { S.cond = Number(r.value); renderSheet(); renderLista(); }));
     }
 
     if (S.passo === 'form') {
       $('#sheetTitle').textContent = 'Dados do interessado';
-      const f = S.form, err = S.errosForm || {};
-      const campo = (k, lab, attrs, ajuda) => `<label class="field${err[k] ? ' is-err' : ''}"><span class="field__lab">${lab} <b>*</b></span>
-        <input class="field__in" name="${k}" value="${esc(f[k] || '')}" ${attrs} required />${err[k] ? `<span class="field__err">${err[k]}</span>` : ajuda ? `<span class="note">${ajuda}</span>` : ''}</label>`;
+      const f = S.form, err = S.errosForm || {}, nerr = Object.keys(err).length;
+      const campo = (k, lab, attrs) => `<label class="field${err[k] ? ' is-err' : ''}" data-campo="${k}"><span class="field__lab">${lab} <b>*</b></span>
+        <input class="field__in" name="${k}" value="${esc(f[k] || '')}" ${attrs} required />${err[k] ? `<span class="field__err">${err[k]}</span>` : ''}</label>`;
       body.innerHTML = `
-        <p class="note">LTIND.${id} · ${esc(tabNome(S.cond))} · <b>${p ? usd(p[0]) : ''}</b></p>
+        ${nerr ? `<div class="alerta" role="alert" tabindex="-1"><b>Corrija ${nerr > 1 ? `${nerr} campos` : '1 campo'} para continuar:</b> ${Object.keys(err).map((k) => ({ nome: 'nome', cpf: 'CPF', email: 'e-mail', telefone: 'telefone', empresa: 'empresa' })[k]).join(', ')}.</div>` : ''}
+        <p class="note">${qtd()} · ${esc(tabNome(S.cond))} · <b>${usd(sm.total)}</b></p>
         <form class="form" id="fCad" novalidate>
           ${campo('nome', 'Nome completo', 'autocomplete="name" autocapitalize="words" enterkeyhint="next"')}
           ${campo('cpf', 'CPF', 'inputmode="numeric" autocomplete="off" maxlength="14" placeholder="000.000.000-00" enterkeyhint="next"')}
           ${campo('email', 'E-mail', 'type="email" inputmode="email" autocomplete="email" autocapitalize="off" spellcheck="false" enterkeyhint="next"')}
-          <div class="field${err.telefone ? ' is-err' : ''}"><span class="field__lab">Telefone / WhatsApp <b>*</b></span>
+          <div class="field${err.telefone ? ' is-err' : ''}" data-campo="telefone"><span class="field__lab">Telefone / WhatsApp <b>*</b></span>
             <div class="field__row">
               <select class="field__in" name="ddi" aria-label="Código do país">${DDI.map(([v, t]) => `<option value="${v}"${(f.ddi ?? '55') === v ? ' selected' : ''}>${t}</option>`).join('')}</select>
               <input class="field__in" name="telefone" value="${esc(f.telefone || '')}" type="tel" inputmode="tel" autocomplete="tel-national" placeholder="DDD + número" enterkeyhint="next" required aria-label="Telefone" />
@@ -451,15 +502,23 @@
         if (el.name === 'cpf') el.value = mascaraCpf(el.value);
         S.form[el.name] = el.value;
         store.set('bp-admin-form', S.form, sessionStorage);
+        const cx = el.closest('.is-err');                // corrigiu: o campo deixa de piscar como erro
+        if (cx && !validar(S.form)[cx.dataset.campo]) { cx.classList.remove('is-err'); const m = cx.querySelector('.field__err'); if (m) m.remove(); }
       });
       fm.ddi.addEventListener('change', () => { S.form.ddi = fm.ddi.value; renderSheet(); });
       fm.addEventListener('submit', (e) => {
         e.preventDefault();
         S.errosForm = validar(S.form);
-        if (Object.keys(S.errosForm).length) { renderSheet(); const x = body.querySelector('.is-err .field__in'); if (x) x.focus(); return; }
-        S.passo = 'revisar'; renderSheet();
+        if (Object.keys(S.errosForm).length) {
+          renderSheet();
+          body.scrollTop = 0;
+          const a = body.querySelector('.alerta'); if (a) a.focus();
+          toast('Confira os campos marcados em vermelho escuro.');
+          return;
+        }
+        S.passo = 'revisar'; renderSheet(); body.scrollTop = 0;
       });
-      if (!f.nome) setTimeout(() => fm.nome.focus(), 350);
+      if (!f.nome && !nerr) setTimeout(() => fm.nome.focus(), 350);
     }
 
     if (S.passo === 'revisar') {
@@ -467,8 +526,8 @@
       const f = S.form;
       body.innerHTML = `
         <dl class="review">
-          <div><dt>Lote</dt><dd><b>LTIND.${id}</b> · ${fmt(l.a)} m² · ${CAT[l.cat] || ''}</dd></div>
-          <div><dt>Condição</dt><dd>${esc(tabNome(S.cond))}<br><b>${p ? usd(p[0]) : ''}</b> — ${esc(condicaoTxt(p))}</dd></div>
+          <div><dt>${n > 1 ? 'Lotes' : 'Lote'}</dt><dd>${S.sel.map((id) => { const l = S.geo.lotes.get(id), p = precoDe(id, S.cond); return `<b>LTIND.${id}</b> · ${fmt(l.a)} m² · ${p ? usd(p[0]) : ''}`; }).join('<br>')}</dd></div>
+          <div><dt>Condição</dt><dd>${esc(tabNome(S.cond))}<br><b>${usd(sm.total)}</b> — ${esc(serieTxt(sm.series))}${n > 1 ? ' (soma)' : ''}</dd></div>
           <div><dt>Nome</dt><dd>${esc(f.nome)}</dd></div>
           <div><dt>CPF</dt><dd>${esc(mascaraCpf(f.cpf))}</dd></div>
           <div><dt>E-mail</dt><dd>${esc(f.email)}</dd></div>
@@ -477,9 +536,9 @@
           ${f.obs ? `<div><dt>Obs.</dt><dd>${esc(f.obs)}</dd></div>` : ''}
           <div><dt>Atendente</dt><dd>${esc(S.quem)}</dd></div>
         </dl>
-        <p class="note">Ao confirmar, o lead, o cliente e a reserva são criados no CV (corretor "Feira EXPO PY BR") e o lote sai da venda na hora — aqui e na maquete.</p>
+        <p class="note">Ao confirmar, o lead e o cliente são criados no CV e ${n > 1 ? `uma reserva para cada um dos ${n} lotes` : 'a reserva do lote'} (corretor "Feira EXPO PY BR"); ${n > 1 ? 'os lotes saem' : 'o lote sai'} da venda na hora — aqui e na maquete.</p>
         <div class="btns">
-          <button class="btn btn--ink" type="button" data-acao="enviar">Confirmar reserva</button>
+          <button class="btn btn--ink" type="button" data-acao="enviar">Confirmar ${n > 1 ? `${n} reservas` : 'reserva'}</button>
           <button class="btn btn--ghost" type="button" data-acao="form">Corrigir dados</button>
         </div>`;
     }
@@ -487,9 +546,9 @@
     if (S.passo === 'enviando' || S.passo === 'erro') {
       const r = S.ultimo || {};
       $('#sheetTitle').textContent = S.passo === 'erro' ? 'Não concluiu' : 'Reservando…';
-      const etapas = [['conferir', 'Conferindo o lote no CV'], ['lead', 'Cadastrando o lead'], ['cliente', 'Cadastrando o cliente'], ['reserva', 'Criando a reserva']];
+      const etapas = [['conferir', `Conferindo ${n > 1 ? 'os lotes' : 'o lote'} no CV`], ['lead', 'Cadastrando o lead'], ['cliente', 'Cadastrando o cliente'], ['reserva', n > 1 ? `Criando as ${n} reservas` : 'Criando a reserva']];
       const feitos = new Set((r.passos || []).map((x) => x.etapa));
-      const falhou = S.passo === 'erro' ? (r.etapa || (r.status === 409 || r.status === 404 ? 'conferir' : r.campos ? 'conferir' : 'conferir')) : null;
+      const falhou = S.passo === 'erro' ? (r.etapa || 'conferir') : null;
       const ativo = S.passo === 'enviando' ? S.etapaAtiva || 0 : -1;
       body.innerHTML = `
         <ol class="steps">${etapas.map(([k, t], i) => {
@@ -499,49 +558,45 @@
           return `<li class="${c}"><i></i>${t}</li>`;
         }).join('')}</ol>
         ${S.passo === 'erro' ? `<p class="form__err" role="alert">${esc(r.erro || 'Erro')}${r.idlead ? `<br>O lead <b>#${r.idlead}</b> já ficou no CV.` : ''}${r.idpessoa ? ` Cliente <b>#${r.idpessoa}</b> cadastrado.` : ''}</p>
-          <div class="btns">${r.status === 409 ? `<button class="btn btn--ink" type="button" data-acao="outro">Escolher outro lote</button>`
+          <div class="btns">${r.status === 409 ? `<button class="btn btn--ink" type="button" data-acao="outro">Tirar o lote ocupado e escolher outro</button>`
             : `<button class="btn btn--ink" type="button" data-acao="enviar">Tentar de novo</button>`}
-          <button class="btn btn--ghost" type="button" data-acao="form">Voltar aos dados</button></div>` : '<p class="note">Não feche esta tela — leva alguns segundos.</p>'}`;
+          <button class="btn btn--ghost" type="button" data-acao="form">Voltar aos dados</button></div>` : '<p class="note">Não feche esta tela — leva alguns segundos por lote.</p>'}`;
     }
 
-    if (S.passo === 'ok' && S.ultimo.modo === 'negociacao') {
-      const r = S.ultimo;
-      $('#sheetTitle').textContent = 'Lote em negociação';
+    if (S.passo === 'ok') {
+      const r = S.ultimo, its = r.itens || [];
+      const nr = its.filter((x) => x.modo === 'reserva').length, nn = its.filter((x) => x.modo === 'negociacao').length, ne = its.filter((x) => x.modo === 'erro').length;
+      $('#sheetTitle').textContent = nn && !nr ? 'Lotes em negociação' : ne ? 'Concluído em parte' : nr > 1 ? 'Reservas feitas' : 'Reserva feita';
       $('#sheetBack').hidden = true;
+      const aviso = its.find((x) => x.aviso);
       body.innerHTML = `
         <div class="done"><div class="done__ic" aria-hidden="true">✓</div>
-          <h3>LTIND.${esc(r.lote)}</h3>
-          <p>${esc(r.nome)} · ${esc(r.tabela && r.tabela.nome || '')} · ${usd(r.total)}</p>
-          <dl><div><dt>Lead</dt><dd>#${r.idlead || '—'}</dd></div><div><dt>Segurado até</dt><dd>${esc(r.ate)} 23:59</dd></div></dl>
+          <h3>${esc(r.nome)}</h3>
+          <p>${its.length} ${its.length > 1 ? 'lotes' : 'lote'} · ${esc(r.tabela && r.tabela.nome || '')} · ${usd(r.total)}</p>
+          <dl><div><dt>Lead</dt><dd>#${r.idlead || '—'}</dd></div>${r.idpessoa ? `<div><dt>Cliente</dt><dd>#${r.idpessoa}${r.cliente_novo ? ' (novo)' : ' (já existia)'}</dd></div>` : ''}</dl>
         </div>
-        <p class="form__err">O CV não aceitou criar a reserva agora: <i>${esc(String(r.aviso || '').replace(/[.\s]+$/, ''))}</i>.
-          O lote ficou <b>segurado em negociação para o CPF</b> deste cliente até ${esc(r.ate)} — saiu da venda no painel e
-          na maquete, e no CV só ele pode ser reservado nele. <b>Termine a reserva no CV</b> pelo lead #${r.idlead || '—'}.</p>
+        <ul class="steps">${its.map((x) => `<li class="${x.modo === 'erro' ? 'is-err' : 'is-ok'}"><i></i><span><b>LTIND.${esc(x.lote)}</b> — ${
+          x.modo === 'reserva' ? `reserva #${x.idreserva || '?'} (Nova Reserva)` : x.modo === 'negociacao' ? `em negociação até ${esc(x.ate)} 23:59` : esc(x.erro || 'não reservado')}</span></li>`).join('')}</ul>
+        ${nn ? `<p class="form__err">O CV não aceitou criar ${nn > 1 ? 'as reservas' : 'a reserva'}: <i>${esc(String(aviso && aviso.aviso || '').replace(/[.\s]+$/, ''))}</i>. ${nn > 1 ? 'Os lotes ficaram segurados' : 'O lote ficou segurado'} em negociação para o CPF do cliente — fora da venda no painel e na maquete, e no CV só ele pode ser reservado. <b>Termine a reserva no CV</b> pelo lead #${r.idlead || '—'}.</p>` : ''}
+        ${nr ? `<p class="note">No CV ${nr > 1 ? 'as reservas estão' : 'a reserva está'} em <b>Nova Reserva</b>, com o corretor da feira.${r.associado === false ? ' <b>Associe o lead às reservas no CV</b> — a ligação automática não confirmou.' : ''}</p>` : ''}
         <div class="btns"><button class="btn btn--ink" type="button" data-acao="nova">Nova reserva</button>
           <button class="btn btn--ghost" type="button" data-acao="verres">Ver reservas e negociações</button></div>`;
-    } else if (S.passo === 'ok') {
-      const r = S.ultimo;
-      $('#sheetTitle').textContent = 'Reserva feita';
-      $('#sheetBack').hidden = true;
-      body.innerHTML = `
-        <div class="done"><div class="done__ic" aria-hidden="true">✓</div>
-          <h3>LTIND.${esc(r.lote)}</h3>
-          <p>${esc(r.nome)} · ${esc(r.tabela && r.tabela.nome || '')} · ${usd(r.total)}</p>
-          <dl>${r.idreserva ? `<div><dt>Reserva</dt><dd>#${r.idreserva}</dd></div>` : ''}<div><dt>Lead</dt><dd>#${r.idlead || '—'}</dd></div>
-            <div><dt>Cliente</dt><dd>#${r.idpessoa}${r.cliente_novo ? ' (novo)' : ' (já existia)'}</dd></div></dl>
-        </div>
-        <p class="note">No CV a reserva está em <b>Nova Reserva</b>, com o corretor da feira; o lote já aparece reservado na maquete.${r.associado ? '' : ' <b>Associe o lead à reserva no CV</b> — a ligação automática não confirmou.'}</p>
-        <div class="btns"><button class="btn btn--ink" type="button" data-acao="nova">Nova reserva</button>
-          <button class="btn btn--ghost" type="button" data-acao="verres">Ver reservas</button></div>`;
     }
   }
   $('#sheetBody').addEventListener('click', (e) => {
+    const t = e.target.closest('[data-tira]');
+    if (t) { S.sel = S.sel.filter((x) => x !== t.dataset.tira); pinta(); renderLista(); if (!S.sel.length) fechaSheet(); else renderSheet(); return; }
     const b = e.target.closest('[data-acao]');
     if (!b) return;
     const a = b.dataset.acao;
-    if (a === 'form') { S.passo = 'form'; renderSheet(); }
+    if (a === 'form') { S.passo = 'form'; renderSheet(); $('#sheetBody').scrollTop = 0; }
     else if (a === 'enviar') enviar();
-    else if (a === 'outro') { fechaSheet(true); carregar(true); }
+    else if (a === 'outro') {
+      const lote = S.ultimo && S.ultimo.lote;
+      if (lote) S.sel = S.sel.filter((x) => x !== lote);
+      carregar(true);
+      if (S.sel.length) { S.passo = 'lotes'; renderSheet(); } else fechaSheet(true);
+    }
     else if (a === 'nova') { fechaSheet(true); }
     else if (a === 'verres') { fechaSheet(true); aba('res'); }
   });
@@ -554,18 +609,20 @@
   function cpfValido(c) {
     c = String(c || '').replace(/\D/g, '');
     if (c.length !== 11 || /^(\d)\1{10}$/.test(c)) return false;
-    for (const n of [9, 10]) {
+    for (const k of [9, 10]) {
       let s = 0;
-      for (let i = 0; i < n; i++) s += Number(c[i]) * (n + 1 - i);
-      if (((s * 10) % 11) % 10 !== Number(c[n])) return false;
+      for (let i = 0; i < k; i++) s += Number(c[i]) * (k + 1 - i);
+      if (((s * 10) % 11) % 10 !== Number(c[k])) return false;
     }
     return true;
   }
   const ddiDe = (f) => String(f.ddi === '' ? f.ddiOutro || '' : f.ddi || '55').replace(/\D/g, '');
   function validar(f) {
     const e = {};
-    if (String(f.nome || '').trim().split(/\s+/).length < 2) e.nome = 'Nome e sobrenome.';
-    if (!cpfValido(f.cpf)) e.cpf = 'CPF inválido — confira os números.';
+    if (String(f.nome || '').trim().length < 3) e.nome = 'Escreva o nome do cliente.';
+    const cpf = String(f.cpf || '').replace(/\D/g, '');
+    if (cpf.length !== 11) e.cpf = 'O CPF tem 11 números.';
+    else if (!cpfValido(cpf)) e.cpf = 'CPF inválido: os dois últimos dígitos não conferem. O CV só aceita CPF válido — confira com o cliente.';
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(f.email || '').trim())) e.email = 'E-mail inválido.';
     const t = String(f.telefone || '').replace(/\D/g, '').replace(/^0+/, '');
     if (t.length < 8 || t.length > 13 || !ddiDe(f)) e.telefone = 'Telefone com DDD (e o código do país).';
@@ -578,22 +635,22 @@
     renderSheet();
     const tic = setInterval(() => { if (S.etapaAtiva < 3) { S.etapaAtiva++; renderSheet(); } }, 1300);
     const f = S.form;
-    const d = await api('reservar', { lote: S.lote, tabela: S.cond, nome: f.nome.trim(), cpf: f.cpf, email: f.email.trim(), ddi: ddiDe(f),
+    const d = await api('reservar', { lotes: S.sel, tabela: S.cond, nome: f.nome.trim(), cpf: f.cpf, email: f.email.trim(), ddi: ddiDe(f),
       telefone: f.telefone, empresa: f.empresa.trim(), obs: (f.obs || '').trim() });
     clearInterval(tic);
     S.enviando = false;
     if (d.status === 401) return;
     S.ultimo = { ...d, nome: f.nome.trim() };
     if (!d.ok) {
-      if (d.campos && d.campos.length) {          // o servidor recusou algum campo: volta ao formulário marcando
-        S.errosForm = Object.fromEntries(d.campos.filter((c) => c !== 'lote' && c !== 'tabela').map((c) => [c, 'Confira este campo.']));
+      if (d.campos && d.campos.length) {
+        S.errosForm = Object.fromEntries(d.campos.filter((c) => c !== 'lote' && c !== 'tabela').map((c) => [c, 'O CV não aceitou este campo — confira.']));
         if (Object.keys(S.errosForm).length) { S.passo = 'form'; renderSheet(); toast('Confira os campos marcados.'); return; }
       }
       S.passo = 'erro'; renderSheet();
       if (d.status === 409) carregar(true);
       return;
     }
-    if (S.est && S.est.lotes[d.lote]) S.est.lotes[d.lote].s = d.modo === 'negociacao' ? 'n' : 'r';
+    for (const x of d.itens || []) if (S.est && S.est.lotes[x.lote] && x.modo !== 'erro') S.est.lotes[x.lote].s = x.modo === 'negociacao' ? 'n' : 'r';
     S.form = { ddi: f.ddi };                       // limpa os dados pessoais para o próximo atendimento
     store.del('bp-admin-form', sessionStorage);
     S.errosForm = {};
@@ -689,5 +746,5 @@
   const s = store.get('bp-admin');
   if (s && s.token && s.exp > Date.now() + 60e3) { Object.assign(S, { token: s.token, exp: s.exp, quem: s.quem }); entrar(); }
   else mostraLogin();
-  window.__adm = { S, abreLote, abreQuadra, carregar };
+  window.__adm = { S, alterna, abreCarrinho, abreQuadra, carregar };
 })();

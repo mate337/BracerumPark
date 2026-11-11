@@ -17,8 +17,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="admin.css?v=2" />
-<script src="admin.js?v=2" defer></script>
+<link rel="stylesheet" href="admin.css?v=3" />
+<script src="admin.js?v=3" defer></script>
 </head>
 <body>
 <!-- Painel de reservas da feira. Página independente: não carrega o site nem a maquete.
@@ -120,6 +120,13 @@
     </header>
     <div class="sheet__body" id="sheetBody"></div>
   </div>
+</div>
+
+<!-- lotes marcados: fica fixa embaixo enquanto se escolhe -->
+<div class="selbar" id="selbar" hidden>
+  <p class="selbar__txt" id="selTxt" aria-live="polite"></p>
+  <button class="selbar__limpar" id="selLimpar" type="button">Limpar</button>
+  <button class="btn btn--sand selbar__ir" id="selIr" type="button">Avançar para reserva <span aria-hidden="true">→</span></button>
 </div>
 
 <div class="toast" id="toast" role="status" hidden></div>

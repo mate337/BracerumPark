@@ -46,6 +46,7 @@ const cfg = () => ({
   dias: Math.max(1, Math.min(30, Number(process.env.CVCRM_FEIRA_DIAS || 3))),
 });
 const SESSAO_H = 16;
+const MAX_LOTES = 20;                         // lotes por atendimento (uma quadra tem 16)
 
 const erro = (status, msg, extra) => Object.assign(new Error(msg), { status }, extra || {});
 const semAcento = (s) => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toUpperCase().trim();
@@ -202,8 +203,9 @@ function cpfValido(c) {
   return true;
 }
 function validar(b) {
+  const lst = Array.isArray(b.lotes) ? b.lotes : [b.lote];
   const v = {
-    lote: limpa(b.lote, 12).toUpperCase(),
+    lotes: [...new Set(lst.map((x) => limpa(x, 12).toUpperCase()).filter(Boolean))],
     tabela: Number(b.tabela) || cfg().tabela,
     nome: limpa(b.nome, 120),
     email: limpa(b.email, 120).toLowerCase(),
@@ -214,8 +216,8 @@ function validar(b) {
     obs: limpa(b.obs, 600),
   };
   const campos = [];
-  if (!/^Q\d{2}\.L\d{3}$/.test(v.lote)) campos.push('lote');
-  if (v.nome.split(' ').filter((p) => p.length > 0).length < 2) campos.push('nome');
+  if (!v.lotes.length || v.lotes.length > MAX_LOTES || v.lotes.some((x) => !/^Q\d{2}\.L\d{3}$/.test(x))) campos.push('lote');
+  if (v.nome.length < 3) campos.push('nome');
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.email)) campos.push('email');
   if (v.tel.length < 8 || v.tel.length > 13) campos.push('telefone');
   if (v.empresa.length < 2) campos.push('empresa');
@@ -268,42 +270,48 @@ async function reservar(b, sessao) {
   const c = cfg();
   const v = validar(b);
   const passos = [];
-  const telefone = `+${v.ddi}${v.tel}`;
 
-  // 1. a unidade está livre agora? (e de onde vêm as condições)
-  const [un, t] = await Promise.all([unidadeAgora(v.lote), tabelas()]);
-  if (!un) throw erro(404, `Lote ${v.lote} não encontrado no CV`);
-  if (un.s) throw erro(409, `O lote ${v.lote} não está disponível no CV (${un.sit})`, { situacao: un.s });
-  const preco = (t.porLote.get(v.lote) || {})[v.tabela];
+  // 1. todos os lotes livres agora? (nada é gravado se algum não estiver) e as condições de cada um
+  const [m, t] = await Promise.all([v.lotes.length === 1 ? null : mapa(), tabelas()]);
   const tab = t.lista.find((x) => x.id === v.tabela);
-  if (!preco || !tab) throw erro(422, 'Tabela de preço sem valor para esse lote', { campos: ['tabela'] });
-  const [total, series] = preco;
-  const condicoes = [];
-  for (const [nome, q, valor, venc] of series) {
-    const ids = await idSerie(nome);
-    if (!ids) throw erro(502, `Série "${nome}" sem correspondência no CV`);
-    condicoes.push({ idserie_cv: ids, quantidade_parcelas: q, valor_parcela: valor, primeiro_vencimento: venc, retirar_comissao: 'N' });
+  if (!tab) throw erro(422, 'Tabela de preço não encontrada no CV', { campos: ['tabela'] });
+  const itens = [];
+  for (const lote of v.lotes) {
+    const un = m ? m.get(lote) : await unidadeAgora(lote);
+    if (!un) throw erro(404, `Lote ${lote} não encontrado no CV`);
+    if (un.s) throw erro(409, `O lote ${lote} não está disponível no CV (${un.sit})`, { situacao: un.s, lote });
+    const preco = (t.porLote.get(lote) || {})[v.tabela];
+    if (!preco) throw erro(422, `Sem preço na tabela "${tab.nome}" para o lote ${lote}`, { campos: ['tabela'] });
+    const condicoes = [];
+    for (const [nome, q, valor, venc] of preco[1]) {
+      const ids = await idSerie(nome);
+      if (!ids) throw erro(502, `Série "${nome}" sem correspondência no CV`);
+      condicoes.push({ idserie_cv: ids, quantidade_parcelas: q, valor_parcela: valor, primeiro_vencimento: venc, retirar_comissao: 'N' });
+    }
+    itens.push({ lote, un, total: preco[0], series: preco[1], condicoes });
   }
-  const resumoCond = series.map(([n, q, val, venc]) => `${q}× ${n.toLowerCase()} de US$ ${val.toLocaleString('pt-BR')} (1º venc. ${venc})`).join(' + ');
+  const total = itens.reduce((a, x) => a + x.total, 0);
+  const cond = (x) => x.series.map(([n, q, val, venc]) => `${q}× ${n.toLowerCase()} de US$ ${val.toLocaleString('pt-BR')} (1º venc. ${venc})`).join(' + ');
   const anotacao = [
     `Reserva feita no stand da feira pelo painel /admin${sessao.quem ? ` — atendente: ${sessao.quem}` : ''}.`,
-    `Lote: LTIND.${v.lote} · Tabela: ${tab.nome} · Total US$ ${total.toLocaleString('pt-BR')}`,
-    `Condição: ${resumoCond}`,
+    `${itens.length > 1 ? `${itens.length} lotes` : 'Lote'} · Tabela: ${tab.nome} · Total US$ ${total.toLocaleString('pt-BR')}`,
+    ...itens.map((x) => `- LTIND.${x.lote}: US$ ${x.total.toLocaleString('pt-BR')} — ${cond(x)}`),
     `Empresa: ${v.empresa}`,
     v.obs && `Observações: ${v.obs}`,
   ].filter(Boolean).join('\n');
 
   if (b.teste === true) {
-    return { teste: true, lote: v.lote, unidade: un.u, condicoes, anotacao, total, tabela: tab };
+    return { teste: true, lotes: itens.map((x) => ({ lote: x.lote, unidade: x.un.u, total: x.total, condicoes: x.condicoes })), anotacao, total, tabela: tab };
   }
 
-  // 2. lead
+  // 2. lead (um só, com todos os lotes na anotação; a 1ª unidade como interesse)
   const lead = {
     nome: v.nome, email: v.email, telefone: v.tel, telefone_ddi: `+${v.ddi}`,
     documento_tipo: 'cpf', documento: v.cpf,
-    idempreendimento: c.emp, idunidade: un.u, idimobiliaria: c.imobiliaria, idcorretor: c.corretor,
-    origem: 'OP', midia: c.midia, conversao: limpa(`Reserva na feira — LTIND.${v.lote}`, 100), modulo: 'Admin feira',
-    tags: ['feira', 'reserva-feira', v.lote], interacoes: [{ tipo: 'A', descricao: anotacao }],
+    idempreendimento: c.emp, idunidade: itens[0].un.u, idimobiliaria: c.imobiliaria, idcorretor: c.corretor,
+    origem: 'OP', midia: c.midia, modulo: 'Admin feira',
+    conversao: limpa(`Reserva na feira — ${itens.map((x) => x.lote).join(', ')}`, 100),
+    tags: ['feira', 'reserva-feira', ...itens.map((x) => x.lote)].slice(0, 20), interacoes: [{ tipo: 'A', descricao: anotacao }],
   };
   let r = await cv('POST', '/v1/comercial/leads', lead);
   if (!r.ok && r.status === 400 && /alterar|elterar|existe|duplic/i.test(JSON.stringify(r.d))) r = await cv('POST', '/v1/comercial/leads', { ...lead, permitir_alteracao: true });
@@ -311,8 +319,8 @@ async function reservar(b, sessao) {
   const idlead = r.d.idlead || r.d.id || (r.d.dados && r.d.dados.idlead) || null;
   passos.push({ etapa: 'lead', id: idlead });
 
-  // 3. cliente
-  let idpessoa = null, novo = false, idreserva = null;
+  // 3. cliente (se o CV recusar, os lotes ficam segurados em negociação para o CPF)
+  let idpessoa = null, novo = false, falhaCliente = null;
   try {
     idpessoa = await acharCliente(v.cpf);
     if (!idpessoa) {
@@ -321,42 +329,49 @@ async function reservar(b, sessao) {
         telefone: v.tel, ddi_telefone: `+${v.ddi}`, celular: v.tel, ddi_celular: `+${v.ddi}`,
         trabalho_nome_empresa: v.empresa, observacoes: limpa(`Cadastrado na feira (lead ${idlead || '-'}), empresa ${v.empresa}`, 300),
       });
-      if (!r.ok) throw erro(502, `Cliente não cadastrado: ${msgCv(r.d)}`, { etapa: 'cliente', passos, idlead });
+      if (!r.ok) throw erro(502, `Cliente não cadastrado: ${msgCv(r.d)}`);
       idpessoa = r.d.idpessoa_cv || r.d.idpessoa || await acharCliente(v.cpf);
       novo = true;
     }
-    if (!idpessoa) throw erro(502, 'Cliente cadastrado, mas o CV não devolveu o id', { etapa: 'cliente', passos, idlead });
+    if (!idpessoa) throw erro(502, 'Cliente cadastrado, mas o CV não devolveu o id');
     passos.push({ etapa: 'cliente', id: idpessoa, novo });
+  } catch (e) { falhaCliente = e.message; }
 
-    // 4. reserva
-    r = await cv('POST', '/v1/comercial/reservas', {
-      idpessoa_cv: idpessoa, idempreendimento_cv: c.emp, idunidade_cv: un.u, idcorretor_cv: c.corretor,
-      idtabela: v.tabela, condicoes,
-    });
-    if (!r.ok) throw erro(r.status === 400 && /indispon/i.test(msgCv(r.d)) ? 409 : 502, `Reserva não criada: ${msgCv(r.d)}`, { etapa: 'reserva', passos, idlead, idpessoa });
-    idreserva = r.d.idreserva || r.d.idreserva_cv || r.d.idproposta_cv || await acharReserva(v.cpf, un.u);
-    passos.push({ etapa: 'reserva', id: idreserva });
-
-  } catch (e) {
-    // Cliente ou reserva recusados (ex.: permissão do perfil no CV). O lead já existe: em vez de deixar o lote
-    // livre, segura-o em negociação para o CPF e devolve o motivo — a reserva é feita depois, no CV.
-    if (e.status === 409) throw e;
-    let ate;
-    try { ate = await segurar(un, v, idlead, sessao); } catch (x) { e.message += ` · ${x.message}`; throw e; }
-    passos.push({ etapa: 'negociacao', ate });
-    console.log('[admin] negociação', JSON.stringify({ lote: v.lote, idlead, idpessoa, ate, motivo: e.message, quem: sessao.quem || null }));
-    return { modo: 'negociacao', lote: v.lote, unidade: un.u, idlead, idpessoa, ate, aviso: e.message, total, tabela: tab, condicao: resumoCond, passos };
+  // 4. uma reserva por lote (no CV a reserva é por unidade); recusa → segura o lote para o CPF
+  const out = [];
+  for (const x of itens) {
+    const res = { lote: x.lote, total: x.total };
+    let motivo = falhaCliente;
+    if (!falhaCliente) {
+      r = await cv('POST', '/v1/comercial/reservas', {
+        idpessoa_cv: idpessoa, idempreendimento_cv: c.emp, idunidade_cv: x.un.u, idcorretor_cv: c.corretor, idtabela: v.tabela, condicoes: x.condicoes,
+      });
+      if (r.ok) {
+        res.modo = 'reserva';
+        res.idreserva = r.d.idreserva || r.d.idreserva_cv || r.d.idproposta_cv || await acharReserva(v.cpf, x.un.u);
+        out.push(res); continue;
+      }
+      motivo = `Reserva não criada: ${msgCv(r.d)}`;
+      if (r.status === 400 && /indispon/i.test(motivo)) { res.modo = 'erro'; res.erro = 'Lote tomado no CV antes de reservar'; out.push(res); continue; }
+    }
+    try { res.ate = await segurar(x.un, v, idlead, sessao); res.modo = 'negociacao'; res.aviso = motivo; }
+    catch (e) { res.modo = 'erro'; res.erro = `${motivo} · ${e.message}`; }
+    out.push(res);
   }
 
-  // 5. lead associado à reserva (situação "Com Reserva")
-  let associado = false;
-  if (idlead && idreserva) {
-    const a = await cv('POST', '/v1/comercial/leads', { idlead, nome: v.nome, email: v.email, telefone: v.tel, permitir_alteracao: true, idreserva, idsituacao: 5 });
-    associado = a.ok;
-    if (!a.ok) console.error('[admin] associar lead à reserva:', a.status, msgCv(a.d));
+  // 5. reservas associadas ao lead (situação "Com Reserva")
+  let associado = null;
+  for (const x of out.filter((y) => y.idreserva)) {
+    if (!idlead) break;
+    const a = await cv('POST', '/v1/comercial/leads', { idlead, nome: v.nome, email: v.email, telefone: v.tel, permitir_alteracao: true, idreserva: x.idreserva, idsituacao: 5 });
+    associado = associado !== false && a.ok;
+    if (!a.ok) console.error('[admin] associar lead à reserva:', x.idreserva, a.status, msgCv(a.d));
   }
-  console.log('[admin] reserva', JSON.stringify({ lote: v.lote, idlead, idpessoa, idreserva, quem: sessao.quem || null }));
-  return { modo: 'reserva', lote: v.lote, unidade: un.u, idlead, idpessoa, cliente_novo: novo, idreserva, associado, total, tabela: tab, condicao: resumoCond };
+  console.log('[admin] reservar', JSON.stringify({ idlead, idpessoa, quem: sessao.quem || null, itens: out.map((y) => [y.lote, y.modo, y.idreserva || y.ate || y.erro]) }));
+  if (!out.some((y) => y.modo !== 'erro')) {
+    throw erro(502, out.map((y) => `${y.lote}: ${y.erro}`).join(' · '), { etapa: falhaCliente ? 'cliente' : 'reserva', passos, idlead, idpessoa });
+  }
+  return { idlead, idpessoa, cliente_novo: novo, associado, itens: out, total, tabela: tab, aviso: falhaCliente || undefined };
 }
 
 async function reservas() {
@@ -455,8 +470,8 @@ module.exports = async (req, res) => {
     return fim(400, { ok: false, erro: 'ação' });
   } catch (e) {
     console.error('[admin]', b.acao, e.status || 500, e.message);
-    const { status = 500, message, campos, etapa, passos, idlead, idpessoa, situacao } = e;
-    return fim(status, { ok: false, erro: message, campos, etapa, passos, idlead, idpessoa, situacao });
+    const { status = 500, message, campos, etapa, passos, idlead, idpessoa, situacao, lote } = e;
+    return fim(status, { ok: false, erro: message, campos, etapa, passos, idlead, idpessoa, situacao, lote });
   }
 };
 

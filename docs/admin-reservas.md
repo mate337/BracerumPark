@@ -7,13 +7,19 @@ do site nem da maquete: é uma página à parte (`admin/`) e uma função à par
 
 1. **Entrar** com o nome de quem atende e a **senha da equipe** (`ADMIN_SENHA` na Vercel). A sessão dura
    16 h no aparelho; "Sair" no menu apaga. O nome vai na anotação de cada reserva.
-2. **Escolher o lote** — pelo mapa (toque na quadra → os lotes ampliam; arrastar e pinçar funcionam),
-   pela grade de quadras ou pela busca ("Q07 L14", "7 14", "LTIND.Q07.L014"). Cores = situação no CV
-   agora: disponível, reservado, vendido, indisponível (bloqueado). Atualiza sozinho a cada 30 s.
+2. **Escolher os lotes** (um ou vários, de quadras diferentes; até 20) — toque na quadra no mapa (os lotes
+   ampliam; arrastar e pinçar funcionam) ou na grade de quadras, e **toque nos lotes para marcar/desmarcar**
+   (no mapa ou na lista; "Marcar os N livres" marca a quadra inteira). A busca ("Q07 L14") marca o lote. Uma
+   barra fixa embaixo mostra os lotes marcados e o total, com **"Avançar para reserva"**. Lote que não está
+   livre não entra; se um marcado deixar de estar livre (outra pessoa reservou), ele sai da seleção com aviso.
+   Cores = situação no CV agora; atualiza sozinho a cada 30 s.
 3. **Condição de pagamento** — as tabelas aprovadas do CV para o loteamento (hoje: Lançamento Expo
-   20%+12x, à vista e 20%+36x), com o valor e as parcelas exatas daquele lote no CV.
-4. **Dados do interessado** — nome completo, CPF (com verificação dos dígitos), e-mail, telefone com
-   código do país e empresa: todos obrigatórios; observação opcional.
+   20%+12x, à vista e 20%+36x), com o valor e as parcelas exatas de cada lote no CV; com vários lotes, a
+   soma (desconto por volume, se houver, é negociado no CV — as tabelas do CV são por lote, faixa 1–8).
+4. **Dados do interessado** — nome, CPF (com verificação dos dígitos: o CV recusa CPF inválido), e-mail,
+   telefone com código do país e empresa: todos obrigatórios; observação opcional. Se algo estiver errado,
+   um aviso no topo diz quais campos corrigir (2026-11-11: antes só os campos ficavam marcados e o botão
+   parecia não fazer nada).
 5. **Revisar e confirmar** → a função faz, no CV:
    1. confere no mapa de disponibilidade que a unidade continua livre;
    2. cadastra o **lead** (`POST /api/v1/comercial/leads`) com CPF, unidade de interesse, corretor e
@@ -22,9 +28,13 @@ do site nem da maquete: é uma página à parte (`admin/`) e uma função à par
    3. acha o **cliente** pelo CPF (`GET /api/v1/cadastros/clientes?documento=`) ou cadastra
       (`POST /api/v1/cadastros/clientes`, `idpessoa_int` = `BPFEIRA-<cpf>`, empresa em
       `trabalho_nome_empresa`);
-   4. cria a **reserva** (`POST /api/v1/comercial/reservas`) com a tabela escolhida e as condições
-      (sinal + mensais) copiadas da tabela do CV para aquela unidade — séries "Sinal" (7) e "Mensal" (1);
-   5. associa a reserva ao lead e põe o lead em "Com Reserva" (situação 5).
+   4. cria **uma reserva por lote** (`POST /api/v1/comercial/reservas` — no CV a reserva é por unidade) com
+      a tabela escolhida e as condições (sinal + mensais) copiadas da tabela do CV para aquela unidade —
+      séries "Sinal" (7) e "Mensal" (1);
+   5. associa as reservas ao lead e põe o lead em "Com Reserva" (situação 5).
+   Com vários lotes: um lead e um cliente, todos os lotes na anotação, e o resultado é mostrado lote a lote
+   (reservado / em negociação / tomado). Antes de gravar qualquer coisa, todos os lotes são conferidos
+   livres no CV; se um estiver ocupado, nada é criado e o painel oferece tirá-lo da seleção.
    A reserva nasce em **"Nova Reserva"** no workflow do CV: é a negociação; dali a equipe segue no CV
    (análise, documentos, contrato). A unidade fica "reservada" e sai da venda — o painel, a maquete
    (`/api/lotes-status`) e as LPs passam a mostrá-la assim.

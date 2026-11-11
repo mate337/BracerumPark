@@ -247,3 +247,30 @@ main{max-width:var(--max);margin:0 auto;padding:14px var(--gap) calc(var(--safe-
   .sheet__panel{max-height:88vh;max-width:560px}
   .sheet__grip{display:none}
 }
+
+/* ------------------------------------------------------------------ seleção de vários lotes */
+.row{grid-template-columns:auto auto 1fr auto}
+.row__ck{width:22px;height:22px;flex:none;border:2px solid var(--line);background:#fff}
+.row.is-on{background:#f6efdf;box-shadow:inset 3px 0 0 var(--ink)}
+.row.is-on .row__ck{border-color:var(--ink);background:var(--ink) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3.5 8.5l3 3 6-7' fill='none' stroke='%23f7f3ea' stroke-width='2'/%3E%3C/svg%3E") center/14px no-repeat}
+.row.is-off .row__ck{visibility:hidden}
+.row--sel{grid-template-columns:auto 1fr auto}
+.row--sel .row__id{min-width:72px}
+.row__x{width:44px;height:44px;font-size:1.5rem;line-height:1;color:var(--k-soft)}
+.list__head .linkbtn{min-height:40px}
+.selbar{position:fixed;left:0;right:0;bottom:0;z-index:40;display:grid;grid-template-columns:1fr auto;gap:8px 12px;align-items:center;
+  padding:12px var(--gap) calc(var(--safe-b) + 12px);background:var(--ink);color:var(--t);box-shadow:0 -10px 30px rgba(0,0,0,.25);animation:sobe .25s ease}
+.selbar__txt{font-size:.95rem;min-width:0}
+.selbar__txt b{font-weight:700}
+.selbar__txt small{display:block;margin-top:2px;font-size:.72rem;color:var(--t-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.selbar__limpar{min-height:44px;padding:0 6px;color:var(--t-soft);font:600 .78rem var(--sans);text-decoration:underline;text-underline-offset:3px}
+.selbar__ir{grid-column:1/-1;min-height:52px}
+body.com-barra main{padding-bottom:calc(var(--safe-b) + 150px)}
+body.com-barra .toast{bottom:calc(var(--safe-b) + 140px)}
+@media (min-width:760px){.selbar{grid-template-columns:1fr auto auto}.selbar__ir{grid-column:auto;width:auto;padding:14px 26px}}
+.alerta{padding:14px 16px;background:var(--brown);color:var(--t);font-size:.9rem;line-height:1.45;outline:none;animation:treme .4s ease}
+.alerta b{display:block;margin-bottom:2px}
+@keyframes treme{20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}
+@media (prefers-reduced-motion:reduce){.alerta{animation:none}}
+.field.is-err .field__err{color:var(--brown)}
+.steps li span{min-width:0}
