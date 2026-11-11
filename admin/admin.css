@@ -12,7 +12,7 @@
   --k:#14110c; --k-soft:rgba(20,17,12,.68); --k-mute:rgba(20,17,12,.46);
   --t:#f7f3ea; --t-soft:rgba(247,243,234,.7);
   --line:rgba(20,17,12,.13); --line-t:rgba(247,243,234,.16);
-  --st-d:#efe6cf; --st-d-b:#b9a374; --st-r:#6b4a1d; --st-v:#1d1a16; --st-n:#a8854a; --st-b:#bdb7aa; --sel:#0e0d0b;
+  --st-d:#efe6cf; --st-d-b:#b9a374; --st-r:#6b4a1d; --st-v:#1d1a16; --st-n:#a8854a; --st-b:#bdb7aa; --st-p:#e9d9ae; --sel:#0e0d0b;
   --serif:"Noto Serif",Georgia,"Times New Roman",serif;
   --sans:"Helvetica Neue",Helvetica,Arial,sans-serif;
   --safe-b:env(safe-area-inset-bottom,0px); --safe-t:env(safe-area-inset-top,0px);
@@ -278,3 +278,23 @@ body.com-barra .toast{bottom:calc(var(--safe-b) + 140px)}
 .efetivar .btn{width:auto;min-height:52px;padding:0 16px}
 
 .rcard__desc{margin:4px 0 0;font-size:14px;line-height:1.45;color:var(--ink,#0e0d0b);overflow-wrap:anywhere}
+
+/* fila do aparelho (sem internet) */
+.map__svg .s-p{fill:var(--st-p);stroke:var(--brown);stroke-dasharray:3 2}
+.sw--p{background:repeating-linear-gradient(45deg,var(--st-p) 0 3px,var(--sand-2) 3px 5px)}
+.filabar{position:sticky;top:calc(var(--safe-t) + 112px);z-index:14;display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:2px 10px;width:100%;
+  padding:10px var(--gap);background:var(--sand);color:var(--ink);text-align:left;font-size:.86rem;border-bottom:1px solid var(--sand-2)}
+.filabar span{font-size:.78rem;text-decoration:underline;text-underline-offset:3px}
+.filabar.is-err{background:#fbf1e2;border-left:4px solid var(--brown)}
+.filalist:empty{display:none}
+.filalist{display:grid;gap:10px}
+.fcard{border-left:4px solid var(--sand-2)}
+.fcard.is-err{border-left-color:var(--brown);background:#fbf1e2}
+.hist{background:#fff;border:1px solid var(--line);padding:0 14px}
+.hist summary{min-height:48px;display:flex;align-items:center;font-size:.86rem;font-weight:600;cursor:pointer}
+.hist__i{padding:10px 0;border-top:1px solid var(--line);font-size:.82rem;line-height:1.45;overflow-wrap:anywhere}
+.hist__i.is-err{color:var(--brown)}
+.alerta--fila{background:var(--st-p);color:var(--ink);border-left:4px solid var(--brown);animation:none}
+.done--fila .done__ic{background:var(--paper);color:var(--ink)}
+.login__off{margin-top:2px;border-color:var(--line-t);color:var(--t)}
+.login__fila{font-size:.84rem;color:var(--sand);line-height:1.45}

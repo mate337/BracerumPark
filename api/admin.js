@@ -215,6 +215,11 @@ function validar(b) {
     empresa: limpa(b.empresa, 120),
     cpf: String(b.cpf || '').replace(/\D/g, ''),
     obs: limpa(b.obs, 600),
+    // fila do aparelho (sem internet): enviado depois, com a hora em que foi anotado e quem atendeu
+    fila: b.fila === true,
+    idlocal: limpa(b.idlocal, 40),
+    criado: Number(b.criado_em) > 1.7e12 && Number(b.criado_em) < Date.now() + 864e5 ? Number(b.criado_em) : null,
+    quem: limpa(b.quem_captura, 40),
   };
   const campos = [];
   if (!v.lotes.length || v.lotes.length > MAX_LOTES || v.lotes.some((x) => !/^Q\d{2}\.L\d{3}$/.test(x))) campos.push('lote');
@@ -303,22 +308,37 @@ async function criarReserva({ idpessoa, idunidade, tabela, condicoes }) {
   return r;
 }
 
+const horaBR = (t) => new Date(t).toLocaleString('pt-BR', { timeZone: 'America/Asuncion', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+
 async function reservar(b, sessao) {
   const c = cfg();
   const v = validar(b);
   const passos = [];
+  if (v.quem) sessao = { ...sessao, quem: v.quem };       // da fila: quem atendeu, não quem estava logado no envio
 
-  // 1. todos os lotes livres agora? (nada é gravado se algum não estiver) e as condições de cada um
-  const [m, t] = await Promise.all([v.lotes.length === 1 ? null : mapa(), tabelas()]);
-  const tab = t.lista.find((x) => x.id === v.tabela);
+  // 1. os lotes estão livres agora? e as condições de cada um.
+  //    Online: se algum não estiver, nada é gravado (409) — a equipe escolhe outro na hora.
+  //    Da fila (anotado sem internet): o lead entra de qualquer jeito; lote tomado no meio-tempo vira aviso.
+  //    Reenvio (a resposta se perdeu): lote já reservado/segurado para este CPF conta como feito — não duplica.
+  const [m, t] = await Promise.all([v.lotes.length === 1 && !v.fila ? null : mapa(), tabelas()]);
+  let tab = t.lista.find((x) => x.id === v.tabela), trocouTabela = false;
+  if (!tab && v.fila) { tab = t.lista.find((x) => x.id === c.tabela) || t.lista[0]; trocouTabela = !!tab; }
   if (!tab) throw erro(422, 'Tabela de preço não encontrada no CV', { campos: ['tabela'] });
-  const itens = [];
+  const itens = [], feitos = [], tomados = [];
   for (const lote of v.lotes) {
     const un = m ? m.get(lote) : await unidadeAgora(lote);
-    if (!un) throw erro(404, `Lote ${lote} não encontrado no CV`);
-    if (un.s) throw erro(409, `O lote ${lote} não está disponível no CV (${un.sit})`, { situacao: un.s, lote });
-    const preco = (t.porLote.get(lote) || {})[v.tabela];
-    if (!preco) throw erro(422, `Sem preço na tabela "${tab.nome}" para o lote ${lote}`, { campos: ['tabela'] });
+    if (!un) { if (v.fila) { tomados.push({ lote, erro: 'Lote não encontrado no CV' }); continue; } throw erro(404, `Lote ${lote} não encontrado no CV`); }
+    if (un.s) {
+      if (un.s === 'n' && un.doc === v.cpf) { feitos.push({ lote, modo: 'negociacao', ja: true }); continue; }
+      if (un.s === 'r' || un.s === 'v') {
+        const idr = await acharReserva(v.cpf, un.u);
+        if (idr) { feitos.push({ lote, modo: 'reserva', idreserva: idr, ja: true }); continue; }
+      }
+      if (v.fila) { tomados.push({ lote, erro: `Lote ficou ${({ r: 'reservado', v: 'vendido', n: 'em negociação', b: 'indisponível' })[un.s] || 'ocupado'} no CV enquanto o aparelho estava sem internet` }); continue; }
+      throw erro(409, `O lote ${lote} não está disponível no CV (${un.sit})`, { situacao: un.s, lote });
+    }
+    const preco = (t.porLote.get(lote) || {})[tab.id];
+    if (!preco) { if (v.fila) { tomados.push({ lote, erro: `Sem preço na tabela "${tab.nome}"` }); continue; } throw erro(422, `Sem preço na tabela "${tab.nome}" para o lote ${lote}`, { campos: ['tabela'] }); }
     const condicoes = [];
     for (const [nome, q, valor, venc] of preco[1]) {
       const ids = await idSerie(nome);
@@ -331,24 +351,27 @@ async function reservar(b, sessao) {
   const cond = (x) => x.series.map(([n, q, val, venc]) => `${q}× ${n.toLowerCase()} de US$ ${val.toLocaleString('pt-BR')} (1º venc. ${venc})`).join(' + ');
   const anotacao = [
     `Reserva feita no stand da feira pelo painel /admin${sessao.quem ? ` — atendente: ${sessao.quem}` : ''}.`,
-    `${itens.length > 1 ? `${itens.length} lotes` : 'Lote'} · Tabela: ${tab.nome} · Total US$ ${total.toLocaleString('pt-BR')}`,
+    v.fila && `Anotado SEM INTERNET${v.criado ? ` em ${horaBR(v.criado)}` : ''} e enviado da fila do aparelho em ${horaBR(Date.now())}.`,
+    trocouTabela && `A tabela escolhida (${v.tabela}) não existe mais no CV — usada "${tab.nome}".`,
+    `${v.lotes.length > 1 ? `${v.lotes.length} lotes` : 'Lote'} · Tabela: ${tab.nome}${itens.length ? ` · Total US$ ${total.toLocaleString('pt-BR')}` : ''}`,
     ...itens.map((x) => `- LTIND.${x.lote}: US$ ${x.total.toLocaleString('pt-BR')} — ${cond(x)}`),
+    ...tomados.map((x) => `- LTIND.${x.lote}: NÃO RESERVADO — ${x.erro}. Oferecer outro lote ao cliente.`),
     `Empresa: ${v.empresa}`,
     v.obs && `Observações: ${v.obs}`,
   ].filter(Boolean).join('\n');
 
   if (b.teste === true) {
-    return { teste: true, lotes: itens.map((x) => ({ lote: x.lote, unidade: x.un.u, total: x.total, condicoes: x.condicoes })), anotacao, total, tabela: tab };
+    return { teste: true, lotes: itens.map((x) => ({ lote: x.lote, unidade: x.un.u, total: x.total, condicoes: x.condicoes })), feitos, tomados, anotacao, total, tabela: tab };
   }
 
   // 2. lead (um só, com todos os lotes na anotação; a 1ª unidade como interesse)
   const lead = {
     nome: v.nome, email: v.email, telefone: v.tel, telefone_ddi: `+${v.ddi}`,
     documento_tipo: 'cpf', documento: v.cpf,
-    idempreendimento: c.emp, idunidade: itens[0].un.u, idimobiliaria: c.imobiliaria, idcorretor: c.corretor,
+    idempreendimento: c.emp, ...(itens[0] ? { idunidade: itens[0].un.u } : {}), idimobiliaria: c.imobiliaria, idcorretor: c.corretor,
     origem: 'OP', midia: c.midia, modulo: 'Admin feira',
-    conversao: limpa(`Reserva na feira — ${itens.map((x) => x.lote).join(', ')}`, 100),
-    tags: ['feira', 'reserva-feira', ...itens.map((x) => x.lote)].slice(0, 20), interacoes: [{ tipo: 'A', descricao: anotacao }],
+    conversao: limpa(`Reserva na feira — ${v.lotes.join(', ')}`, 100),
+    tags: ['feira', 'reserva-feira', ...(v.fila ? ['offline'] : []), ...v.lotes].slice(0, 20), interacoes: [{ tipo: 'A', descricao: anotacao }],
   };
   let r = await cv('POST', '/v1/comercial/leads', lead);
   if (!r.ok && r.status === 400 && /alterar|elterar|existe|duplic/i.test(JSON.stringify(r.d))) r = await cv('POST', '/v1/comercial/leads', { ...lead, permitir_alteracao: true });
@@ -375,12 +398,12 @@ async function reservar(b, sessao) {
   } catch (e) { falhaCliente = e.message; }
 
   // 4. uma reserva por lote (no CV a reserva é por unidade); recusa → segura o lote para o CPF
-  const out = [];
+  const out = [...feitos, ...tomados.map((x) => ({ lote: x.lote, modo: 'erro', erro: x.erro, tomado: true }))];
   for (const x of itens) {
     const res = { lote: x.lote, total: x.total };
     let motivo = falhaCliente;
     if (!falhaCliente) {
-      r = await criarReserva({ idpessoa, idunidade: x.un.u, tabela: v.tabela, condicoes: x.condicoes });
+      r = await criarReserva({ idpessoa, idunidade: x.un.u, tabela: tab.id, condicoes: x.condicoes });
       if (r.ok) {
         res.modo = 'reserva';
         res.idreserva = r.d.idreserva || r.d.idreserva_cv || r.d.idproposta_cv || await acharReserva(v.cpf, x.un.u);
@@ -403,8 +426,8 @@ async function reservar(b, sessao) {
     associado = associado !== false && a.ok;
     if (!a.ok) console.error('[admin] associar lead à reserva:', x.idreserva, a.status, msgCv(a.d));
   }
-  console.log('[admin] reservar', JSON.stringify({ idlead, idpessoa, quem: sessao.quem || null, itens: out.map((y) => [y.lote, y.modo, y.idreserva || y.ate || y.erro]) }));
-  if (!out.some((y) => y.modo !== 'erro')) {
+  console.log('[admin] reservar', JSON.stringify({ idlead, idpessoa, quem: sessao.quem || null, fila: v.fila ? v.idlocal || true : undefined, itens: out.map((y) => [y.lote, y.modo, y.idreserva || y.ate || y.erro]) }));
+  if (!out.some((y) => y.modo !== 'erro') && !(v.fila && idlead)) {      // da fila: o lead entrou, isso basta
     throw erro(502, out.map((y) => `${y.lote}: ${y.erro}`).join(' · '), { etapa: falhaCliente ? 'cliente' : 'reserva', passos, idlead, idpessoa });
   }
   return { idlead, idpessoa, cliente_novo: novo, associado, itens: out, total, tabela: tab, aviso: falhaCliente || undefined };

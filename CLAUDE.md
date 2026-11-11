@@ -41,6 +41,10 @@ rotas) que as seis páginas internas baixavam e interpretavam à toa. Ele roda d
   negociação tem **"Reservar agora"** na aba Reservas (`acao: efetivar`), que transforma o bloqueio em reserva.
   **Repetiu com `"36000.00"`:** o CV quer float literal no JSON — agora vai `36000.00` escrito no texto do JSON.
   O erro não aparece mais na tela: o lote fica bloqueado com nome/CPF/telefone/e-mail/empresa/lead/cliente na descrição.
+- **Modo sem internet (11/11):** todo cadastro vai antes para a **fila do aparelho** (`localStorage`) e só sai quando o CV
+  confirma; sem internet/lenta/CV fora = "Guardado no aparelho", lotes "Na fila", envio automático ao voltar a
+  conexão, sem duplicar (servidor reconhece reserva/bloqueio do mesmo CPF; `fila: true` cria o lead mesmo com lote
+  tomado). `admin/sw.js` faz o painel abrir offline; menu → Exportar CSV. Detalhes em `docs/admin-reservas.md`.
 - **Limpeza dos testes (11/11):** liberados os 8 lotes segurados nos testes (Q32 L002/004/006/009/010, Q21
   L003/004/005); leads de teste 6, 9, 10 e 11 em "Descarte" (motivo Desistência, explicação "lead de teste").
   Ficaram os clientes de teste #7 e #8 (`BPFEIRA-…`) — a API não apaga cliente; apagar no CV se quiser.

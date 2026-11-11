@@ -85,6 +85,41 @@ descrição em cada lote em negociação (se o mapa do CV a devolver). O motivo 
 Feira"**, com cor de fundo própria (aparece assim no Mapa de Disponibilidade do CV), e pôr o nome dele em
 `CVCRM_FEIRA_MOTIVO` na Vercel.
 
+## Sem internet ou internet ruim — fila no aparelho (2026-11-11)
+
+Feito para a feira, onde o Wi-Fi cai. **Nenhum cadastro se perde:**
+
+- **Gravado antes de enviar.** Ao confirmar, o cadastro (lotes, tabela, nome, CPF, e-mail, telefone, empresa,
+  observação, atendente, hora) vai primeiro para a **fila do aparelho** (`localStorage` `bp-admin-fila`) e só
+  sai dela quando o servidor confirma. Se a página fechar ou o celular travar no meio, o cadastro continua lá.
+- **Sem internet, internet lenta (sem resposta em 58 s), CV fora (5xx) ou sessão vencida:** a tela diz
+  **"Guardado no aparelho"** e o atendimento segue. Os lotes aparecem **"Na fila"** (hachurado) neste aparelho e
+  não podem ser marcados de novo aqui. Uma faixa bege no topo mostra quantos cadastros estão guardados.
+- **Envio automático** quando a conexão volta (evento `online`), a cada 20 s, ao voltar para a aba e ao abrir o
+  painel; um aparelho com duas abas não envia duas vezes (`navigator.locks`). "Enviar agora" em **Reservas →
+  Neste aparelho** força.
+- **Sem duplicar** (o reenvio pode acontecer depois de uma resposta perdida): o servidor reconhece lote já
+  reservado para o mesmo CPF (acha a reserva) ou segurado para o mesmo CPF e conta como feito; cliente é achado
+  pelo CPF e lead pelo e-mail/telefone (vira nova conversão do mesmo lead).
+- **Lote tomado enquanto estava sem internet** (outro aparelho reservou): o envio da fila (`fila: true`) **cria
+  o lead mesmo assim**, reserva os lotes que seguem livres e escreve na anotação do lead "NÃO RESERVADO — oferecer
+  outro lote"; no aparelho, o histórico marca o aviso. Online (sem fila) continua como antes: lote ocupado = nada
+  é gravado e a equipe escolhe outro na hora.
+- A anotação no CV diz **"Anotado SEM INTERNET em dd/mm hh:mm e enviado da fila em …"** e o lead ganha a tag
+  `offline`; o atendente é quem anotou, não quem estava logado no envio.
+- **Recusado pelo CV** (4xx, ex.: dado inválido): fica na fila como "Recusado", com "Corrigir e reenviar" (volta
+  ao formulário) ou "Descartar" (só com confirmação).
+- **Abre sem internet:** `admin/sw.js` (service worker) guarda a página, CSS, JS, o mapa dos lotes e os logos;
+  a última situação dos lotes e os preços ficam em `bp-admin-estado` ("sem internet · situação das hh:mm"). Precisa
+  ter sido aberto **uma vez com internet** no aparelho. Sem sessão válida e sem internet, o login oferece
+  **"Continuar sem internet"**: dá para anotar; o envio acontece depois que alguém entrar de novo.
+- **Cópia de segurança:** histórico dos últimos 7 dias (`bp-admin-hist`, enviados e recusados) e menu →
+  **Exportar cadastros (CSV)** com tudo o que foi anotado no aparelho (inclusive o que está na fila).
+- **Limites:** outro aparelho não vê os lotes da fila deste até o envio (dois aparelhos sem internet podem
+  anotar o mesmo lote — o segundo a enviar recebe o aviso de lote tomado, com o lead salvo). Os dados pessoais
+  ficam no aparelho por até 7 dias (LGPD: usar só aparelhos da equipe). Ao trocar `?v=` no `index.html`, trocar
+  `VERSAO` e a lista `CASCA` no `sw.js`.
+
 ## Se algo falhar
 
 - **Lote tomado** no meio do atendimento (outra pessoa reservou): o CV recusa, o painel diz e oferece

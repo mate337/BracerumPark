@@ -9,7 +9,8 @@
   const LOTES = '../3dmasterplan/data/lotes.json';
   const MAX_SEL = 20;
   const CAT = { V: 'Vitrine', B: 'Business', P: 'Padrão', I: 'Interna' };
-  const ST = { d: 'Disponível', r: 'Reservado', n: 'Em negociação', v: 'Vendido', b: 'Indisponível' };
+  const ST = { d: 'Disponível', r: 'Reservado', n: 'Em negociação', v: 'Vendido', b: 'Indisponível', p: 'Na fila deste aparelho' };
+  const FILA = 'bp-admin-fila', HIST = 'bp-admin-hist', EST = 'bp-admin-estado';
   const DDI = [['55', 'BR +55'], ['595', 'PY +595'], ['54', 'AR +54'], ['598', 'UY +598'], ['1', 'US +1'], ['', 'Outro']];
 
   const $ = (s, el = document) => el.querySelector(s);
@@ -26,18 +27,139 @@
     passo: 'lote', form: store.get('bp-admin-form', sessionStorage) || { ddi: '55' }, enviando: false, res: null, ultimo: null };
 
   /* ------------------------------------------------------------------ API */
-  async function api(acao, dados = {}) {
+  async function api(acao, dados = {}, ms = 25000) {
+    if (!S.token && acao !== 'login') return { ok: false, status: 0, rede: true, semSessao: true, erro: 'Sem sessão — entre de novo para falar com o CV.' };
     let r, d;
+    const ctl = new AbortController(), t = setTimeout(() => ctl.abort(), ms);
     try {
-      r = await fetch(API, { method: 'POST', headers: { 'content-type': 'application/json', ...(S.token ? { authorization: `Bearer ${S.token}` } : {}) },
+      r = await fetch(API, { method: 'POST', signal: ctl.signal, headers: { 'content-type': 'application/json', ...(S.token ? { authorization: `Bearer ${S.token}` } : {}) },
         body: JSON.stringify({ acao, ...dados }) });
       d = await r.json();
     } catch (e) {
-      return { ok: false, status: 0, erro: 'Sem conexão. Confira a internet do celular e tente de novo.' };
-    }
+      return { ok: false, status: 0, rede: true, erro: e.name === 'AbortError' ? 'A internet está lenta demais — sem resposta a tempo.' : 'Sem conexão. Confira a internet do celular.' };
+    } finally { clearTimeout(t); }
     d.status = r.status;
     if (r.status === 401 && d.sair) { sair('A sessão expirou. Entre de novo.'); }
     return d;
+  }
+
+  /* ------------------------------------------------------------------ fila do aparelho (sem internet)
+     Todo cadastro é gravado aqui ANTES de ir para o CV e só sai quando o servidor confirma. Sem internet,
+     internet lenta, CV fora ou sessão vencida: fica na fila e é reenviado sozinho (ao voltar a conexão, a cada
+     20 s e ao abrir o painel). O reenvio não duplica: o servidor reconhece lote já reservado/segurado para o
+     mesmo CPF, e o lead/cliente são achados pelo e-mail/CPF. Os lotes da fila aparecem "Na fila" neste aparelho.
+     O histórico (enviados e recusados, 7 dias) fica para exportar em CSV — nenhum lead se perde. */
+  const uid = () => (crypto.randomUUID ? crypto.randomUUID() : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`);
+  const filaLer = () => store.get(FILA) || [];
+  function filaGrava(l) { store.set(FILA, l); S.filaLotes = new Set(l.flatMap((p) => p.lotes)); renderFila(); }
+  const filaMuda = (id, m) => filaGrava(filaLer().map((p) => (p.idlocal === id ? { ...p, ...m } : p)));
+  const filaTira = (id) => filaGrava(filaLer().filter((p) => p.idlocal !== id));
+  function histAdd(x) {
+    const lim = Date.now() - 7 * 864e5;
+    store.set(HIST, [{ ...x, em: Date.now() }, ...(store.get(HIST) || []).filter((h) => h.em > lim && h.idlocal !== x.idlocal)].slice(0, 300));
+  }
+  const corpoDe = (p) => ({ lotes: p.lotes, tabela: p.tabela, nome: p.nome, cpf: p.cpf, email: p.email, ddi: p.ddi, telefone: p.telefone,
+    empresa: p.empresa, obs: p.obs, idlocal: p.idlocal, criado_em: p.criado_em, quem_captura: p.quem });
+  const resumo = (d) => ({ idlead: d.idlead || null, idpessoa: d.idpessoa || null,
+    itens: (d.itens || []).map((x) => ({ lote: x.lote, modo: x.modo, idreserva: x.idreserva || null, ate: x.ate || null, erro: x.erro || null })) });
+  const deuRede = (d) => d.rede || d.status === 0 || d.status === 401 || d.status === 429 || d.status >= 500;
+  const semNet = () => navigator.onLine === false;
+  const hora = (t) => new Date(t).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+  function marcaResultado(d) {
+    for (const x of d.itens || []) if (S.est && S.est.lotes[x.lote] && x.modo !== 'erro') S.est.lotes[x.lote].s = x.modo === 'negociacao' ? 'n' : 'r';
+  }
+  const textoResultado = (r) => (r.itens || []).map((x) => `${x.lote}: ${x.modo === 'reserva' ? `reserva #${x.idreserva || '?'}` : x.modo === 'negociacao' ? 'bloqueado p/ o cliente' : `não reservado (${x.erro || 'erro'})`}`).join(' · ');
+
+  async function sincroniza() {
+    if (S.sync || !S.token || semNet()) return;
+    const prontos = () => filaLer().filter((p) => p.estado !== 'erro' && !(p.estado === 'enviando' && Date.now() - (p.desde || 0) < 90e3));
+    if (!prontos().length) return;
+    const roda = async () => {
+      S.sync = true; renderFila();
+      let foi = 0;
+      for (const p of prontos()) {
+        filaMuda(p.idlocal, { estado: 'enviando', desde: Date.now(), tentativas: (p.tentativas || 0) + 1 });
+        const d = await api('reservar', { ...corpoDe(p), fila: true }, 58000);
+        if (d.ok) {
+          filaTira(p.idlocal); foi++;
+          const r = resumo(d), tomou = r.itens.some((x) => x.modo === 'erro');
+          histAdd({ ...p, estado: tomou ? 'aviso' : 'enviado', resultado: r });
+          marcaResultado(d);
+          toast(`Enviado ao CV: ${p.nome} — lead #${r.idlead || '?'}${tomou ? '. Atenção: lote tomado, veja em Reservas.' : '.'}`);
+          continue;
+        }
+        if (deuRede(d)) { filaMuda(p.idlocal, { estado: 'pendente', erro: d.erro || null }); break; }
+        filaMuda(p.idlocal, { estado: 'erro', erro: d.erro || 'O CV recusou', campos: d.campos || null });   // 4xx: precisa de alguém
+      }
+      S.sync = false; renderFila();
+      if (foi) { pinta(); contagem(); renderLista(); setTimeout(() => carregar(true), 1500); if (S.res) { S.res = null; if (!$('#vRes').hidden) carregaReservas(); } }
+    };
+    if (navigator.locks) await navigator.locks.request('bp-admin-fila', { ifAvailable: true }, (l) => (l ? roda() : null));
+    else await roda();
+  }
+  addEventListener('online', () => { live('internet de volta — enviando a fila…', ''); sincroniza(); carregar(true); });
+  addEventListener('offline', () => live(`sem internet${filaLer().length ? ` · ${filaLer().length} na fila` : ''} — cadastros ficam no aparelho`, 'is-err'));
+
+  function renderFila() {
+    const l = filaLer(), n = l.length, nerr = l.filter((p) => p.estado === 'erro').length;
+    const b = $('#filaBar');
+    if (b) {
+      b.hidden = !n;
+      b.className = `filabar${nerr ? ' is-err' : ''}`;
+      b.innerHTML = n ? `<b>${n} ${n > 1 ? 'cadastros guardados' : 'cadastro guardado'} neste aparelho</b><span>${nerr ? `${nerr} ${nerr > 1 ? 'precisam' : 'precisa'} de atenção` : S.sync ? 'enviando ao CV…' : !S.token ? 'entre de novo para enviar' : semNet() ? 'aguardando internet — envio automático' : 'envio automático em instantes'} · ver</span>` : '';
+    }
+    const lf = $('#loginFila');
+    if (lf) { lf.hidden = !n; lf.textContent = n ? `${n} ${n > 1 ? 'cadastros guardados' : 'cadastro guardado'} neste aparelho — ${n > 1 ? 'serão enviados' : 'será enviado'} ao CV depois que você entrar.` : ''; }
+    const box = $('#filaList');
+    if (!box) return;
+    const hist = (store.get(HIST) || []).slice(0, 12);
+    box.innerHTML = (n || hist.length) ? `<div class="list__head"><h3>Neste aparelho</h3>${n && S.token && !semNet() ? '<button class="linkbtn" type="button" data-fila="enviar">Enviar agora</button>' : '<span>fila e histórico</span>'}</div>
+      ${l.map((p) => `<article class="rcard fcard${p.estado === 'erro' ? ' is-err' : ''}"><div class="rcard__top"><span class="rcard__lote">${esc(p.lotes.map((x) => 'LTIND.' + x).join(' · '))}</span>
+          <span class="rcard__sit">${p.estado === 'erro' ? 'Recusado' : p.estado === 'enviando' ? 'Enviando…' : 'Na fila'}</span></div>
+        <p class="rcard__cli">${esc(p.nome)} · ${esc(p.empresa)}</p>
+        <p class="rcard__meta"><span>anotado ${hora(p.criado_em)}</span><span>${esc(p.tabelaNome || '')}</span><span>${p.total ? usd(p.total) : ''}</span>${p.tentativas ? `<span>${p.tentativas} ${p.tentativas > 1 ? 'tentativas' : 'tentativa'}</span>` : ''}<span>${esc(p.quem || '')}</span></p>
+        ${p.erro ? `<p class="rcard__desc">${esc(p.erro)}</p>` : ''}
+        <div class="rcard__acts">${p.estado === 'erro' ? `<button class="linkbtn" type="button" data-fila="corrigir" data-id="${p.idlocal}">Corrigir e reenviar</button>` : ''}
+          <button class="linkbtn" type="button" data-fila="descartar" data-id="${p.idlocal}">Descartar</button></div></article>`).join('')}
+      ${hist.length ? `<details class="hist"><summary>Enviados e recusados — últimos ${hist.length}</summary>${hist.map((h) => `<p class="hist__i${h.estado === 'aviso' || h.estado === 'recusado' ? ' is-err' : ''}"><b>${esc(h.nome)}</b> · ${esc(h.lotes.join(', '))} · ${hora(h.em)}<br>${
+          h.estado === 'recusado' ? `não enviado: ${esc(h.erro || '')}` : `lead #${(h.resultado || {}).idlead || '?'} · ${esc(textoResultado(h.resultado || {}))}`}</p>`).join('')}</details>` : ''}
+      <p class="note">Tudo o que foi anotado aqui nos últimos 7 dias pode ser baixado: menu → <b>Exportar cadastros (CSV)</b>.</p>` : '';
+    const rn = $('#resN');
+    if (rn && !S.res) rn.textContent = n || '';
+  }
+  document.addEventListener('click', async (e) => {
+    const b = e.target.closest('[data-fila]');
+    if (!b) return;
+    const a = b.dataset.fila, p = filaLer().find((x) => x.idlocal === b.dataset.id);
+    if (a === 'enviar') { sincroniza(); return; }
+    if (!p) return;
+    if (a === 'descartar') {
+      if (!confirm(`Descartar o cadastro de ${p.nome} (${p.lotes.join(', ')})? Ele NÃO vai para o CV. Fica só no histórico/CSV deste aparelho.`)) return;
+      histAdd({ ...p, estado: 'recusado', erro: `descartado da fila${p.erro ? ` (${p.erro})` : ''}` });
+      filaTira(p.idlocal); pinta(); renderLista();
+    } else if (a === 'corrigir') {                 // volta os dados para o formulário; o envio novo substitui este
+      filaTira(p.idlocal);
+      histAdd({ ...p, estado: 'recusado', erro: `aberto para correção (${p.erro || ''})` });
+      S.form = { nome: p.nome, cpf: p.cpf, email: p.email, ddi: p.ddiSel ?? p.ddi, ddiOutro: p.ddiOutro || '', telefone: p.telefone, empresa: p.empresa, obs: p.obs };
+      S.sel = p.lotes.filter((id) => !stDe(id) || stDe(id) === 'd'); S.cond = p.tabela;
+      S.errosForm = Object.fromEntries((p.campos || []).filter((c) => c !== 'lote' && c !== 'tabela').map((c) => [c, 'O CV não aceitou este campo — confira.']));
+      aba('lotes');
+      if (!S.sel.length) { toast('Os lotes deste cadastro não estão mais livres — escolha outro(s); os dados do cliente ficaram no formulário.'); pinta(); renderLista(); barra(); return; }
+      abreCarrinho(); S.passo = 'form'; renderSheet();
+    }
+  });
+  function exportaCsv() {
+    const linhas = [...filaLer().map((p) => ({ ...p, estado: `na fila (${p.estado})` })), ...(store.get(HIST) || [])];
+    if (!linhas.length) { toast('Nada anotado neste aparelho nos últimos 7 dias.'); return; }
+    const col = ['anotado em', 'situação', 'nome', 'cpf', 'e-mail', 'telefone', 'empresa', 'lotes', 'tabela', 'total US$', 'lead', 'resultado', 'atendente', 'observações'];
+    const q = (v) => `"${String(v == null ? '' : v).replace(/"/g, '""')}"`;
+    const csv = [col.map(q).join(';'), ...linhas.map((p) => [hora(p.criado_em), p.estado, p.nome, p.cpf, p.email, `+${p.ddi} ${p.telefone}`, p.empresa, p.lotes.join(' '),
+      p.tabelaNome, p.total, (p.resultado || {}).idlead, p.resultado ? textoResultado(p.resultado) : p.erro, p.quem, p.obs].map(q).join(';'))].join('\r\n');
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' }));
+    a.download = `cadastros-feira-${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.append(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 4000);
   }
 
   /* ------------------------------------------------------------------ login */
@@ -46,6 +168,8 @@
     const f = $('#loginForm');
     f.quem.value = store.get('bp-admin-quem') || '';
     $('#loginErr').hidden = !msg; $('#loginErr').textContent = msg || '';
+    $('#loginOff').hidden = !semNet();
+    renderFila();
     (f.quem.value ? f.senha : f.quem).focus();
   }
   $('#loginForm').addEventListener('submit', async (e) => {
@@ -55,19 +179,33 @@
     b.disabled = true;
     const d = await api('login', { senha: f.senha.value, quem: f.quem.value.trim() });
     b.disabled = false;
-    if (!d.ok) { $('#loginErr').hidden = false; $('#loginErr').textContent = d.erro || 'Não entrou.'; f.senha.select(); return; }
+    if (!d.ok) {
+      $('#loginErr').hidden = false; $('#loginErr').textContent = d.erro || 'Não entrou.'; f.senha.select();
+      $('#loginOff').hidden = !d.rede;            // sem internet: dá para seguir anotando no aparelho
+      return;
+    }
     Object.assign(S, { token: d.token, exp: d.exp, quem: d.quem });
     store.set('bp-admin', { token: d.token, exp: d.exp, quem: d.quem });
     store.set('bp-admin-quem', d.quem);
     f.senha.value = '';
     entrar();
   });
+  $('#loginOff').addEventListener('click', () => {
+    const f = $('#loginForm');
+    if (!f.quem.value.trim()) { $('#loginErr').hidden = false; $('#loginErr').textContent = 'Escreva seu nome — ele vai na anotação de cada reserva.'; return; }
+    Object.assign(S, { token: null, exp: 0, quem: f.quem.value.trim() });
+    store.set('bp-admin-quem', S.quem);
+    entrar();
+    toast('Modo sem internet: os cadastros ficam guardados e vão para o CV quando você entrar de novo.');
+  });
   function sair(msg) {
     store.del('bp-admin');
     Object.assign(S, { token: null, exp: 0 });
     clearInterval(S.timer);
+    if (S.enviando) S.enviando = false;
     fechaSheet(true);
     mostraLogin(msg);
+    renderFila();
   }
 
   /* ------------------------------------------------------------------ app */
@@ -76,29 +214,38 @@
     $('#menuWho').textContent = `Atendente: ${S.quem || '—'}`;
     if (!S.geo) {
       lista('<p class="empty">Carregando o mapa dos lotes…</p>');
-      try { S.geo = prepara(await (await fetch(LOTES)).json()); } catch (e) { lista('<p class="empty">Não carregou o mapa dos lotes. Atualize a página.</p>'); return; }
+      try { S.geo = prepara(await (await fetch(LOTES)).json()); } catch (e) { lista('<p class="empty">Não carregou o mapa dos lotes (sem internet e sem cópia neste aparelho). Abra o painel uma vez com internet para ele funcionar offline.</p>'); return; }
       montaMapa();
     }
     renderLista();
     await carregar();
     clearInterval(S.timer);
     S.timer = setInterval(() => { if (!document.hidden && !S.enviando) carregar(true); }, 30000);
+    clearInterval(S.timerFila);
+    S.timerFila = setInterval(() => { if (!S.enviando) sincroniza(); }, 20000);
+    renderFila(); sincroniza();
   }
-  document.addEventListener('visibilitychange', () => { if (!document.hidden && S.token && !S.enviando) carregar(true); });
+  document.addEventListener('visibilitychange', () => { if (!document.hidden && !S.enviando && !$('#app').hidden) { carregar(true); sincroniza(); } });
 
   async function carregar(quieto) {
     const b = $('#btnRefresh');
     b.classList.add('is-busy');
     if (!quieto && !S.est) live('carregando lotes e preços do CV…', '');
-    const d = await api('estado');
+    const d = semNet() ? { ok: false, rede: true } : await api('estado');
     b.classList.remove('is-busy');
     if (!d.ok) {
       if (d.status === 401) return;
-      live(S.est ? 'sem resposta do CV — mostrando a última leitura' : 'sem resposta do CV', 'is-err');
+      if (!S.est) {                                  // sem resposta: a última leitura guardada no aparelho
+        const c = store.get(EST);
+        if (c && c.lotes) { S.est = c; if (S.cond == null) S.cond = c.padrao; pinta(); contagem(); renderLista(); barra(); }
+      }
+      const nf = filaLer().length;
+      live(`${d.semSessao ? 'sem sessão' : semNet() || d.rede ? 'sem internet' : 'sem resposta do CV'}${S.est ? ` · situação das ${new Date(S.est.atualizado).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}` : ''}${nf ? ` · ${nf} na fila` : ''}`, 'is-err');
       if (!S.est) lista(`<p class="empty">${esc(d.erro || 'O CV não respondeu.')}<br><button class="linkbtn" type="button" data-acao="recarregar">Tentar de novo</button></p>`);
       return;
     }
     S.est = d;
+    store.set(EST, d);
     if (S.cond == null) S.cond = d.padrao;
     const h = new Date(d.atualizado).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
     live(`CV ao vivo · ${h}`, 'is-on');
@@ -111,17 +258,18 @@
     }
     barra();
     if (!$('#sheet').hidden && S.passo === 'lotes') renderSheet();
+    sincroniza();
   }
   function live(txt, cls) {
     $('#liveTxt').textContent = txt;
     $('#liveDot').className = `dot ${cls || ''}`;
   }
-  const stDe = (id) => { const x = S.est && S.est.lotes[id]; return !x ? (S.est ? 'b' : null) : (x.s || 'd'); };
+  const stDe = (id) => { if (S.filaLotes && S.filaLotes.has(id)) return 'p'; const x = S.est && S.est.lotes[id]; return !x ? (S.est ? 'b' : null) : (x.s || 'd'); };
   const precoDe = (id, t) => { const x = S.est && S.est.lotes[id]; return x && x.p ? x.p[t] : null; };
 
   function contagem() {
     const c = { d: 0, r: 0, v: 0, b: 0 };
-    for (const id of S.geo.ids) { const st = stDe(id) || 'd'; c[st === 'n' ? 'r' : st]++; }   // negociação conta com reservado
+    for (const id of S.geo.ids) { const st = stDe(id) || 'd'; c[st === 'n' || st === 'p' ? 'r' : st]++; }   // negociação conta com reservado
     $('#counts').innerHTML = ['d', 'r', 'v', 'b'].map((k) => `<div><b>${fmt(c[k])}</b><span><i class="sw sw--${k}"></i>${ST[k]}${k === 'd' || k === 'r' ? '' : ''}</span></div>`).join('');
   }
 
@@ -430,7 +578,7 @@
     if (S.enviando && !forca) return;
     sheet.hidden = true;
     document.body.style.overflow = '';
-    if (S.passo === 'ok') { S.sel = []; S.passo = 'lotes'; }
+    if (S.passo === 'ok' || S.passo === 'fila') { S.sel = []; S.passo = 'lotes'; }
     pinta(); renderLista(); barra();
   }
   sheet.addEventListener('click', (e) => { if (e.target.closest('[data-fechar]')) fechaSheet(); });
@@ -536,9 +684,10 @@
           ${f.obs ? `<div><dt>Obs.</dt><dd>${esc(f.obs)}</dd></div>` : ''}
           <div><dt>Atendente</dt><dd>${esc(S.quem)}</dd></div>
         </dl>
+        ${semNet() || !S.token ? `<p class="alerta alerta--fila"><b>Sem internet agora.</b> Ao confirmar, o cadastro fica guardado neste aparelho e vai para o CV sozinho quando a conexão voltar — o lead não se perde. ${n > 1 ? 'Os lotes ficam' : 'O lote fica'} "Na fila" aqui; outro aparelho ainda ${n > 1 ? 'os vê livres' : 'o vê livre'} até o envio.</p>` : ''}
         <p class="note">Ao confirmar, o lead e o cliente são criados no CV e ${n > 1 ? `uma reserva para cada um dos ${n} lotes` : 'a reserva do lote'} (corretor "Feira EXPO PY BR"); ${n > 1 ? 'os lotes saem' : 'o lote sai'} da venda na hora — aqui e na maquete.</p>
         <div class="btns">
-          <button class="btn btn--ink" type="button" data-acao="enviar">Confirmar ${n > 1 ? `${n} reservas` : 'reserva'}</button>
+          <button class="btn btn--ink" type="button" data-acao="enviar">${semNet() || !S.token ? 'Guardar no aparelho' : `Confirmar ${n > 1 ? `${n} reservas` : 'reserva'}`}</button>
           <button class="btn btn--ghost" type="button" data-acao="form">Corrigir dados</button>
         </div>`;
     }
@@ -561,6 +710,21 @@
           <div class="btns">${r.status === 409 ? `<button class="btn btn--ink" type="button" data-acao="outro">Tirar o lote ocupado e escolher outro</button>`
             : `<button class="btn btn--ink" type="button" data-acao="enviar">Tentar de novo</button>`}
           <button class="btn btn--ghost" type="button" data-acao="form">Voltar aos dados</button></div>` : '<p class="note">Não feche esta tela — leva alguns segundos por lote.</p>'}`;
+    }
+
+    if (S.passo === 'fila') {
+      const p = S.ultimo || {};
+      $('#sheetTitle').textContent = 'Guardado no aparelho';
+      $('#sheetBack').hidden = true;
+      body.innerHTML = `
+        <div class="done done--fila"><div class="done__ic" aria-hidden="true">⇅</div>
+          <h3>${esc(p.nome)}</h3>
+          <p>${p.lotes.length} ${p.lotes.length > 1 ? 'lotes' : 'lote'} · ${esc(p.tabelaNome || '')} · ${usd(p.total || 0)}</p>
+        </div>
+        <ul class="steps">${p.lotes.map((id) => `<li class="is-on"><i></i><span><b>LTIND.${esc(id)}</b> — na fila deste aparelho</span></li>`).join('')}</ul>
+        <p class="note">${esc(p.motivo || 'Sem internet.')} O cadastro está salvo neste celular e vai para o CV <b>sozinho</b> assim que a conexão voltar (lead, cliente e reserva — sem duplicar). Pode seguir atendendo. Acompanhe em <b>Reservas → Neste aparelho</b>.</p>
+        <div class="btns"><button class="btn btn--ink" type="button" data-acao="nova">Nova reserva</button>
+          <button class="btn btn--ghost" type="button" data-acao="verres">Ver a fila</button></div>`;
     }
 
     if (S.passo === 'ok') {
@@ -633,12 +797,28 @@
     S.enviando = true; S.passo = 'enviando'; S.etapaAtiva = 0; S.ultimo = null;
     renderSheet();
     const tic = setInterval(() => { if (S.etapaAtiva < 3) { S.etapaAtiva++; renderSheet(); } }, 1300);
-    const f = S.form;
-    const d = await api('reservar', { lotes: S.sel, tabela: S.cond, nome: f.nome.trim(), cpf: f.cpf, email: f.email.trim(), ddi: ddiDe(f),
-      telefone: f.telefone, empresa: f.empresa.trim(), obs: (f.obs || '').trim() });
+    const f = S.form, sm = somaSel(S.cond);
+    // 1º grava no aparelho; só sai da fila quando o CV confirmar
+    const p = { idlocal: uid(), criado_em: Date.now(), quem: S.quem, lotes: [...S.sel], tabela: S.cond, tabelaNome: tabNome(S.cond), total: sm.total,
+      nome: f.nome.trim(), cpf: String(f.cpf).replace(/\D/g, ''), email: f.email.trim(), ddi: ddiDe(f), ddiSel: f.ddi, ddiOutro: f.ddiOutro || '',
+      telefone: f.telefone, empresa: f.empresa.trim(), obs: (f.obs || '').trim(), estado: 'enviando', desde: Date.now(), tentativas: 0 };
+    filaGrava([...filaLer(), p]);
+    const guardado = (motivo) => {
+      clearInterval(tic); S.enviando = false;
+      filaMuda(p.idlocal, { estado: 'pendente', erro: motivo });
+      S.form = { ddi: f.ddi }; store.del('bp-admin-form', sessionStorage); S.errosForm = {};
+      S.ultimo = { ...p, motivo }; S.passo = 'fila';
+      if (!sheet.hidden) renderSheet(); else toast(`Cadastro de ${p.nome} guardado no aparelho — vai para o CV quando a internet voltar.`);
+      pinta(); contagem(); renderLista();
+    };
+    if (semNet() || !S.token) return guardado(!S.token ? 'Sem sessão no CV agora.' : 'Sem internet agora.');
+    filaMuda(p.idlocal, { tentativas: 1 });
+    const d = await api('reservar', corpoDe(p), 58000);
+    if (deuRede(d)) return guardado(d.status === 401 ? 'A sessão expirou.' : d.rede ? (d.erro || 'Sem internet.') : `O CV não respondeu (${d.erro || d.status}).`);
     clearInterval(tic);
     S.enviando = false;
-    if (d.status === 401) return;
+    filaTira(p.idlocal);
+    histAdd(d.ok ? { ...p, estado: 'enviado', resultado: resumo(d) } : { ...p, estado: 'recusado', erro: d.erro || `erro ${d.status}` });
     S.ultimo = { ...d, nome: f.nome.trim() };
     if (!d.ok) {
       if (d.campos && d.campos.length) {
@@ -649,7 +829,7 @@
       if (d.status === 409) carregar(true);
       return;
     }
-    for (const x of d.itens || []) if (S.est && S.est.lotes[x.lote] && x.modo !== 'erro') S.est.lotes[x.lote].s = x.modo === 'negociacao' ? 'n' : 'r';
+    marcaResultado(d);
     S.form = { ddi: f.ddi };                       // limpa os dados pessoais para o próximo atendimento
     store.del('bp-admin-form', sessionStorage);
     S.errosForm = {};
@@ -673,8 +853,9 @@
   $('#soFeira').addEventListener('change', renderReservas);
   async function carregaReservas() {
     if (!S.res) $('#resList').innerHTML = '<p class="empty">Carregando as reservas do CV…</p>';
+    renderFila();
     const d = await api('reservas');
-    if (!d.ok) { if (d.status !== 401) $('#resList').innerHTML = `<p class="empty">${esc(d.erro || 'O CV não respondeu.')}</p>`; return; }
+    if (!d.ok) { if (d.status !== 401) $('#resList').innerHTML = `<p class="empty">${esc(d.rede ? 'Sem internet — as reservas do CV aparecem quando a conexão voltar.' : d.erro || 'O CV não respondeu.')}</p>`; return; }
     S.res = d.reservas || [];
     S.neg = d.negociacoes || [];
     S.resAviso = (d.avisos || []).join(' · ');
@@ -685,7 +866,7 @@
     if (!S.res) return;
     const so = $('#soFeira').checked;
     const lst = S.res.filter((r) => (!so || r.feira));
-    $('#resN').textContent = (S.res.filter((r) => r.feira && ativa(r)).length + (S.neg || []).length) || '';
+    $('#resN').textContent = (S.res.filter((r) => r.feira && ativa(r)).length + (S.neg || []).length + filaLer().length) || '';
     const neg = (S.neg || []).length ? `<div class="list__head"><h3>Em negociação</h3><span>lote segurado para o CPF</span></div>
       ${S.neg.map((n) => `<article class="rcard"><div class="rcard__top"><span class="rcard__lote">LTIND.${esc(n.lote)}</span>
         <span class="rcard__sit">Em negociação</span></div>
@@ -747,7 +928,12 @@
     m.hidden = !on; e.currentTarget.setAttribute('aria-expanded', String(on));
   });
   document.addEventListener('click', (e) => { if (!e.target.closest('#menu,#btnMenu')) { $('#menu').hidden = true; $('#btnMenu').setAttribute('aria-expanded', 'false'); } });
-  $('#btnSair').addEventListener('click', () => sair());
+  $('#btnSair').addEventListener('click', () => {
+    const n = filaLer().length;
+    if (n && !confirm(`${n} ${n > 1 ? 'cadastros ainda estão' : 'cadastro ainda está'} na fila deste aparelho. Eles continuam guardados e vão para o CV quando alguém entrar de novo aqui. Sair mesmo assim?`)) return;
+    sair();
+  });
+  $('#btnCsv').addEventListener('click', exportaCsv);
   let tt = 0;
   function toast(msg) {
     const t = $('#toast');
@@ -756,8 +942,11 @@
   }
   addEventListener('resize', () => { if (VB && S.geo) setVB(S.quadra ? enquadra(S.geo.quadras.get(S.quadra).bb, 0.08) : enquadra(S.geo.tudo, 0)); });
 
+  S.filaLotes = new Set(filaLer().flatMap((p) => p.lotes));
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});   // abre sem internet
+  if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});  // o navegador não apaga a fila
   const s = store.get('bp-admin');
   if (s && s.token && s.exp > Date.now() + 60e3) { Object.assign(S, { token: s.token, exp: s.exp, quem: s.quem }); entrar(); }
   else mostraLogin();
-  window.__adm = { S, alterna, abreCarrinho, abreQuadra, carregar };
+  window.__adm = { S, alterna, abreCarrinho, abreQuadra, carregar, sincroniza, filaLer };
 })();

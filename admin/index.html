@@ -17,8 +17,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="admin.css?v=5" />
-<script src="admin.js?v=5" defer></script>
+<link rel="stylesheet" href="admin.css?v=6" />
+<script src="admin.js?v=6" defer></script>
 </head>
 <body>
 <!-- Painel de reservas da feira. Página independente: não carrega o site nem a maquete.
@@ -41,6 +41,8 @@
       </label>
       <p class="form__err" id="loginErr" role="alert" hidden></p>
       <button class="btn btn--sand" type="submit">Entrar <span aria-hidden="true">→</span></button>
+      <button class="btn btn--ghost login__off" id="loginOff" type="button" hidden>Continuar sem internet</button>
+      <p class="login__fila" id="loginFila" role="status" hidden></p>
     </form>
   </div>
 </section>
@@ -61,6 +63,7 @@
     <div class="menu" id="menu" hidden>
       <p class="menu__who" id="menuWho"></p>
       <a class="menu__item" href="../3dmasterplan/#lotes" target="_blank" rel="noopener">Abrir a maquete 3D</a>
+      <button class="menu__item" id="btnCsv" type="button">Exportar cadastros (CSV)</button>
       <button class="menu__item" id="btnSair" type="button">Sair</button>
     </div>
   </header>
@@ -69,6 +72,7 @@
     <button class="tabs__b" role="tab" id="tabLotes" aria-selected="true" aria-controls="vLotes">Lotes</button>
     <button class="tabs__b" role="tab" id="tabRes" aria-selected="false" aria-controls="vRes">Reservas <span class="tabs__n" id="resN"></span></button>
   </nav>
+  <button class="filabar" id="filaBar" type="button" hidden></button>
 
   <main>
     <section class="view" id="vLotes" role="tabpanel" aria-labelledby="tabLotes">
@@ -88,7 +92,7 @@
         <svg id="svg" class="map__svg" role="img" aria-label="Mapa dos lotes do Bracerum Park"></svg>
         <ul class="legend" aria-label="Legenda">
           <li><i class="sw sw--d"></i>Disponível</li><li><i class="sw sw--r"></i>Reservado</li><li><i class="sw sw--n"></i>Em negociação</li>
-          <li><i class="sw sw--v"></i>Vendido</li><li><i class="sw sw--b"></i>Indisponível</li>
+          <li><i class="sw sw--v"></i>Vendido</li><li><i class="sw sw--b"></i>Indisponível</li><li><i class="sw sw--p"></i>Na fila (sem internet)</li>
         </ul>
       </div>
 
@@ -96,6 +100,7 @@
     </section>
 
     <section class="view" id="vRes" role="tabpanel" aria-labelledby="tabRes" hidden>
+      <div class="filalist" id="filaList" aria-live="polite"></div>
       <div class="resbar">
         <label class="switch"><input type="checkbox" id="soFeira" checked /> <span>Só as da feira</span></label>
         <button class="linkbtn" id="btnResRefresh" type="button">Atualizar</button>
