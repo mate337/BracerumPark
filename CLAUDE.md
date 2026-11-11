@@ -21,6 +21,16 @@ rotas) que as seis páginas internas baixavam e interpretavam à toa. Ele roda d
   sessão injeta o token real de `api.vercel.com`; se expirou, pedir outro em vercel.com/account/tokens).
   Conferir no ar que nenhuma página pede arquivo que ficou de fora.
 
+### Painel de reservas da feira — `/admin/` (v6.8 — 2026-11-11)
+- **`admin/`** (página à parte, celular primeiro) + **`api/admin.js`** (função à parte): a equipe entra com
+  nome + senha (`ADMIN_SENHA` na Vercel), escolhe o lote no mapa/quadra/busca, a condição (as **tabelas
+  aprovadas do CV**, valores por lote), preenche **nome, CPF, e-mail, telefone e empresa** (obrigatórios) e
+  confirma → **lead + cliente + reserva no CV** (corretor "Feira EXPO PY BR" id 2, imobiliária 1, reserva em
+  "Nova Reserva", lead "Com Reserva"); o lote sai da venda no painel, na maquete e nas LPs. Aba Reservas lista
+  e cancela as da feira. **Não toca no site nem na maquete** (lê `3dmasterplan/data/lotes.json`).
+- Tudo em **`docs/admin-reservas.md`** (fluxo, variáveis, falhas, testes). **A gravação real no CV não foi
+  testada** (bloqueada nesta sessão) — o primeiro uso deve ser uma reserva de teste, conferida e cancelada.
+
 ### Landing pages dos folders + lead no CV CRM (v6.7 — 2026-11-10)
 - **Seis LPs**, uma por QR Code de folder: `folderpark/`, `folderresidence/`, `folderresort/`,
   `folderbusinesscenter/`, `foldermapadisponibilidade/`, `folderlp/`. **Geradas por

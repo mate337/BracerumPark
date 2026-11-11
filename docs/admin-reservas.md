@@ -1,0 +1,83 @@
+# Painel de reservas da feira — `bracerumpark.com/admin/`
+
+Feito em 2026-11-11 para a equipe reservar lotes no stand, pelo celular, direto no CV CRM. Não muda nada
+do site nem da maquete: é uma página à parte (`admin/`) e uma função à parte (`api/admin.js`).
+
+## Fluxo
+
+1. **Entrar** com o nome de quem atende e a **senha da equipe** (`ADMIN_SENHA` na Vercel). A sessão dura
+   16 h no aparelho; "Sair" no menu apaga. O nome vai na anotação de cada reserva.
+2. **Escolher o lote** — pelo mapa (toque na quadra → os lotes ampliam; arrastar e pinçar funcionam),
+   pela grade de quadras ou pela busca ("Q07 L14", "7 14", "LTIND.Q07.L014"). Cores = situação no CV
+   agora: disponível, reservado, vendido, indisponível (bloqueado). Atualiza sozinho a cada 30 s.
+3. **Condição de pagamento** — as tabelas aprovadas do CV para o loteamento (hoje: Lançamento Expo
+   20%+12x, à vista e 20%+36x), com o valor e as parcelas exatas daquele lote no CV.
+4. **Dados do interessado** — nome completo, CPF (com verificação dos dígitos), e-mail, telefone com
+   código do país e empresa: todos obrigatórios; observação opcional.
+5. **Revisar e confirmar** → a função faz, no CV:
+   1. confere no mapa de disponibilidade que a unidade continua livre;
+   2. cadastra o **lead** (`POST /api/v1/comercial/leads`) com CPF, unidade de interesse, corretor e
+      imobiliária da feira, origem "Outras publicidades", mídia `expo-py-br`, tags `feira`,
+      `reserva-feira` e o lote, e uma anotação com empresa, lote, condição e atendente;
+   3. acha o **cliente** pelo CPF (`GET /api/v1/cadastros/clientes?documento=`) ou cadastra
+      (`POST /api/v1/cadastros/clientes`, `idpessoa_int` = `BPFEIRA-<cpf>`, empresa em
+      `trabalho_nome_empresa`);
+   4. cria a **reserva** (`POST /api/v1/comercial/reservas`) com a tabela escolhida e as condições
+      (sinal + mensais) copiadas da tabela do CV para aquela unidade — séries "Sinal" (7) e "Mensal" (1);
+   5. associa a reserva ao lead e põe o lead em "Com Reserva" (situação 5).
+   A reserva nasce em **"Nova Reserva"** no workflow do CV: é a negociação; dali a equipe segue no CV
+   (análise, documentos, contrato). A unidade fica "reservada" e sai da venda — o painel, a maquete
+   (`/api/lotes-status`) e as LPs passam a mostrá-la assim.
+6. **Aba Reservas** — reservas do loteamento no CV (só as da feira, ou todas), com WhatsApp/e-mail do
+   cliente. As da feira ainda ativas podem ser **canceladas** dali (`POST
+   /api/v1/comercial/reservas/cancelar-reserva`); o lote volta a ficar disponível.
+
+É o caminho do guia "Jornada do cliente: do lead à reserva" da documentação do CV e o mesmo da reserva
+que a equipe fez à mão em 10/11 (reserva 7, Q03.010: corretor "Feira EXPO PY BR", tabela 3, sinal 1x
+em 13/11 + 12 mensais a partir de 15/12, lead em "Com Reserva").
+
+## Se algo falhar
+
+- **Lote tomado** no meio do atendimento (outra pessoa reservou): o CV recusa, o painel diz e oferece
+  "Escolher outro lote" — os dados digitados continuam.
+- **Falha numa etapa** (lead, cliente ou reserva): o painel mostra qual, o que já ficou no CV (ex.: "o lead
+  #901 já ficou no CV") e "Tentar de novo" com os mesmos dados. Repetir não duplica o cliente (o CPF é
+  procurado antes) e o lead vira uma nova conversão do mesmo lead.
+- **Sem internet / CV fora**: aviso no topo ("sem resposta do CV") e a última leitura continua na tela.
+- Tudo o que a função faz vai para o log da Vercel (Deployments → Functions → `api/admin`) e para o CVIO
+  do CV (`bracerum.cvcrm.com.br/cvio`, 30 dias).
+
+## Configuração (Vercel → Settings → Environment Variables, Production)
+
+| Variável | Para quê |
+| --- | --- |
+| `ADMIN_SENHA` | senha da equipe (sensível). Trocar a senha derruba todas as sessões. |
+| `CVCRM_EMAIL`, `CVCRM_TOKEN` | as mesmas da maquete e das LPs (usuário CONEXAOSITECV) |
+| `CVCRM_FEIRA_CORRETOR` | opcional, padrão `2` ("Feira EXPO PY BR") |
+| `CVCRM_FEIRA_IMOBILIARIA` | opcional, padrão `1` |
+| `CVCRM_FEIRA_TABELA` | opcional, tabela marcada de início, padrão `3` (Expo 20%+12x) |
+| `CVCRM_FEIRA_MIDIA` | opcional, padrão `expo-py-br` |
+| `CVCRM_EMPREENDIMENTO` | opcional, padrão `4` (loteamento) |
+
+O perfil do usuário da integração no CV precisa de permissão para **Leads, Clientes e Reservas**
+(criar e cancelar). O bloqueio de unidades e o cadastro de leads já foram usados com ele; criar
+cliente e reserva **não puderam ser testados de verdade daqui** (ver abaixo).
+
+O `vercel.json` redireciona `/admin` → `/admin/`, manda `noindex` e `no-cache` para `/admin/*` e dá
+60 s à função (a primeira leitura das tabelas de preço do CV, ~575 KB, leva ~10 s; depois fica em
+memória por 10 min e o estado sai em ~0,5 s).
+
+## Testes feitos (2026-11-11)
+
+- Contra o CV real, só leitura: login (senha errada → 401, certa → sessão), estado (614 lotes, 3 tabelas,
+  517 disponíveis / 1 reservado / 96 bloqueados), reservas (a 7 da Q03), validação (CPF, e-mail,
+  telefone, nome, empresa), lote bloqueado recusado (Q02.L001), e a reserva em modo de teste
+  (`"teste": true` no corpo: monta as condições — ex.: Q42.L016 20%+12x = sinal 36.000 + 12 × 12.000 —
+  sem gravar nada).
+- Interface no Chromium como iPhone 13, iPhone SE, Pixel 7 e desktop: sem rolagem lateral, fluxo
+  completo até "Reserva feita" (com a gravação simulada), erros de campo, falha na etapa da reserva,
+  lote tomado, sessão expirada.
+- **Não testado:** a gravação real (lead + cliente + reserva + cancelamento) — o modo automático da
+  sessão bloqueou criar registros no CV de produção. **Primeiro uso real:** fazer uma reserva de teste
+  num lote Interna (ex.: Q42.L016) com dados de teste, conferir no CV (lead, cliente, reserva "Nova
+  Reserva", unidade reservada), e cancelar pela aba Reservas.

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Reservas · Bracerum Park</title>
+<meta name="robots" content="noindex, nofollow" />
+<meta name="theme-color" content="#0e0d0b" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Reservas BP" />
+<meta name="format-detection" content="telephone=no" />
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml" />
+<link rel="apple-touch-icon" href="../assets/apple-touch-icon.png" />
+<link rel="manifest" href="manifest.webmanifest" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="admin.css?v=1" />
+<script src="admin.js?v=1" defer></script>
+</head>
+<body>
+<!-- Painel de reservas da feira. Página independente: não carrega o site nem a maquete.
+     Lotes desenhados a partir de ../3dmasterplan/data/lotes.json; situação, preços e reservas pelo
+     /api/admin, que fala com o CV CRM. Documentação: docs/admin-reservas.md. -->
+
+<section class="login" id="login" hidden>
+  <div class="login__box">
+    <img class="login__logo" src="../assets/logo/logo-horizontal-cream.svg" alt="Bracerum Park" width="180" height="31" />
+    <h1 class="login__title">Reservas <em>da feira</em></h1>
+    <p class="login__sub">Painel da equipe comercial. Reserva o lote no CV na hora.</p>
+    <form class="form" id="loginForm" novalidate>
+      <label class="field">
+        <span class="field__lab">Seu nome</span>
+        <input class="field__in" name="quem" autocomplete="name" placeholder="Quem está atendendo" maxlength="40" required />
+      </label>
+      <label class="field">
+        <span class="field__lab">Senha da equipe</span>
+        <input class="field__in" name="senha" type="password" autocomplete="current-password" required />
+      </label>
+      <p class="form__err" id="loginErr" role="alert" hidden></p>
+      <button class="btn btn--sand" type="submit">Entrar <span aria-hidden="true">→</span></button>
+    </form>
+  </div>
+</section>
+
+<div class="app" id="app" hidden>
+  <header class="top">
+    <img class="top__logo" src="../assets/logo/logo-compact-cream.svg" alt="Bracerum Park" width="34" height="34" />
+    <div class="top__txt">
+      <p class="top__title">Reservas · feira</p>
+      <p class="top__sub"><i class="dot" id="liveDot" aria-hidden="true"></i><span id="liveTxt">conectando ao CV…</span></p>
+    </div>
+    <button class="iconbtn" id="btnRefresh" type="button" aria-label="Atualizar">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66M20 4v5h-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="square"/></svg>
+    </button>
+    <button class="iconbtn" id="btnMenu" type="button" aria-label="Menu" aria-expanded="false">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.8"/></svg>
+    </button>
+    <div class="menu" id="menu" hidden>
+      <p class="menu__who" id="menuWho"></p>
+      <a class="menu__item" href="../3dmasterplan/#lotes" target="_blank" rel="noopener">Abrir a maquete 3D</a>
+      <button class="menu__item" id="btnSair" type="button">Sair</button>
+    </div>
+  </header>
+
+  <nav class="tabs" role="tablist">
+    <button class="tabs__b" role="tab" id="tabLotes" aria-selected="true" aria-controls="vLotes">Lotes</button>
+    <button class="tabs__b" role="tab" id="tabRes" aria-selected="false" aria-controls="vRes">Reservas <span class="tabs__n" id="resN"></span></button>
+  </nav>
+
+  <main>
+    <section class="view" id="vLotes" role="tabpanel" aria-labelledby="tabLotes">
+      <div class="counts" id="counts"></div>
+
+      <form class="search" id="search" role="search" autocomplete="off">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M16 16l4.5 4.5" stroke="currentColor" stroke-width="1.8"/></svg>
+        <input id="q" type="search" inputmode="text" autocapitalize="characters" placeholder="Buscar lote — ex.: Q07 L14" aria-label="Buscar lote" />
+        <button type="submit" class="search__go">Ir</button>
+      </form>
+
+      <div class="map" id="map">
+        <div class="map__bar">
+          <button class="map__back" id="mapBack" type="button" hidden><span aria-hidden="true">←</span> Todas as quadras</button>
+          <p class="map__title" id="mapTitle">Toque numa quadra</p>
+        </div>
+        <svg id="svg" class="map__svg" role="img" aria-label="Mapa dos lotes do Bracerum Park"></svg>
+        <ul class="legend" aria-label="Legenda">
+          <li><i class="sw sw--d"></i>Disponível</li><li><i class="sw sw--r"></i>Reservado</li>
+          <li><i class="sw sw--v"></i>Vendido</li><li><i class="sw sw--b"></i>Indisponível</li>
+        </ul>
+      </div>
+
+      <div class="list" id="list" aria-live="polite"></div>
+    </section>
+
+    <section class="view" id="vRes" role="tabpanel" aria-labelledby="tabRes" hidden>
+      <div class="resbar">
+        <label class="switch"><input type="checkbox" id="soFeira" checked /> <span>Só as da feira</span></label>
+        <button class="linkbtn" id="btnResRefresh" type="button">Atualizar</button>
+      </div>
+      <div class="reslist" id="resList" aria-live="polite"></div>
+    </section>
+  </main>
+</div>
+
+<!-- ficha do lote → cadastro → revisão → envio → resultado -->
+<div class="sheet" id="sheet" hidden>
+  <div class="sheet__scrim" data-fechar></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+    <div class="sheet__grip" aria-hidden="true"></div>
+    <header class="sheet__head">
+      <button class="sheet__back" id="sheetBack" type="button" aria-label="Voltar" hidden>←</button>
+      <div>
+        <p class="sheet__eyebrow" id="sheetEyebrow"></p>
+        <h2 class="sheet__title" id="sheetTitle"></h2>
+      </div>
+      <button class="sheet__x" type="button" data-fechar aria-label="Fechar">×</button>
+    </header>
+    <div class="sheet__body" id="sheetBody"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" hidden></div>
+</body>
+</html>
