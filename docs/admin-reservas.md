@@ -71,6 +71,16 @@ deve ser um decimal" (o painel mandava `36000`) e os lotes Q32.L002/L004/L006 fi
 por isso apareciam "bloqueados" no CV. Corrigido: o valor da parcela vai como decimal (`"36000.00"`; se o CV
 ainda recusar, tenta como número com casas) — função `criarReserva()` em `api/admin.js`.
 
+**2ª ocorrência (11/11, Q32.L009/L010, lead #10, cliente #7):** a string `"36000.00"` e o número `36000` também
+voltaram "deve ser um decimal". O CV (PHP) só aceita um float literal no JSON, e o `JSON.stringify` escreve
+36000.00 como `36000`. Agora `criarReserva()` escreve `"valor_parcela":36000.00` direto no texto do JSON (1º
+formato); se o CV ainda reclamar, tenta `"36000.00"` e `"36000,00"`. O formato aceito/recusado vai para o log.
+
+**Sem mensagem de erro na tela (pedido do cliente, 11/11):** quando o lote é segurado, o painel não mostra mais
+o erro do CV — mostra que o lote está bloqueado para o cliente. A descrição do bloqueio no CV leva **nome, CPF,
+telefone, e-mail, empresa, lead #, cliente #, tabela e valor e o atendente**, e a aba Reservas mostra essa
+descrição em cada lote em negociação (se o mapa do CV a devolver). O motivo da recusa fica só no log da Vercel.
+
 **Recomendado no CV** (o artigo acima mostra como): criar um motivo próprio, por exemplo **"Em negociação —
 Feira"**, com cor de fundo própria (aparece assim no Mapa de Disponibilidade do CV), e pôr o nome dele em
 `CVCRM_FEIRA_MOTIVO` na Vercel.

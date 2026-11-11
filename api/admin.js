@@ -97,7 +97,7 @@ async function cv(metodo, caminho, corpo) {
     const r = await fetch(`https://${cfg().host}/api${caminho}`, {
       method: metodo, signal: ctl.signal,
       headers: { email, token, accept: 'application/json', ...(corpo ? { 'content-type': 'application/json' } : {}) },
-      body: corpo ? JSON.stringify(corpo) : undefined,
+      body: corpo ? (typeof corpo === 'string' ? corpo : JSON.stringify(corpo)) : undefined,
     });
     const txt = await r.text();
     let d;
@@ -126,7 +126,8 @@ function lerMapa(d, out) {
     // bloqueio "reservado para o doc" (ajuda.cvcrm.com.br, artigo 157000357227) = lote segurado em negociação
     const st = s === undefined ? 'b' : s;
     out.set(id, { u: u.idunidade, s: st === 'b' && doc ? 'n' : st, sit: u.situacao, bloco: u.idbloco,
-      doc, motivo: u.motivo_bloqueio || null, desde: u.data_bloqueio || null });
+      doc, motivo: u.motivo_bloqueio || null, desde: u.data_bloqueio || null,
+      desc: u.descricao_motivo_bloqueio || u.descricao_bloqueio || u.descricao || null });
   }
 }
 async function mapa() {                        // todas as unidades: a 1ª página diz quantas faltam, o resto vem junto
@@ -253,12 +254,20 @@ const dataBR = (d) => d.toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Pau
 // Segura o lote em negociação para o CPF: bloqueio temporário com "reservar a unidade para (doc)" e liberação
 // automática em N dias (POST /v1/cadastros/empreendimentos/unidades/bloquear). Só aquela pessoa pode ser
 // reservada nele no CV; para todo o resto (painel, maquete, LPs) o lote fica indisponível.
-async function segurar(un, v, idlead, sessao) {
+// A descrição leva quem é o cliente (nome, CPF, telefone, e-mail, empresa, lead e cliente no CV), para quem abre
+// o bloqueio no CV saber para quem o lote está segurado; `desc` pronta (efetivar) é reaproveitada como está.
+const fmtCpf = (c) => String(c || '').replace(/^(\d{3})(\d{3})(\d{3})(\d{2})$/, '$1.$2.$3-$4');
+async function segurar(un, v, idlead, sessao, extra = {}) {
   const c = cfg();
   const ate = new Date(Date.now() + c.dias * 86400e3);
+  const desc = extra.desc || [
+    `Em negociação (feira): ${v.nome}`, `CPF ${fmtCpf(v.cpf)}`, v.tel && `tel +${v.ddi || ''} ${v.tel}`, v.email,
+    v.empresa && `empresa ${v.empresa}`, idlead && `lead #${idlead}`, extra.idpessoa && `cliente #${extra.idpessoa}`,
+    extra.tabela && extra.tabela, sessao.quem && `atendente ${sessao.quem}`,
+  ].filter(Boolean).join(' · ');
   const corpo = {
     idunidade: String(un.u), situacao: 'Bloqueada', motivo_bloqueio: c.motivo,
-    descricao_motivo_bloqueio: limpa(`Em negociação na feira — ${v.nome} (${v.empresa}) — lead #${idlead || '-'}${sessao.quem ? ` — atendente ${sessao.quem}` : ''}`, 250),
+    descricao_motivo_bloqueio: limpa(desc, 250),
     documento_bloqueio: v.cpf, data_desbloqueio: dataBR(ate), hora_desbloqueio: '23:59:00',
   };
   const r = await cv('POST', '/v1/cadastros/empreendimentos/unidades/bloquear', corpo);
@@ -269,14 +278,28 @@ async function segurar(un, v, idlead, sessao) {
 // POST da reserva. O CV valida valor_parcela como DECIMAL: um inteiro em JSON (183750) volta "O campo
 // valor_parcela deve ser um decimal" (visto em produção em 2026-11-11). Manda "183750.00"; se ainda assim o
 // CV reclamar de decimal, tenta uma vez como número.
+// 2ª ocorrência (11/11, Q32.L009/L010): a string "36000.00" e o número 36000 também voltaram "deve ser um
+// decimal" — o CV (PHP) quer um float de verdade no JSON, e o JSON.stringify escreve 36000.00 como 36000. Por
+// isso o 1º formato é o literal 36000.00 escrito à mão no texto do JSON; depois string com ponto e com vírgula.
+const DEC = (n) => `@@DEC:${n.toFixed(2)}@@`;
+const FORMATOS = [
+  ['literal', (n) => DEC(n)],
+  ['texto', (n) => n.toFixed(2)],
+  ['virgula', (n) => n.toFixed(2).replace('.', ',')],
+];
 async function criarReserva({ idpessoa, idunidade, tabela, condicoes }) {
   const c = cfg();
-  const corpo = (fmt) => ({
+  const corpo = (fmt) => JSON.stringify({
     idpessoa_cv: idpessoa, idempreendimento_cv: c.emp, idunidade_cv: idunidade, idcorretor_cv: c.corretor, idtabela: tabela,
     condicoes: condicoes.map((x) => ({ ...x, valor_parcela: fmt(Number(x.valor_parcela)) })),
-  });
-  let r = await cv('POST', '/v1/comercial/reservas', corpo((n) => n.toFixed(2)));
-  if (!r.ok && /decimal/i.test(msgCv(r.d))) r = await cv('POST', '/v1/comercial/reservas', corpo((n) => Math.round(n * 100) / 100));
+  }).replace(/"@@DEC:(-?\d+\.\d\d)@@"/g, '$1');
+  let r;
+  for (const [nome, fmt] of FORMATOS) {
+    r = await cv('POST', '/v1/comercial/reservas', corpo(fmt));
+    if (r.ok) { console.log('[admin] reserva aceita no formato', nome); return r; }
+    if (!/decimal/i.test(msgCv(r.d))) return r;
+    console.error('[admin] valor_parcela recusado no formato', nome);
+  }
   return r;
 }
 
@@ -366,7 +389,8 @@ async function reservar(b, sessao) {
       motivo = `Reserva não criada: ${msgCv(r.d)}`;
       if (r.status === 400 && /indispon/i.test(motivo)) { res.modo = 'erro'; res.erro = 'Lote tomado no CV antes de reservar'; out.push(res); continue; }
     }
-    try { res.ate = await segurar(x.un, v, idlead, sessao); res.modo = 'negociacao'; res.aviso = motivo; }
+    console.error('[admin] reserva recusada, lote segurado:', x.lote, motivo);
+    try { res.ate = await segurar(x.un, v, idlead, sessao, { idpessoa, tabela: `${tab.nome} US$ ${x.total.toLocaleString('pt-BR')}` }); res.modo = 'negociacao'; res.aviso = motivo; }
     catch (e) { res.modo = 'erro'; res.erro = `${motivo} · ${e.message}`; }
     out.push(res);
   }
@@ -412,7 +436,7 @@ async function negociacoes() {
   const out = [];
   for (const [lote, x] of m) {
     if (x.s !== 'n') continue;
-    out.push({ lote, motivo: x.motivo, desde: x.desde, doc: x.doc.replace(/^(\d{3})\d{5}(\d{3})$/, '$1.***.**$2') });
+    out.push({ lote, motivo: x.motivo, desde: x.desde, desc: x.desc, doc: x.doc.replace(/^(\d{3})\d{5}(\d{3})$/, '$1.***.**$2') });
   }
   return out.sort((a, b) => String(b.desde).localeCompare(String(a.desde)));
 }
@@ -446,10 +470,11 @@ async function efetivar(b, sessao) {
   if (!r.ok) {
     const motivo = msgCv(r.d);
     if (liberou) {
-      try { await segurar(un, { cpf: un.doc, nome: `cliente #${idpessoa}`, empresa: '-' }, null, sessao); }
+      try { await segurar(un, { cpf: un.doc, nome: `cliente #${idpessoa}` }, null, sessao, { idpessoa, desc: un.desc }); }
       catch (e) { throw erro(502, `Reserva não criada: ${motivo} · e não consegui segurar o lote de novo: ${e.message}`); }
     }
-    throw erro(502, `Reserva não criada: ${motivo}`);
+    console.error('[admin] efetivar recusado:', lote, motivo);
+    throw erro(502, `O CV não aceitou a reserva (${motivo}). O lote continua bloqueado para o cliente.`);
   }
   const idreserva = r.d.idreserva || r.d.idreserva_cv || r.d.idproposta_cv || await acharReserva(un.doc, un.u);
   console.log('[admin] efetivou', JSON.stringify({ lote, idreserva, idpessoa, tabela, quem: sessao.quem || null }));

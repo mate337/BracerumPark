@@ -568,7 +568,6 @@
       const nr = its.filter((x) => x.modo === 'reserva').length, nn = its.filter((x) => x.modo === 'negociacao').length, ne = its.filter((x) => x.modo === 'erro').length;
       $('#sheetTitle').textContent = nn && !nr ? 'Lotes em negociação' : ne ? 'Concluído em parte' : nr > 1 ? 'Reservas feitas' : 'Reserva feita';
       $('#sheetBack').hidden = true;
-      const aviso = its.find((x) => x.aviso);
       body.innerHTML = `
         <div class="done"><div class="done__ic" aria-hidden="true">✓</div>
           <h3>${esc(r.nome)}</h3>
@@ -577,7 +576,7 @@
         </div>
         <ul class="steps">${its.map((x) => `<li class="${x.modo === 'erro' ? 'is-err' : 'is-ok'}"><i></i><span><b>LTIND.${esc(x.lote)}</b> — ${
           x.modo === 'reserva' ? `reserva #${x.idreserva || '?'} (Nova Reserva)` : x.modo === 'negociacao' ? `em negociação até ${esc(x.ate)} 23:59` : esc(x.erro || 'não reservado')}</span></li>`).join('')}</ul>
-        ${nn ? `<p class="form__err">O CV não aceitou criar ${nn > 1 ? 'as reservas' : 'a reserva'}: <i>${esc(String(aviso && aviso.aviso || '').replace(/[.\s]+$/, ''))}</i>. ${nn > 1 ? 'Os lotes ficaram segurados' : 'O lote ficou segurado'} em negociação para o CPF do cliente — fora da venda no painel e na maquete, e no CV só ele pode ser reservado. <b>Termine a reserva no CV</b> pelo lead #${r.idlead || '—'}.</p>` : ''}
+        ${nn ? `<p class="note">${nn > 1 ? 'Os lotes estão bloqueados' : 'O lote está bloqueado'} no CV para <b>${esc(r.nome)}</b>: o bloqueio leva o CPF (só esse cliente pode ser reservado nele), o telefone, o e-mail, a empresa e o lead #${r.idlead || '—'}. Fora da venda no painel, na maquete e nas LPs. Para virar reserva: aba <b>Reservas</b> → <b>Reservar agora</b>.</p>` : ''}
         ${nr ? `<p class="note">No CV ${nr > 1 ? 'as reservas estão' : 'a reserva está'} em <b>Nova Reserva</b>, com o corretor da feira.${r.associado === false ? ' <b>Associe o lead às reservas no CV</b> — a ligação automática não confirmou.' : ''}</p>` : ''}
         <div class="btns"><button class="btn btn--ink" type="button" data-acao="nova">Nova reserva</button>
           <button class="btn btn--ghost" type="button" data-acao="verres">Ver reservas e negociações</button></div>`;
@@ -690,6 +689,7 @@
     const neg = (S.neg || []).length ? `<div class="list__head"><h3>Em negociação</h3><span>lote segurado para o CPF</span></div>
       ${S.neg.map((n) => `<article class="rcard"><div class="rcard__top"><span class="rcard__lote">LTIND.${esc(n.lote)}</span>
         <span class="rcard__sit">Em negociação</span></div>
+        ${n.desc ? `<p class="rcard__desc">${esc(String(n.desc).replace(/^Em negociação \(feira\):\s*/, ''))}</p>` : ''}
         <p class="rcard__meta"><span>CPF ${esc(n.doc)}</span>${n.desde ? `<span>desde ${esc(String(n.desde).slice(0, 16).split(' ').map((x, i) => (i ? x : x.split('-').reverse().join('/'))).join(' '))}</span>` : ''}<span>${esc(n.motivo || '')}</span></p>
         ${S.est ? `<div class="efetivar"><select class="field__in" data-tab="${esc(n.lote)}" aria-label="Tabela da reserva de ${esc(n.lote)}">${S.est.tabelas.filter((t) => precoDe(n.lote, t.id)).map((t) => `<option value="${t.id}"${t.id === S.est.padrao ? ' selected' : ''}>${esc(t.nome.replace(/^Lançamento\s+/i, ''))} · ${usd(precoDe(n.lote, t.id)[0])}</option>`).join('')}</select>
           <button class="btn btn--ink" type="button" data-efetivar="${esc(n.lote)}">Reservar agora</button></div>` : ''}
