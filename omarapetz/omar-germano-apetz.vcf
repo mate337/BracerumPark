@@ -1,0 +1,14 @@
+BEGIN:VCARD
+VERSION:3.0
+N:Apetz;Omar;Germano;;
+FN:Omar Germano Apetz
+ORG:Bracerum Park
+TEL;TYPE=CELL,VOICE,pref:+595992148252
+EMAIL;TYPE=INTERNET,WORK:omar@bracerum.com
+URL:https://bracerumpark.com/omarapetz
+URL;TYPE=Site:https://bracerumpark.com/
+X-SOCIALPROFILE;TYPE=instagram:https://www.instagram.com/bracerumpark/
+X-SOCIALPROFILE;TYPE=linkedin:https://py.linkedin.com/company/bracerumpark
+ADR;TYPE=WORK:;;Acceso Sur · Ruta PY19;Villeta;Departamento Central;;Paraguay
+NOTE:Bracerum Park — Villeta Industrial City\, Paraguay · Mercosur
+END:VCARD

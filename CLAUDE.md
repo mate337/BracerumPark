@@ -109,11 +109,12 @@ rotas) que as seis páginas internas baixavam e interpretavam à toa. Ele roda d
 - Página aberta pelo QR Code do cartão impresso, no mesmo padrão do linktree (independente, sem
   `style.css`/`script.js`/`i18n.js`, mesma chave `bp-lang`, PT/EN/ES, `tracking.js`). **Visual próprio: preto
   (`#000`) e branco puro, sem foto de fundo** (pedido do cliente em 2026-11-09) — a foto do botão do site
-  fica em tons de cinza e o logo é o `logo-horizontal-white.svg`. Não voltar aos tons bege do site aqui. **Cinco cartões**,
+  fica em tons de cinza e o logo é o `logo-horizontal-white.svg`. Não voltar aos tons bege do site aqui. **Seis cartões**,
   com os dados dos cartões impressos enviados pelo cliente em 2026-11-09:
   `/cleberpavao` (Business Development) · `/sydneysavi` (Sydney Marcos Savi, Business Development) ·
   `/athospavao` (sem cargo no cartão) · `/juniopadua` (Junio Felipe de Pádua, Arquiteto) ·
-  `/vaniarosa` (Vania Cunha da Rosa, Advogada).
+  `/vaniarosa` (Vania Cunha da Rosa, Advogada) · `/omarapetz` (Omar Germano Apetz, sem cargo, só PY —
+  cartão de 2026-11-11).
 - Conteúdo: nome, cargo, **WhatsApp e e-mail pessoais** e **Instagram, LinkedIn e site do Park**, mais o
   botão **"Salvar contato"** (vCard 3.0 com cargo, telefones, e-mail, site e redes —
   `data-track="save_contact"`). **Um botão de WhatsApp por número, o do Brasil primeiro (principal) e

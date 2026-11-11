@@ -8,6 +8,7 @@
     { "source": "/AthosPavao", "destination": "/athospavao", "permanent": true },
     { "source": "/JunioPadua", "destination": "/juniopadua", "permanent": true },
     { "source": "/VaniaRosa", "destination": "/vaniarosa", "permanent": true },
+    { "source": "/OmarApetz", "destination": "/omarapetz", "permanent": true },
     { "source": "/admin", "destination": "/admin/", "permanent": false },
     { "source": "/Admin", "destination": "/admin/", "permanent": false },
     { "source": "/Admin/", "destination": "/admin/", "permanent": false }
@@ -19,6 +20,7 @@
     { "source": "/athospavao", "destination": "/athospavao/index.html" },
     { "source": "/juniopadua", "destination": "/juniopadua/index.html" },
     { "source": "/vaniarosa", "destination": "/vaniarosa/index.html" },
+    { "source": "/omarapetz", "destination": "/omarapetz/index.html" },
     { "source": "/folderpark", "destination": "/folderpark/index.html" },
     { "source": "/FolderPark", "destination": "/folderpark/index.html" },
     { "source": "/FolderPark/", "destination": "/folderpark/index.html" },

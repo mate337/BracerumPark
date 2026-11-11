@@ -67,6 +67,15 @@ PESSOAS = [
         "email": "vania@bracerum.com",
         "phones": [("595983522000", "+595 983 522 000", "py")],
     },
+    {
+        "slug": "omarapetz",
+        "first": "Omar",
+        "name": ("Omar Germano", "Apetz"),
+        "vcard_n": ("Apetz", "Omar", "Germano"),
+        "role": None,
+        "email": "omar@bracerum.com",
+        "phones": [("595992148252", "+595 992 148 252", "py")],
+    },
 ]
 
 INSTAGRAM = "https://www.instagram.com/bracerumpark/"
