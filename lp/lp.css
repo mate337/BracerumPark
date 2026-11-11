@@ -2,7 +2,7 @@
    Bracerum Park — landing pages dos folders (lp.css)
    Compartilhado pelas páginas geradas por docs/build_lps.py
    (folderpark, folderresidence, folderresort, folderbusinesscenter,
-   foldermapadisponibilidade, folderlp). Independente do style.css do site:
+   foldermapadisponibilidade, folderlp e corretores). Independente do style.css do site:
    quem chega pelo QR Code do folder está no celular e precisa da página
    leve. Mesmos tokens do site: ink / paper / sand / brown, Helvetica +
    Noto Serif (aqui com o eixo de largura, para o itálico condensado dos
@@ -138,7 +138,8 @@ em{font-style:italic}
 .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--ink)}
 .field textarea{min-height:84px;resize:vertical}
 .field input[aria-invalid="true"]{border-color:#8a5a1c;background:#fff8ec}
-.tel{display:grid;grid-template-columns:116px 1fr;gap:6px}
+/* .field>.tel: sem o ">" a regra dos rótulos (.field>span) ganhava e o DDI ficava em cima do número */
+.field>.tel{display:grid;grid-template-columns:116px 1fr;gap:6px;margin-bottom:0;font:inherit;letter-spacing:normal;text-transform:none;color:inherit}
 .tel select{padding:0 8px;font-size:.92rem}
 .check{display:flex;gap:10px;align-items:flex-start;margin-top:14px;font-size:.78rem;line-height:1.45;color:var(--k-soft);cursor:pointer}
 .check input{width:18px;height:18px;margin-top:1px;accent-color:var(--brown);flex:none}
@@ -151,9 +152,12 @@ em{font-style:italic}
 .form__trust svg{width:14px;height:14px;flex:none}
 .form.is-busy .btn{opacity:.6;pointer-events:none}
 .done{text-align:left}
-.done .h3{margin-top:10px}
+.done .h3{margin-top:10px;font-size:1.6rem;line-height:1.15;color:var(--k)}
+.form [hidden]{display:none!important}   /* .form__head é flex: sem isto o título ficava depois do envio */
 .done p{color:var(--k-soft);font-size:.92rem;margin-top:10px}
 .done .btn{margin-top:14px}
+.form .btn--line:hover{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.form__legal{margin-top:12px;font-size:.74rem;line-height:1.45;color:var(--k-mute)}
 
 /* Seções ----------------------------------------------------------------- */
 .sec{position:relative;padding:var(--sec) var(--pad)}

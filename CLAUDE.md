@@ -21,6 +21,16 @@ rotas) que as seis páginas internas baixavam e interpretavam à toa. Ele roda d
   sessão injeta o token real de `api.vercel.com`; se expirou, pedir outro em vercel.com/account/tokens).
   Conferir no ar que nenhuma página pede arquivo que ficou de fora.
 
+### LP de corretores — `/corretores` (v6.9 — 2026-11-11)
+- Cadastro de corretores parceiros no **mesmo padrão das LPs** (`docs/build_lps.py` → `corretores/index.html`,
+  `lp/`), mas **não vai para o CV**: o formulário (Nome, WhatsApp, Imobiliária — um passo) manda para
+  **`api/corretor.js`**, que grava na planilha **"Leads Corretores"** do Drive por um **Apps Script** publicado como
+  App da Web (`docs/corretores-planilha.gs`; URL em `CORRETORES_PLANILHA_URL` na Vercel), e a página abre o
+  **WhatsApp do Sydney Savi** (`5547988030200`) com "Olá, me chamo X, da Imobiliária Y, e tenho interesse em
+  ofertar o Bracerum Park para os meus clientes." Fluxo, instalação e testes: **`docs/corretores.md`**.
+- Junto: três correções no `lp/lp.css` compartilhado que valem para as sete LPs — DDI ao lado do número (estava
+  empilhado), título do formulário some depois do envio e o "Pronto, …" no tamanho de título. `lp/` em `?v=2`.
+
 ### Painel de reservas da feira — `/admin/` (v6.8 — 2026-11-11)
 - **`admin/`** (página à parte, celular primeiro) + **`api/admin.js`** (função à parte): a equipe entra com
   nome + senha (`ADMIN_SENHA` na Vercel), escolhe o lote no mapa/quadra/busca, a condição (as **tabelas

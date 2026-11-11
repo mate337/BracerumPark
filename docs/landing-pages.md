@@ -13,6 +13,10 @@ compartilhados em `lp/`; o envio passa pela função `api/lead.js`.
 | `/Foldermapadisponibilidade/` | `foldermapadisponibilidade/` — Preços e disponibilidade | escolhido no formulário | 4 / 7 / 9 conforme a opção |
 | `/FolderLP/` | `folderlp/` — Bracerum Park (visão geral) | escolhido no formulário | conforme a opção; "ainda conhecendo" vai sem empreendimento |
 
+**Sétima página, fora do CV (2026-11-11):** `/corretores` — cadastro de corretores parceiros, mesmo
+gerador e mesmo `lp/`, mas grava na planilha "Leads Corretores" do Drive (`api/corretor.js` + Apps
+Script) e abre o WhatsApp do Sydney com a mensagem pronta. Tudo em **`docs/corretores.md`**.
+
 Empreendimentos conferidos no CV em 2026-11-10 (`GET /api/v1/cadastros/empreendimentos`):
 **3 Bracerum Hotel · 4 Lotes industriais · 7 Residence — Condomínios · 9 Bracerum Outlet**
 (o CLAUDE.md dizia "9 = Cidade"; no CV é o Outlet). Não existe empreendimento do Resort à parte.

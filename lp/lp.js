@@ -1,6 +1,7 @@
 /* =====================================================================
    Bracerum Park — landing pages dos folders (lp.js)
-   Um arquivo para as seis LPs geradas por docs/build_lps.py:
+   Um arquivo para as LPs geradas por docs/build_lps.py (seis dos folders
+   e a de corretores):
      1. idioma (PT no HTML; EN/ES no <script id="lp-i18n">; chave "bp-lang",
         a mesma do site, do linktree e da maquete)
      2. barra do topo, barra fixa do celular, revelar ao rolar
@@ -11,6 +12,9 @@
      5. tabela de preço dos lotes pela janela vigente (precos.json da
         maquete — um lugar só para editar quando sair tabela nova)
      6. disponibilidade ao vivo dos lotes (/api/lotes-status)
+     4b. cadastro de corretor (form data-kind="corretor"): um passo só →
+        POST /api/corretor → planilha do Drive, e o WhatsApp do Sydney abre
+        com a mensagem pronta. Não passa pelo CV.
    Sem JS a página continua inteira em PT; o formulário cai no WhatsApp.
    ===================================================================== */
 (function () {
@@ -46,7 +50,13 @@
       tblNote: 'Valores em dólares americanos, por lote, na condição 20% + 12 parcelas (preço de tabela), conforme a Tabela de Preços v3.1 (rev. 14/10/2026), válida até a publicação de nova tabela. Lotes múltiplos de 1.250 m²: o preço por m² cai a partir de 9, 17 e 33 lotes. À vista: −8%. 20% + 36 parcelas: +8%. Preços sujeitos à disponibilidade do lote no momento da reserva e à alteração sem aviso prévio; esta tabela não é oferta vinculante — as condições valem conforme o contrato de compra e venda.',
       liveAv: 'disponíveis agora', liveR: 'reservados', liveV: 'vendidos', liveB: 'indisponíveis',
       liveAt: 'Atualizado às {h} pelo mapa de vendas (CV CRM).', liveOff: 'Mapa de vendas indisponível no momento — fale com a equipe para a posição de hoje.',
-      catAv: '{n} {cat}'
+      catAv: '{n} {cat}',
+      imob: 'Escreva o nome da imobiliária (ou “Autônomo”).',
+      cMsg: 'Olá, me chamo {nome}, {imob}, e tenho interesse em ofertar o Bracerum Park para os meus clientes.',
+      cDa: 'da Imobiliária {x}', cDe: 'da {x}', cAuto: 'corretor(a) autônomo(a)',
+      cOkT: 'Pronto, {nome}. <em>Cadastro recebido.</em>',
+      cOkP: 'A conversa com Sydney Savi abriu no WhatsApp, com a sua mensagem já escrita — é só enviar. Se não abriu, toque abaixo:',
+      cOkWa: 'Abrir o WhatsApp', cOk2: 'Conhecer os produtos'
     },
     en: {
       step: 'Step {n} of 2', next: 'Continue', send: 'Get it now', back: '← back',
@@ -69,7 +79,13 @@
       tblNote: 'Prices in US dollars, per lot, for 20% down + 12 instalments (list price), per Price Table v3.1 (rev. 14 Oct 2026), valid until a new table is published. Lots in multiples of 1,250 m²: the price per m² drops from 9, 17 and 33 lots. Cash: −8%. 20% + 36 instalments: +8%. Prices subject to lot availability at the time of reservation and to change without notice; this table is not a binding offer — terms are those of the purchase contract.',
       liveAv: 'available now', liveR: 'reserved', liveV: 'sold', liveB: 'unavailable',
       liveAt: 'Updated at {h} from the sales map (CV CRM).', liveOff: 'Sales map unavailable right now — ask the team for today’s position.',
-      catAv: '{n} {cat}'
+      catAv: '{n} {cat}',
+      imob: 'Please enter the agency name (or “Independent”).',
+      cMsg: 'Hello, my name is {nome}, {imob}, and I am interested in offering Bracerum Park to my clients.',
+      cDa: 'from {x}', cDe: 'from {x}', cAuto: 'an independent broker',
+      cOkT: 'Done, {nome}. <em>You are signed up.</em>',
+      cOkP: 'A chat with Sydney Savi opened on WhatsApp with your message already written — just hit send. If it did not open, tap below:',
+      cOkWa: 'Open WhatsApp', cOk2: 'See the products'
     },
     es: {
       step: 'Paso {n} de 2', next: 'Continuar', send: 'Recibir ahora', back: '← volver',
@@ -92,7 +108,13 @@
       tblNote: 'Valores en dólares estadounidenses, por lote, en la condición 20% + 12 cuotas (precio de lista), según la Tabla de Precios v3.1 (rev. 14/10/2026), vigente hasta la publicación de una nueva tabla. Lotes en múltiplos de 1.250 m²: el precio por m² baja a partir de 9, 17 y 33 lotes. Al contado: −8%. 20% + 36 cuotas: +8%. Precios sujetos a la disponibilidad del lote al momento de la reserva y a cambios sin aviso; esta tabla no es oferta vinculante — rigen las condiciones del contrato de compraventa.',
       liveAv: 'disponibles ahora', liveR: 'reservados', liveV: 'vendidos', liveB: 'no disponibles',
       liveAt: 'Actualizado a las {h} desde el mapa de ventas (CV CRM).', liveOff: 'Mapa de ventas no disponible ahora — consulte al equipo la posición de hoy.',
-      catAv: '{n} {cat}'
+      catAv: '{n} {cat}',
+      imob: 'Escriba el nombre de la inmobiliaria (o “Independiente”).',
+      cMsg: 'Hola, me llamo {nome}, {imob}, y tengo interés en ofrecer Bracerum Park a mis clientes.',
+      cDa: 'de la Inmobiliaria {x}', cDe: 'de {x}', cAuto: 'corredor(a) independiente',
+      cOkT: 'Listo, {nome}. <em>Registro recibido.</em>',
+      cOkP: 'La conversación con Sydney Savi se abrió en WhatsApp, con su mensaje ya escrito — solo tiene que enviarlo. Si no se abrió, toque abajo:',
+      cOkWa: 'Abrir WhatsApp', cOk2: 'Conocer los productos'
     }
   };
   var LOCALE = { pt: 'pt-BR', en: 'en-US', es: 'es-PY' };
@@ -151,7 +173,7 @@
   } else D.querySelectorAll('.rv').forEach(function (n) { n.classList.add('is-in'); });
 
   /* ---------- 3. WhatsApp --------------------------------------------- */
-  function waNumber() { return lang === 'pt' ? WA.br : WA.py; }
+  function waNumber() { return CFG.wa || (lang === 'pt' ? WA.br : WA.py); }
   function waLink(msg, n) { return 'https://wa.me/' + (n || waNumber()) + '?text=' + encodeURIComponent(msg); }
   function paintWa() {
     var msg = (DICT[lang] && DICT[lang]['wa.msg']) || (D.querySelector('[data-t="wa.msg"]') || {})._pt || '';
@@ -163,10 +185,11 @@
 
   /* ---------- 4. formulário ------------------------------------------- */
   var form = formEl && formEl.querySelector('form');
+  var KIND = (formEl && formEl.dataset.kind) || 'lead';
   var started = false;
   function err(msg) {
     formEl.querySelectorAll('.form__err').forEach(function (e) { e.textContent = ''; });
-    var pane = formEl.querySelector('.pane:not([hidden])'), e = pane && pane.querySelector('.form__err');
+    var pane = formEl.querySelector('.pane:not([hidden])') || formEl, e = pane.querySelector('.form__err');
     if (e) e.textContent = msg || '';
   }
   function goStep(n) {
@@ -197,6 +220,8 @@
   if (form) {
     form.addEventListener('focusin', function () { if (!started) { started = true; track('form_start', { lp: CFG.lp }); } });
     form.querySelectorAll('select[name="ddi"]').forEach(function (s) { s.addEventListener('change', function () { s.dataset.touched = '1'; }); });
+  }
+  if (form && KIND === 'lead') {
     form.querySelectorAll('input[name="interesse"]').forEach(function (i) {
       i.addEventListener('change', function () { if (formEl.dataset.step === '1' && !form.querySelector('.pane[data-pane="1"] [name="perfil"]')) setTimeout(function () { goStep(2); }, 180); });
     });
@@ -256,6 +281,54 @@
     });
   }
   var T0 = Date.now();
+
+  /* ---------- 4b. cadastro de corretor ---------------------------------- */
+  // Um passo só. O WhatsApp abre no próprio toque de enviar (depois de um fetch o
+  // navegador bloquearia a janela); o cadastro segue em segundo plano com keepalive,
+  // que termina mesmo se a página sair. Se a janela for bloqueada (navegador de app),
+  // a página vai para o WhatsApp no mesmo separador. Se a planilha falhar, a mensagem
+  // chega ao Sydney do mesmo jeito, com nome e imobiliária, e a função grava no log.
+  function imobFrase(x) {
+    if (/^(aut[oô]nom|independ|freelanc|por conta|cuenta propia)/i.test(x)) return u('cAuto');
+    var ja = /^(imob|inmob|im[oó]veis|real estate|realty)/i.test(x);   // já começa com "Imobiliária…"
+    return fill(u(ja ? 'cDe' : 'cDa'), { x: x });
+  }
+  if (form && KIND === 'corretor') {
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var o = dataFromForm();
+      var bad = function (name, msg) { var f = form.querySelector('[name="' + name + '"]'); if (f) { f.setAttribute('aria-invalid', 'true'); f.focus(); } err(msg); };
+      form.querySelectorAll('[aria-invalid]').forEach(function (f) { f.removeAttribute('aria-invalid'); });
+      var nome = String(o.nome || '').replace(/\s+/g, ' '), imob = String(o.imobiliaria || '').replace(/\s+/g, ' ');
+      var tel = String(o.telefone || '').replace(/\D/g, '');
+      if (nome.length < 2) return bad('nome', u('name'));
+      if (tel.length < (o.ddi === '55' ? 10 : 7)) return bad('telefone', u('phone'));
+      if (imob.length < 2) return bad('imobiliaria', u('imob'));
+      var url = waLink(fill(u('cMsg'), { nome: nome, imob: imobFrase(imob) }), CFG.wa || WA.br);
+      var win = null;
+      try { win = W.open(url, '_blank'); if (win) win.opener = null; } catch (x) { win = null; }
+      track('whatsapp_click', { lp: CFG.lp, destino: 'cadastro_corretor' });
+      var body = {
+        lp: CFG.lp, idioma: lang, pagina: location.pathname + location.search,
+        nome: nome, telefone: tel, ddi: o.ddi, imobiliaria: imob,
+        hp: o.website || '', t: Date.now() - T0, attrib: (W.bpAttribution && W.bpAttribution()) || {}
+      };
+      var req = fetch(CFG.envio || '/api/corretor', { method: 'POST', keepalive: true, headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) })
+        .then(function (r) { return r.json().catch(function () { return { ok: false }; }); })
+        .catch(function () { return { ok: false, erro: 'rede' }; });
+      req.then(function (d) { track(d && d.ok ? 'corretor_cadastro' : 'corretor_erro', { lp: CFG.lp, erro: d && d.erro }); });
+      var first = esc(nome.split(' ')[0]);
+      var box = formEl.querySelector('.done');
+      box.innerHTML = '<span class="eyebrow">' + esc(CFG.nome || '') + '</span><p class="h3">' + fill(u('cOkT'), { nome: first }) + '</p><p>' + esc(u('cOkP')) + '</p>' +
+        '<a class="btn btn--ink" target="_blank" rel="noopener" data-track="corretor_whatsapp" href="' + esc(url) + '">' + esc(u('cOkWa')) + '</a>' +
+        '<a class="btn btn--line" href="#produtos">' + esc(u('cOk2')) + '</a>';
+      form.hidden = true; box.hidden = false;
+      ['.form__head', '.form__bar', '.form__sub'].forEach(function (s) { var n = formEl.querySelector(s); if (n) n.hidden = true; });
+      if (!win) location.href = url;
+      else formEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+  }
+
   // CTAs que já escolhem a opção do formulário: <a href="#form" data-pick="valor">
   D.querySelectorAll('[data-pick]').forEach(function (a) {
     a.addEventListener('click', function () {
@@ -354,6 +427,6 @@
   D.addEventListener('lp:lang', function () { paintWa(); setDdiByLang(); renderPrices(); renderRibbon(); renderLive();
     if (formEl) { var s = formEl.querySelector('.form__step'); if (s) s.textContent = fill(u('step'), { n: formEl.dataset.step || 1 }); } });
   setLang(LOCALE[qs] ? qs : LOCALE[saved] ? saved : LOCALE[nav] ? nav : 'pt');
-  if (formEl) goStep(1);
+  if (formEl && KIND === 'lead') goStep(1);
   onScroll();
 })();

@@ -4,7 +4,8 @@
     python3 docs/build_lps.py
 
 Grava <slug>/index.html para cada página de PAGINAS (folderpark, folderresidence,
-folderresort, folderbusinesscenter, foldermapadisponibilidade, folderlp) e as imagens
+folderresort, folderbusinesscenter, foldermapadisponibilidade, folderlp e corretores —
+esta última não vai para o CV: grava na planilha do Drive, ver docs/corretores.md) e as imagens
 de compartilhamento assets/lp/og-<slug>.jpg. **Não editar o HTML gerado** — editar
 aqui e rodar de novo. CSS e JS compartilhados em lp/ (lp.css, lp.js).
 
@@ -21,7 +22,7 @@ from PIL import Image
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SITE = "https://bracerumpark.com"
-VERSAO = "1"
+VERSAO = "2"
 
 WA_BR = "5547988030200"  # Sydney Savi (Brasil)
 WA_PY = "595985516065"   # Cleber Pavão (Paraguai)
@@ -29,8 +30,10 @@ WA_PY = "595985516065"   # Cleber Pavão (Paraguai)
 
 # --------------------------------------------------------------------------- textos
 class Pagina:
-    def __init__(self, slug, lp, produto, nome):
+    def __init__(self, slug, lp, produto, nome, cta=None):
         self.slug, self.lp, self.produto, self.nome = slug, lp, produto, nome
+        # Texto do botão do topo e da barra fixa do celular (todos levam ao #form).
+        self.cta = cta or T("Receber tabela", "Get price list", "Recibir tabla")
         self.i18n = {"en": {}, "es": {}}
         self.n = 0
 
@@ -126,7 +129,7 @@ def topbar(p):
   <div class="lang" role="group"{p.attr("ta", T("Idioma", "Language", "Idioma"))}>
     <button type="button" data-lang="pt" aria-pressed="true">PT</button><button type="button" data-lang="en" aria-pressed="false">EN</button><button type="button" data-lang="es" aria-pressed="false">ES</button>
   </div>
-  <a class="btn btn--sand" href="#form" data-track="top_cta">{p.tx("span", T("Receber tabela", "Get price list", "Recibir tabla"))}</a>
+  <a class="btn btn--sand" href="#form" data-track="top_cta">{p.tx("span", p.cta)}</a>
 </header>'''
 
 
@@ -258,15 +261,18 @@ def produtos(p, itens):
     return f'<div class="cards rv" style="--cols:{3 if len(itens) % 3 == 0 else 2 if len(itens) == 4 else 3}">{"".join(out)}</div>'
 
 
-def final(p, titulo, texto):
-    pessoas = f'''<div class="people">
-  <a class="person js-wa" data-phone="{WA_PY}" href="https://wa.me/{WA_PY}" target="_blank" rel="noopener">{WA_SVG}<div><b>Cleber Pavão</b>{p.tx("span", T("Paraguai · +595 985 516 065", "Paraguay · +595 985 516 065", "Paraguay · +595 985 516 065"))}</div></a>
+def final(p, titulo, texto, cta=None, so_br=False):
+    """cta = texto do botão que leva ao #form; so_br = só o Sydney (Brasil) nos contatos."""
+    cta = cta or T("Receber a tabela", "Get the price list", "Recibir la tabla")
+    py = "" if so_br else f'''
+  <a class="person js-wa" data-phone="{WA_PY}" href="https://wa.me/{WA_PY}" target="_blank" rel="noopener">{WA_SVG}<div><b>Cleber Pavão</b>{p.tx("span", T("Paraguai · +595 985 516 065", "Paraguay · +595 985 516 065", "Paraguay · +595 985 516 065"))}</div></a>'''
+    pessoas = f'''<div class="people">{py}
   <a class="person js-wa" data-phone="{WA_BR}" href="https://wa.me/{WA_BR}" target="_blank" rel="noopener">{WA_SVG}<div><b>Sydney Savi</b>{p.tx("span", T("Brasil · +55 47 98803-0200", "Brazil · +55 47 98803-0200", "Brasil · +55 47 98803-0200"))}</div></a>
 </div>'''
     return f'''<section class="sec ink" id="contato">
   <div class="final">
     <div class="rv">{p.tx("span", T("Fale com a equipe", "Talk to the team", "Hable con el equipo"), "eyebrow")}{p.tx("h2", titulo, "h2")}{p.tx("p", texto, "lead")}
-      <div class="btns"><a class="btn btn--sand" href="#form" data-track="final_cta">{p.tx("span", T("Receber a tabela", "Get the price list", "Recibir la tabla"))}<span class="arrow" aria-hidden="true">→</span></a></div></div>
+      <div class="btns"><a class="btn btn--sand" href="#form" data-track="final_cta">{p.tx("span", cta)}<span class="arrow" aria-hidden="true">→</span></a></div></div>
     <div class="rv">{pessoas}</div>
   </div>
 </section>'''
@@ -283,7 +289,7 @@ def rodape(p, nota=None):
   {n}{p.tx("p", base)}
   <p>© 2026 Bracerum Park · Villeta, Paraguay</p>
 </footer>
-<div class="sticky"><a href="#form" data-track="sticky_cta">{p.tx("span", T("Receber tabela", "Get price list", "Recibir tabla"))}</a><a class="js-wa" href="https://wa.me/{WA_BR}" target="_blank" rel="noopener"{p.attr("ta", T("WhatsApp", "WhatsApp", "WhatsApp"))}>{WA_SVG}</a></div>
+<div class="sticky"><a href="#form" data-track="sticky_cta">{p.tx("span", p.cta)}</a><a class="js-wa" href="https://wa.me/{WA_BR}" target="_blank" rel="noopener"{p.attr("ta", T("WhatsApp", "WhatsApp", "WhatsApp"))}>{WA_SVG}</a></div>
 <a class="wa js-wa" href="https://wa.me/{WA_BR}" target="_blank" rel="noopener"{p.attr("ta", T("Falar no WhatsApp", "Chat on WhatsApp", "Hablar por WhatsApp"))}>{WA_SVG}</a>'''
 
 
@@ -292,10 +298,11 @@ def lotes_map():
     return {l["id"]: l["cat"] for l in d["lotes"]}
 
 
-def montar(p, titulo_doc, desc, og, corpo, wa_msg, maquete=True, lotes=False):
+def montar(p, titulo_doc, desc, og, corpo, wa_msg, maquete=True, lotes=False, cfg_extra=None):
     p.key(*wa_msg, k="wa.msg")
     p.key(titulo_doc[0], titulo_doc[1], titulo_doc[2], k="_title")
     cfg = {"lp": p.lp, "produto": p.produto, "nome": p.nome, "maquete": "../3dmasterplan/" if maquete else ""}
+    cfg.update(cfg_extra or {})
     lm = f'<script type="application/json" id="lp-lotes">{json.dumps(lotes_map(), separators=(",", ":"))}</script>' if lotes else ""
     url = f"{SITE}/{p.slug}"
     return f'''<!DOCTYPE html>
@@ -1048,6 +1055,141 @@ def pg_geral():
                     "¡Hola! Llegué por el folleto de Bracerum Park y quiero conocer el proyecto."))
 
 
+# ===================================================================== 7. Cadastro de corretores
+# Não cadastra no CV: o formulário manda para /api/corretor, que grava uma linha na planilha
+# "Leads Corretores" do Drive (Apps Script, docs/corretores-planilha.gs), e a conversa com o
+# Sydney Savi abre no WhatsApp com a mensagem pronta. Fluxo e instalação: docs/corretores.md.
+def formulario_corretor(p):
+    ddi = "".join(f'<option value="{v}">{t}</option>' for v, t in DDI)
+    return f'''<div class="form rv" id="form" data-kind="corretor">
+  <div class="form__head">{p.tx("p", T("Cadastro de <em>corretor</em>", "Broker <em>sign-up</em>", "Registro de <em>corredor</em>"), "form__title")}</div>
+  {p.tx("p", T("Três campos. Ao enviar, a conversa com Sydney Savi, da equipe comercial, abre no seu WhatsApp com a mensagem pronta.",
+               "Three fields. When you send, a chat with Sydney Savi from the sales team opens on your WhatsApp, message ready.",
+               "Tres campos. Al enviar, la conversación con Sydney Savi, del equipo comercial, se abre en su WhatsApp con el mensaje listo."), "form__sub")}
+  <div class="form__bar"></div>
+  <form novalidate>
+    <label class="field">{p.tx("span", T("Nome", "Name", "Nombre"))}<input name="nome" autocomplete="name" required maxlength="100" /></label>
+    <label class="field">{p.tx("span", T("WhatsApp"))}
+      <span class="tel"><select name="ddi"{p.attr("ta", T("Código do país", "Country code", "Código de país"))}>{ddi}</select><input name="telefone" type="tel" inputmode="tel" autocomplete="tel-national" required maxlength="20" /></span></label>
+    <label class="field">{p.tx("span", T("Imobiliária", "Real estate agency", "Inmobiliaria"))}<input name="imobiliaria" autocomplete="organization" required maxlength="100"{p.attr("tp", T("Nome da imobiliária — ou “Autônomo”", "Agency name — or “Independent”", "Nombre de la inmobiliaria — o “Independiente”"))} /></label>
+    <label class="hp" aria-hidden="true">Website<input name="website" tabindex="-1" autocomplete="off" /></label>
+    <p class="form__err" role="alert"></p>
+    <button type="submit" class="btn btn--ink" data-track="corretor_submit">{WA_SVG}{p.tx("span", T("Cadastrar e chamar no WhatsApp", "Sign up and chat on WhatsApp", "Registrarme y escribir por WhatsApp"))}</button>
+    {p.tx("p", T("Ao enviar, você autoriza o Bracerum Park a falar com você pelo WhatsApp sobre a parceria.",
+                 "By sending, you authorise Bracerum Park to contact you on WhatsApp about the partnership.",
+                 "Al enviar, autoriza a Bracerum Park a contactarle por WhatsApp sobre la alianza."), "form__legal")}
+  </form>
+  <div class="done" hidden aria-live="polite"></div>
+  <p class="form__trust">{LOCK_SVG}{p.tx("span", T(
+      "Seus dados vão só para a equipe comercial do Bracerum Park.",
+      "Your details go only to the Bracerum Park sales team.",
+      "Sus datos van solo al equipo comercial de Bracerum Park."))}</p>
+</div>'''
+
+
+def pg_corretores():
+    p = Pagina("corretores", "corretores", "corretores", "Corretores parceiros",
+               cta=T("Cadastrar", "Sign up", "Registrarme"))
+    corpo = hero(
+        p, "assets/web/fotos/park-boulevard-aereo.jpg",
+        T("Bracerum Park · Corretores parceiros", "Bracerum Park · Partner brokers", "Bracerum Park · Corredores asociados"),
+        T("Corretor <em>parceiro</em>", "Partner <em>broker</em>", "Corredor <em>asociado</em>"),
+        T("Uma cidade industrial inteira à venda em Villeta, no Paraguai — lotes industriais, apartamentos, casas e lojas. Cadastre-se para ofertar aos seus clientes, com material, tabela e atendimento direto da equipe comercial.",
+          "A whole industrial city for sale in Villeta, Paraguay — industrial lots, apartments, houses and stores. Sign up to offer it to your clients, with materials, prices and direct support from the sales team.",
+          "Una ciudad industrial entera en venta en Villeta, Paraguay — lotes industriales, departamentos, casas y locales. Regístrese para ofrecerla a sus clientes, con material, tabla y atención directa del equipo comercial."),
+        [T("Quatro produtos num endereço só", "Four products at one address", "Cuatro productos en una sola dirección"),
+         T("Tabela e disponibilidade ao vivo", "Live prices and availability", "Tabla y disponibilidad en vivo"),
+         T("Atendimento direto com a equipe", "Direct line to the sales team", "Atención directa con el equipo")],
+        [("go", T("Quero me cadastrar", "I want to sign up", "Quiero registrarme"), "#form", ' data-track="hero_cta"'),
+         ("wa", T("WhatsApp"), "", "")],
+        formulario_corretor(p))
+    corpo += f'''
+<section class="sec" id="numeros">
+  {stats(p, [(T("614"), T("lotes industriais, de 1.250 m² a quadras inteiras", "industrial lots, from 1,250 m² to whole blocks", "lotes industriales, de 1.250 m² a manzanas enteras")),
+             (T("1.452", "1,452", "1.452"), T("apartamentos de 1, 2 e 3 quartos e coberturas no Residence", "1, 2 and 3-bedroom flats and penthouses at the Residence", "departamentos de 1, 2 y 3 dormitorios y penthouses en el Residence")),
+             (T("31"), T("lotes para casas no Bracerum Resort, a partir de 600 m²", "house lots at Bracerum Resort, from 600 m²", "lotes para casas en Bracerum Resort, desde 600 m²")),
+             (T("57"), T("lojas na 1ª fase do Outlet Premium", "stores in phase 1 of the Premium Outlet", "locales en la 1ª fase del Outlet Premium"))])}
+</section>
+<section class="sec paper2" id="produtos">
+  {head_sec(p, T("O que você vai ofertar", "What you will offer", "Qué va a ofrecer"),
+            T("Um portfólio inteiro, <em>num endereço só.</em>", "A whole portfolio, <em>at one address.</em>", "Un portafolio entero, <em>en una sola dirección.</em>"),
+            T("Do industrial ao residencial: cada produto tem a sua página, com valores e disponibilidade, para você conhecer antes de apresentar ao cliente.",
+              "From industrial to residential: each product has its own page, with prices and availability, so you know it before presenting it to your client.",
+              "De lo industrial a lo residencial: cada producto tiene su página, con valores y disponibilidad, para que lo conozca antes de presentarlo al cliente."))}
+  {cards_produtos(p)}
+  <div class="btns rv"><a class="btn btn--ink" href="../3dmasterplan/" data-track="open_3d">{p.tx("span", T("Explorar o masterplan 3D", "Explore the 3D masterplan", "Explorar el masterplan 3D"))}<span class="arrow" aria-hidden="true">→</span></a>
+  <a class="btn btn--line" href="../foldermapadisponibilidade/" data-track="open_mapa">{p.tx("span", T("Preços e disponibilidade", "Prices and availability", "Precios y disponibilidad"))}</a></div>
+</section>
+<section class="sec" id="argumentos">
+  {split(p, "assets/lp/park-hangar-jato.jpg", "Hangar do Bracerum Park com jato executivo",
+         T("Argumentos de venda", "Selling points", "Argumentos de venta"),
+         T("O que o seu cliente <em>não encontra em outro lugar.</em>", "What your client <em>won’t find anywhere else.</em>", "Lo que su cliente <em>no encuentra en otro lugar.</em>"),
+         [T("O Bracerum Park reúne num só endereço o que uma indústria precisa para operar e o que as pessoas precisam para morar perto dela: lotes e galpões, recinto alfandegado, pista de pouso, centro de negócios, condomínios, escola e clube.",
+            "Bracerum Park brings together at one address what an industry needs to operate and what people need to live close to it: lots and warehouses, a bonded customs area, a runway, a business centre, housing, a school and a club.",
+            "Bracerum Park reúne en una sola dirección lo que una industria necesita para operar y lo que las personas necesitan para vivir cerca: lotes y galpones, recinto aduanero, pista de aterrizaje, centro de negocios, condominios, escuela y club."),
+          T("Para o investidor industrial, o argumento é o Paraguai: tributo único de 1% no regime de Maquila, 100% de capital estrangeiro e 20 anos de benefícios garantidos. Para quem vai morar, é ter tudo a poucos passos do trabalho.",
+            "For the industrial investor, the argument is Paraguay: a single 1% tax under the Maquila regime, 100% foreign ownership and 20 years of guaranteed benefits. For those who will live there, it is having everything a few steps from work.",
+            "Para el inversor industrial, el argumento es Paraguay: tributo único del 1% en el régimen de Maquila, 100% de capital extranjero y 20 años de beneficios garantizados. Para quien va a vivir, es tener todo a pocos pasos del trabajo.")],
+         extra=feats(p, [("pct", T("Regime de Maquila · 1%", "Maquila regime · 1%", "Régimen de Maquila · 1%"), None),
+                         ("alfandega", T("Recinto alfandegado", "Bonded customs area", "Recinto aduanero"), None),
+                         ("aviao", T("Pista de pouso de 1.460 m", "1,460 m runway", "Pista de aterrizaje de 1.460 m"), None),
+                         ("praia", T("Praia artificial no Residence", "Artificial beach at the Residence", "Playa artificial en el Residence"), None)]),
+         cap=T("Hangar e pátio de aeronaves · imagem ilustrativa", "Hangar and apron · illustrative image", "Hangar y plataforma · imagen ilustrativa"))}
+</section>
+{sec_paraguai(p)}
+<section class="sec" id="como-funciona">
+  {head_sec(p, T("Como funciona", "How it works", "Cómo funciona"), T("Três passos <em>até a primeira venda.</em>", "Three steps <em>to your first sale.</em>", "Tres pasos <em>hasta la primera venta.</em>"))}
+  {steps(p, [
+      (T("Cadastre-se", "Sign up", "Regístrese"),
+       T("Nome, WhatsApp e imobiliária. Ao enviar, a conversa com Sydney Savi abre no seu WhatsApp, com a mensagem pronta.",
+         "Name, WhatsApp and agency. When you send, a chat with Sydney Savi opens on your WhatsApp, message ready.",
+         "Nombre, WhatsApp e inmobiliaria. Al enviar, la conversación con Sydney Savi se abre en su WhatsApp, con el mensaje listo.")),
+      (T("Receba o material", "Get the materials", "Reciba el material"),
+       T("Tabela vigente, mapa de disponibilidade ao vivo, maquete 3D do masterplan e as condições da parceria, direto com a equipe comercial.",
+         "Current price list, live availability map, the 3D masterplan model and the partnership terms, straight from the sales team.",
+         "Tabla vigente, mapa de disponibilidad en vivo, maqueta 3D del masterplan y las condiciones de la alianza, directo con el equipo comercial.")),
+      (T("Apresente e reserve", "Present and reserve", "Presente y reserve"),
+       T("Visita ao parque ou apresentação online pela maquete 3D, com o apoio da equipe. A reserva entra no mapa de vendas na hora.",
+         "A site visit or an online presentation with the 3D model, backed by the team. The reservation goes into the sales map at once.",
+         "Visita al parque o presentación en línea con la maqueta 3D, con el apoyo del equipo. La reserva entra al mapa de ventas al instante.")),
+  ])}
+</section>
+{sec_faq(p, [
+    (T("Quem pode se cadastrar?", "Who can sign up?", "¿Quién puede registrarse?"),
+     T("Corretores de imóveis e imobiliárias. Quem trabalha por conta própria escreve “Autônomo” no campo da imobiliária.",
+       "Real estate brokers and agencies. If you work on your own, write “Independent” in the agency field.",
+       "Corredores inmobiliarios e inmobiliarias. Quien trabaja por cuenta propia escribe “Independiente” en el campo de la inmobiliaria.")),
+    (T("Como funciona a comissão?", "How does the commission work?", "¿Cómo funciona la comisión?"),
+     T("As condições da parceria — comissão, prazos e como cada venda fica registrada — são passadas pela equipe comercial no primeiro contato, depois do cadastro.",
+       "The partnership terms — commission, timelines and how each sale is registered — are given by the sales team at the first contact, after you sign up.",
+       "Las condiciones de la alianza — comisión, plazos y cómo queda registrada cada venta — las informa el equipo comercial en el primer contacto, después del registro.")),
+    (T("O que eu posso ofertar?", "What can I offer?", "¿Qué puedo ofrecer?"),
+     T("Lotes industriais a partir de 1.250 m² no Parque Industrial, apartamentos de 1, 2 e 3 quartos e coberturas no Bracerum Residence, lotes para casas no Bracerum Resort e lojas e salas no Business Center (Outlet, Market e Centro Tecnológico).",
+       "Industrial lots from 1,250 m² at the Industrial Park, 1, 2 and 3-bedroom flats and penthouses at Bracerum Residence, house lots at Bracerum Resort, and stores and offices at the Business Center (Outlet, Market and Technology Centre).",
+       "Lotes industriales desde 1.250 m² en el Parque Industrial, departamentos de 1, 2 y 3 dormitorios y penthouses en Bracerum Residence, lotes para casas en Bracerum Resort y locales y oficinas en el Business Center (Outlet, Market y Centro Tecnológico).")),
+    (T("Como sei o que ainda está disponível?", "How do I know what is still available?", "¿Cómo sé qué sigue disponible?"),
+     T("Pelo mapa de vendas ao vivo, na página de preços e disponibilidade, e pela maquete 3D do masterplan, lote por lote. Antes de fechar, a equipe confirma a posição do dia.",
+       "Through the live sales map on the prices and availability page, and the 3D masterplan model, lot by lot. Before closing, the team confirms the day’s position.",
+       "Con el mapa de ventas en vivo, en la página de precios y disponibilidad, y con la maqueta 3D del masterplan, lote por lote. Antes de cerrar, el equipo confirma la posición del día.")),
+    (T("Posso levar clientes para visitar?", "Can I bring clients to visit?", "¿Puedo llevar clientes de visita?"),
+     T("Sim. Agende com a equipe pelo WhatsApp. Para clientes de longe, a apresentação pode ser online, pela maquete 3D — lote por lote.",
+       "Yes. Book with the team on WhatsApp. For clients far away, the presentation can be online, with the 3D model — lot by lot.",
+       "Sí. Agende con el equipo por WhatsApp. Para clientes lejanos, la presentación puede ser en línea, con la maqueta 3D — lote por lote.")),
+    FAQ_ONDE])}
+{final(p, T("Vamos vender <em>juntos?</em>", "Shall we sell <em>together?</em>", "¿Vendemos <em>juntos?</em>"),
+       T("Cadastre-se e fale direto com Sydney Savi, da equipe comercial do Bracerum Park.",
+         "Sign up and talk directly to Sydney Savi from the Bracerum Park sales team.",
+         "Regístrese y hable directo con Sydney Savi, del equipo comercial de Bracerum Park."),
+       cta=T("Fazer meu cadastro", "Sign me up", "Hacer mi registro"), so_br=True)}'''
+    return montar(p, T("Corretores parceiros · Bracerum Park", "Partner brokers · Bracerum Park", "Corredores asociados · Bracerum Park"),
+                  "Cadastro de corretores e imobiliárias para ofertar o Bracerum Park: lotes industriais, apartamentos, casas e lojas em Villeta, Paraguai.",
+                  "corretores", corpo,
+                  T("Olá! Sou corretor(a) e tenho interesse em ofertar o Bracerum Park para os meus clientes.",
+                    "Hello! I am a real estate broker and I am interested in offering Bracerum Park to my clients.",
+                    "¡Hola! Soy corredor(a) inmobiliario(a) y tengo interés en ofrecer Bracerum Park a mis clientes."),
+                  cfg_extra={"wa": WA_BR, "envio": "/api/corretor"})
+
+
 PAGINAS = {
     "folderpark": (pg_park, "assets/lp/park-galpao-avenida.jpg"),
     "folderresidence": (pg_residence, "assets/lp/residence-praia.jpg"),
@@ -1055,6 +1197,7 @@ PAGINAS = {
     "folderbusinesscenter": (pg_business, "assets/lp/outlet-boulevard.jpg"),
     "foldermapadisponibilidade": (pg_mapa, "3dmasterplan/data/poster.jpg"),
     "folderlp": (pg_geral, "assets/web/fotos/park-aereo-rio.jpg"),
+    "corretores": (pg_corretores, "assets/web/fotos/park-boulevard-aereo.jpg"),
 }
 
 

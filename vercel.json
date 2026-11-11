@@ -9,6 +9,8 @@
     { "source": "/JunioPadua", "destination": "/juniopadua", "permanent": true },
     { "source": "/VaniaRosa", "destination": "/vaniarosa", "permanent": true },
     { "source": "/OmarApetz", "destination": "/omarapetz", "permanent": true },
+    { "source": "/corretor", "destination": "/corretores", "permanent": false },
+    { "source": "/Corretor", "destination": "/corretores", "permanent": false },
     { "source": "/admin", "destination": "/admin/", "permanent": false },
     { "source": "/Admin", "destination": "/admin/", "permanent": false },
     { "source": "/Admin/", "destination": "/admin/", "permanent": false }
@@ -38,10 +40,14 @@
     { "source": "/Foldermapadisponibilidade/", "destination": "/foldermapadisponibilidade/index.html" },
     { "source": "/folderlp", "destination": "/folderlp/index.html" },
     { "source": "/FolderLP", "destination": "/folderlp/index.html" },
-    { "source": "/FolderLP/", "destination": "/folderlp/index.html" }
+    { "source": "/FolderLP/", "destination": "/folderlp/index.html" },
+    { "source": "/corretores", "destination": "/corretores/index.html" },
+    { "source": "/Corretores", "destination": "/corretores/index.html" },
+    { "source": "/Corretores/", "destination": "/corretores/index.html" }
   ],
   "functions": {
-    "api/admin.js": { "maxDuration": 60 }
+    "api/admin.js": { "maxDuration": 60 },
+    "api/corretor.js": { "maxDuration": 20 }
   },
   "headers": [
     {
