@@ -28,10 +28,9 @@ rotas) que as seis páginas internas baixavam e interpretavam à toa. Ele roda d
   App da Web (`docs/corretores-planilha.gs`; URL em `CORRETORES_PLANILHA_URL` na Vercel), e a página abre o
   **WhatsApp do Sydney Savi** (`5547988030200`) com "Olá, me chamo X, da Imobiliária Y, e tenho interesse em
   ofertar o Bracerum Park para os meus clientes." Fluxo, instalação e testes: **`docs/corretores.md`**.
-- **No ar desde 2026-11-11** (deploy `dpl_BS6ZTmhVm5xZCJpjsPEoc8Bz4sq5`, conferido: página, arquivos, `/corretor` →
-  `/corretores`, WhatsApp abrindo). **Falta ligar a planilha:** o Apps Script ainda não foi publicado, então
-  `/api/corretor` responde `não configurado` e os cadastros só ficam no log da Vercel (`[corretor]`) — o WhatsApp
-  chega ao Sydney normalmente. Quando vier a URL `/exec`: variável `CORRETORES_PLANILHA_URL` + novo deploy.
+- **No ar desde 2026-11-11, com a planilha ligada** (Apps Script publicado pelo Matheus; `CORRETORES_PLANILHA_URL`
+  sensível em Production; deploy `dpl_DP5588h2rvCAdtmWHcsgEt9k7VTg`). Teste real conferido: linha 2 da planilha,
+  "TESTE Claude - apagar" (cabeçalho criado pelo script, data em horário de Brasília) — **apagar essa linha na planilha**.
 - Junto: três correções no `lp/lp.css` compartilhado que valem para as sete LPs — DDI ao lado do número (estava
   empilhado), título do formulário some depois do envio e o "Pronto, …" no tamanho de título. `lp/` em `?v=2`.
 
