@@ -26,6 +26,20 @@ maquete 3D embutida, que as seis páginas internas baixavam e interpretavam à t
   sessão injeta o token real de `api.vercel.com`; se expirou, pedir outro em vercel.com/account/tokens).
   Conferir no ar que nenhuma página pede arquivo que ficou de fora.
 
+### Google Analytics 4 ligado (2026-11-12)
+- **`CONFIG.ga4 = 'G-0MZSYRTHND'`** no `tracking.js` (propriedade criada pelo Matheus). Vale em todas as páginas
+  que carregam o `tracking.js` (as 7 do site, linktree, cartões, LPs dos folders, corretores e a maquete);
+  **`/admin/` e `/cadastro/` não carregam** — o uso da equipe não entra nos números.
+- Vão para o GA4: `page_view` e os eventos do `tracking.js` (`whatsapp_click`, `phone_click`, `email_click`,
+  `social_click`, `outbound_click`, `nav_click`, `button_click`, `language_change`, `section_view`,
+  `scroll_depth`, `save_contact`, `masterplan3d_open` e o `generate_lead` das LPs), com os utm dos folders.
+  Cliques dentro da maquete embutida chegam com `frame=/3dmasterplan/`. `?bpdebug=1` liga o `debug_mode` (DebugView).
+- O trecho que o GA mostra ao criar a propriedade **não vai no HTML**: o `tracking.js` já carrega o `gtag.js`.
+- Testes do Claude interceptam `g/collect` (resposta 204 local) para não mandar visita falsa ao GA.
+- **Vercel Web Analytics** continua (visitas, páginas, país, aparelho, origem); no plano Hobby não mostra
+  eventos nem utm — isso agora é no GA4.
+- **LGPD:** o GA4 grava cookies; o aviso de consentimento ainda **não** foi posto (oferecido ao usuário).
+
 ### Masterplan 3D na home (v6.11 — 2026-11-12)
 - **A vista aérea com pinos saiu da home** (pedido do cliente): a seção `#masterplan` agora tem título
   (`mp.eyebrow`/`mp.title`/`mp.lead`), o link "Abrir a maquete em tela cheia" (`/3dmasterplan/`) e um

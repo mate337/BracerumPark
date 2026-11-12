@@ -32,7 +32,7 @@
 
   /* ---------- CONFIGURAÇÃO ------------------------------------------ */
   var CONFIG = {
-    ga4: '',        // ex.: 'G-XXXXXXXXXX'  (Google Analytics 4)
+    ga4: 'G-0MZSYRTHND', // Google Analytics 4 — propriedade "Bracerum Park" (ligado em 2026-11-12)
     metaPixel: '',  // ex.: '1234567890123456' (Meta / Facebook / Instagram)
     vercel: true    // Vercel Web Analytics (ligar também no painel da Vercel)
   };
@@ -79,7 +79,9 @@
     W.dataLayer = W.dataLayer || [];
     W.gtag = function () { W.dataLayer.push(arguments); };
     W.gtag('js', new Date());
-    W.gtag('config', CONFIG.ga4, { page_path: location.pathname + location.search });
+    var cfg = { page_path: location.pathname + location.search };
+    if (DEBUG) cfg.debug_mode = true;   // ?bpdebug=1 também aparece no DebugView do GA4
+    W.gtag('config', CONFIG.ga4, cfg);
     load('https://www.googletagmanager.com/gtag/js?id=' + CONFIG.ga4);
   }
   if (CONFIG.metaPixel) {
