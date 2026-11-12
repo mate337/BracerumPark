@@ -26,6 +26,8 @@
     "Cadastra Leads"); se vier, precisa ser válido. Telefone continua obrigatório.
     lp "cadastro" = /cadastro/, o cadastro rápido da equipe (nome, telefone, empresa, interesse):
     vai com módulo "Cadastro rápido" e tag "cadastro-rapido" em vez de "Landing page".
+    produtos: [..] (opcional, no lugar de produto) = mais de um interesse; vira idempreendimento em
+    lista ([4, 7]) — o CV aceita lista de empreendimentos de interesse — e uma tag por produto.
   Saída: { ok:true, idlead } · { ok:false, erro } — a página mostra o WhatsApp como saída
   quando o CV falha, com os dados já escritos na mensagem, para o lead não se perder.
 
@@ -67,13 +69,20 @@ function validar(b) {
   return { nome, email, tel, ddi: ddi.length > 1 ? ddi : '' };
 }
 
+// id do empreendimento no CV para um produto (variável CVCRM_EMP_<PRODUTO> vence a tabela EMP)
+const empDe = (p) => Number(process.env[`CVCRM_EMP_${p.toUpperCase()}`] || EMP[p]) || null;
+
 function montar(b, v) {
-  const produto = slug(b.produto) || 'park';
+  // "produtos" (lista, /cadastro/ com mais de um interesse) ou "produto" (um só, LPs)
+  const lista = (Array.isArray(b.produtos) ? b.produtos : [b.produto]).map(slug).filter(Boolean).slice(0, 8);
+  const produtos = lista.length ? [...new Set(lista)] : ['park'];
+  const produto = produtos[0];
   const lp = slug(b.lp) || produto;
   const at = (b.attrib && typeof b.attrib === 'object') ? b.attrib : {};
   const last = at.last || {}, first = at.first || {};
-  const envEmp = process.env[`CVCRM_EMP_${produto.toUpperCase()}`];
-  const idemp = Number(envEmp || EMP[produto]) || null;
+  // O CV aceita lista de empreendimentos de interesse ([4, 7]); com um só vai o número, como sempre foi.
+  const emps = [...new Set(produtos.map(empDe).filter(Boolean))];
+  const idemp = emps.length > 1 ? emps : emps[0] || null;
 
   const campanha = last.utm_campaign || first.utm_campaign || '';
   const rapido = lp === 'cadastro';
@@ -102,7 +111,7 @@ function montar(b, v) {
     midia: slug(campanha || last.utm_source || `site-${lp}`) || `site-${lp}`,
     conversao: limpa(`${rapido ? 'Cadastro rápido' : 'LP ' + lp}${b.interesse ? ' — ' + b.interesse : ''}`, 100),
     modulo: rapido ? 'Cadastro rápido' : 'Landing page',
-    tags: (rapido ? ['cadastro-rapido', produto] : ['landing-page', lp, produto, limpa(b.idioma, 5) || 'pt']).filter(Boolean),
+    tags: (rapido ? ['cadastro-rapido', ...produtos] : ['landing-page', lp, ...produtos, limpa(b.idioma, 5) || 'pt']).filter(Boolean),
     interacoes: [{ tipo: 'A', descricao: linhas.join('\n') }],
   };
   if (idemp) corpo.idempreendimento = idemp;

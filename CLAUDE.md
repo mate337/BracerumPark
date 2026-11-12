@@ -26,6 +26,8 @@ rotas) que as seis páginas internas baixavam e interpretavam à toa. Ele roda d
   interesse** → **`api/lead.js`** (a das LPs, com `lp: "cadastro"`) → **lead no CV** (empreendimento pelo
   interesse, módulo "Cadastro rápido", tag `cadastro-rapido`, empresa na anotação). Sem utm na URL entra como
   da feira (origem OP, mídia `expo-py-br`, `ORIGEM_PADRAO` em `cadastro/cadastro.js`).
+- **Interesse com mais de uma opção** (caixas de marcar): `produtos: [...]` → `idempreendimento` em lista (`[4, 7]`) e uma
+  tag por produto; Apartamento + Lote para casa caem no mesmo 7.
 - **`api/lead.js` aceita lead sem e-mail** (o CV aceita "e-mail ou telefone"); e-mail, se vier, é validado. As LPs
   continuam exigindo e-mail no navegador.
 - Sem internet/CV fora: fila no aparelho que sobe sozinha; `cadastro/sw.js` abre a página offline.

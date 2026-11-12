@@ -17,8 +17,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="cadastro.css?v=1" />
-<script src="cadastro.js?v=1" defer></script>
+<link rel="stylesheet" href="cadastro.css?v=2" />
+<script src="cadastro.js?v=2" defer></script>
 </head>
 <body>
 <!-- Cadastro rápido de lead (nome, telefone, empresa, interesse) → /api/lead → lead no CV CRM.
@@ -73,12 +73,12 @@
       </label>
 
       <fieldset class="field" data-campo="interesse">
-        <legend class="field__lab">Interesse <b aria-hidden="true">*</b></legend>
+        <legend class="field__lab">Interesse <b aria-hidden="true">*</b> <span class="field__dica">marque um ou mais</span></legend>
         <div class="opts">
-          <label class="opt"><input type="radio" name="interesse" value="Lotes industriais" data-produto="park" /><span><b>Lotes industriais</b><small>Parque Industrial</small></span></label>
-          <label class="opt"><input type="radio" name="interesse" value="Apartamento" data-produto="residence" /><span><b>Apartamento</b><small>Bracerum Residence</small></span></label>
-          <label class="opt"><input type="radio" name="interesse" value="Lote para casa" data-produto="resort" /><span><b>Lote para casa</b><small>Bracerum Resort</small></span></label>
-          <label class="opt"><input type="radio" name="interesse" value="Loja ou sala" data-produto="outlet" /><span><b>Loja ou sala</b><small>Business Center</small></span></label>
+          <label class="opt"><input type="checkbox" name="interesse" value="Lotes industriais" data-produto="park" /><span><b>Lotes industriais</b><small>Parque Industrial</small></span></label>
+          <label class="opt"><input type="checkbox" name="interesse" value="Apartamento" data-produto="residence" /><span><b>Apartamento</b><small>Bracerum Residence</small></span></label>
+          <label class="opt"><input type="checkbox" name="interesse" value="Lote para casa" data-produto="resort" /><span><b>Lote para casa</b><small>Bracerum Resort</small></span></label>
+          <label class="opt"><input type="checkbox" name="interesse" value="Loja ou sala" data-produto="outlet" /><span><b>Loja ou sala</b><small>Business Center</small></span></label>
         </div>
         <span class="field__err" hidden></span>
       </fieldset>

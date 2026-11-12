@@ -21,10 +21,15 @@ telefone, empresa e interesse**. Mesmo visual do painel de reservas (`/admin/`),
 | Nome (obrigatório) | `nome` |
 | Telefone + código do país (obrigatório) | `telefone` (só dígitos, sem o zero da frente) + `telefone_ddi` |
 | Empresa (opcional) | anotação do lead ("Empresa: …") — o CV não tem campo de empresa no lead |
-| Interesse (obrigatório) | `idempreendimento` + `conversao` + anotação |
+| Interesse (obrigatório, **um ou mais**) | `idempreendimento` (número, ou lista `[4, 7]` com mais de um) + tags + `conversao` + anotação |
 
 Interesse → empreendimento (igual às LPs): Lotes industriais → 4 · Apartamento (Residence) → 7 ·
 Lote para casa (Resort) → 7 · Loja ou sala (Business Center/Outlet) → 9.
+
+**Mais de um interesse (2026-11-12, pedido do cliente):** os quatro cartões são caixas de marcar. A página manda
+`produtos: [...]` e a `api/lead.js` junta os empreendimentos sem repetir — Apartamento + Lote para casa = `7`;
+Lotes + Loja = `[4, 9]` (o CV aceita lista de empreendimentos de interesse). Uma tag por produto, e o texto
+"Apartamento, Lote para casa" na conversão e na anotação. Cadastro antigo na fila (só `produto`) continua valendo.
 
 Sem e-mail: o CV aceita lead só com telefone ("e-mail **ou** telefone", doc. "Cadastra Leads"). Por isso a
 `api/lead.js` passou a aceitar e-mail vazio (se vier, continua sendo validado) — as LPs não mudam, elas

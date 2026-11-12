@@ -58,14 +58,16 @@
     var tel = form.telefone.value.replace(/\D/g, '');
     var ddi = ddiDe();
     tel = tel.replace(/^0+/, '');                       // PY escreve 0985…, BR 047…: com o código do país o zero sai
-    var esc1 = form.querySelector('input[name="interesse"]:checked');
+    var marcados = [].slice.call(form.querySelectorAll('input[name="interesse"]:checked'));
     var erros = {};
     if (nome.length < 2) erros.nome = 'Escreva o nome.';
     if (!ddi) erros.telefone = 'Falta o código do país.';
     else if (tel.length < (ddi === '55' ? 10 : 7) || tel.length > 15) erros.telefone = ddi === '55' ? 'Telefone com DDD (ex.: 47 98803-0200).' : 'Confira o número.';
-    if (!esc1) erros.interesse = 'Escolha o interesse.';
+    if (!marcados.length) erros.interesse = 'Marque pelo menos um interesse.';
     ['nome', 'telefone', 'interesse'].forEach(function (c) { marcar(c, erros[c]); });
-    return { erros: erros, dados: { nome: nome, tel: tel, ddi: ddi, empresa: form.empresa.value.replace(/\s+/g, ' ').trim(), escolha: esc1 } };
+    return { erros: erros, dados: { nome: nome, tel: tel, ddi: ddi, empresa: form.empresa.value.replace(/\s+/g, ' ').trim(),
+      interesse: marcados.map(function (i) { return i.value; }).join(', '),
+      produtos: marcados.map(function (i) { return i.dataset.produto; }) } };
   }
   // corrigiu o campo: some a marca dele e, sem nenhuma marca, some o aviso do topo
   var limpar = function (c) { marcar(c, ''); if (!form.querySelector('.is-err')) alerta.hidden = true; };
@@ -159,8 +161,8 @@
     gravar(K_DDI, ddiSel.value);
     var id = 'c' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
     var corpo = {
-      lp: 'cadastro', produto: d.escolha.dataset.produto, idioma: 'pt', pagina: location.pathname + location.search,
-      nome: d.nome, telefone: d.tel, ddi: d.ddi, empresa: d.empresa, interesse: d.escolha.value,
+      lp: 'cadastro', produto: d.produtos[0], produtos: d.produtos, idioma: 'pt', pagina: location.pathname + location.search,
+      nome: d.nome, telefone: d.tel, ddi: d.ddi, empresa: d.empresa, interesse: d.interesse,
       hp: form.website.value || '', t: Date.now() - T0, attrib: atribuicao()
     };
     var criado = new Date().toISOString();
