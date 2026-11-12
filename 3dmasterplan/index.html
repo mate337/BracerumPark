@@ -9,6 +9,9 @@
     var p = location.pathname;
     if (!/\/$|\.html?$/.test(p)) { document.documentElement.hidden = true; location.replace(p + '/' + location.search + location.hash); }
   })();
+  /* ?embed = maquete dentro da home (index.html#masterplan): sem a barra de cima e com a rolagem
+     cedida à página — a classe entra aqui, antes de pintar, e o app.js lê a mesma classe. */
+  if (/[?&]embed\b/.test(location.search)) document.documentElement.className += ' is-embed';
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>Masterplan 3D — Bracerum Park</title>
@@ -21,7 +24,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="app.css?v=4" />
+<link rel="stylesheet" href="app.css?v=5" />
 <script type="importmap">{"imports":{"three":"./vendor/three.module.min.js"}}</script>
 <script src="../tracking.js?v=1" defer></script>
 </head>
@@ -46,7 +49,7 @@
     <p class="eyebrow" data-i18n="ui.eyebrow">Bracerum Park · Villeta, Paraguai</p>
     <h1 data-i18n="ui.noWebgl">Este navegador não abriu a maquete 3D.</h1>
     <p data-i18n="ui.noWebglText">A visualização precisa de WebGL. Tente outro navegador ou um computador — enquanto isso, a imagem acima mostra o masterplan.</p>
-    <a class="btn" data-site="index.html#masterplan" href="../index.html#masterplan" data-i18n="ui.toSiteMp">Ver o masterplan no site</a>
+    <a class="btn" data-site="" href="../" data-i18n="ui.back">Voltar ao site</a>
   </div>
 </div>
 
@@ -154,6 +157,6 @@
 
 <noscript><div class="fallback"><div class="fallback__box"><h1>Masterplan 3D</h1><p>Esta maquete precisa de JavaScript.</p><a class="btn" href="../">Bracerum Park</a></div></div></noscript>
 
-<script type="module" src="app.js?v=4"></script>
+<script type="module" src="app.js?v=5"></script>
 </body>
 </html>

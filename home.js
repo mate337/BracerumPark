@@ -1,398 +1,48 @@
 /* ==========================================================
    BRACERUM/PARK — home.js
-   Masterplan com zoom por área e mapa de localização. São 50 KB
-   de dados (áreas, POIs, rotas) que só a home usa — ficavam no
-   script.js e as seis páginas internas baixavam e interpretavam
-   tudo à toa. Carregar depois do script.js: usa hasGsap,
-   reduceMotion (script.js) e tr() (i18n.js).
+   Masterplan 3D embutido e mapa de localização. Os dados do mapa
+   (POIs, rotas) só a home usa — ficavam no script.js e as seis
+   páginas internas baixavam e interpretavam tudo à toa. Carregar
+   depois do script.js: usa hasGsap, reduceMotion (script.js) e
+   tr() (i18n.js).
    ========================================================== */
 
 /* ==========================================================
-   04 · MASTERPLAN — zoom por área
+   04 · MASTERPLAN 3D — a maquete de 3dmasterplan/ num iframe
    ========================================================== */
-/* Coordenadas em % sobre assets/web/vista-aerea-park-02.jpg (2600x1515).
-   Cada área traz a lista de fotos que o passador do cartão mostra —
-   a primeira é a capa. */
-const AREAS = [
-  { x: 33, y: 30, side: "right",
-    tag: { pt: "Clube do Caminhoneiro", en: "Truck Drivers' Club", es: "Club del Camionero" },
-    eyebrow: { pt: "Serviços rodoviários", en: "Road services", es: "Servicios viales" },
-    title: { pt: "Clube do Caminhoneiro", en: "Truck Drivers' Club", es: "Club del Camionero" },
-    val: { pt: "40.065 m² · pátio, posto, restaurante e salão de jogos",
-           en: "40,065 m² · yard, fuel station, restaurant and game room",
-           es: "40.065 m² · patio, estación de servicio, restaurante y salón de juegos" },
-    desc: { pt: "O motorista descansa dentro do Park, não na rodovia — apoio completo à logística.",
-            en: "Drivers rest inside the Park, not on the highway — full logistics support.",
-            es: "El conductor descansa dentro del Park, no en la ruta — apoyo logístico completo." },
-    imgs: [ "assets/web/fotos/posto-caminhoes.jpg",
-            "assets/park/select-apoio-caminhoes.jpg",
-            "assets/park/select-posto-cobertura.jpg" ] },
+/* A vista aérea com pinos saiu em 2026-11-12 (pedido do cliente): no lugar
+   dela entra a maquete 3D, a mesma página de /3dmasterplan/ em modo embutido.
+   O src só é ligado quando a seção se aproxima da tela ou, antes disso, quando
+   a home fica ociosa depois de carregar — assim a maquete não disputa a rede
+   e a CPU com o hero, e costuma estar pronta quando o visitante chega nela.
+   Com economia de dados ligada, só quando se aproxima. O idioma acompanha o
+   seletor do site sozinho: a troca grava bp-lang e o iframe ouve 'storage'. */
+(function masterplan3d(){
+  const frame = document.getElementById("mp3d");
+  if (!frame) return;
+  let ligado = false;
+  const ligar = () => {
+    if (ligado) return;
+    ligado = true;
+    frame.src = frame.dataset.src;
+  };
 
-  { x: 39.5, y: 33.5, side: "right",
-    tag: { pt: "Portaria", en: "Main gate", es: "Portería" },
-    eyebrow: { pt: "Acesso e operação", en: "Access and operations", es: "Acceso y operación" },
-    title: { pt: "Portaria & Estacionamento de caminhões", en: "Main gate & Truck parking", es: "Portería y estacionamiento de camiones" },
-    val: { pt: "Administração · acessos indústria · 3.510 m²",
-           en: "Administration · industrial access · 3,510 m²",
-           es: "Administración · accesos industria · 3.510 m²" },
-    desc: { pt: "Entrada operacional do Park, com controle de acesso dedicado para caminhões e visitantes.",
-            en: "The Park's operational entrance, with dedicated access control for trucks and visitors.",
-            es: "Entrada operativa del Park, con control de acceso dedicado para camiones y visitantes." },
-    imgs: [ "assets/web/fotos/portaria.jpg",
-            "assets/web/fotos/vias-boulevard.jpg",
-            "assets/web/fotos/galpao-via.jpg" ] },
+  if ("IntersectionObserver" in window){
+    const io = new IntersectionObserver(es => {
+      if (es.some(e => e.isIntersecting)){ io.disconnect(); ligar(); }
+    }, { rootMargin: "0px 0px 25% 0px" });
+    io.observe(frame);
+  } else ligar();
 
-  { x: 32, y: 42.5, side: "right",
-    tag: { pt: "Fábricas Bracerum", en: "Bracerum factories", es: "Fábricas Bracerum" },
-    eyebrow: { pt: "Execução própria", en: "In-house execution", es: "Ejecución propia" },
-    title: { pt: "Fábricas Bracerum", en: "Bracerum factories", es: "Fábricas Bracerum" },
-    val: { pt: "Steel Frame · Concreto · Pavers", en: "Steel Frame · Concrete · Pavers", es: "Steel Frame · Hormigón · Pavers" },
-    desc: { pt: "Três unidades fabris do grupo constroem o parque sem depender de terceiros — prazo, custo e risco de obra comprados.",
-            en: "Three of the group's factories build the park without third parties — schedule, cost and construction risk secured.",
-            es: "Tres unidades fabriles del grupo construyen el parque sin depender de terceros — plazo, costo y riesgo de obra asegurados." },
-    imgs: [ "assets/renders/fabrica-bracerum-noturna.jpg",
-            "assets/park/fabrica-bracerum.jpg",
-            "assets/web/fotos/galpao-docas.jpg" ] },
-
-  { x: 55, y: 45, side: "right",
-    tag: { pt: "Lotes industriais", en: "Industrial lots", es: "Lotes industriales" },
-    eyebrow: { pt: "Área industrial", en: "Industrial area", es: "Área industrial" },
-    title: { pt: "Lotes industriais & Built-to-Suit", en: "Industrial lots & Built-to-Suit", es: "Lotes industriales y Built-to-Suit" },
-    val: { pt: "989.642 m² de lotes · módulos de 40.000 m²",
-           en: "989,642 m² of lots · 40,000 m² modules",
-           es: "989.642 m² de lotes · módulos de 40.000 m²" },
-    desc: { pt: "Galpões sob medida, venda ou locação, erguidos com o Steel Frame do próprio grupo.",
-            en: "Made-to-measure warehouses, for sale or lease, built with the group's own Steel Frame.",
-            es: "Galpones a medida, venta o alquiler, levantados con el Steel Frame del propio grupo." },
-    imgs: [ "assets/web/fotos/park-boulevard-aereo.jpg",
-            "assets/web/fotos/galpao-via.jpg",
-            "assets/web/fotos/galpao-portico-azul.jpg",
-            "assets/web/fotos/vias-rotatoria.jpg" ] },
-
-  { x: 27, y: 42, side: "left",
-    tag: { pt: "ETE / ETA", en: "Water plants", es: "PTAR / PTAP" },
-    eyebrow: { pt: "Infraestrutura", en: "Infrastructure", es: "Infraestructura" },
-    title: { pt: "E.T.E. / E.T.A. & Subestação", en: "Water & effluent plants and Substation", es: "PTAR / PTAP y Subestación" },
-    val: { pt: "Tratamento próprio · 10.650 m² · subestação 11.375 m²",
-           en: "On-site treatment · 10,650 m² · substation 11,375 m²",
-           es: "Tratamiento propio · 10.650 m² · subestación 11.375 m²" },
-    desc: { pt: "Energia de duas usinas (Itaipu e Yacyretá) e tratamento próprio de água e efluentes — operação industrial contínua.",
-            en: "Power from two plants (Itaipu and Yacyretá) plus on-site water and effluent treatment — continuous industrial operation.",
-            es: "Energía de dos usinas (Itaipú y Yacyretá) y tratamiento propio de agua y efluentes — operación industrial continua." },
-    imgs: [ "assets/park/ete-eta.jpg",
-            "assets/web/fotos/vias-boulevard.jpg" ] },
-
-  { x: 20, y: 58.5, side: "right",
-    tag: { pt: "Hangares", en: "Hangars", es: "Hangares" },
-    eyebrow: { pt: "Aviação executiva", en: "Business aviation", es: "Aviación ejecutiva" },
-    title: { pt: "Hangares, heliponto e abastecimento", en: "Hangars, helipad and refuelling", es: "Hangares, helipuerto y abastecimiento" },
-    val: { pt: "7.686 m² · heliponto no pátio dos hangares", en: "7,686 m² · helipad on the hangar apron", es: "7.686 m² · helipuerto en el patio de hangares" },
-    desc: { pt: "Hangaragem, heliponto e abastecimento no mesmo pátio, junto à pista, para a aeronave do investidor ficar no próprio parque.",
-            en: "Hangars, helipad and refuelling on the same apron, next to the runway, so the investor's aircraft stays inside the park.",
-            es: "Hangaraje, helipuerto y abastecimiento en el mismo patio, junto a la pista, para que la aeronave del inversor quede en el propio parque." },
-    imgs: [ "assets/web/fotos/hangar-bracerum.jpg",
-            "assets/web/fotos/hangar-interior.jpg",
-            "assets/web/fotos/aero-patio-jato.jpg" ] },
-
-  { x: 33, y: 71, side: "right",
-    tag: { pt: "Pista de pouso", en: "Runway", es: "Pista de aterrizaje" },
-    eyebrow: { pt: "Aeroporto corporativo", en: "Corporate airport", es: "Aeropuerto corporativo" },
-    title: { pt: "Pista de pouso", en: "Runway", es: "Pista de aterrizaje" },
-    val: { pt: "1.480 m de pista · aviação executiva", en: "1,480 m runway · business aviation", es: "1.480 m de pista · aviación ejecutiva" },
-    desc: { pt: "Acesso executivo direto ao Park, sem depender de Assunção.",
-            en: "Direct executive access to the Park, without depending on Asunción.",
-            es: "Acceso ejecutivo directo al Park, sin depender de Asunción." },
-    imgs: [ "assets/web/fotos/aero-pista-aerea.jpg",
-            "assets/web/fotos/aero-cabeceira.jpg",
-            "assets/web/fotos/aero-patio-jato.jpg" ] },
-
-  { x: 77, y: 32.5, side: "left",
-    tag: { pt: "Centro de convenções", en: "Convention centre", es: "Centro de convenciones" },
-    eyebrow: { pt: "Eventos & negócios", en: "Events & business", es: "Eventos y negocios" },
-    title: { pt: "Centro de Convenções", en: "Convention Centre", es: "Centro de Convenciones" },
-    val: { pt: "13.500 m² · anfiteatro para 1.200 lugares", en: "13,500 m² · 1,200-seat amphitheatre", es: "13.500 m² · anfiteatro para 1.200 lugares" },
-    desc: { pt: "Feiras, lançamentos setoriais e showrooms de marca sob a cobertura envidraçada.",
-            en: "Trade fairs, sector launches and brand showrooms under the glazed roof.",
-            es: "Ferias, lanzamientos sectoriales y showrooms de marca bajo la cubierta vidriada." },
-    imgs: [ "assets/web/fotos/convencoes-foyer.jpg",
-            "assets/web/fotos/convencoes-auditorio.jpg",
-            "assets/web/fotos/convencoes-auditorio-2.jpg",
-            "assets/web/fotos/convencoes-galeria.jpg",
-            "assets/web/fotos/convencoes-galeria-2.jpg",
-            "assets/web/fotos/convencoes-restaurante.jpg",
-            "assets/web/fotos/convencoes-restaurante-noite.jpg" ] },
-
-  { x: 77.5, y: 27.5, side: "left",
-    tag: { pt: "Hotel", en: "Hotel", es: "Hotel" },
-    eyebrow: { pt: "Hospitalidade", en: "Hospitality", es: "Hospitalidad" },
-    title: { pt: "Hotel & Apart-hotel", en: "Hotel & Apart-hotel", es: "Hotel y Apart-hotel" },
-    val: { pt: "384 studios de 35 m² · 1.700 vagas", en: "384 studios of 35 m² · 1,700 parking spaces", es: "384 studios de 35 m² · 1.700 plazas" },
-    desc: { pt: "Hospedagem executiva dentro do masterplan — a equipe da matriz dorme a minutos da fábrica.",
-            en: "Executive accommodation inside the masterplan — head-office teams sleep minutes from the plant.",
-            es: "Hospedaje ejecutivo dentro del masterplan — el equipo de la casa matriz duerme a minutos de la fábrica." },
-    imgs: [ "assets/web/fotos/hotel-cupula-dia.jpg",
-            "assets/web/fotos/hotel-cupula-piscina.jpg",
-            "assets/web/fotos/hotel-fachada-varandas.jpg",
-            "assets/web/fotos/hotel-recepcao.jpg",
-            "assets/web/fotos/hotel-quarto.jpg",
-            "assets/web/fotos/hotel-suite.jpg",
-            "assets/web/fotos/hotel-varanda-vista.jpg" ] },
-
-  { x: 72, y: 40, side: "left",
-    tag: { pt: "Bracerum Resort", en: "Bracerum Resort", es: "Bracerum Resort" },
-    eyebrow: { pt: "Condomínio & clube", en: "Residential & club", es: "Condominio y club" },
-    title: { pt: "Condomínio Bracerum Resort", en: "Bracerum Resort Residential", es: "Condominio Bracerum Resort" },
-    val: { pt: "141 lotes · 142.067 m² · lago, quadras e campo society",
-           en: "141 lots · 142,067 m² · lake, courts and football pitch",
-           es: "141 lotes · 142.067 m² · lago, canchas y campo de fútbol" },
-    desc: { pt: "Residências e lazer para a comunidade corporativa do parque.",
-            en: "Homes and leisure for the park's corporate community.",
-            es: "Residencias y ocio para la comunidad corporativa del parque." },
-    imgs: [ "assets/web/fotos/resort-lago.jpg",
-            "assets/web/fotos/resort-casas-rua.jpg",
-            "assets/web/fotos/resort-casa.jpg",
-            "assets/web/fotos/resort-rua-arborizada.jpg",
-            "assets/web/fotos/amen-piscina-quincho.jpg",
-            "assets/web/fotos/amen-quadra.jpg",
-            "assets/park/resort-implantacao.jpg" ] }
-];
-
-(function masterplan(){
-  const section = document.querySelector(".masterplan");
-  const viewport = document.getElementById("mpViewport");
-  const stage = document.getElementById("mpStage");
-  const pinsWrap = document.getElementById("mpPins");
-  const card = document.getElementById("areaCard");
-  const back = document.getElementById("mpBack");
-  if (!viewport || !stage) return;
-
-  const slides = document.getElementById("acSlides");
-  const dots   = document.getElementById("acDots");
-  const acPrev = document.getElementById("acPrev");
-  const acNext = document.getElementById("acNext");
-  const cardEyebrow = card.querySelector(".area-card__eyebrow");
-  const cardTitle = card.querySelector(".area-card__title");
-  const cardVal = card.querySelector(".area-card__val");
-  const cardDesc = card.querySelector(".area-card__desc");
-  let active = -1;
-
-  AREAS.forEach((a, i) => {
-    const pin = document.createElement("button");
-    pin.className = "pin";
-    pin.style.left = a.x + "%";
-    pin.style.top = a.y + "%";
-    pin.dataset.idx = i;
-    if (a.side === "left") pin.classList.add("pin--left");
-    pin.innerHTML = a.side === "left"
-      ? `<span class="pin__tag"></span><span class="pin__dot"></span>`
-      : `<span class="pin__dot"></span><span class="pin__tag"></span>`;
-    pin.addEventListener("click", () => { if (moved > 6) return; zoomTo(i); });
-    pinsWrap.appendChild(pin);
-  });
-
-  function renderPins(){
-    pinsWrap.querySelectorAll(".pin").forEach(p => {
-      const a = AREAS[+p.dataset.idx];
-      p.querySelector(".pin__tag").textContent = tr(a.tag);
-      p.setAttribute("aria-label", tr(a.title));
-    });
+  const poupa = navigator.connection && navigator.connection.saveData;
+  if (!poupa){
+    const ocioso = () => ("requestIdleCallback" in window)
+      ? requestIdleCallback(ligar, { timeout: 4000 })
+      : setTimeout(ligar, 1500);
+    const depois = () => setTimeout(ocioso, 2500);   // o loader e a entrada do hero vão primeiro
+    if (document.readyState === "complete") depois();
+    else window.addEventListener("load", depois, { once: true });
   }
-  renderPins();
-
-  /* --- passador de fotos do cartão ---
-     Cada área tem uma lista de imagens. As lâminas são montadas a cada
-     abertura; só a atual e as vizinhas recebem src, senão abrir o cartão
-     do Hotel puxaria seis fotos de uma vez. */
-  let fotos = [], foto = 0;
-
-  function carregarVizinhas(){
-    slides.querySelectorAll(".ac-slide").forEach((el, i) => {
-      const img = el.querySelector("img");
-      if (!img.src && Math.abs(i - foto) <= 1) img.src = img.dataset.src;
-    });
-  }
-
-  function mostrarFoto(i, instant){
-    if (!fotos.length) return;
-    foto = (i + fotos.length) % fotos.length;
-    slides.style.transition = instant || reduceMotion ? "none" : "";
-    slides.style.transform = `translate3d(${-foto * 100}%,0,0)`;
-    dots.querySelectorAll("button").forEach((b, k) => {
-      b.classList.toggle("is-on", k === foto);
-      b.setAttribute("aria-current", String(k === foto));
-    });
-    carregarVizinhas();
-  }
-
-  function montarFotos(a){
-    fotos = a.imgs || [];
-    const nome = tr(a.title);
-    slides.innerHTML = fotos.map((src, i) =>
-      `<div class="ac-slide"><img data-src="${src}" alt="${nome} — ${i + 1}/${fotos.length}" draggable="false"></div>`
-    ).join("");
-    dots.innerHTML = fotos.length > 1
-      ? fotos.map((_, i) => `<button type="button" data-i="${i}"><span></span></button>`).join("")
-      : "";
-    dots.querySelectorAll("button").forEach(b => {
-      b.setAttribute("aria-label", `${tr(a.title)} ${Number(b.dataset.i) + 1}`);
-      b.addEventListener("click", () => mostrarFoto(Number(b.dataset.i)));
-    });
-    const unica = fotos.length < 2;
-    acPrev.hidden = acNext.hidden = unica;
-    mostrarFoto(0, true);
-  }
-
-  acPrev.addEventListener("click", () => mostrarFoto(foto - 1));
-  acNext.addEventListener("click", () => mostrarFoto(foto + 1));
-
-  /* arrastar/deslizar sobre as fotos — no celular é o gesto esperado */
-  let px = 0, arrastando = false;
-  slides.addEventListener("pointerdown", e => { px = e.clientX; arrastando = true; });
-  slides.addEventListener("pointerup", e => {
-    if (!arrastando) return;
-    arrastando = false;
-    const d = e.clientX - px;
-    if (Math.abs(d) > 40) mostrarFoto(foto + (d < 0 ? 1 : -1));
-  });
-  slides.addEventListener("pointercancel", () => { arrastando = false; });
-
-  /* setas do teclado andam nas fotos enquanto o cartão está aberto */
-  document.addEventListener("keydown", e => {
-    if (!card.classList.contains("is-open") || fotos.length < 2) return;
-    if (e.key === "ArrowRight") { mostrarFoto(foto + 1); e.preventDefault(); }
-    if (e.key === "ArrowLeft")  { mostrarFoto(foto - 1); e.preventDefault(); }
-  });
-
-  function fillCard(a){
-    montarFotos(a);
-    cardEyebrow.textContent = tr(a.eyebrow);
-    cardTitle.textContent = tr(a.title);
-    cardVal.textContent = tr(a.val);
-    cardDesc.textContent = tr(a.desc);
-    /* o cartão fica do lado oposto ao da área, na mesma coluna do resto
-       da página (--pad-align), para não cobrir o que o usuário abriu. */
-    if (a.x < 45){ card.style.left = "auto"; card.style.right = "var(--pad-align)"; }
-    else { card.style.right = "auto"; card.style.left = "var(--pad-align)"; }
-  }
-
-  /* --- Dimensão do palco ---
-     O palco recebe a proporção da imagem e é escalado para cobrir o viewport.
-     Em tela alta e estreita (celular) ele fica mais largo que a tela: o que
-     sobra vira área de arrasto, em vez de ficar cortado sem aviso. */
-  const stageImg = stage.querySelector("img");
-  let SW = 0, SH = 0, panX = 0, panY = 0, maxPanX = 0, maxPanY = 0, canPan = false;
-  const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
-
-  function ratio(){
-    return (stageImg && stageImg.naturalWidth) ? stageImg.naturalWidth / stageImg.naturalHeight : 1.5;
-  }
-
-  function fitStage(){
-    const w = viewport.offsetWidth, h = viewport.offsetHeight, ar = ratio();
-    SW = w; SH = w / ar;
-    if (SH < h){ SH = h; SW = h * ar; }
-    stage.style.width = SW + "px";
-    stage.style.height = SH + "px";
-    maxPanX = Math.max(0, (SW - w) / 2);
-    maxPanY = Math.max(0, (SH - h) / 2);
-    panX = clamp(panX, -maxPanX, maxPanX);
-    panY = clamp(panY, -maxPanY, maxPanY);
-    /* sobra de poucos pixels (desktop widescreen) não vira arrasto: só ligamos
-       quando realmente há planta escondida fora da tela. */
-    canPan = maxPanX > w * 0.04 || maxPanY > h * 0.04;
-    stage.classList.toggle("can-pan", canPan);
-    section.classList.toggle("mp-can-pan", canPan);
-    if (active < 0) setStage(1, panX, panY, null, true);
-  }
-
-  function setStage(s, x, y, cb, instant){
-    const dur = instant ? 0 : (reduceMotion ? 0 : 1.15);
-    if (hasGsap){
-      gsap.to(stage, { xPercent: -50, yPercent: -50, scale: s, x, y, duration: dur,
-                       ease: "power3.inOut", overwrite: "auto", onComplete: cb });
-    } else {
-      stage.style.transition = instant ? "none" : "transform .9s cubic-bezier(.19,.8,.22,1)";
-      stage.style.transform = `translate(-50%, -50%) translate(${x}px, ${y}px) scale(${s})`;
-      if (cb) setTimeout(cb, instant ? 0 : 900);
-    }
-  }
-
-  function zoomTo(i){
-    active = (i + AREAS.length) % AREAS.length;
-    const a = AREAS[active];
-    const w = viewport.offsetWidth, h = viewport.offsetHeight;
-    const s = window.innerWidth < 720 ? 2.7 : 2.2;
-    const maxX = Math.max(0, SW * s / 2 - w / 2), maxY = Math.max(0, SH * s / 2 - h / 2);
-    const tx = clamp((0.5 - a.x / 100) * SW * s, -maxX, maxX);
-    const ty = clamp((0.5 - a.y / 100) * SH * s, -maxY, maxY);
-    section.classList.add("is-zoomed");
-    card.classList.remove("is-open");
-    setStage(s, tx, ty, () => { fillCard(a); card.classList.add("is-open"); });
-  }
-
-  function resetZoom(){
-    active = -1;
-    section.classList.remove("is-zoomed");
-    card.classList.remove("is-open");
-    setStage(1, panX, panY);
-  }
-
-  /* --- Arrastar a planta ---
-     touch-action:pan-y deixa a rolagem vertical da página passar; o gesto
-     horizontal é nosso. Um arrasto não pode virar clique no pino. */
-  let armed = false, dragging = false, moved = 0;
-  let startX = 0, startY = 0, baseX = 0, baseY = 0, pid = null;
-  stage.addEventListener("pointerdown", e => {
-    if (active >= 0 || !canPan) return;
-    if (e.button !== undefined && e.button !== 0) return;
-    armed = true; dragging = false; moved = 0; pid = e.pointerId;
-    startX = e.clientX; startY = e.clientY; baseX = panX; baseY = panY;
-  });
-  stage.addEventListener("pointermove", e => {
-    if (!armed) return;
-    const dx = e.clientX - startX, dy = e.clientY - startY;
-    moved = Math.max(moved, Math.abs(dx), Math.abs(dy));
-    /* só captura o ponteiro depois que virou arrasto de verdade — capturar
-       no pointerdown roubaria o clique dos pinos. */
-    if (!dragging){
-      if (moved < 5) return;
-      dragging = true;
-      stage.classList.add("is-dragging");
-      try { stage.setPointerCapture(pid); } catch (err) {}
-    }
-    panX = clamp(baseX + dx, -maxPanX, maxPanX);
-    panY = clamp(baseY + dy, -maxPanY, maxPanY);
-    setStage(1, panX, panY, null, true);
-  });
-  function endDrag(){
-    if (!armed) return;
-    armed = false;
-    if (dragging){
-      dragging = false;
-      stage.classList.remove("is-dragging");
-      try { stage.releasePointerCapture(pid); } catch (err) {}
-    }
-    setTimeout(() => { moved = 0; }, 0);
-  }
-  stage.addEventListener("pointerup", endDrag);
-  stage.addEventListener("pointercancel", endDrag);
-  stage.addEventListener("lostpointercapture", endDrag);
-
-  if (stageImg){
-    if (stageImg.complete) fitStage();
-    stageImg.addEventListener("load", fitStage);
-  }
-  fitStage();
-
-  back.addEventListener("click", resetZoom);
-  card.querySelector("[data-area-prev]").addEventListener("click", () => zoomTo(active - 1));
-  card.querySelector("[data-area-next]").addEventListener("click", () => zoomTo(active + 1));
-  document.addEventListener("keydown", e => { if (e.key === "Escape" && active >= 0) resetZoom(); });
-  window.addEventListener("resize", () => { fitStage(); if (active >= 0) zoomTo(active); });
-  document.addEventListener("langchange", () => {
-    renderPins();
-    if (active >= 0) fillCard(AREAS[active]);
-  });
 })();
 
 /* ==========================================================

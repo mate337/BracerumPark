@@ -43,6 +43,13 @@
   var DEBUG = /[?&]bpdebug=1/.test(location.search);
   var KEYS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'gclid', 'fbclid', 'origem'];
 
+  /* Dentro de um iframe do próprio site (a maquete 3D embutida na home, 3dmasterplan/?embed): a
+     página de cima já contou a visita, guarda a origem e carrega os pixels. Aqui só os cliques,
+     entregues ao bpTrack dela com frame = caminho do quadro. De outro domínio o acesso falha e
+     a página segue como sempre. */
+  var PARENT = null;
+  try { if (W.parent !== W && typeof W.parent.bpTrack === 'function') PARENT = W.parent.bpTrack; } catch (e) { PARENT = null; }
+
   function log() { if (DEBUG && W.console) console.log.apply(console, ['[bp-track]'].concat([].slice.call(arguments))); }
   function load(src) { var s = D.createElement('script'); s.async = true; s.src = src; D.head.appendChild(s); return s; }
   function store(get, val) {
@@ -59,12 +66,15 @@
   if (ref) touch.referrer = ref.slice(0, 200);
 
   var attrib = store(true) || {};
-  if (!attrib.first) attrib.first = touch;
-  if (hasTag || ref || !attrib.last) attrib.last = touch;   // navegação interna não apaga a origem
-  store(false, attrib);
+  if (!PARENT) {
+    if (!attrib.first) attrib.first = touch;
+    if (hasTag || ref || !attrib.last) attrib.last = touch;   // navegação interna não apaga a origem
+    store(false, attrib);
+  }
   W.bpAttribution = function () { return store(true) || attrib; };
 
   /* ---------- 2. pixels --------------------------------------------- */
+  if (PARENT) CONFIG = { ga4: '', metaPixel: '', vercel: false };
   if (CONFIG.ga4) {
     W.dataLayer = W.dataLayer || [];
     W.gtag = function () { W.dataLayer.push(arguments); };
@@ -89,6 +99,7 @@
 
   function track(name, p) {
     p = p || {};
+    if (PARENT) { p.frame = location.pathname; log(name, p); return PARENT(name, p); }
     p.page = location.pathname;
     p.lang = D.documentElement.lang || '';
     var c = (attrib.last && attrib.last.utm_campaign) || '';
@@ -135,6 +146,7 @@
   function onReady(fn) { D.readyState === 'loading' ? D.addEventListener('DOMContentLoaded', fn) : fn(); }
 
   onReady(function () {
+    if (PARENT) return;   // seções e rolagem são da página de cima
     // seções vistas (uma vez por página)
     if ('IntersectionObserver' in W) {
       var seen = {};

@@ -6,8 +6,8 @@ Site institucional do **Bracerum Park**, cidade industrial multiuso em Villeta, 
 
 O site tem **7 páginas**: `index.html`, `tributacao.html`, `bracerum.html`, `hotel.html`,
 `resort.html`, `select.html` e `qualidade.html`, mais `i18n.js`, `style.css`, `script.js` e
-`home.js`. **`home.js` só a home carrega**: são os 52 KB do masterplan e do mapa (áreas, POIs,
-rotas) que as seis páginas internas baixavam e interpretavam à toa. Ele roda depois do
+`home.js`. **`home.js` só a home carrega**: são os ~40 KB do mapa (POIs, rotas) e o carregador da
+maquete 3D embutida, que as seis páginas internas baixavam e interpretavam à toa. Ele roda depois do
 `script.js` porque usa `hasGsap`, `reduceMotion` e `tr()`.
 
 ### ⚠️ Publicação sem GitHub (2026-11-09)
@@ -20,6 +20,29 @@ rotas) que as seis páginas internas baixavam e interpretavam à toa. Ele roda d
   na pasta, `vercel deploy --prod --yes --token proxyinjected --scope team_M5fGTN1hNkSvweDXEjfrauUl` (o proxy da
   sessão injeta o token real de `api.vercel.com`; se expirou, pedir outro em vercel.com/account/tokens).
   Conferir no ar que nenhuma página pede arquivo que ficou de fora.
+
+### Masterplan 3D na home (v6.11 — 2026-11-12)
+- **A vista aérea com pinos saiu da home** (pedido do cliente): a seção `#masterplan` agora tem título
+  (`mp.eyebrow`/`mp.title`/`mp.lead`), o link "Abrir a maquete em tela cheia" (`/3dmasterplan/`) e um
+  **iframe da própria maquete em modo embutido** (`3dmasterplan/?embed=1`), com a altura da tela menos a
+  nav (80svh no celular). Só essa troca foi liberada — o resto do site continua parado (V12/V14).
+- **Modo embutido** (classe `is-embed`, posta no `<head>` do `3dmasterplan/index.html`; regras no fim do
+  `app.css` e `modoEmbutido()` no `app.js`): sem a barra de cima; **a roda do mouse rola a home** e só
+  aproxima com **Ctrl/⌘** (ou pinça do trackpad), com dica; **dedo na vertical rola a home**, na horizontal
+  gira, dois dedos aproximam; links abrem em `_top`; o voo de chegada espera a maquete aparecer na tela;
+  bússola, barra e "Próxima" saem de baixo do WhatsApp flutuante da home; "Tela cheia" vira a maquete
+  inteira (no iPhone, sem Fullscreen API, abre `/3dmasterplan/`). Fora do iframe nada muda.
+- **Idioma** acompanha o seletor do site pelo evento `storage` da chave `bp-lang` (vale também entre abas).
+- **Carga:** o `home.js` só põe o `src` quando a seção chega perto ou ~2,5 s depois do `load`, em ocioso
+  (não com economia de dados) — são ~1,4 MB de three.js e dados, e o iframe divide a thread com a home.
+- **`tracking.js`** dentro do iframe do próprio site não conta visita nem carrega pixels: repassa os cliques
+  ao `bpTrack` da home com `frame: "/3dmasterplan/"`.
+- **Barra de ferramentas compacta** (vale também na página própria): quando os rótulos não cabem entre as
+  laterais (1.100–1.250 px conforme o idioma), ficam só os ícones, com o rótulo no `title` — em 1024 px a
+  barra saía cortada nas duas pontas.
+- Saíram do `home.js` o array `AREAS` e o passador de fotos; do `style.css` os pinos e o `.area-card`; do
+  `i18n.js` as chaves `mp.hint/hintDrag/back/prev/next/photoPrev/photoNext` (entraram `mp.lead/open/frame`).
+  `assets/web/vista-aerea-park-02.jpg` ficou sem uso no site — **não apagar sem o ok do cliente**.
 
 ### Cadastro rápido de lead — `/cadastro/` (v6.10 — 2026-11-12)
 - Página à parte, **mesmo visual do `/admin/`**, sem login: **nome, telefone (com código do país), empresa e
@@ -264,7 +287,8 @@ rotas) que as seis páginas internas baixavam e interpretavam à toa. Ele roda d
   masterplan da home (pinos remarcados, quando o site for liberado) e o take B do filme.
 - **🚫 Não mexer no site até o usuário liberar** (pedido dele em 2026-10-16). O V12 e as respostas
   ficam só registrados em `docs/` e aqui; nenhuma página, `home.js`, `i18n.js` ou asset publicado
-  muda por enquanto.
+  muda por enquanto. **Exceção liberada em 2026-11-12:** o masterplan da home virou a maquete 3D
+  (ver "Masterplan 3D na home") — com isso o fundo V15 e os pinos do §8 deixaram de existir.
 
 ### Masterplan 3D — aplicação fora do site (2026-10-19)
 - **`3dmasterplan/`** é uma maquete 3D interativa do **V14 de 28/10/2026** (era do V12 até 2026-10-29;
@@ -274,8 +298,8 @@ rotas) que as seis páginas internas baixavam e interpretavam à toa. Ele roda d
   (615, com nome oficial, feição e preço — ver abaixo), vista geral, de cima, tour, régua, rótulos, hora
   do sol com sombra real, PT/EN/ES pela mesma chave `bp-lang` do site e links por área (`#hotel`,
   `#lote-Q38.L001`, `#lotes-Q38-Q39`). Documentação completa em **`docs/3dmasterplan/README.md`**.
-- **Não está ligada ao site** (pedido de "aplicação fora do site" + a regra de não mexer no site).
-  Publicada junto, abre em `bracerumpark.com/3dmasterplan/` — **em minúsculas** (o cliente sugeriu
+- **Desde 2026-11-12 está na home**, embutida no lugar do masterplan antigo (ver "Masterplan 3D na
+  home"); até então era só "aplicação fora do site". Publicada junto, abre em `bracerumpark.com/3dmasterplan/` — **em minúsculas** (o cliente sugeriu
   "/3DMasterplan"; com maiúsculas só por redirecionamento na hospedagem).
 - **Dados gerados** por `docs/3dmasterplan/build_data.py` (classe `Maquete14`, lê o PDF do V14), que
   reaproveita o `build_refs.py` da vista aérea (mesmas alturas). As **alturas e a arquitetura são
@@ -373,11 +397,8 @@ O HTML carrega **português**; `i18n.js` traz dicionários **EN** e **ES** que s
 **Atenção:** o helper chama-se `tr()` e **não** `L()`, porque `L` é o global do Leaflet. Ao adicionar texto novo, incluir a chave nos dois dicionários (há um script de conferência no histórico da sessão).
 
 ### Estrutura do index (ordem definida pelo cliente na v5)
-loader → hero → **respiro** → masterplan com zoom por área (`AREAS` no home.js, coordenadas em %
-sobre `assets/web/vista-aerea-park-02.jpg`; o palco `#mpStage` tem a **proporção da própria imagem** e é
-dimensionado para cobrir o viewport — é isso que mantém os pinos no lugar em qualquer tela. Quando a
-planta é mais larga que a tela, o bloco fica **arrastável na horizontal** e as bordas esmaecem; no
-celular a faixa é mais baixa, `clamp(420px,68svh,600px)`) → galeria sanfona "Fotos do Parque" (o
+loader → hero → **respiro** → **masterplan 3D** (título + a maquete `3dmasterplan/` num iframe
+`?embed=1`, desde 2026-11-12 — antes era a vista aérea com zoom por área, ver v6.1) → galeria sanfona "Fotos do Parque" (o
 **Clube saiu** — está dentro do Select) → **bloco Hotel** → **bloco Resort** → **bloco Select** →
 "Como funciona" (seção de exatamente `100svh` fixada com `ScrollTrigger.pin`. **A altura fixa é o que
 evita a sobreposição e o espaço em branco da v2** — se mudar o conteúdo, manter o bloco cabendo em uma
@@ -385,7 +406,7 @@ tela) → mapa Leaflet dark full-bleed → **Villeta** (um ato só: as quatro ra
 em números e a esteira de logos) → **Tributação** (um ato só: o argumento, as quatro cifras que
 contam ao entrar na tela e a conclusão em marrom com o CTA) → faixa Bracerum → footer.
 
-### Masterplan novo e passador de fotos (v6.1 — 2026-09-03)
+### Masterplan novo e passador de fotos (v6.1 — 2026-09-03) — *substituído pela maquete 3D em 2026-11-12*
 - **A planta mudou** para `assets/Vista Aerea Park 02.png` (3570×2080, enviada pelo cliente). A
   versão web é `assets/web/vista-aerea-park-02.jpg`, 2600×1515 a 80% — 2200 px ficava mole no zoom
   de 2,2× e 2800 px não compensava os 60 KB a mais. A vista antiga saiu do repositório.
@@ -562,11 +583,11 @@ Faltam (mencionados no `LEIA-ME.txt` original, ainda não enviados): `tecnologic
 
 ## Próximo passo
 
-Aguardando o usuário: (0) retorno sobre o **Masterplan 3D no V14** (`3dmasterplan/`) e se ele entra
-linkado no site; as confirmações do §5 de `docs/masterplan-v14.md` (Q04.L017 1.650 × 1.410 m²,
+Aguardando o usuário: (0) retorno sobre o **Masterplan 3D na home** (no lugar da vista aérea desde
+2026-11-12); as confirmações do §5 de `docs/masterplan-v14.md` (Q04.L017 1.650 × 1.410 m²,
 tabela de preços para os 615 lotes, Q11 fora da oferta, "Market" × "Outlet"); (1) **ok para levar o
 masterplan ao site** — a lista do que muda está no §8 de `docs/masterplan-v12.md`, a rever com os
-números do V14; até lá, não mexer no site; (2) a
-vista aérea do V12 gerada pelo Astra-6 com `docs/prompt-aerea-v12/` (quando chegar, ela pode
-substituir a `vista-aerea-park-02.jpg` do masterplan — e os pinos precisam ser remarcados); (3) fotos próprias dos terminais privados, para
+números do V14 (o fundo e os pinos da home já saíram); até lá, não mexer no resto do site; (2) a
+vista aérea do V12 gerada pelo Astra-6 com `docs/prompt-aerea-v12/` (o masterplan da home não usa
+mais vista aérea — ela serviria a outro bloco ou ao filme); (3) fotos próprias dos terminais privados, para
 substituir as ilustrativas; (4) o dado de anos de história da Bracerum como importadora de aço.

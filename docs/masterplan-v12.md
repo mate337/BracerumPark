@@ -442,6 +442,11 @@ Administração (24) · Galpões de manutenção (26) · Creche e Ambulatório/R
 **Nada disto foi alterado ainda — o usuário pediu (2026-10-16) para não mexer no site por enquanto.**
 É a lista para quando ele der o ok. Já incorpora as respostas do §9.
 
+> **2026-11-12:** o masterplan da home (vista aérea + pinos do `AREAS` do `home.js`) foi **trocado pela
+> maquete 3D do V14** embutida (`3dmasterplan/?embed=1`). O parágrafo "A vista do masterplan da home" e a
+> tabela de pinos abaixo não valem mais; os números de linha do `home.js` também mudaram. O resto da
+> lista (textos das páginas, POI da pista no mapa etc.) continua pendente.
+
 **A vista do masterplan da home.** `assets/web/vista-aerea-park-02.jpg` é um render do **layout do
 V15**: entrada e Clube do Caminhoneiro no canto superior esquerdo, sem Outlet na frente da rodovia,
 sem condomínio vertical nem escola. Os pinos podem ser corrigidos, mas o render em si não mostra a

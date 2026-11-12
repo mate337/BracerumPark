@@ -20,6 +20,13 @@ const LOW = QUERY.get('q') === 'low';
 const COARSE = matchMedia('(pointer: coarse)').matches;
 const SMALL = () => innerWidth <= 760;
 const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
+/* Embutida na home do site (index.html#masterplan, iframe com ?embed — a classe is-embed é posta no
+   <head> do index.html, antes de pintar). Muda pouco: some a barra de cima (a home já tem nav, título e
+   idioma), a roda do mouse rola a página e só aproxima com Ctrl/⌘ (a pinça do trackpad chega como
+   Ctrl + roda), o dedo na vertical rola a página e na horizontal gira, e os links abrem na janela de
+   cima. Sem isso a maquete prenderia quem só está passando pela home. Em tela cheia volta a ser inteira. */
+const EMBED = document.documentElement.classList.contains('is-embed');
+const MOD = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent) ? '⌘' : 'Ctrl';
 
 /* ------------------------------------------------------------------ textos */
 const T = {
@@ -27,7 +34,7 @@ const T = {
     'ui.loading': 'Montando a maquete…', 'ui.eyebrow': 'Bracerum Park · Villeta, Paraguai',
     'ui.noWebgl': 'Este navegador não abriu a maquete 3D.',
     'ui.noWebglText': 'A visualização precisa de WebGL. Tente outro navegador ou um computador — enquanto isso, a imagem mostra o masterplan.',
-    'ui.toSiteMp': 'Ver o masterplan no site', 'ui.backAria': 'Bracerum Park — voltar ao site', 'ui.title': 'Masterplan',
+    'ui.backAria': 'Bracerum Park — voltar ao site', 'ui.title': 'Masterplan',
     'ui.version': 'Masterplan V14 · rev. 02/11/2026', 'ui.back': 'Voltar ao site', 'ui.h1a': 'A cidade industrial', 'ui.h1b': 'em volume',
     'f.area': 'área total', 'f.front': 'de frente para a PY-19', 'f.lots': 'lotes à venda', 'f.runway': 'pista de pouso',
     'ui.areas': 'Conheça o Bracerum Park',
@@ -40,6 +47,9 @@ const T = {
     'hint.touch': 'Um dedo gira · dois dedos movem e aproximam · toque num ponto ou num lote',
     'hint.measure': 'Clique em dois pontos do chão para medir · Esc para sair',
     'hint.tour': 'Tour pelos pontos do mapa · toque na maquete para parar',
+    'hint.deskEmbed': 'Arraste para girar · {mod} + rolagem para aproximar · clique num ponto ou num lote',
+    'hint.touchEmbed': 'Deslize para os lados para girar · dois dedos aproximam · toque num ponto ou num lote',
+    'hint.wheel': 'Para aproximar a maquete, use {mod} + rolagem',
     'card.area': 'Ponto', 'card.site': 'Ver no site', 'card.contact': 'Falar com a equipe comercial',
     'card.nophoto': 'Ainda não há imagens desta área — o volume é uma estimativa a partir da planta.',
     'card.photo': 'Foto', 'tip.open': 'clique para ver',
@@ -73,7 +83,7 @@ const T = {
     'ui.loading': 'Building the model…', 'ui.eyebrow': 'Bracerum Park · Villeta, Paraguay',
     'ui.noWebgl': 'This browser could not open the 3D model.',
     'ui.noWebglText': 'The viewer needs WebGL. Try another browser or a computer — meanwhile, the image shows the master plan.',
-    'ui.toSiteMp': 'See the master plan on the site', 'ui.backAria': 'Bracerum Park — back to the site', 'ui.title': 'Master plan',
+    'ui.backAria': 'Bracerum Park — back to the site', 'ui.title': 'Master plan',
     'ui.version': 'Master plan V14 · rev. 2026-11-02', 'ui.back': 'Back to the site', 'ui.h1a': 'The industrial city', 'ui.h1b': 'in three dimensions',
     'f.area': 'total area', 'f.front': 'of frontage on the PY-19', 'f.lots': 'lots for sale', 'f.runway': 'airstrip',
     'ui.areas': 'Discover Bracerum Park',
@@ -86,6 +96,9 @@ const T = {
     'hint.touch': 'One finger rotates · two fingers pan and zoom · tap a point or a lot',
     'hint.measure': 'Click two points on the ground to measure · Esc to exit',
     'hint.tour': 'Tour of the map points · tap the model to stop',
+    'hint.deskEmbed': 'Drag to rotate · {mod} + scroll to zoom · click a point or a lot',
+    'hint.touchEmbed': 'Swipe sideways to rotate · two fingers zoom · tap a point or a lot',
+    'hint.wheel': 'To zoom the model, use {mod} + scroll',
     'card.area': 'Point', 'card.site': 'See on the site', 'card.contact': 'Talk to the sales team',
     'card.nophoto': 'No images of this area yet — the volume is an estimate based on the plan.',
     'card.photo': 'Photo', 'tip.open': 'click to open',
@@ -119,7 +132,7 @@ const T = {
     'ui.loading': 'Armando la maqueta…', 'ui.eyebrow': 'Bracerum Park · Villeta, Paraguay',
     'ui.noWebgl': 'Este navegador no abrió la maqueta 3D.',
     'ui.noWebglText': 'La visualización necesita WebGL. Pruebe otro navegador o una computadora — mientras tanto, la imagen muestra el masterplan.',
-    'ui.toSiteMp': 'Ver el masterplan en el sitio', 'ui.backAria': 'Bracerum Park — volver al sitio', 'ui.title': 'Masterplan',
+    'ui.backAria': 'Bracerum Park — volver al sitio', 'ui.title': 'Masterplan',
     'ui.version': 'Masterplan V14 · rev. 02/11/2026', 'ui.back': 'Volver al sitio', 'ui.h1a': 'La ciudad industrial', 'ui.h1b': 'en volumen',
     'f.area': 'superficie total', 'f.front': 'de frente sobre la PY-19', 'f.lots': 'lotes en venta', 'f.runway': 'pista de aterrizaje',
     'ui.areas': 'Conozca Bracerum Park',
@@ -132,6 +145,9 @@ const T = {
     'hint.touch': 'Un dedo gira · dos dedos mueven y acercan · toque un punto o un lote',
     'hint.measure': 'Haga clic en dos puntos del suelo para medir · Esc para salir',
     'hint.tour': 'Recorrido por los puntos del mapa · toque la maqueta para detener',
+    'hint.deskEmbed': 'Arrastre para girar · {mod} + rueda para acercar · haga clic en un punto o un lote',
+    'hint.touchEmbed': 'Deslice hacia los lados para girar · dos dedos acercan · toque un punto o un lote',
+    'hint.wheel': 'Para acercar la maqueta, use {mod} + rueda',
     'card.area': 'Punto', 'card.site': 'Ver en el sitio', 'card.contact': 'Hablar con el equipo comercial',
     'card.nophoto': 'Todavía no hay imágenes de esta área — el volumen es una estimación a partir del plano.',
     'card.photo': 'Foto', 'tip.open': 'clic para ver',
@@ -1656,6 +1672,9 @@ function aplicaIdioma() {
   document.querySelectorAll('.facts dd').forEach((dd) => { dd.textContent = `${fmt(+dd.dataset.n)}${dd.dataset.u ? ' ' + dd.dataset.u : ''}`; });
   document.querySelectorAll('.lang button').forEach((b) => b.setAttribute('aria-pressed', b.dataset.lang === lang ? 'true' : 'false'));
   document.title = `${t('ui.title')} 3D — Bracerum Park`;
+  // o rótulo de cada ferramenta vira dica no hover: na barra só de ícones (ajustaBarra) é o que sobra à vista
+  document.querySelectorAll('.tool').forEach((b) => { const s = b.querySelector('span[data-i18n]'); if (s) b.title = s.textContent; });
+  ajustaBarra();
   $('#areaList').innerHTML = AREAS.map((a, i) => `<li><button type="button" data-i="${i}" aria-current="false"><b>${String(i + 1).padStart(2, '0')}</b><span>${esc(tr(a.name))}</span></button></li>`).join('');
   document.querySelectorAll('.arealist button').forEach((b) => {
     const i = +b.dataset.i;
@@ -1672,7 +1691,37 @@ function aplicaIdioma() {
   if (k && !$('#hint').classList.contains('is-off')) { const o = $('#hint').dataset.o; $('#hint').textContent = o ? subst(t(k), JSON.parse(o)) : t(k); }
   invalidate();
 }
+/* A barra com rótulos tem de 1.100 a 1.250 px conforme o idioma. Quando não cabe entre as laterais
+   (a bússola à direita — que, embutida na home, ainda recua para dar lugar ao WhatsApp do site), ficam
+   só os ícones; o rótulo continua para leitor de tela e no title. No celular vale a barra de rolar. */
+function ajustaBarra() {
+  const bar = $('.tools');
+  bar.classList.remove('is-compact');
+  if (SMALL()) return;
+  const folga = innerWidth - $('#compass').getBoundingClientRect().left + 12;
+  bar.classList.toggle('is-compact', bar.offsetWidth > innerWidth - 2 * folga);
+}
 function progresso(f) { $('#loaderBar').style.width = Math.round(f * 100) + '%'; }
+
+function modoEmbutido() {
+  const el = renderer.domElement, solto = () => !!document.fullscreenElement;
+  // pan-y: o dedo na vertical é do navegador (rola a home); na horizontal e com dois dedos, da maquete
+  const toque = () => { el.style.touchAction = solto() ? 'none' : 'pan-y'; };
+  toque();
+  document.addEventListener('fullscreenchange', toque);
+  // roda sem Ctrl/⌘: o OrbitControls não a consome (sai antes do preventDefault) e a home rola
+  addEventListener('wheel', (e) => {
+    if (solto() || e.ctrlKey || e.metaKey) return;
+    controls.enableZoom = false;
+    setTimeout(() => { controls.enableZoom = true; });   // só para este evento — a pinça no toque continua
+    if (e.target === el) dica('hint.wheel', 2600, { mod: MOD });
+  }, { capture: true, passive: true });
+  // site, WhatsApp e e-mail abrem na janela de cima, não dentro do quadro
+  document.addEventListener('click', (e) => {
+    const a = e.target.closest && e.target.closest('a[href]');
+    if (a && (!a.target || a.target === '_self')) a.target = '_top';
+  }, true);
+}
 
 function ligaInterface() {
   document.querySelectorAll('.lang button').forEach((b) => b.addEventListener('click', () => {
@@ -1681,6 +1730,12 @@ function ligaInterface() {
     aplicaIdioma();
   }));
   document.querySelectorAll('[data-site]').forEach((a) => { a.href = SITE + a.dataset.site; });
+  // o seletor da home (ou de outra aba) grava bp-lang: o evento 'storage' chega aqui e a maquete acompanha
+  addEventListener('storage', (e) => {
+    if (e.key !== 'bp-lang' || !T[e.newValue] || e.newValue === lang) return;
+    lang = e.newValue; aplicaIdioma();
+  });
+  if (EMBED) modoEmbutido();
   $('#cardClose').addEventListener('click', () => { pararTour(); limpaSelecao(); });
   $('#tLots').addEventListener('click', () => { modoMedir(false); modoLotesOn(!modoLotes); });
   const controlesLotes = (e) => {
@@ -1730,8 +1785,12 @@ function ligaInterface() {
   });
   $('#tSun').addEventListener('input', (e) => setHora(+e.target.value));
   const full = $('#tFull');
-  if (!document.documentElement.requestFullscreen) full.hidden = true;
-  full.addEventListener('click', () => (document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen().catch(() => {})));
+  const fsOk = !!document.documentElement.requestFullscreen && document.fullscreenEnabled !== false;
+  if (!fsOk && !EMBED) full.hidden = true;
+  full.addEventListener('click', () => {
+    if (!fsOk) { open(location.pathname + location.hash, '_top'); return; }   // embutida no iPhone: abre a página inteira
+    if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen().catch(() => {});
+  });
   document.addEventListener('fullscreenchange', () => full.setAttribute('aria-pressed', document.fullscreenElement ? 'true' : 'false'));
   $('#compass').addEventListener('click', () => {
     const n = S.north, sph = esfera();
@@ -1780,6 +1839,7 @@ function ligaInterface() {
     camera.fov = camera.aspect < 1 ? 46 : 38;
     camera.updateProjectionMatrix();
     renderer.setSize(innerWidth, innerHeight);
+    ajustaBarra();
     invalidate();
   });
 }
@@ -1910,8 +1970,16 @@ async function iniciar() {
     if (lotes.length) { vistaGeral(1); modoLotesOn(true, false); escolheLotes(lotes); }
     else if (h === 'lotes') { vistaGeral(1); modoLotesOn(true); }
     else if (areaIdx[APELIDO[h] || h] != null) { vistaGeral(1); escolheArea(areaIdx[APELIDO[h] || h]); }
-    else { vistaGeral(2600); dica(COARSE ? 'hint.touch' : 'hint.desk', 9000); }
+    else chegada();
   }, 250);
+  function chegada() {
+    const abre = () => { vistaGeral(2600); dica(EMBED ? (COARSE ? 'hint.touchEmbed' : 'hint.deskEmbed') : (COARSE ? 'hint.touch' : 'hint.desk'), 9000, EMBED ? { mod: MOD } : null); };
+    // embutida, a maquete carrega antes de o visitante chegar à seção: o voo e a dica esperam ela aparecer
+    // (dentro do iframe, o IntersectionObserver sem root mede contra a tela da página de cima)
+    if (!EMBED || !('IntersectionObserver' in window)) { abre(); return; }
+    const io = new IntersectionObserver((es) => { if (es.some((x) => x.isIntersecting)) { io.disconnect(); abre(); } }, { threshold: 0.35 });
+    io.observe($('#stage'));
+  }
   // situação dos lotes no CV CRM: ao abrir e a cada 2 min com a aba visível (a CDN segura 60 s)
   carregaStatus();
   setInterval(() => { if (!document.hidden) carregaStatus(); }, 120000);

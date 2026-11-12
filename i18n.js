@@ -6,8 +6,6 @@
 
 const I18N = {
   en: {
-    "mp.photoPrev": "Previous photo",
-    "mp.photoNext": "Next photo",
     "fv.2.k": "Road-train",
     "fv.3.k": "2 oceans",
     "vl.s1v": "+US$ 3 bn",
@@ -290,9 +288,9 @@ const I18N = {
     /* masterplan */
     "mp.eyebrow": "The Masterplan",
     "mp.title": "1,819,856 m² planned as a <em>city</em>",
-    "mp.hint": "Click the points to explore each area",
-    "mp.hintDrag": "Drag to see the whole plan · tap the points",
-    "mp.back": "← Overview", "mp.prev": "← Previous", "mp.next": "Next →",
+    "mp.lead": "Rotate, zoom and click any area or lot. The model shows Masterplan V14 with live lot availability.",
+    "mp.open": "Open the model full screen",
+    "mp.frame": "Interactive 3D model of Bracerum Park",
 
     /* localização */
     "loc.eyebrow": "Location",
@@ -474,8 +472,6 @@ const I18N = {
   },
 
   es: {
-    "mp.photoPrev": "Foto anterior",
-    "mp.photoNext": "Foto siguiente",
     "fv.2.k": "Bitrén",
     "fv.3.k": "2 océanos",
     "vl.s1v": "+US$ 3 mil mill.",
@@ -753,9 +749,9 @@ const I18N = {
     "tax.cta": "Conocer las ventajas",
     "mp.eyebrow": "El Masterplan",
     "mp.title": "1.819.856 m² planificados como una <em>ciudad</em>",
-    "mp.hint": "Haga clic en los puntos para explorar cada área",
-    "mp.hintDrag": "Arrastra para ver todo el plano · toca los puntos",
-    "mp.back": "← Vista general", "mp.prev": "← Anterior", "mp.next": "Siguiente →",
+    "mp.lead": "Gire, acerque y haga clic en cada área o lote. La maqueta muestra el Masterplan V14 con la disponibilidad de los lotes en tiempo real.",
+    "mp.open": "Abrir la maqueta en pantalla completa",
+    "mp.frame": "Maqueta 3D interactiva del Bracerum Park",
     "loc.eyebrow": "Ubicación",
     "loc.title": "La elección correcta tiene <em>dirección</em>.",
     "loc.lead": "Villeta, Paraguay — acceso directo a la Hidrovía Paraná–Paraguay y al corredor vial del Mercosur, sobre la misma ruta (PY19) que sirve al Terport y al Puerto Seguro.",

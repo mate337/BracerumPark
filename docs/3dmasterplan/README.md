@@ -1,9 +1,9 @@
 # Masterplan 3D (`3dmasterplan/`)
 
 Maquete 3D interativa do Bracerum Park, montada a partir do **Masterplan V14 (28/10/2026, "lotes
-identificados")** — registro da planta em `docs/masterplan-v14.md`. É uma aplicação **fora do site**:
-nenhuma página do site aponta para ela ainda. Publicada junto com o site, abre em
-**`bracerumpark.com/3dmasterplan/`**.
+identificados")** — registro da planta em `docs/masterplan-v14.md`. Publicada junto com o site, abre em
+**`bracerumpark.com/3dmasterplan/`** e, **desde 2026-11-12, também na home**, embutida no lugar da vista
+aérea do masterplan (ver "Embutida na home" abaixo).
 
 > **Endereço em minúsculas.** A pasta é `3dmasterplan`. Servidores web diferenciam maiúsculas de
 > minúsculas, então `/3DMasterplan` não abre a mesma pasta. Se o cliente quiser o endereço com
@@ -107,9 +107,37 @@ python3 -m http.server 8000      # na raiz
 `?q=low` desliga as sombras (útil em máquina fraca ou em navegador sem GPU). No console,
 `window.__bp` expõe cena, câmera e as funções de seleção.
 
-## Quando o site for liberado
+## Embutida na home (2026-11-12)
 
-- Linkar a maquete a partir do masterplan da home (e talvez da nav) — hoje não há link.
+A seção `#masterplan` do `index.html` tem um `<iframe id="mp3d" data-src="3dmasterplan/?embed=1">`. O
+`home.js` põe o `src` quando a seção chega perto da tela ou ~2,5 s depois do `load`, em ocioso — a maquete
+divide a thread com a home e não pode disputar com o loader e o hero. Embaixo do iframe fica
+`data/poster.jpg` (a mesma vista inicial), que é o que aparece sem JS, junto do link para a página própria.
+
+`?embed` liga a classe `is-embed` no `<html>` (script no `<head>`, antes de pintar) e o `app.js` lê a
+mesma classe (`EMBED`). O que muda — e só dentro do iframe:
+
+| | Página própria | Embutida |
+|---|---|---|
+| Barra de cima (logo, idioma, voltar) | sim | não — a home tem nav e seletor |
+| Roda do mouse | aproxima | **rola a home**; aproxima com Ctrl/⌘ + roda ou pinça do trackpad (`hint.wheel`) |
+| Dedo | 1 gira, 2 movem/aproximam | vertical **rola a home** (`touch-action: pan-y`), horizontal gira, 2 aproximam |
+| Links (site, WhatsApp, e-mail) | mesma janela | `target="_top"` |
+| Voo de chegada e dica | ao carregar | quando a maquete aparece na tela (IntersectionObserver contra a tela da home) |
+| Bússola / barra / "Próxima" | canto | recuam do WhatsApp flutuante da home |
+| Tela cheia | Fullscreen API | idem (com `allow="fullscreen"`); sem a API (iPhone) abre `/3dmasterplan/` |
+| Idioma | seletor próprio | acompanha a home pelo evento `storage` de `bp-lang` (vale também entre abas) |
+| `tracking.js` | conta visita | só repassa os cliques ao `bpTrack` da home, com `frame` |
+
+Em tela cheia o embutido volta a ser a maquete inteira (roda e toque). A **barra compacta** (só ícones,
+rótulo no `title`) vale nos dois modos: `ajustaBarra()` liga quando os rótulos não cabem entre as laterais.
+
+Testado no Chromium em 390, 1024, 1280, 1440, 1600 e 1920 px: roda sem Ctrl rola a home e não mexe na
+câmera; com Ctrl aproxima sem rolar; toque vertical rola a home, horizontal gira; a troca de idioma na nav
+chega ao iframe; o link "Ver no site" do cartão sai com `target=_top`.
+
+## Pendências
+
 - Se as fotos de Escola, Condo, Club, Posto de Saúde, Bombeiros, Hub e Grêmio chegarem, entram em
   `photos` do ponto no `app.js`.
 

@@ -155,6 +155,9 @@ em{font-style:italic}
 .tool--sun{cursor:default;gap:10px}
 .tool--sun input{width:96px;accent-color:var(--sand);cursor:pointer}
 .tool--sun output{min-width:42px;color:var(--paper);font-variant-numeric:tabular-nums}
+/* sem espaço para os rótulos (ajustaBarra no app.js): só os ícones, rótulo escondido só da vista */
+.tools.is-compact .tool{padding:0 15px}
+.tools.is-compact .tool>span:not(.sr){position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 
 .compass{position:fixed;z-index:18;right:var(--edge);bottom:var(--edge);width:var(--tools-h);height:var(--tools-h);
   background:var(--ink);box-shadow:var(--shadow);display:grid;place-items:center}
@@ -338,4 +341,24 @@ body.modo-lotes .qtag{display:block}
 }
 @media (prefers-reduced-motion:reduce){
   *{transition-duration:.01ms!important}
+}
+
+/* ---------- embutida na home (iframe com ?embed) ----------
+   A home já tem nav, título e idioma: a barra de cima sai e os painéis sobem até a borda.
+   overscroll-behavior volta ao normal — com "none" a rolagem que começa aqui não passaria para
+   a home — e o palco aceita o dedo na vertical (pan-y) para a página rolar; o app.js faz o
+   mesmo no canvas e devolve tudo à maquete em tela cheia. */
+html.is-embed,html.is-embed body{overscroll-behavior:auto}
+html.is-embed{--top-h:calc(var(--edge) - 6px)}
+html.is-embed .top{display:none}
+html.is-embed .stage{touch-action:pan-y}
+html.is-embed:fullscreen .stage{touch-action:none}
+html.is-embed .fallback .btn{display:none}
+/* o WhatsApp flutuante da home (52 px, a 20 px do canto da tela) cai no canto de baixo à direita do
+   quadro: a bússola, a barra de ferramentas e o "Próxima" do cartão saem de baixo dele */
+html.is-embed .compass{right:calc(var(--edge) + 64px)}
+@media (max-width:760px){
+  html.is-embed .compass{right:var(--edge)}
+  html.is-embed .tools{right:calc(var(--edge) + 62px)}
+  html.is-embed .card__nav{padding-right:72px}
 }

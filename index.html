@@ -12,7 +12,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
 <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" />
-<link rel="stylesheet" href="style.css?v=18" />
+<link rel="stylesheet" href="style.css?v=19" />
 <noscript><style>.reveal{opacity:1!important;transform:none!important}.mask__in{transform:none!important}.step{opacity:1!important;filter:none!important;transform:none!important}#loader{display:none!important}</style></noscript>
 <script src="tracking.js?v=1" defer></script>
 </head>
@@ -132,50 +132,22 @@
   </a>
 </section>
 
-<!-- ============ MASTERPLAN ============ -->
+<!-- ============ MASTERPLAN 3D ============ -->
+<!-- A maquete 3D (3dmasterplan/) no lugar da vista aérea com pinos — pedido do cliente em 2026-11-12.
+     É a mesma página de /3dmasterplan/, em modo embutido (?embed): sem a barra dela, a rolagem fica
+     com a home e o idioma acompanha o seletor do site. O src entra pelo home.js quando a seção se
+     aproxima (ou o site fica ocioso): são ~1,4 MB de three.js e dados. Sem JS fica a imagem e o link. -->
 <section class="masterplan" id="masterplan" style="padding-top:clamp(64px,8vw,124px)">
-  <div class="masterplan__viewport" id="mpViewport">
-    <div class="masterplan__stage" id="mpStage">
-      <img src="assets/web/vista-aerea-park-02.jpg" alt="Vista aérea do masterplan do Bracerum Park em Villeta" draggable="false" />
-      <div class="masterplan__pins" id="mpPins"></div>
-    </div>
-    <div class="masterplan__scrim"></div>
-
-    <div class="masterplan__head">
-      <p class="eyebrow eyebrow--dark" data-i18n="mp.eyebrow">O Masterplan</p>
-      <h2 data-i18n="mp.title">1.819.856 m² planejados como uma <em>cidade</em></h2>
-    </div>
-
-    <p class="masterplan__hint masterplan__hint--pins" data-i18n="mp.hint">Clique nos pontos para explorar cada área</p>
-  <p class="masterplan__hint masterplan__hint--drag" data-i18n="mp.hintDrag">Arraste para ver a planta inteira · toque nos pontos</p>
-    <button class="masterplan__back" id="mpBack" data-i18n="mp.back">← Vista geral</button>
-
-    <aside class="area-card" id="areaCard">
-      <!-- passador de fotos: as lâminas e os pontos são montados pelo JS
-           a partir da lista imgs[] da área (home.js) -->
-      <div class="area-card__media">
-        <div class="ac-slides" id="acSlides"></div>
-        <button class="ac-arrow ac-arrow--prev" type="button" id="acPrev"
-                data-i18n-attr="aria-label:mp.photoPrev" aria-label="Foto anterior">
-          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M15 4 7 12l8 8"/></svg>
-        </button>
-        <button class="ac-arrow ac-arrow--next" type="button" id="acNext"
-                data-i18n-attr="aria-label:mp.photoNext" aria-label="Próxima foto">
-          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M9 4l8 8-8 8"/></svg>
-        </button>
-        <div class="ac-dots" id="acDots"></div>
-      </div>
-      <div class="area-card__body">
-        <p class="area-card__eyebrow"></p>
-        <h3 class="area-card__title"></h3>
-        <p class="area-card__val"></p>
-        <p class="area-card__desc"></p>
-        <div class="area-card__nav">
-          <button type="button" data-area-prev data-i18n="mp.prev">← Anterior</button>
-          <button type="button" data-area-next data-i18n="mp.next">Próxima →</button>
-        </div>
-      </div>
-    </aside>
+  <div class="section__head section__head--dark reveal">
+    <p class="eyebrow eyebrow--dark" data-i18n="mp.eyebrow">O Masterplan</p>
+    <h2><span class="mask"><span class="mask__in" data-i18n="mp.title">1.819.856 m² planejados como uma <em>cidade</em></span></span></h2>
+    <p class="lead" data-i18n="mp.lead">Gire, aproxime e clique em cada área ou lote. A maquete mostra o Masterplan V14 com a disponibilidade dos lotes em tempo real.</p>
+    <a class="linkarrow" href="3dmasterplan/" data-track="masterplan3d_open"><span data-i18n="mp.open">Abrir a maquete em tela cheia</span> <span class="btn__arrow">&rarr;</span></a>
+  </div>
+  <div class="masterplan__frame">
+    <img src="3dmasterplan/data/poster.jpg" alt="Maquete 3D do masterplan do Bracerum Park em Villeta" loading="lazy" />
+    <iframe id="mp3d" data-src="3dmasterplan/?embed=1" title="Maquete 3D interativa do Bracerum Park"
+            data-i18n-attr="title:mp.frame" allow="fullscreen" allowfullscreen></iframe>
   </div>
 </section>
 
@@ -607,9 +579,9 @@
 <script src="https://unpkg.com/@maplibre/maplibre-gl-leaflet@0.0.22/leaflet-maplibre-gl.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-<script src="i18n.js?v=18"></script>
-<script src="script.js?v=18"></script>
-<script src="home.js?v=18"></script>
+<script src="i18n.js?v=19"></script>
+<script src="script.js?v=19"></script>
+<script src="home.js?v=19"></script>
 </body>
 </html>
 
