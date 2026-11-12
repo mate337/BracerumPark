@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Cadastro de lead · Bracerum Park</title>
+<meta name="robots" content="noindex, nofollow" />
+<meta name="theme-color" content="#0e0d0b" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Leads BP" />
+<meta name="format-detection" content="telephone=no" />
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml" />
+<link rel="apple-touch-icon" href="../assets/apple-touch-icon.png" />
+<link rel="manifest" href="manifest.webmanifest" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="cadastro.css?v=1" />
+<script src="cadastro.js?v=1" defer></script>
+</head>
+<body>
+<!-- Cadastro rápido de lead (nome, telefone, empresa, interesse) → /api/lead → lead no CV CRM.
+     Irmão do painel de reservas (/admin/), no mesmo visual, sem login e sem mapa.
+     Sem internet, o cadastro fica guardado no aparelho e sobe sozinho depois.
+     Documentação: docs/cadastro-lead.md. -->
+
+<header class="top">
+  <img class="top__logo" src="../assets/logo/logo-compact-cream.svg" alt="Bracerum Park" width="34" height="34" />
+  <div class="top__txt">
+    <p class="top__title">Cadastro de lead</p>
+    <p class="top__sub"><i class="dot" id="liveDot" aria-hidden="true"></i><span id="liveTxt">Vai direto para o CV</span></p>
+  </div>
+</header>
+
+<main>
+  <section class="card" id="formCard">
+    <h1 class="title">Novo <em>lead</em></h1>
+    <p class="sub">Preencha e envie — o lead entra no CV na hora.</p>
+
+    <form class="form" id="form" novalidate autocomplete="off">
+      <div class="alerta" id="alerta" role="alert" tabindex="-1" hidden></div>
+
+      <label class="field" data-campo="nome">
+        <span class="field__lab">Nome <b aria-hidden="true">*</b></span>
+        <input class="field__in" name="nome" autocomplete="off" autocapitalize="words" maxlength="100" placeholder="Nome e sobrenome" required />
+        <span class="field__err" hidden></span>
+      </label>
+
+      <div class="field" data-campo="telefone">
+        <label class="field__lab" for="telefone">Telefone / WhatsApp <b aria-hidden="true">*</b></label>
+        <div class="field__row">
+          <select class="field__in" name="ddi" id="ddi" aria-label="Código do país">
+            <option value="55">BR +55</option>
+            <option value="595">PY +595</option>
+            <option value="54">AR +54</option>
+            <option value="598">UY +598</option>
+            <option value="56">CL +56</option>
+            <option value="591">BO +591</option>
+            <option value="1">US +1</option>
+            <option value="">Outro</option>
+          </select>
+          <input class="field__in" name="telefone" id="telefone" type="tel" inputmode="tel" autocomplete="off" maxlength="20" placeholder="DDD + número" required />
+        </div>
+        <input class="field__in" name="ddiOutro" id="ddiOutro" inputmode="numeric" maxlength="4" placeholder="Código do país, ex.: 351" aria-label="Código do país" hidden />
+        <span class="field__err" hidden></span>
+      </div>
+
+      <label class="field" data-campo="empresa">
+        <span class="field__lab">Empresa</span>
+        <input class="field__in" name="empresa" autocomplete="off" maxlength="100" placeholder="Opcional" />
+      </label>
+
+      <fieldset class="field" data-campo="interesse">
+        <legend class="field__lab">Interesse <b aria-hidden="true">*</b></legend>
+        <div class="opts">
+          <label class="opt"><input type="radio" name="interesse" value="Lotes industriais" data-produto="park" /><span><b>Lotes industriais</b><small>Parque Industrial</small></span></label>
+          <label class="opt"><input type="radio" name="interesse" value="Apartamento" data-produto="residence" /><span><b>Apartamento</b><small>Bracerum Residence</small></span></label>
+          <label class="opt"><input type="radio" name="interesse" value="Lote para casa" data-produto="resort" /><span><b>Lote para casa</b><small>Bracerum Resort</small></span></label>
+          <label class="opt"><input type="radio" name="interesse" value="Loja ou sala" data-produto="outlet" /><span><b>Loja ou sala</b><small>Business Center</small></span></label>
+        </div>
+        <span class="field__err" hidden></span>
+      </fieldset>
+
+      <!-- campo-isca: gente não vê, robô preenche -->
+      <input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" />
+
+      <button class="btn btn--ink" id="enviar" type="submit">Enviar para o CV <span aria-hidden="true">→</span></button>
+    </form>
+  </section>
+
+  <section class="done" id="done" hidden tabindex="-1" aria-live="polite">
+    <div class="done__ic" id="doneIc" aria-hidden="true">✓</div>
+    <h2 id="doneTitle">Lead no CV</h2>
+    <p id="doneTxt"></p>
+    <button class="btn btn--sand" id="novo" type="button">Cadastrar outro <span aria-hidden="true">→</span></button>
+  </section>
+
+  <section class="hist" id="hist" hidden>
+    <div class="hist__head">
+      <h3>Neste aparelho</h3>
+      <button class="linkbtn" id="reenviar" type="button" hidden>Enviar a fila agora</button>
+    </div>
+    <ul class="rows" id="histList"></ul>
+  </section>
+</main>
+</body>
+</html>

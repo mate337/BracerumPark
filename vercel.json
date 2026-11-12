@@ -13,7 +13,10 @@
     { "source": "/Corretor", "destination": "/corretores", "permanent": false },
     { "source": "/admin", "destination": "/admin/", "permanent": false },
     { "source": "/Admin", "destination": "/admin/", "permanent": false },
-    { "source": "/Admin/", "destination": "/admin/", "permanent": false }
+    { "source": "/Admin/", "destination": "/admin/", "permanent": false },
+    { "source": "/cadastro", "destination": "/cadastro/", "permanent": false },
+    { "source": "/Cadastro", "destination": "/cadastro/", "permanent": false },
+    { "source": "/Cadastro/", "destination": "/cadastro/", "permanent": false }
   ],
   "rewrites": [
     { "source": "/linktree", "destination": "/linktree/index.html" },
@@ -52,6 +55,13 @@
   "headers": [
     {
       "source": "/admin/(.*)",
+      "headers": [
+        { "key": "X-Robots-Tag", "value": "noindex, nofollow" },
+        { "key": "Cache-Control", "value": "no-cache" }
+      ]
+    },
+    {
+      "source": "/cadastro/(.*)",
       "headers": [
         { "key": "X-Robots-Tag", "value": "noindex, nofollow" },
         { "key": "Cache-Control", "value": "no-cache" }

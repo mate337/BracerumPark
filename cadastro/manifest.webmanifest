@@ -1,0 +1,12 @@
+{
+  "name": "Cadastro de lead · Bracerum Park",
+  "short_name": "Leads BP",
+  "start_url": "/cadastro/",
+  "scope": "/cadastro/",
+  "display": "standalone",
+  "background_color": "#0e0d0b",
+  "theme_color": "#0e0d0b",
+  "icons": [
+    { "src": "/assets/apple-touch-icon.png", "sizes": "180x180", "type": "image/png" }
+  ]
+}

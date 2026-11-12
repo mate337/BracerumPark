@@ -21,6 +21,16 @@ rotas) que as seis páginas internas baixavam e interpretavam à toa. Ele roda d
   sessão injeta o token real de `api.vercel.com`; se expirou, pedir outro em vercel.com/account/tokens).
   Conferir no ar que nenhuma página pede arquivo que ficou de fora.
 
+### Cadastro rápido de lead — `/cadastro/` (v6.10 — 2026-11-12)
+- Página à parte, **mesmo visual do `/admin/`**, sem login: **nome, telefone (com código do país), empresa e
+  interesse** → **`api/lead.js`** (a das LPs, com `lp: "cadastro"`) → **lead no CV** (empreendimento pelo
+  interesse, módulo "Cadastro rápido", tag `cadastro-rapido`, empresa na anotação). Sem utm na URL entra como
+  da feira (origem OP, mídia `expo-py-br`, `ORIGEM_PADRAO` em `cadastro/cadastro.js`).
+- **`api/lead.js` aceita lead sem e-mail** (o CV aceita "e-mail ou telefone"); e-mail, se vier, é validado. As LPs
+  continuam exigindo e-mail no navegador.
+- Sem internet/CV fora: fila no aparelho que sobe sozinha; `cadastro/sw.js` abre a página offline.
+- Tudo em **`docs/cadastro-lead.md`**. **Testado só com o CV simulado** — o primeiro uso deve ser um lead de teste.
+
 ### LP de corretores — `/corretores` (v6.9 — 2026-11-11)
 - Cadastro de corretores parceiros no **mesmo padrão das LPs** (`docs/build_lps.py` → `corretores/index.html`,
   `lp/`), mas **não vai para o CV**: o formulário (Nome, WhatsApp, Imobiliária — um passo) manda para

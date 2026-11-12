@@ -22,6 +22,10 @@
     { lp, produto, idioma, nome, email, telefone, ddi, empresa, pais, perfil, interesse, prazo,
       mensagem, consentimento, pagina, attrib:{first,last}, hp, t }
     hp = campo-isca (robô preenche, gente não vê) · t = ms entre abrir a página e enviar.
+    E-mail é opcional (2026-11-12): o CV aceita lead só com telefone ("e-mail OU telefone", doc.
+    "Cadastra Leads"); se vier, precisa ser válido. Telefone continua obrigatório.
+    lp "cadastro" = /cadastro/, o cadastro rápido da equipe (nome, telefone, empresa, interesse):
+    vai com módulo "Cadastro rápido" e tag "cadastro-rapido" em vez de "Landing page".
   Saída: { ok:true, idlead } · { ok:false, erro } — a página mostra o WhatsApp como saída
   quando o CV falha, com os dados já escritos na mensagem, para o lead não se perder.
 
@@ -58,7 +62,7 @@ function validar(b) {
   let tel = String(b.telefone || '').replace(/\D/g, '');
   if (ddi.length > 1) tel = tel.replace(/^0+/, '');   // PY escreve 0985…; com o DDI o zero sai
   if (nome.length < 2) return { erro: 'nome' };
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return { erro: 'email' };
+  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return { erro: 'email' };
   if (tel.length < 6 || tel.length > 15) return { erro: 'telefone' };
   return { nome, email, tel, ddi: ddi.length > 1 ? ddi : '' };
 }
@@ -72,8 +76,9 @@ function montar(b, v) {
   const idemp = Number(envEmp || EMP[produto]) || null;
 
   const campanha = last.utm_campaign || first.utm_campaign || '';
+  const rapido = lp === 'cadastro';
   const linhas = [
-    `Landing page: ${lp} (${limpa(b.pagina, 200) || '-'})`,
+    rapido ? `Cadastro rápido da equipe (${limpa(b.pagina, 200) || '/cadastro/'})` : `Landing page: ${lp} (${limpa(b.pagina, 200) || '-'})`,
     `Idioma: ${limpa(b.idioma, 5) || 'pt'}`,
     b.perfil && `Perfil: ${limpa(b.perfil)}`,
     b.interesse && `Interesse: ${limpa(b.interesse, 200)}`,
@@ -85,19 +90,19 @@ function montar(b, v) {
     first.landing && `Primeira visita: ${limpa(first.at, 30)} em ${limpa(first.landing, 120)}${first.utm_source ? ` (${first.utm_source}/${first.utm_medium || '-'}/${first.utm_campaign || '-'})` : ''}`,
     (last.referrer || first.referrer) && `Referência: ${limpa(last.referrer || first.referrer, 200)}`,
     (last.gclid || last.fbclid) && `Clique de anúncio: ${last.gclid ? 'gclid ' + limpa(last.gclid, 120) : 'fbclid ' + limpa(last.fbclid, 120)}`,
-    `Consentimento LGPD: ${b.consentimento ? 'sim' : 'não'}`,
+    !rapido && `Consentimento LGPD: ${b.consentimento ? 'sim' : 'não'}`,
   ].filter(Boolean);
 
   const corpo = {
     nome: v.nome,
-    email: v.email,
+    ...(v.email ? { email: v.email } : {}),
     telefone: v.tel,
     ...(v.ddi ? { telefone_ddi: v.ddi } : {}),
     origem: origem({ ...first, ...last }),
     midia: slug(campanha || last.utm_source || `site-${lp}`) || `site-${lp}`,
-    conversao: limpa(`LP ${lp}${b.interesse ? ' — ' + b.interesse : ''}`, 100),
-    modulo: 'Landing page',
-    tags: ['landing-page', lp, produto, limpa(b.idioma, 5) || 'pt'].filter(Boolean),
+    conversao: limpa(`${rapido ? 'Cadastro rápido' : 'LP ' + lp}${b.interesse ? ' — ' + b.interesse : ''}`, 100),
+    modulo: rapido ? 'Cadastro rápido' : 'Landing page',
+    tags: (rapido ? ['cadastro-rapido', produto] : ['landing-page', lp, produto, limpa(b.idioma, 5) || 'pt']).filter(Boolean),
     interacoes: [{ tipo: 'A', descricao: linhas.join('\n') }],
   };
   if (idemp) corpo.idempreendimento = idemp;
@@ -156,7 +161,7 @@ module.exports = async (req, res) => {
     return fim(200, { ok: true, idlead });
   } catch (err) {
     // O lead não pode sumir: fica no log da função (Vercel → Logs) para a equipe recuperar.
-    console.error('[lead] falhou', err.message, JSON.stringify({ nome: corpo.nome, email: corpo.email,
+    console.error('[lead] falhou', err.message, JSON.stringify({ nome: corpo.nome, email: corpo.email || '-',
       telefone: (corpo.telefone_ddi || '') + corpo.telefone, conversao: corpo.conversao, midia: corpo.midia }));
     return fim(err.status || 502, { ok: false, erro: err.status === 503 ? 'não configurado' : 'CV indisponível' });
   }

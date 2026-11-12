@@ -1,0 +1,123 @@
+/* =====================================================================
+   Bracerum Park — cadastro rápido de lead (/cadastro/)
+   Mesmo visual do painel de reservas (/admin/admin.css): tokens do site
+   (ink / paper / sand / brown, Helvetica + Noto Serif), cantos quadrados,
+   zero vermelho (erro em marrom), alvos de toque de 48–52 px, celular primeiro.
+   ===================================================================== */
+:root{
+  --ink:#0e0d0b; --ink-2:#1a1814; --ink-3:#26231d;
+  --paper:#f7f3ea; --paper-2:#efe8da; --paper-3:#e6dcc7;
+  --sand:#cbb88f; --sand-2:#b9a374; --brown:#473315;
+  --k:#14110c; --k-soft:rgba(20,17,12,.68); --k-mute:rgba(20,17,12,.46);
+  --t:#f7f3ea; --t-soft:rgba(247,243,234,.7);
+  --line:rgba(20,17,12,.13); --line-t:rgba(247,243,234,.16);
+  --serif:"Noto Serif",Georgia,"Times New Roman",serif;
+  --sans:"Helvetica Neue",Helvetica,Arial,sans-serif;
+  --safe-b:env(safe-area-inset-bottom,0px); --safe-t:env(safe-area-inset-top,0px);
+  --gap:16px; --max:560px;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{background:var(--ink);-webkit-text-size-adjust:100%;overflow-x:hidden}
+body{min-height:100svh;overflow-x:hidden;background:var(--paper);color:var(--k);font:16px/1.45 var(--sans);-webkit-font-smoothing:antialiased;
+  -webkit-tap-highlight-color:transparent}
+button,input,select,textarea{font:inherit;color:inherit}
+button{background:none;border:0;cursor:pointer}
+fieldset{min-width:0;border:0}
+[hidden]{display:none!important}
+em{font-style:italic}
+:focus-visible{outline:2px solid var(--sand-2);outline-offset:2px}
+
+/* ------------------------------------------------------------------ topo */
+.top{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:12px;padding:calc(var(--safe-t) + 10px) var(--gap) 10px;background:var(--ink);color:var(--t)}
+.top__logo{width:34px;height:34px;flex:none}
+.top__txt{flex:1;min-width:0}
+.top__title{font:400 1.12rem/1.1 var(--serif)}
+.top__sub{display:flex;align-items:center;gap:7px;margin-top:3px;font-size:.74rem;color:var(--t-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dot{width:8px;height:8px;flex:none;background:#7aa35c}
+.dot.is-off{background:var(--sand)}
+.dot.is-busy{animation:pulso 1.2s ease-in-out infinite}
+@keyframes pulso{50%{opacity:.35}}
+
+main{max-width:var(--max);margin:0 auto;padding:20px var(--gap) calc(var(--safe-b) + 40px);display:grid;grid-template-columns:minmax(0,1fr);gap:18px}
+main>*{min-width:0}
+
+/* ------------------------------------------------------------------ cabeçalho do formulário */
+.title{font:400 2.1rem/1.05 var(--serif);letter-spacing:-.01em}
+.title em{color:var(--brown)}
+.sub{margin:8px 0 22px;color:var(--k-soft);font-size:.95rem}
+
+/* ------------------------------------------------------------------ botões e campos */
+.btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:54px;padding:14px 18px;
+  font:700 .82rem/1 var(--sans);letter-spacing:.14em;text-transform:uppercase;border:1px solid transparent;transition:background .2s,opacity .2s}
+.btn--ink{background:var(--ink);color:var(--t)}
+.btn--sand{background:var(--sand);color:var(--ink)}
+.btn:disabled{opacity:.5;cursor:progress}
+.btn:active:not(:disabled){opacity:.82}
+.linkbtn{min-height:44px;padding:0 4px;font:600 .8rem var(--sans);letter-spacing:.04em;text-decoration:underline;text-underline-offset:3px}
+
+.form{display:grid;gap:16px}
+.field{display:grid;gap:6px}
+.field__lab{font:600 .72rem/1 var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--k-soft)}
+.field__lab b{color:var(--brown)}
+legend.field__lab{margin-bottom:6px}
+.field__in{width:100%;min-height:52px;padding:12px 14px;background:#fff;border:1px solid var(--line);border-radius:0;font-size:16px;
+  appearance:none;-webkit-appearance:none}
+.field__in::placeholder{color:var(--k-mute)}
+.field__in:focus{outline:none;border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.field__row{display:grid;grid-template-columns:112px minmax(0,1fr);gap:8px}
+select.field__in{background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%2314110c' stroke-width='1.6'/%3E%3C/svg%3E") no-repeat right 12px center/12px 8px;padding-right:30px}
+.field.is-err .field__in{border-color:var(--brown);box-shadow:inset 0 0 0 1px var(--brown);background-color:#fbf6ec}
+.field__err{font-size:.78rem;color:var(--brown);font-weight:600}
+
+/* interesse: cartões de escolha única, 2 × 2 */
+.opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.opt{position:relative;display:block;cursor:pointer}
+.opt input{position:absolute;opacity:0;pointer-events:none}
+.opt span{display:grid;gap:3px;min-height:68px;height:100%;padding:12px 12px 12px 40px;background:#fff;border:1px solid var(--line);
+  transition:border-color .15s,background .15s}
+.opt span::before{content:"";position:absolute;left:12px;top:14px;width:18px;height:18px;border:2px solid var(--line);background:#fff}
+.opt b{font:700 .9rem/1.2 var(--sans)}
+.opt small{font-size:.74rem;color:var(--k-mute)}
+.opt input:checked+span{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink);background:#f6efdf}
+.opt input:checked+span::before{border-color:var(--ink);background:var(--ink) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3.5 8.5l3 3 6-7' fill='none' stroke='%23f7f3ea' stroke-width='2'/%3E%3C/svg%3E") center/14px no-repeat}
+.opt input:focus-visible+span{outline:2px solid var(--sand-2);outline-offset:2px}
+.field.is-err .opt span{border-color:var(--brown)}
+@media (max-width:340px){.opts{grid-template-columns:minmax(0,1fr)}}
+
+.hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
+
+.alerta{padding:14px 16px;background:var(--brown);color:var(--t);font-size:.9rem;line-height:1.45;outline:none;animation:treme .4s ease}
+.alerta b{display:block;margin-bottom:2px}
+@keyframes treme{20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}
+
+/* ------------------------------------------------------------------ resultado */
+.done{padding:28px 18px 18px;text-align:center;background:var(--ink);color:var(--t);outline:none;animation:sobe .32s cubic-bezier(.19,.8,.22,1)}
+.done__ic{width:56px;height:56px;margin:0 auto 14px;display:grid;place-items:center;background:var(--sand);color:var(--ink);font-size:1.8rem}
+.done--fila .done__ic{background:var(--paper);font-size:1.4rem}
+.done h2{font:400 1.7rem/1.15 var(--serif)}
+.done p{margin:8px 0 20px;color:var(--t-soft);font-size:.92rem}
+.done p b{color:var(--t)}
+@keyframes sobe{from{transform:translateY(24px);opacity:0}}
+
+/* ------------------------------------------------------------------ histórico do aparelho */
+.hist{display:grid;gap:8px}
+.hist__head{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.hist__head h3{font:400 1.2rem/1.1 var(--serif)}
+.rows{display:grid;list-style:none;border:1px solid var(--line);background:#fff}
+.row{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px;min-height:58px;padding:10px 12px;border-bottom:1px solid var(--line)}
+.row:last-child{border-bottom:0}
+.row__info{min-width:0;font-size:.8rem;color:var(--k-soft)}
+.row__info b{display:block;color:var(--k);font-weight:600;font-size:.92rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row__st{font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;padding:4px 7px;background:var(--paper-2)}
+.row__st.is-ok{background:var(--ink);color:var(--t)}
+.row__st.is-fila{background:var(--sand);color:var(--ink)}
+.row__st.is-err{background:var(--brown);color:var(--t)}
+
+@media (prefers-reduced-motion:reduce){
+  .alerta,.done{animation:none}
+  .dot.is-busy{animation:none}
+}
+@media (min-width:760px){
+  main{padding-top:40px}
+  .title{font-size:2.5rem}
+}
