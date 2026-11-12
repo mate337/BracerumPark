@@ -26,7 +26,7 @@ maquete 3D embutida, que as seis páginas internas baixavam e interpretavam à t
   sessão injeta o token real de `api.vercel.com`; se expirou, pedir outro em vercel.com/account/tokens).
   Conferir no ar que nenhuma página pede arquivo que ficou de fora.
 
-### Google Analytics 4 ligado (2026-11-12)
+### Google Analytics 4 + Clarity + aviso de cookies (2026-11-12)
 - **`CONFIG.ga4 = 'G-0MZSYRTHND'`** no `tracking.js` (propriedade criada pelo Matheus). Vale em todas as páginas
   que carregam o `tracking.js` (as 7 do site, linktree, cartões, LPs dos folders, corretores e a maquete);
   **`/admin/` e `/cadastro/` não carregam** — o uso da equipe não entra nos números.
@@ -38,7 +38,21 @@ maquete 3D embutida, que as seis páginas internas baixavam e interpretavam à t
 - Testes do Claude interceptam `g/collect` (resposta 204 local) para não mandar visita falsa ao GA.
 - **Vercel Web Analytics** continua (visitas, páginas, país, aparelho, origem); no plano Hobby não mostra
   eventos nem utm — isso agora é no GA4.
-- **LGPD:** o GA4 grava cookies; o aviso de consentimento ainda **não** foi posto (oferecido ao usuário).
+- **Microsoft Clarity** (`CONFIG.clarity = 'zcor807a8n'`, mapas de calor e gravações): os eventos do `bpTrack` também
+  vão como `clarity('event', nome)`, para filtrar gravações (ex.: sessões com `whatsapp_click`). Os campos de
+  formulário saem mascarados se o projeto ficar no modo de máscara "Balanced" ou "Strict" — não afrouxar.
+- **Aviso de cookies (LGPD)** — seção 5 do `tracking.js`, injetado em toda página que o carrega (site, linktree,
+  cartões, LPs, maquete; nunca dentro do iframe da home). **GA4, Clarity e Meta só carregam depois de "Aceitar"**
+  (modo básico: antes disso o Google e a Microsoft não recebem nada). Escolha em `localStorage` `bp-consent`
+  (`{v:'sim'|'nao', t}`, vale 12 meses). Aceitar e Recusar do mesmo tamanho (guia de cookies da ANPD). Recusar
+  depois de aceitar liga `ga-disable-…`, manda `consent update denied`, para o Clarity e apaga `_ga*`/`_cl*`.
+  O aviso espera o loader da home/maquete sair; texto em PT/EN/ES pelo `lang` do `<html>` (troca ao vivo);
+  cita os serviços ligados no `CONFIG` (com Meta vira "medição e publicidade").
+- **Reabrir:** qualquer `[data-cookies]` — o rodapé das 7 páginas tem "Preferências de cookies" (`ft.cookies`,
+  `.footer__cookies`). `window.bpConsent.open()` / `.get()` também. Linktree, cartões e LPs não têm o link.
+- **A Vercel Web Analytics conta todo mundo** (sem cookie, sem aviso); o GA4/Clarity só quem aceita — os números
+  do GA4 vão ser menores que os da Vercel, e isso é esperado.
+- Falta uma **página de política de privacidade** (o aviso não tem link para ela) — texto jurídico, pedir ao cliente.
 
 ### Masterplan 3D na home (v6.11 — 2026-11-12)
 - **A vista aérea com pinos saiu da home** (pedido do cliente): a seção `#masterplan` agora tem título
@@ -216,8 +230,7 @@ maquete 3D embutida, que as seis páginas internas baixavam e interpretavam à t
   cliques (WhatsApp/telefone/e-mail viram `Contact` no Meta), seções vistas e rolagem. `?bpdebug=1` mostra
   os eventos no console. Evento manual: `data-track="nome"` ou `window.bpTrack('nome', {...})`; o lead
   deve disparar `bpTrack('generate_lead', …)` (vira `Lead` no Meta).
-- **LGPD:** os pixels do Google e do Meta gravam cookies de marketing; antes de campanha paga, pôr aviso de
-  consentimento.
+- **LGPD:** resolvido em 2026-11-12 com o aviso de cookies do `tracking.js` (ver "Google Analytics 4 + Clarity").
 
 ### Linktree (v6.4 — 2026-11-03)
 - `linktree/index.html` → **bracerumpark.com/linktree** (pasta com `index.html`, funciona em qualquer host

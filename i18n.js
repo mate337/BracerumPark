@@ -342,6 +342,7 @@ const I18N = {
     /* footer */
     "ft.cta": "Let's build the industrial gateway to <em>Mercosur</em>?",
     "ft.rights": "© 2026 Bracerum Park. All rights reserved.",
+    "ft.cookies": "Cookie preferences",
     "ft.br": "Brazil", "ft.py": "Paraguay",
 
     /* tributação (página) */
@@ -789,6 +790,7 @@ const I18N = {
     "hist.cta": "Conocer Bracerum",
     "ft.cta": "¿Construimos juntos la puerta de entrada industrial del <em>Mercosur</em>?",
     "ft.rights": "© 2026 Bracerum Park. Todos los derechos reservados.",
+    "ft.cookies": "Preferencias de cookies",
     "ft.br": "Brasil", "ft.py": "Paraguay",
     "tp.eyebrow": "Tesis fiscal",
     "tp.title": "La tributación más <em>competitiva</em> de América del Sur",

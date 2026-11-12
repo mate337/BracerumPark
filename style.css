@@ -675,6 +675,11 @@ html.no-motion .step{opacity:1;filter:none;transform:none}
   padding-top:28px;margin-top:28px;font-size:.74rem;color:var(--t-dark-mute);
 }
 .footer__meta a:hover{color:var(--t-dark)}
+/* reabre o aviso de cookies do tracking.js (qualquer [data-cookies] serve) */
+.footer__cookies{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;
+  text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--line-dark)}
+.footer__cookies:hover{color:var(--t-dark)}
+.footer__cookies:focus-visible{outline:2px solid var(--sand);outline-offset:3px}
 @media (max-width: 720px){ .footer__contacts{grid-template-columns:1fr} }
 
 /* WhatsApp flutuante — discreto, dentro da paleta */
