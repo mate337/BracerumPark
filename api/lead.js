@@ -35,7 +35,8 @@
 */
 'use strict';
 
-const EMP = { park: 4, lotes: 4, mapa: 4, residence: 7, resort: 7, outlet: 9, business: 9, hotel: 3 };
+// casas = "Bracerum Residence Casas" do /cadastro/ (as casas do antigo Resort, no CV dentro do 7)
+const EMP = { park: 4, lotes: 4, mapa: 4, residence: 7, resort: 7, casas: 7, outlet: 9, business: 9, hotel: 3 };
 
 // utm -> código de origem do CV (lista "origem" da API; desconhecido vira SI = WebSite)
 function origem(a) {

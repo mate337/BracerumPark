@@ -27,7 +27,8 @@ rotas) que as seis páginas internas baixavam e interpretavam à toa. Ele roda d
   interesse, módulo "Cadastro rápido", tag `cadastro-rapido`, empresa na anotação). Sem utm na URL entra como
   da feira (origem OP, mídia `expo-py-br`, `ORIGEM_PADRAO` em `cadastro/cadastro.js`).
 - **Interesse com mais de uma opção** (caixas de marcar): `produtos: [...]` → `idempreendimento` em lista (`[4, 7]`) e uma
-  tag por produto; Apartamento + Lote para casa caem no mesmo 7. Conferido no CV real: lead #15 com 4 e 9, já em "Descarte".
+  tag por produto; Apartamento + Bracerum Residence Casas caem no mesmo 7 (a opção "Lote para casa"
+  virou "Bracerum Residence Casas" em 12/11, tag `casas`). Conferido no CV real: lead #15 com 4 e 9, já em "Descarte".
 - **`api/lead.js` aceita lead sem e-mail** (o CV aceita "e-mail ou telefone"); e-mail, se vier, é validado. As LPs
   continuam exigindo e-mail no navegador.
 - Sem internet/CV fora: fila no aparelho que sobe sozinha; `cadastro/sw.js` abre a página offline.

@@ -3,8 +3,8 @@
    Os cadastros sem internet ficam no localStorage, pelo cadastro.js — aqui não.
    A API (/api/…) nunca passa pelo cache. Ao trocar ?v= no index.html, trocar VERSAO aqui também.
    Mesmo desenho do admin/sw.js. Documentação: docs/cadastro-lead.md. */
-const VERSAO = 'bp-cadastro-v2';
-const CASCA = ['./', './cadastro.css?v=2', './cadastro.js?v=2', './manifest.webmanifest',
+const VERSAO = 'bp-cadastro-v3';
+const CASCA = ['./', './cadastro.css?v=3', './cadastro.js?v=3', './manifest.webmanifest',
   '../assets/logo/logo-compact-cream.svg', '../assets/favicon.svg', '../assets/apple-touch-icon.png'];
 
 self.addEventListener('install', (e) => {
