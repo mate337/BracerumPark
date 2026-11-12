@@ -73,6 +73,13 @@ Claude", Lotes industriais → **lead #13**, sem e-mail, empreendimento 4, orige
 `expo-py-br`, tags `park` + `cadastro-rapido`, anotação com a empresa. **Descartado** em seguida (situação 3
 "Descarte", motivo "Desistência", explicação "lead de teste").
 
+**Vários interesses no ar (2026-11-12, deploy seguinte):** teste real pela página com Lotes industriais + Loja ou sala,
+PY +595 900 000 002 → **lead #15** com os dois empreendimentos no CV (4 "Lotes industriais" e 9 "Bracerum Outlet"),
+tags `park`, `outlet`, `cadastro-rapido`; **descartado** em seguida. Visto no caminho: **telefone repetido reativa o
+lead** — um reenvio com o telefone do #13 tirou-o de "Descarte" (voltou a "Aguardando Atendimento", com
+`data_reativacao`); foi descartado de novo. É o comportamento certo para um cliente que volta, mas teste novo usa
+telefone novo.
+
 Para descartar pela API: `POST /api/v1/comercial/leads` com `idlead`, `permitir_alteracao: true`, `idsituacao: 3`,
 `motivo_cancelamento` (nome do motivo) e `descricao_motivo_cancelamento` quando o motivo exige explicação
 (lista em `GET /api/v1/comercial/motivos-cancelamento-lead`; situações em `GET /api/v1/configuracoes/workflows/leads`).
