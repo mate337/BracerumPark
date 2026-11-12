@@ -57,4 +57,20 @@ entra na fila. "Neste aparelho" lista os últimos 30 cadastros com o estado: No 
 - validação: vazio, telefone BR sem DDD, "Outro" código do país; 320 px sem rolagem lateral;
 - `api/lead.js`: LP continua com e-mail obrigatório no navegador, tags e LGPD como antes.
 
-**Não testado contra o CV real.** O primeiro uso deve ser um lead de teste conferido no CV e descartado.
+## No ar (2026-11-12)
+
+Publicado pela Vercel CLI (`docs/pacote_vercel.py`), deploy `dpl_B2DxM8jzC9BC1Qtu3W1xSTzYV4E7`. Conferido no ar:
+`/cadastro` → `/cadastro/` (307), página, CSS, JS e SW em 200, noindex; home, `/admin/`, LPs, `/corretores`,
+maquete e `/api/lotes-status` seguem em 200.
+
+**Teste real no CV:** pela página no ar, "TESTE cadastro Claude - apagar", PY +595 900 000 001, empresa "Teste
+Claude", Lotes industriais → **lead #13**, sem e-mail, empreendimento 4, origem "Outras publicidades", mídia
+`expo-py-br`, tags `park` + `cadastro-rapido`, anotação com a empresa. **Descartado** em seguida (situação 3
+"Descarte", motivo "Desistência", explicação "lead de teste").
+
+Para descartar pela API: `POST /api/v1/comercial/leads` com `idlead`, `permitir_alteracao: true`, `idsituacao: 3`,
+`motivo_cancelamento` (nome do motivo) e `descricao_motivo_cancelamento` quando o motivo exige explicação
+(lista em `GET /api/v1/comercial/motivos-cancelamento-lead`; situações em `GET /api/v1/configuracoes/workflows/leads`).
+
+**Aviso do CV:** a resposta da API trouxe "A rota /api/v1/comercial/leads será descontinuada. Migre para
+/api/v4/comercial/leads". Vale para `api/lead.js` e `api/admin.js` — sem data anunciada; migrar antes que o CV desligue.

@@ -29,7 +29,10 @@ rotas) que as seis páginas internas baixavam e interpretavam à toa. Ele roda d
 - **`api/lead.js` aceita lead sem e-mail** (o CV aceita "e-mail ou telefone"); e-mail, se vier, é validado. As LPs
   continuam exigindo e-mail no navegador.
 - Sem internet/CV fora: fila no aparelho que sobe sozinha; `cadastro/sw.js` abre a página offline.
-- Tudo em **`docs/cadastro-lead.md`**. **Testado só com o CV simulado** — o primeiro uso deve ser um lead de teste.
+- Tudo em **`docs/cadastro-lead.md`**. **No ar desde 2026-11-12** (deploy `dpl_B2DxM8jzC9BC1Qtu3W1xSTzYV4E7`); teste real
+  = lead #13 (sem e-mail, empreendimento 4, mídia `expo-py-br`), já em "Descarte".
+- **O CV avisou que `/api/v1/comercial/leads` será descontinuada** (migrar para `/api/v4/comercial/leads`) — afeta
+  `api/lead.js` e `api/admin.js`.
 
 ### LP de corretores — `/corretores` (v6.9 — 2026-11-11)
 - Cadastro de corretores parceiros no **mesmo padrão das LPs** (`docs/build_lps.py` → `corretores/index.html`,
