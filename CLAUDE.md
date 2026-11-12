@@ -10,6 +10,11 @@ O site tem **7 páginas**: `index.html`, `tributacao.html`, `bracerum.html`, `ho
 maquete 3D embutida, que as seis páginas internas baixavam e interpretavam à toa. Ele roda depois do
 `script.js` porque usa `hasGsap`, `reduceMotion` e `tr()`.
 
+### ✅ Publicação pelo GitHub voltou (2026-11-12)
+- Em 2026-11-12 o push no `main` **voltou a publicar sozinho** na Vercel (deploy de produção `source: git`,
+  `dpl_7JjxbfKeqn7pAZaTbVdBiPuxFW6D`, commit `55abe92`), e push em branch gera prévia. **Push no `main` = site no
+  ar** — só enviar ao `main` o que pode ir ao ar. A Vercel CLI (abaixo) continua valendo se a integração cair de novo.
+
 ### ⚠️ Publicação sem GitHub (2026-11-09)
 - **A conta GitHub `mate337` foi sinalizada ("flagged")** e não pode autorizar apps de terceiros: a Vercel
   perdeu o acesso ao repositório e **push no `main` não publica mais** (desde 6/11; o `tracking.js` ficou fora
@@ -43,6 +48,8 @@ maquete 3D embutida, que as seis páginas internas baixavam e interpretavam à t
 - Saíram do `home.js` o array `AREAS` e o passador de fotos; do `style.css` os pinos e o `.area-card`; do
   `i18n.js` as chaves `mp.hint/hintDrag/back/prev/next/photoPrev/photoNext` (entraram `mp.lead/open/frame`).
   `assets/web/vista-aerea-park-02.jpg` ficou sem uso no site — **não apagar sem o ok do cliente**.
+- **No ar desde 2026-11-12** (deploy `dpl_7JjxbfKeqn7pAZaTbVdBiPuxFW6D`, pelo GitHub). Conferido em bracerumpark.com:
+  iframe em modo embutido, roda rola a home, `/api/lotes-status` com os 614 lotes do CV (96 bloqueados aparecem).
 
 ### Cadastro rápido de lead — `/cadastro/` (v6.10 — 2026-11-12)
 - Página à parte, **mesmo visual do `/admin/`**, sem login: **nome, telefone (com código do país), empresa e
