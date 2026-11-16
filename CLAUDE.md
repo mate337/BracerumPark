@@ -10,6 +10,21 @@ O site tem **7 páginas**: `index.html`, `tributacao.html`, `bracerum.html`, `ho
 maquete 3D embutida, que as seis páginas internas baixavam e interpretavam à toa. Ele roda depois do
 `script.js` porque usa `hasGsap`, `reduceMotion` e `tr()`.
 
+### Apresentação para WhatsApp (2026-11-16)
+- **`docs/apresentacao/Bracerum-Park-Apresentacao.pdf`** — os quatro folders impressos V3 (Park, Residence Aptos,
+  Residence Casas, Business Center; Drive "Folder Final - Impressão") condensados em **14 páginas 4:5
+  (1080 × 1350), 4,3 MB**, para ler no celular. Índice clicável na capa; links com
+  `utm_source=whatsapp&utm_medium=apresentacao&utm_campaign=apresentacao-park` (lead entra no CV com origem WA)
+  para maquete 3D, `/foldermapadisponibilidade/` e site; cartões de WhatsApp do Cleber (PY) e do Sydney (BR).
+- **Gerada**: `python3 docs/apresentacao/build_apresentacao.py` → `node docs/apresentacao/imprimir.js [--previas <pasta>]`.
+  Textos em `build_apresentacao.py`, visual em `apresentacao.css`, fontes em `fonts/` (Noto Serif condensada
+  estática + Liberation Sans, embutidas no PDF). Imagens em `img/` saem dos PDFs dos folders por
+  `preparar_imagens.py <pasta-com-os-4-pdfs>` (PDFs de 23–50 MB, fora do repositório).
+- **Preço dos lotes = janela vigente**, não a do folder: o folder imprime a tabela "Expo" (até 13/11/2026);
+  a apresentação lê `3dmasterplan/data/precos.json` na janela `JANELA = 'pos'` (Pós-Expo, US$ 185/m² Padrão,
+  até 31/03/2027). **Em 01/04/2027 trocar para `'plena'` e regerar.** Outlet: tabela do folder (US$ 1.150/m²).
+- Masterplan da página 4 é o do folder impresso (não o V14 da maquete).
+
 ### ✅ Publicação pelo GitHub voltou (2026-11-12)
 - Em 2026-11-12 o push no `main` **voltou a publicar sozinho** na Vercel (deploy de produção `source: git`,
   `dpl_7JjxbfKeqn7pAZaTbVdBiPuxFW6D`, commit `55abe92`), e push em branch gera prévia. **Push no `main` = site no
