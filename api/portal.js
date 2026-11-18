@@ -1,31 +1,42 @@
 /*
   /api/portal — servidor do Portal do Corretor (bracerumpark.com/PortalCorretores).
 
-  Guarda tudo num Vercel Blob **privado** (store "portal-corretores", região gru1), ligado ao projeto
-  pela variável BLOB_READ_WRITE_TOKEN (criada junto com o store). Nada passa pelo CV CRM aqui —
-  o portal leva o corretor ao painel do CV (bracerum.cvcrm.com.br/corretor/) para lead, reserva e
-  comissão. Documentação: docs/portal-corretores.md.
+  Guarda tudo num Vercel Blob **privado** (store "portal-corretores", região gru1), ligado ao projeto pela
+  variável BLOB_READ_WRITE_TOKEN. Regras puras (fuso, vigência, elegibilidade, preço, sincronização,
+  etapas das solicitações, card) ficam em api/_portal-regras.js e têm testes em tests/portal.test.js.
+  Documentação de operação: docs/portal-corretores.md §7.
 
-  Variáveis:
-    BLOB_READ_WRITE_TOKEN    store privado do portal                                  [segredo]
-    PORTAL_CONVITE           chave que assina os links de primeiro acesso             [segredo]
-    PORTAL_ADMINS            e-mails que podem virar o primeiro gerenciador (sem conta ainda)
-    PORTAL_SEGREDO           (opcional) chave da sessão; sem ela deriva de ADMIN_SENHA/BLOB/CVCRM
+  Variáveis (nomes em .env.example):
+    BLOB_READ_WRITE_TOKEN   store privado do portal                                         [segredo]
+    PORTAL_CONVITE          chave que assina os links de primeiro acesso                    [segredo]
+    PORTAL_ADMINS           e-mails que podem virar o primeiro gestor (só sem conta ainda)
+    PORTAL_FUSO             fuso comercial das vigências (padrão America/Asuncion)
+    PORTAL_SYNC_MIN         intervalo mínimo entre consultas ao CV (padrão 5)
+    PORTAL_DADOS_MAX_MIN    idade máxima do último sucesso para o dado contar como atual (padrão 60)
+    CVCRM_EMAIL/CVCRM_TOKEN leitura do mapa de disponibilidade do CV (mesmas do /api/lotes-status) [segredo]
+    PORTAL_SEGREDO          (opcional) chave da sessão; sem ela deriva de ADMIN_SENHA/BLOB/CVCRM
 
   Arquivos no store:
-    portal/u/<id>.json       conta (id = sha256 do e-mail, 24 hex); papel "equipe" = gerenciador | "corretor"
-    portal/p/<id>.json       pedido ao marketing · portal/a/<pedido>/… anexos do pedido
-    portal/m/index.json      biblioteca enviada pelo gerenciador · portal/m/f/… arquivos
-    portal/avisos.json       mural (fora do menu desde 2026-11-18)
+    portal/u/<id>.json        conta (id = sha256 do e-mail); papel "equipe" = GESTOR | "corretor";
+                              status aprovado | bloqueado | excluido (exclusão lógica)
+    portal/i/index.json       imobiliárias
+    portal/p/<id>.json        solicitação ao marketing · portal/a/<pedido>/… anexos
+    portal/m/index.json       materiais (versões, rascunho/publicado/arquivado) · portal/m/f/… arquivos
+    portal/t/index.json       tutoriais do "Aprender" · portal/t/f/… arquivos
+    portal/o/index.json       ofertas / campanhas
+    portal/sync/comercial.json retrato da situação dos lotes vinda do CV (com última tentativa/sucesso)
+    portal/log/<ts>-<r>.json  auditoria (uma entrada por arquivo)
 
-  Sessão: cookie HttpOnly "bp_portal" (HMAC, 30 dias, SameSite=Strict). Todo pedido é POST JSON
-  com { acao, ... }; GET só para baixar anexo (?anexo=) e material (?material=).
-  Contas: só o gerenciador cria (Gestão), com link de primeiro acesso — não há cadastro aberto nem
-  senha compartilhada.
+  Sessão: cookie HttpOnly "bp_portal" (HMAC, 30 dias, SameSite=Strict). POST JSON { acao, ... }.
+  GET só para baixar: ?anexo= · ?material= · ?tutorial= · ?card=<oferta>. Toda chamada relê a conta:
+  bloqueio, exclusão ou troca de papel derrubam a sessão já aberta.
 */
 'use strict';
 
 const crypto = require('crypto');
+const fs = require('fs');
+const path = require('path');
+const R = require('./_portal-regras.js');
 
 let blob = null;
 const B = () => (blob || (blob = require('@vercel/blob')));
@@ -33,11 +44,13 @@ const B = () => (blob || (blob = require('@vercel/blob')));
 /* ------------------------------------------------------------------ utilitários */
 const limpa = (v, n = 120) => String(v == null ? '' : v).replace(/[\u0000-\u001f\u007f]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, n);
 const texto = (v, n = 2000) => String(v == null ? '' : v).replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/g, '').replace(/\r\n?/g, '\n').trim().slice(0, n);
-const erro = (status, message) => Object.assign(new Error(message), { status });
+const erro = (status, message, extra) => Object.assign(new Error(message), { status }, extra || {});
 const agora = () => new Date().toISOString();
 const idEmail = (email) => crypto.createHash('sha256').update(`bp-portal|${email}`).digest('hex').slice(0, 24);
+const novoId = () => `${Date.now().toString(36)}-${crypto.randomBytes(3).toString('hex')}`;
 const emailOk = (e) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(e);
 const urlOk = (u) => !u || /^https:\/\/[^\s]+$/i.test(u);
+const nomeArquivoSeguro = (n) => limpa(n, 120).normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^\w.\-]+/g, '-').replace(/^-+|-+$/g, '') || 'arquivo';
 
 function segredo() {
   return process.env.PORTAL_SEGREDO || crypto.createHash('sha256')
@@ -56,14 +69,20 @@ function senhaConfere(senha, reg) {
   const b = Buffer.from(reg.h, 'hex');
   return a.length === b.length && crypto.timingSafeEqual(a, b);
 }
+function validarSenha(s) {
+  s = String(s || '');
+  if (s.length < 8) throw erro(422, 'A senha precisa de pelo menos 8 caracteres');
+  if (s.length > 200) throw erro(422, 'Senha longa demais');
+  return s;
+}
+
 /* ------------------------------------------------------------------ sessão (cookie assinado) */
 const COOKIE = 'bp_portal';
 const DIAS = 30;
 const assina = (p) => crypto.createHmac('sha256', segredo()).update(p).digest('base64url');
 function emitir(res, s) {
   const corpo = Buffer.from(JSON.stringify({ ...s, x: Date.now() + DIAS * 864e5 })).toString('base64url');
-  const v = `${corpo}.${assina(corpo)}`;
-  res.setHeader('Set-Cookie', `${COOKIE}=${v}; Path=/api/portal; HttpOnly; Secure; SameSite=Strict; Max-Age=${DIAS * 86400}`);
+  res.setHeader('Set-Cookie', `${COOKIE}=${corpo}.${assina(corpo)}; Path=/api/portal; HttpOnly; Secure; SameSite=Strict; Max-Age=${DIAS * 86400}`);
 }
 function apagarCookie(res) {
   res.setHeader('Set-Cookie', `${COOKIE}=; Path=/api/portal; HttpOnly; Secure; SameSite=Strict; Max-Age=0`);
@@ -75,10 +94,7 @@ function lerSessao(req) {
   if (!corpo || !sig) return null;
   const e = assina(corpo);
   if (sig.length !== e.length || !crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(e))) return null;
-  try {
-    const s = JSON.parse(Buffer.from(corpo, 'base64url').toString());
-    return s.x > Date.now() ? s : null;
-  } catch (err) { return null; }
+  try { const s = JSON.parse(Buffer.from(corpo, 'base64url').toString()); return s.x > Date.now() ? s : null; } catch (err) { return null; }
 }
 
 /* ------------------------------------------------------------------ limite de tentativas (por instância) */
@@ -91,9 +107,7 @@ function bloqueado(chave) {
 const falhou = (chave) => tentativas.set(chave, [...(tentativas.get(chave) || []), Date.now()]);
 
 /* ------------------------------------------------------------------ armazenamento */
-function exigeStore() {
-  if (!process.env.BLOB_READ_WRITE_TOKEN) throw erro(503, 'Armazenamento do portal não configurado');
-}
+function exigeStore() { if (!process.env.BLOB_READ_WRITE_TOKEN) throw erro(503, 'Armazenamento do portal não configurado'); }
 async function ler(caminho) {
   exigeStore();
   const r = await B().get(caminho, { access: 'private', useCache: false }).catch((e) => {
@@ -106,10 +120,7 @@ async function ler(caminho) {
 }
 async function gravar(caminho, obj) {
   exigeStore();
-  await B().put(caminho, JSON.stringify(obj), {
-    access: 'private', addRandomSuffix: false, allowOverwrite: true,
-    contentType: 'application/json', cacheControlMaxAge: 60,
-  });
+  await B().put(caminho, JSON.stringify(obj), { access: 'private', addRandomSuffix: false, allowOverwrite: true, contentType: 'application/json', cacheControlMaxAge: 60 });
   return obj;
 }
 async function listar(prefixo) {
@@ -132,30 +143,105 @@ async function lerVarios(blobs, limite = 300) {
   }
   return res;
 }
+async function servirArquivo(res, caminho, tipo, nome, baixar) {
+  const r = await B().get(caminho, { access: 'private', useCache: false });
+  if (!r || !r.stream) { res.statusCode = 404; return res.end('não encontrado'); }
+  res.setHeader('Content-Type', (r.blob && r.blob.contentType) || tipo || 'application/octet-stream');
+  if (r.blob && r.blob.size) res.setHeader('Content-Length', String(r.blob.size));
+  res.setHeader('Cache-Control', 'private, no-store');
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('Content-Security-Policy', "default-src 'none'; img-src 'self' data:; style-src 'unsafe-inline'; sandbox");
+  res.setHeader('Content-Disposition', `${baixar ? 'attachment' : 'inline'}; filename*=UTF-8''${encodeURIComponent(nome)}`);
+  const { Readable } = require('stream');
+  Readable.fromWeb(r.stream).pipe(res);
+}
+const nao = (res) => { res.statusCode = 404; res.setHeader('Content-Type', 'text/plain; charset=utf-8'); return res.end('não encontrado'); };
 
 const caminhoU = (id) => `portal/u/${id}.json`;
 const caminhoP = (id) => `portal/p/${id}.json`;
-const CAMINHO_AVISOS = 'portal/avisos.json';
+const CAM = { imob: 'portal/i/index.json', mat: 'portal/m/index.json', tut: 'portal/t/index.json', of: 'portal/o/index.json', sync: 'portal/sync/comercial.json' };
 
-/* ------------------------------------------------------------------ contas */
-function publico(u) {
-  if (!u) return null;
+/* ------------------------------------------------------------------ auditoria */
+// Quem fez o quê, em qual registro. Nunca grava senha, token ou conteúdo de arquivo.
+async function auditar(s, acao, entidade, id, det) {
+  try {
+    const t = new Date().toISOString().replace(/[-:.TZ]/g, '');
+    await gravar(`portal/log/${t}-${crypto.randomBytes(2).toString('hex')}.json`, { em: agora(), por: s ? { id: s.u, nome: s.n } : null, acao, entidade, id: id || null, det: det || null });
+  } catch (e) { console.error('[portal] auditoria', e.message); }
+}
+async function auditoriaListar() {
+  const blobs = (await listar('portal/log/')).sort((a, b) => b.pathname.localeCompare(a.pathname));
+  return { eventos: await lerVarios(blobs, 150) };
+}
+
+/* ------------------------------------------------------------------ base comercial (arquivos do repositório) */
+let BASE = null;
+function base() {
+  if (BASE) return BASE;
+  const rd = (f) => {   // na Vercel a pasta atual é a raiz do projeto; fora dela, relativo a este arquivo
+    const a = path.join(process.cwd(), '3dmasterplan', 'data', f);
+    return JSON.parse(fs.readFileSync(fs.existsSync(a) ? a : path.join(__dirname, '..', '3dmasterplan', 'data', f), 'utf8'));
+  };
+  const lotes = rd('lotes.json');
+  const precos = rd('precos.json');
+  const unidades = new Map(lotes.lotes.map((l) => [l.id, { id: l.id, q: l.q, a: l.a, cat: l.cat, nome: l.nome }]));
+  BASE = { unidades, precos, fonteLotes: lotes.fonte };
+  return BASE;
+}
+
+/* ------------------------------------------------------------------ sincronização com o CV */
+let lerCV = null;
+async function sincronizar(forcar) {
+  const anterior = await ler(CAM.sync);
+  const ult = anterior && anterior.ultimaTentativa ? Date.parse(anterior.ultimaTentativa) : 0;
+  if (!forcar && Date.now() - ult < R.politica().syncMin * 60e3) return anterior;
+  if (!lerCV) lerCV = require('./lotes-status.js').lerCV;
+  let tentativa;
+  try {
+    const d = await Promise.race([lerCV(), new Promise((_, rej) => setTimeout(() => rej(new Error('tempo esgotado ao consultar o CV')), 15000))]);
+    tentativa = { ok: true, total: d.total, lotes: d.lotes, desconhecidas: d.desconhecidas, origem: 'CV CRM · mapa de disponibilidade (empreendimento ' + (process.env.CVCRM_EMPREENDIMENTO || '4') + ')' };
+  } catch (e) {
+    tentativa = { ok: false, erro: e.status === 503 ? 'integração com o CV não configurada neste ambiente' : e.message };
+    console.error('[portal] sincronização falhou:', tentativa.erro);
+  }
+  return gravar(CAM.sync, R.registrarSync(anterior, tentativa));
+}
+function resumoSync(snap) {
   return {
-    id: u.id, nome: u.nome, email: u.email, ddi: u.ddi, tel: u.tel, imobiliaria: u.imobiliaria,
-    creci: u.creci, pais: u.pais, idioma: u.idioma, status: u.status, criado: u.criado,
-    aprovado: u.aprovado || null, slug: u.slug, papel: 'corretor',
+    origem: (snap && snap.origem) || 'CV CRM · mapa de disponibilidade', ultimaTentativa: (snap && snap.ultimaTentativa) || null,
+    ultimoSucesso: (snap && snap.ultimoSucesso) || null, resultado: (snap && snap.resultado) || 'nunca', erro: (snap && snap.erro) || null,
+    estado: R.estadoSync(snap), politica: R.politica(), total: (snap && snap.total) || 0,
+  };
+}
+async function comercial() {
+  const { unidades, precos, fonteLotes } = base();
+  const snap = await sincronizar(false);
+  const j = R.janelaVigente(precos);
+  return {
+    sync: resumoSync(snap), fuso: R.fuso(),
+    fonte: { unidades: fonteLotes, precos: { fonte: precos.fonte, tabela: precos.tabela, revisao: precos.revisao, moeda: 'USD', unidade: 'US$/m²' } },
+    janela: { id: j.id, de: j.de || null, ate: j.ate || null },
+    unidades: [...unidades.values()].map((x) => ({ ...x, situacao: R.situacaoDe(x.id, snap) })),
+  };
+}
+
+/* ------------------------------------------------------------------ contas: gestor × corretor */
+const PAPEL = (u) => (u && u.papel === 'equipe' ? 'equipe' : 'corretor');
+const ativo = (u) => u && u.status !== 'bloqueado' && u.status !== 'excluido';
+function publico(u) {
+  return {
+    id: u.id, nome: u.nome, email: u.email, ddi: u.ddi, tel: u.tel, imobiliaria: u.imobiliaria, imobiliariaId: u.imobiliariaId || null,
+    creci: u.creci, pais: u.pais, idioma: u.idioma, status: u.status, criado: u.criado, slug: u.slug, papel: PAPEL(u), conta: true,
   };
 }
 function slugDe(nome, id) {
-  const base = limpa(nome, 60).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').split('-').filter(Boolean);
-  const curto = [base[0], base.length > 1 ? base[base.length - 1] : ''].filter(Boolean).join('-') || 'corretor';
-  return `${curto}-${id.slice(0, 4)}`;
+  const base0 = limpa(nome, 60).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').split('-').filter(Boolean);
+  return `${[base0[0], base0.length > 1 ? base0[base0.length - 1] : ''].filter(Boolean).join('-') || 'corretor'}-${id.slice(0, 4)}`;
 }
 function validarConta(b, parcial) {
   const v = {};
-  const nome = limpa(b.nome, 80);
   if (!parcial || b.nome !== undefined) {
+    const nome = limpa(b.nome, 80);
     if (nome.split(' ').filter((x) => x.length > 1).length < 2) throw erro(422, 'Escreva nome e sobrenome');
     v.nome = nome;
   }
@@ -167,21 +253,10 @@ function validarConta(b, parcial) {
     if (tel.length < (ddi === '55' ? 10 : 6) || tel.length > 15) throw erro(422, 'WhatsApp inválido');
     v.ddi = ddi; v.tel = tel;
   }
-  if (!parcial || b.imobiliaria !== undefined) {
-    const imob = limpa(b.imobiliaria, 80);
-    if (imob.length < 2) throw erro(422, 'Informe a imobiliária (ou "Autônomo")');
-    v.imobiliaria = imob;
-  }
   if (b.creci !== undefined) v.creci = limpa(b.creci, 30);
   if (b.pais !== undefined) v.pais = ['BR', 'PY', 'AR', 'UY', 'OUTRO'].includes(b.pais) ? b.pais : 'OUTRO';
   if (b.idioma !== undefined) v.idioma = ['pt', 'es', 'en'].includes(b.idioma) ? b.idioma : 'pt';
   return v;
-}
-function validarSenha(s) {
-  s = String(s || '');
-  if (s.length < 8) throw erro(422, 'A senha precisa de pelo menos 8 caracteres');
-  if (s.length > 200) throw erro(422, 'Senha longa demais');
-  return s;
 }
 
 async function login(b, res, ip) {
@@ -189,35 +264,23 @@ async function login(b, res, ip) {
   const chave = `${ip}|${email}`;
   if (bloqueado(chave)) throw erro(429, 'Muitas tentativas. Espere 10 minutos.');
   const u = emailOk(email) ? await ler(caminhoU(idEmail(email))) : null;
-  if (!u || !senhaConfere(b.senha, u.senha)) {
+  if (!u || u.status === 'excluido' || !senhaConfere(b.senha, u.senha)) {
     falhou(chave);
     await new Promise((r) => setTimeout(r, 600));
     throw erro(401, 'E-mail ou senha incorretos');
   }
-  if (u.status === 'bloqueado') throw erro(403, 'Acesso suspenso. Fale com a equipe Bracerum.');
+  if (u.status === 'bloqueado') throw erro(403, 'Acesso suspenso. Fale com o gestor do portal.');
   u.acessos = [agora(), ...(u.acessos || [])].slice(0, 20);
   await gravar(caminhoU(u.id), u);
-  if (u.papel === 'equipe') {
-    emitir(res, { p: 'equipe', n: u.nome, u: u.id });
-    return { usuario: equipePublico(u) };
-  }
-  emitir(res, { p: 'corretor', u: u.id });
+  emitir(res, { p: PAPEL(u), n: u.nome, u: u.id });
   return { usuario: publico(u) };
 }
 
-/* ------------------------------------------------------------------ contas: gerenciador × corretor */
-/* Dois tipos de conta (2026-11-18): papel "equipe" = GERENCIADOR (gestão de contas, materiais, pedidos e
-   tudo o que o corretor vê) e papel "corretor" (tabela, solicitações ao marketing, materiais, masterplan 3D,
-   aprender). Não existe cadastro aberto nem senha compartilhada: o gerenciador cria a conta na Gestão e
-   recebe um LINK DE PRIMEIRO ACESSO, que a pessoa abre para definir a senha:
-     /PortalCorretores#/convite/<e-mail em base64url>.<HMAC(PORTAL_CONVITE, e-mail)>
-   O link vale enquanto a conta não tem senha; "novo link de acesso" zera a senha e gera outro (esqueceu a senha).
-   PORTAL_ADMINS (lista de e-mails) só serve para criar o PRIMEIRO gerenciador, quando ainda não há conta. */
-const equipePublico = (u) => ({ papel: 'equipe', nome: u.nome, id: u.id, email: u.email, conta: true });
+// Primeiro acesso / nova senha por link assinado. PORTAL_ADMINS só vale para o PRIMEIRO gestor (sem conta).
 const listaAdmins = () => String(process.env.PORTAL_ADMINS || '').toLowerCase().split(/[,;\s]+/).filter(emailOk);
 function assinaConvite(email) {
   const chave = process.env.PORTAL_CONVITE;
-  if (!chave) throw erro(503, 'Convites não configurados (PORTAL_CONVITE)');
+  if (!chave) throw erro(503, 'Links de acesso não configurados (PORTAL_CONVITE)');
   return crypto.createHmac('sha256', chave).update(`convite|${email}`).digest('hex').slice(0, 32);
 }
 const origemDe = (req) => `https://${String(req.headers['x-forwarded-host'] || req.headers.host || 'bracerumpark.com')}`;
@@ -226,18 +289,18 @@ function lerConvite(token) {
   const [e64, sig] = String(token || '').split('.');
   let email = '';
   try { email = Buffer.from(e64 || '', 'base64url').toString().toLowerCase(); } catch (err) { email = ''; }
-  if (!emailOk(email) || !sig) throw erro(400, 'Convite inválido');
+  if (!emailOk(email) || !sig) throw erro(400, 'Link inválido');
   const certo = assinaConvite(email);
-  if (sig.length !== certo.length || !crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(certo))) throw erro(400, 'Convite inválido');
+  if (sig.length !== certo.length || !crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(certo))) throw erro(400, 'Link inválido');
   return email;
 }
 async function conviteVer(b) {
   const email = lerConvite(b.token);
   const u = await ler(caminhoU(idEmail(email)));
   if (u && u.senha) throw erro(410, 'Este link já foi usado. Entre com o seu e-mail e senha.');
-  if (u && u.status === 'bloqueado') throw erro(403, 'Acesso suspenso. Fale com o gerenciador.');
+  if (u && !ativo(u)) throw erro(403, 'Acesso suspenso. Fale com o gestor do portal.');
   if (!u && !listaAdmins().includes(email)) throw erro(403, 'Link sem permissão');
-  return { email, nome: (u && u.nome) || '', papel: (u && u.papel) || 'equipe' };
+  return { email, nome: (u && u.nome) || '', papel: u ? PAPEL(u) : 'equipe' };
 }
 async function conviteAceitar(b, res) {
   const { email } = await conviteVer(b);
@@ -246,47 +309,65 @@ async function conviteAceitar(b, res) {
   const senha = validarSenha(b.senha);
   const id = idEmail(email);
   const antes = (await ler(caminhoU(id))) || {};
-  const papel = antes.papel || 'equipe';
-  const u = {
-    ...antes, id, email, nome, papel, status: antes.status === 'pendente' ? 'aprovado' : (antes.status || 'aprovado'),
-    slug: antes.slug || slugDe(nome, id), senha: hashSenha(senha),
-    criado: antes.criado || agora(), ativado: agora(), acessos: [agora()],
-  };
+  const u = { ...antes, id, email, nome, papel: antes.papel || 'equipe', status: 'aprovado', slug: antes.slug || slugDe(nome, id),
+    senha: hashSenha(senha), criado: antes.criado || agora(), ativado: agora(), acessos: [agora()] };
   await gravar(caminhoU(id), u);
-  console.log('[portal] conta ativada', papel, id);
-  if (papel === 'equipe') { emitir(res, { p: 'equipe', n: nome, u: id }); return { usuario: equipePublico(u) }; }
-  emitir(res, { p: 'corretor', u: id });
+  await auditar({ u: id, n: nome }, 'conta.ativada', 'conta', id, { papel: u.papel });
+  emitir(res, { p: PAPEL(u), n: nome, u: id });
   return { usuario: publico(u) };
 }
+
 function contaResumo(u) {
   return {
-    id: u.id, nome: u.nome, email: u.email, papel: u.papel === 'equipe' ? 'equipe' : 'corretor',
-    status: u.status || 'aprovado', ativo: !!u.senha, ddi: u.ddi || '', tel: u.tel || '', imobiliaria: u.imobiliaria || '',
+    id: u.id, nome: u.nome, email: u.email, papel: PAPEL(u), status: u.status || 'aprovado', ativo: !!u.senha,
+    ddi: u.ddi || '', tel: u.tel || '', imobiliaria: u.imobiliaria || '', imobiliariaId: u.imobiliariaId || null,
     creci: u.creci || '', pais: u.pais || '', slug: u.slug || '', criado: u.criado, criadoPor: u.criadoPor || null,
-    ultimoAcesso: (u.acessos || [])[0] || null,
+    ultimoAcesso: (u.acessos || [])[0] || null, excluido: u.excluido || null,
   };
 }
+async function todasContas() { return lerVarios(await listar('portal/u/'), 5000); }
 async function contasListar() {
-  const lst = await lerVarios(await listar('portal/u/'), 2000);
-  return { contas: lst.map(contaResumo).sort((a, b) => String(b.criado).localeCompare(String(a.criado))) };
+  return { contas: (await todasContas()).map(contaResumo).sort((a, b) => String(b.criado).localeCompare(String(a.criado))) };
+}
+// Nunca deixar o portal sem um gestor ativo (aprovado e com senha criada).
+async function garantirGestor(alvoId) {
+  const restam = (await todasContas()).filter((x) => x.id !== alvoId && PAPEL(x) === 'equipe' && x.status === 'aprovado' && x.senha);
+  if (!restam.length) throw erro(409, 'O portal precisa de pelo menos um gestor ativo.');
+}
+async function imobiliariaDe(id) {
+  if (!id) return null;
+  const imob = (await imobiliarias()).itens.find((x) => x.id === id);
+  if (!imob) throw erro(422, 'Imobiliária não encontrada');
+  if (imob.status !== 'ativa') throw erro(422, 'Imobiliária arquivada');
+  return imob;
 }
 async function contaCriar(b, s, req) {
   const papel = b.papel === 'equipe' ? 'equipe' : 'corretor';
   const email = limpa(b.email, 120).toLowerCase();
   if (!emailOk(email)) throw erro(422, 'E-mail inválido');
   const id = idEmail(email);
-  if (await ler(caminhoU(id))) throw erro(409, 'Já existe uma conta com esse e-mail');
+  const ja = await ler(caminhoU(id));
+  if (ja) throw erro(409, ja.status === 'excluido' ? 'Esse e-mail é de uma conta excluída — reative-a na lista (filtro "Excluídas").' : 'Já existe uma conta com esse e-mail');
   let dados;
-  if (papel === 'corretor') dados = validarConta({ ...b, pais: b.pais || 'BR', idioma: b.idioma || 'pt' });
-  else {
+  if (papel === 'corretor') {
+    dados = validarConta({ ...b, pais: b.pais || 'BR', idioma: b.idioma || 'pt' });
+    const imob = await imobiliariaDe(limpa(b.imobiliariaId, 40));
+    if (imob) Object.assign(dados, { imobiliariaId: imob.id, imobiliaria: imob.nome });
+    else {
+      const nomeImob = limpa(b.imobiliaria, 80);
+      if (nomeImob.length < 2) throw erro(422, 'Escolha a imobiliária ou escreva "Autônomo"');
+      dados.imobiliaria = nomeImob;
+    }
+  } else {
     const nome = limpa(b.nome, 80);
     if (nome.length < 2) throw erro(422, 'Escreva o nome');
     dados = { nome };
     if (b.tel) Object.assign(dados, validarConta({ ddi: b.ddi, tel: b.tel }, true));
   }
+  // papel e situação vêm do servidor, nunca do corpo
   const u = { id, email, ...dados, papel, status: 'aprovado', slug: slugDe(dados.nome, id), criado: agora(), criadoPor: s.n };
   await gravar(caminhoU(id), u);
-  console.log('[portal] conta criada', papel, id, 'por', s.n);
+  await auditar(s, 'conta.criada', 'conta', id, { papel, email });
   return { conta: contaResumo(u), link: linkConvite(origemDe(req), email) };
 }
 async function contaAlvo(b, s) {
@@ -297,270 +378,477 @@ async function contaAlvo(b, s) {
 }
 async function contaAtualizar(b, s, req) {
   const u = await contaAlvo(b, s);
+  const mud = {};
   let link = null;
+  const perdeGestor = PAPEL(u) === 'equipe' && ((b.status && b.status !== 'aprovado') || b.papel === 'corretor');
+  if (perdeGestor) await garantirGestor(u.id);
   if (b.status !== undefined) {
-    if (!['aprovado', 'bloqueado'].includes(b.status)) throw erro(422, 'Situação inválida');
+    if (!['aprovado', 'bloqueado', 'excluido'].includes(b.status)) throw erro(422, 'Situação inválida');
+    if (b.status !== u.status) mud.status = [u.status || 'aprovado', b.status];
+    if (b.status === 'excluido') { u.excluido = { em: agora(), por: s.n }; delete u.senha; }   // exclusão lógica: preserva histórico
+    if (b.status === 'aprovado' && u.status === 'excluido') delete u.excluido;
     u.status = b.status;
   }
-  if (b.papel !== undefined) u.papel = b.papel === 'equipe' ? 'equipe' : 'corretor';
-  if (b.novoLink) { delete u.senha; link = linkConvite(origemDe(req), u.email); }   // esqueceu a senha: zera e gera link
+  if (b.papel !== undefined) {
+    const p = b.papel === 'equipe' ? 'equipe' : 'corretor';
+    if (p !== PAPEL(u)) mud.papel = [PAPEL(u), p];
+    u.papel = p;
+  }
+  if (b.imobiliariaId !== undefined) {
+    const imob = await imobiliariaDe(limpa(b.imobiliariaId, 40));
+    mud.imobiliaria = [u.imobiliaria || null, imob ? imob.nome : limpa(b.imobiliaria, 80) || null];
+    u.imobiliariaId = imob ? imob.id : null;
+    u.imobiliaria = imob ? imob.nome : (limpa(b.imobiliaria, 80) || u.imobiliaria);
+  }
+  if (b.novoLink) {
+    if (u.status === 'excluido') throw erro(409, 'Reative a conta antes de gerar um link');
+    delete u.senha; link = linkConvite(origemDe(req), u.email); mud.senha = 'zerada';
+  }
   if (!u.slug) u.slug = slugDe(u.nome, u.id);
   await gravar(caminhoU(u.id), u);
+  await auditar(s, 'conta.alterada', 'conta', u.id, mud);
   return { conta: contaResumo(u), link };
 }
 async function contaLink(b, s, req) {
   const u = await ler(caminhoU(limpa(b.id, 40)));
   if (!u) throw erro(404, 'Conta não encontrada');
+  if (!ativo(u)) throw erro(409, 'Conta suspensa ou excluída');
   if (u.senha) throw erro(409, 'Essa pessoa já criou a senha. Use "Novo link de acesso" para zerar.');
   return { link: linkConvite(origemDe(req), u.email) };
 }
-async function contaRemover(b, s) {
-  const u = await contaAlvo(b, s);
-  exigeStore();
-  await B().del(caminhoU(u.id));
-  console.log('[portal] conta removida', u.id, 'por', s.n);
-  return { removida: u.id };
+
+/* ------------------------------------------------------------------ imobiliárias */
+// Cadastro vinculado aos corretores (não tem login próprio). Excluir só sem nenhum corretor vinculado
+// (inclusive excluídos, para não quebrar histórico); com vínculo, arquivar.
+async function imobiliarias() {
+  const d = await ler(CAM.imob);
+  return { itens: (d && Array.isArray(d.itens)) ? d.itens : [] };
+}
+async function imobiliariasComContagem() {
+  const [d, contas] = await Promise.all([imobiliarias(), todasContas()]);
+  return { itens: d.itens.map((x) => ({ ...x, corretores: contas.filter((u) => u.imobiliariaId === x.id && u.status !== 'excluido').length })) };
+}
+async function imobiliariaSalvar(b, s) {
+  const d = await imobiliarias();
+  const nome = limpa(b.nome, 100);
+  if (nome.length < 2) throw erro(422, 'Escreva o nome da imobiliária');
+  const email = limpa(b.email, 120).toLowerCase();
+  if (email && !emailOk(email)) throw erro(422, 'E-mail inválido');
+  if (d.itens.some((x) => x.id !== b.id && x.nome.toLowerCase() === nome.toLowerCase())) throw erro(409, 'Já existe uma imobiliária com esse nome');
+  let it = b.id ? d.itens.find((x) => x.id === b.id) : null;
+  if (b.id && !it) throw erro(404, 'Imobiliária não encontrada');
+  const novo = !it;
+  if (!it) { it = { id: novoId(), status: 'ativa', criado: agora(), criadoPor: s.n }; d.itens.push(it); }
+  Object.assign(it, { nome, contato: limpa(b.contato, 80) || null, telefone: limpa(b.telefone, 30) || null, email: email || null,
+    documento: limpa(b.documento, 30) || null, cidade: limpa(b.cidade, 60) || null, atualizado: agora() });
+  await gravar(CAM.imob, d);
+  // o nome exibido nos corretores acompanha a imobiliária
+  if (!novo) for (const u of await todasContas()) if (u.imobiliariaId === it.id && u.imobiliaria !== it.nome) { u.imobiliaria = it.nome; await gravar(caminhoU(u.id), u); }
+  await auditar(s, novo ? 'imobiliaria.criada' : 'imobiliaria.alterada', 'imobiliaria', it.id, { nome });
+  return imobiliariasComContagem();
+}
+async function imobiliariaArquivar(b, s) {
+  const d = await imobiliarias();
+  const it = d.itens.find((x) => x.id === b.id);
+  if (!it) throw erro(404, 'Imobiliária não encontrada');
+  it.status = b.arquivar ? 'arquivada' : 'ativa'; it.atualizado = agora();
+  await gravar(CAM.imob, d);
+  await auditar(s, b.arquivar ? 'imobiliaria.arquivada' : 'imobiliaria.reativada', 'imobiliaria', it.id);
+  return imobiliariasComContagem();
+}
+async function imobiliariaExcluir(b, s) {
+  const d = await imobiliarias();
+  const it = d.itens.find((x) => x.id === b.id);
+  if (!it) throw erro(404, 'Imobiliária não encontrada');
+  const vinc = (await todasContas()).filter((u) => u.imobiliariaId === it.id).length;
+  if (vinc) throw erro(409, `Há ${vinc} corretor(es) vinculado(s). Desvincule ou arquive a imobiliária.`);
+  d.itens = d.itens.filter((x) => x.id !== it.id);
+  await gravar(CAM.imob, d);
+  await auditar(s, 'imobiliaria.excluida', 'imobiliaria', it.id, { nome: it.nome });
+  return imobiliariasComContagem();
 }
 
-/* ------------------------------------------------------------------ biblioteca: materiais enviados pelo gerenciador */
-/* Índice em portal/m/index.json = { itens: [...], ocultos: [chaves dos materiais fixos do conteudo.js] }.
-   Arquivos em portal/m/f/<aleatório>-<nome>, enviados DIRETO do navegador ao Blob com um token de 30 min
-   (generateClientTokenFromReadWriteToken) — assim vídeo e PDF grande não passam pelo limite de 4,5 MB da função.
-   Download por GET /api/portal?material=<caminho> (qualquer conta logada; o arquivo não é público). */
-const CAMINHO_MAT = 'portal/m/index.json';
-const MAT_TIPOS = ['tabela', 'folder', 'foto', 'video', 'logo', 'pagina', 'apresentacao', 'documento'];
-const MAT_CONTEUDO = ['image/*', 'video/*', 'application/pdf', 'application/zip', 'application/x-zip-compressed',
+/* ------------------------------------------------------------------ envio direto ao Blob (token de 30 min) */
+const ARQ_CONTEUDO = ['image/*', 'video/*', 'application/pdf', 'application/zip', 'application/x-zip-compressed',
   'application/vnd.openxmlformats-officedocument.presentationml.presentation', 'application/vnd.ms-powerpoint',
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/msword',
-  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel', 'image/svg+xml'];
-async function biblioteca() {
-  const d = await ler(CAMINHO_MAT);
-  return { itens: (d && Array.isArray(d.itens)) ? d.itens : [], ocultos: (d && Array.isArray(d.ocultos)) ? d.ocultos : [] };
-}
-async function materialToken(b) {
-  const nome = limpa(b.nome, 120).normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^\w.\-]+/g, '-').replace(/^-+|-+$/g, '') || 'arquivo';
-  const caminho = `portal/m/f/${crypto.randomBytes(5).toString('hex')}-${nome}`;
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel'];
+const RX_ARQ = { m: /^portal\/m\/f\/[a-f0-9]{10}-[\w.\-]+$/, t: /^portal\/t\/f\/[a-f0-9]{10}-[\w.\-]+$/ };
+async function tokenEnvio(b) {
+  const pasta = b.destino === 'tutorial' ? 't' : 'm';
+  if (b.tipo && !ARQ_CONTEUDO.some((p) => (p.endsWith('/*') ? String(b.tipo).startsWith(p.slice(0, -1)) : p === b.tipo))) throw erro(415, 'Tipo de arquivo não aceito');
+  if (Number(b.tamanho) > 500 * 1024 * 1024) throw erro(413, 'Arquivo maior que 500 MB');
+  const caminho = `portal/${pasta}/f/${crypto.randomBytes(5).toString('hex')}-${nomeArquivoSeguro(b.nome)}`;
   const { generateClientTokenFromReadWriteToken } = require('@vercel/blob/client');
   exigeStore();
-  const token = await generateClientTokenFromReadWriteToken({
-    token: process.env.BLOB_READ_WRITE_TOKEN, pathname: caminho, maximumSizeInBytes: 500 * 1024 * 1024,
-    allowedContentTypes: MAT_CONTEUDO, validUntil: Date.now() + 30 * 60e3, addRandomSuffix: false, allowOverwrite: false,
-  });
+  const token = await generateClientTokenFromReadWriteToken({ token: process.env.BLOB_READ_WRITE_TOKEN, pathname: caminho, maximumSizeInBytes: 500 * 1024 * 1024,
+    allowedContentTypes: ARQ_CONTEUDO, validUntil: Date.now() + 30 * 60e3, addRandomSuffix: false, allowOverwrite: false });
   return { token, caminho };
+}
+function versaoDe(b, pasta) {
+  const caminho = String(b.caminho || '');
+  const link = limpa(b.link, 500);
+  if (caminho && !RX_ARQ[pasta].test(caminho)) throw erro(422, 'Arquivo inválido');
+  if (!caminho && !/^https:\/\/\S+$/.test(link)) throw erro(422, 'Envie um arquivo ou informe um link https://');
+  return { caminho: caminho || null, link: caminho ? null : link, conteudo: limpa(b.conteudo, 120) || null,
+    kb: Math.max(0, Math.round(Number(b.kb) || 0)), nomeArquivo: limpa(b.nomeArquivo, 120) || null };
+}
+
+/* ------------------------------------------------------------------ materiais (rascunho / publicado / arquivado, com versões) */
+const MAT_TIPOS = ['tabela', 'folder', 'foto', 'video', 'logo', 'pagina', 'apresentacao', 'documento'];
+const PRODUTOS = ['park', 'residence', 'resort', 'hotel', 'outlet', 'geral'];
+const ST_CONTEUDO = ['rascunho', 'publicado', 'arquivado'];
+function normalizaMaterial(x) {     // itens enviados antes do versionamento viram versão 1, publicados
+  if (Array.isArray(x.versoes)) return x;
+  const v = { n: 1, caminho: x.caminho || null, link: x.link || null, conteudo: x.conteudo || null, kb: x.kb || 0, nomeArquivo: x.nomeArquivo || null, em: x.criado, por: x.por };
+  const { caminho, link, conteudo, kb, nomeArquivo, ...resto } = x;
+  return { ...resto, status: x.status || 'publicado', versoes: [v], atual: 1 };
+}
+const versaoAtual = (x) => x.versoes.find((v) => v.n === x.atual) || x.versoes[x.versoes.length - 1];
+async function biblioteca() {
+  const d = await ler(CAM.mat);
+  return { itens: ((d && d.itens) || []).map(normalizaMaterial), ocultos: (d && Array.isArray(d.ocultos)) ? d.ocultos : [] };
+}
+function bibliotecaPara(bib, eq) {
+  if (eq) return bib;
+  // corretor: só publicado, só a versão vigente (sem caminhos de versões antigas)
+  return { ocultos: bib.ocultos, itens: bib.itens.filter((x) => x.status === 'publicado').map((x) => {
+    const v = versaoAtual(x);
+    return { id: x.id, titulo: x.titulo, tipo: x.tipo, produto: x.produto, desc: x.desc, destaque: x.destaque, status: x.status, atual: x.atual,
+      atualizado: x.atualizado, versoes: [{ n: v.n, caminho: v.caminho, link: v.link, conteudo: v.conteudo, kb: v.kb, nomeArquivo: v.nomeArquivo, em: v.em }] };
+  }) };
 }
 async function materialSalvar(b, s) {
   const bib = await biblioteca();
   const titulo = limpa(b.titulo, 120);
   if (titulo.length < 2) throw erro(422, 'Dê um título ao material');
-  const tipo = MAT_TIPOS.includes(b.tipo) ? b.tipo : 'documento';
-  const produto = PRODUTOS.includes(b.produto) ? b.produto : 'geral';
-  let item = b.id ? bib.itens.find((x) => x.id === b.id) : null;
-  if (b.id && !item) throw erro(404, 'Material não encontrado');
-  if (!item) {
-    const caminho = String(b.caminho || '');
-    const link = limpa(b.link, 500);
-    if (caminho && !/^portal\/m\/f\/[a-f0-9]{10}-[\w.\-]+$/.test(caminho)) throw erro(422, 'Arquivo inválido');
-    if (!caminho && !/^https:\/\/\S+$/.test(link)) throw erro(422, 'Envie um arquivo ou informe um link https://');
-    item = { id: crypto.randomBytes(5).toString('hex'), caminho: caminho || null, link: caminho ? null : link,
-      conteudo: limpa(b.conteudo, 120) || null, kb: Math.max(0, Math.round(Number(b.kb) || 0)), nomeArquivo: limpa(b.nomeArquivo, 120) || null,
-      criado: agora(), por: s.n };
-    bib.itens.unshift(item);
+  let it = b.id ? bib.itens.find((x) => x.id === b.id) : null;
+  if (b.id && !it) throw erro(404, 'Material não encontrado');
+  const novo = !it;
+  if (novo) {
+    const v = { n: 1, ...versaoDe(b, 'm'), em: agora(), por: s.n };
+    it = { id: crypto.randomBytes(5).toString('hex'), status: b.publicar ? 'publicado' : 'rascunho', versoes: [v], atual: 1, criado: agora(), por: s.n };
+    bib.itens.unshift(it);
   }
-  Object.assign(item, { titulo, tipo, produto, desc: texto(b.desc, 400) || null, destaque: !!b.destaque, atualizado: agora() });
-  await gravar(CAMINHO_MAT, bib);
+  Object.assign(it, { titulo, tipo: MAT_TIPOS.includes(b.tipo) ? b.tipo : 'documento', produto: PRODUTOS.includes(b.produto) ? b.produto : 'geral',
+    desc: texto(b.desc, 400) || null, destaque: !!b.destaque, atualizado: agora() });
+  await gravar(CAM.mat, bib);
+  await auditar(s, novo ? 'material.criado' : 'material.editado', 'material', it.id, { titulo, status: it.status });
   return bib;
 }
-async function materialRemover(b) {
+async function materialVersao(b, s) {
   const bib = await biblioteca();
-  const item = bib.itens.find((x) => x.id === b.id);
-  if (!item) throw erro(404, 'Material não encontrado');
-  bib.itens = bib.itens.filter((x) => x.id !== b.id);
-  if (item.caminho) await B().del(item.caminho).catch((e) => console.error('[portal] del material', e.message));
-  await gravar(CAMINHO_MAT, bib);
+  const it = bib.itens.find((x) => x.id === b.id);
+  if (!it) throw erro(404, 'Material não encontrado');
+  const n = Math.max(...it.versoes.map((v) => v.n)) + 1;
+  it.versoes.push({ n, ...versaoDe(b, 'm'), em: agora(), por: s.n, nota: limpa(b.nota, 200) || null });
+  it.atual = n; it.atualizado = agora();
+  await gravar(CAM.mat, bib);
+  await auditar(s, 'material.nova_versao', 'material', it.id, { versao: n });
   return bib;
 }
-async function materialOcultar(b) {
+async function materialStatus(b, s) {
+  const bib = await biblioteca();
+  const it = bib.itens.find((x) => x.id === b.id);
+  if (!it) throw erro(404, 'Material não encontrado');
+  if (!ST_CONTEUDO.includes(b.status)) throw erro(422, 'Situação inválida');
+  const de = it.status; it.status = b.status; it.atualizado = agora();
+  await gravar(CAM.mat, bib);
+  await auditar(s, 'material.situacao', 'material', it.id, { de, para: b.status });
+  return bib;
+}
+async function materialOcultar(b, s) {
   const bib = await biblioteca();
   const chave = limpa(b.chave, 300);
   if (!chave) throw erro(422, 'Material inválido');
   bib.ocultos = b.ocultar ? [...new Set([...bib.ocultos, chave])] : bib.ocultos.filter((x) => x !== chave);
-  await gravar(CAMINHO_MAT, bib);
+  await gravar(CAM.mat, { itens: bib.itens, ocultos: bib.ocultos });
+  await auditar(s, b.ocultar ? 'material.fixo_oculto' : 'material.fixo_visivel', 'material', chave);
   return bib;
 }
-async function materialBaixar(req, res) {
-  const s = lerSessao(req);
-  const q = new URL(req.url, 'http://x').searchParams;
-  const caminho = String(q.get('material') || '');
-  if (!s || !s.u || !/^portal\/m\/f\/[a-f0-9]{10}-[\w.\-]+$/.test(caminho)) { res.statusCode = 404; return res.end('não encontrado'); }
-  const u = await ler(caminhoU(s.u));
-  if (!u || u.status === 'bloqueado') { res.statusCode = 404; return res.end('não encontrado'); }
-  const item = (await biblioteca()).itens.find((x) => x.caminho === caminho);
-  if (!item) { res.statusCode = 404; return res.end('não encontrado'); }
-  const r = await B().get(caminho, { access: 'private', useCache: false });
-  if (!r || !r.stream) { res.statusCode = 404; return res.end('não encontrado'); }
-  const tipo = (r.blob && r.blob.contentType) || item.conteudo || 'application/octet-stream';
-  res.setHeader('Content-Type', tipo);
-  if (r.blob && r.blob.size) res.setHeader('Content-Length', String(r.blob.size));
-  res.setHeader('Cache-Control', 'private, max-age=300');
-  res.setHeader('X-Content-Type-Options', 'nosniff');
-  const nome = item.nomeArquivo || caminho.split('/').pop().replace(/^[a-f0-9]{10}-/, '');
-  res.setHeader('Content-Disposition', `${q.get('baixar') ? 'attachment' : 'inline'}; filename*=UTF-8''${encodeURIComponent(nome)}`);
-  const { Readable } = require('stream');
-  Readable.fromWeb(r.stream).pipe(res);
+
+/* ------------------------------------------------------------------ tutoriais (Aprender) */
+async function tutoriais() {
+  const d = await ler(CAM.tut);
+  return { itens: ((d && d.itens) || []).slice().sort((a, b) => (a.ordem || 0) - (b.ordem || 0)), ocultos: (d && Array.isArray(d.ocultos)) ? d.ocultos : [] };
+}
+const tutoriaisPara = (d, eq) => (eq ? d : { ocultos: d.ocultos, itens: d.itens.filter((x) => x.status === 'publicado') });
+async function tutorialSalvar(b, s) {
+  const d = await tutoriais();
+  const titulo = limpa(b.titulo, 120);
+  if (titulo.length < 3) throw erro(422, 'Dê um título ao tutorial');
+  const tipo = ['texto', 'link', 'arquivo'].includes(b.tipo) ? b.tipo : 'texto';
+  let it = b.id ? d.itens.find((x) => x.id === b.id) : null;
+  if (b.id && !it) throw erro(404, 'Tutorial não encontrado');
+  const novo = !it;
+  if (novo) { it = { id: crypto.randomBytes(5).toString('hex'), status: 'rascunho', ordem: d.itens.length + 1, criado: agora(), por: s.n }; d.itens.push(it); }
+  const conteudo = { tipo, corpo: tipo === 'texto' ? texto(b.corpo, 20000) : null };
+  if (tipo === 'texto' && (conteudo.corpo || '').length < 10) throw erro(422, 'Escreva o conteúdo do tutorial');
+  if (tipo !== 'texto' && (novo || b.caminho || b.link)) Object.assign(conteudo, versaoDe(b, 't'));
+  if (tipo !== 'texto' && !novo && !b.caminho && !b.link && !(it.caminho || it.link)) throw erro(422, 'Envie um arquivo ou informe um link');
+  Object.assign(it, conteudo, { titulo, resumo: limpa(b.resumo, 240) || null, categoria: limpa(b.categoria, 60) || null, atualizado: agora() });
+  if (tipo === 'texto') { it.caminho = null; it.link = null; }
+  await gravar(CAM.tut, d);
+  await auditar(s, novo ? 'tutorial.criado' : 'tutorial.editado', 'tutorial', it.id, { titulo });
+  return d;
+}
+async function tutorialStatus(b, s) {
+  const d = await tutoriais();
+  const it = d.itens.find((x) => x.id === b.id);
+  if (!it) throw erro(404, 'Tutorial não encontrado');
+  if (!ST_CONTEUDO.includes(b.status)) throw erro(422, 'Situação inválida');
+  const de = it.status; it.status = b.status; it.atualizado = agora();
+  await gravar(CAM.tut, d);
+  await auditar(s, 'tutorial.situacao', 'tutorial', it.id, { de, para: b.status });
+  return d;
+}
+async function tutorialMover(b, s) {
+  const d = await tutoriais();
+  const i = d.itens.findIndex((x) => x.id === b.id);
+  if (i < 0) throw erro(404, 'Tutorial não encontrado');
+  const j = i + (b.dir < 0 ? -1 : 1);
+  if (j >= 0 && j < d.itens.length) [d.itens[i], d.itens[j]] = [d.itens[j], d.itens[i]];
+  d.itens.forEach((x, k) => { x.ordem = k + 1; });
+  await gravar(CAM.tut, d);
+  return d;
+}
+async function tutorialOcultar(b, s) {
+  const d = await tutoriais();
+  const chave = limpa(b.chave, 80);
+  d.ocultos = b.ocultar ? [...new Set([...d.ocultos, chave])] : d.ocultos.filter((x) => x !== chave);
+  await gravar(CAM.tut, d);
+  await auditar(s, b.ocultar ? 'tutorial.fixo_retirado' : 'tutorial.fixo_publicado', 'tutorial', chave);
+  return d;
 }
 
-/* ------------------------------------------------------------------ pedidos ao marketing */
+/* ------------------------------------------------------------------ ofertas / campanhas / cards */
+async function ofertasTodas() { const d = await ler(CAM.of); return (d && d.ofertas) || []; }
+async function ofertasListar(eq) {
+  const [lst, snap] = await Promise.all([ofertasTodas(), sincronizar(false)]);
+  const { unidades } = base();
+  const com = lst.map((o) => ({ ...o, elegibilidade: R.elegibilidade(o, { snap, unidades }) }))
+    .map((o) => ({ ...o, motivo: R.motivoTexto(o.elegibilidade) }));
+  return { sync: resumoSync(snap), fuso: R.fuso(), nomeFuso: R.nomeFuso(), ofertas: eq ? com : com.filter((o) => o.elegibilidade.ok) };
+}
+async function ofertaSalvar(b, s) {
+  const lst = await ofertasTodas();
+  const { unidades } = base();
+  const titulo = limpa(b.titulo, 90);
+  if (titulo.length < 3) throw erro(422, 'Dê um título à oferta');
+  const condicoes = texto(b.condicoes, 600);
+  if (condicoes.length < 5) throw erro(422, 'Escreva as condições essenciais (aparecem no card)');
+  const inicio = R.localParaUTC(b.inicio), fim = R.localParaUTC(b.fim);
+  if (!inicio || !fim) throw erro(422, 'Informe início e fim da vigência');
+  if (Date.parse(inicio) >= Date.parse(fim)) throw erro(422, 'O fim precisa ser depois do início');
+  const ids = [...new Set((Array.isArray(b.unidades) ? b.unidades : String(b.unidades || '').split(/[\s,;]+/)).map((x) => limpa(x, 20).toUpperCase()).filter(Boolean))];
+  const errados = ids.filter((x) => !unidades.has(x));
+  if (errados.length) throw erro(422, `Unidade(s) inexistente(s): ${errados.join(', ')}`);
+  const valor = R.valorDecimal(b.valor);
+  if (valor === undefined) throw erro(422, 'Valor inválido: use números com até 2 casas (ex.: 150000 ou 1250.50)');
+  let o = b.id ? lst.find((x) => x.id === b.id) : null;
+  if (b.id && !o) throw erro(404, 'Oferta não encontrada');
+  const novo = !o;
+  if (novo) { o = { id: novoId(), status: 'rascunho', criado: agora(), criadoPor: s.n, historico: [] }; lst.unshift(o); }
+  Object.assign(o, { titulo, descricao: texto(b.descricao, 1200) || null, condicoes, campanha: limpa(b.campanha, 60) || null, unidades: ids,
+    valor, moeda: 'USD', valorRotulo: limpa(b.valorRotulo, 60) || null, inicio, fim, responsavel: s.n, atualizado: agora() });
+  o.historico.push({ em: agora(), por: s.n, acao: novo ? 'criada' : 'editada' });
+  await gravar(CAM.of, { ofertas: lst });
+  await auditar(s, novo ? 'oferta.criada' : 'oferta.editada', 'oferta', o.id, { titulo, inicio, fim, unidades: ids });
+  return ofertasListar(true);
+}
+async function ofertaStatus(b, s) {
+  const lst = await ofertasTodas();
+  const o = lst.find((x) => x.id === b.id);
+  if (!o) throw erro(404, 'Oferta não encontrada');
+  if (!['rascunho', 'publicada', 'encerrada'].includes(b.status)) throw erro(422, 'Situação inválida');
+  if (b.status === 'publicada' && Date.parse(o.fim) <= Date.now()) throw erro(422, 'A vigência já terminou — ajuste o fim antes de publicar');
+  const de = o.status; o.status = b.status; o.atualizado = agora();
+  o.historico.push({ em: agora(), por: s.n, acao: `situação: ${de} → ${b.status}` });
+  await gravar(CAM.of, { ofertas: lst });
+  await auditar(s, 'oferta.situacao', 'oferta', o.id, { de, para: b.status });
+  return ofertasListar(true);
+}
+async function cardBaixar(req, res, s) {
+  const id = limpa(new URL(req.url, 'http://x').searchParams.get('card'), 40);
+  const o = (await ofertasTodas()).find((x) => x.id === id);
+  const snap = await sincronizar(false);
+  const { unidades, precos } = base();
+  const el = R.elegibilidade(o, { snap, unidades });
+  if (!el.ok) {     // validação também no download direto, não só na lista
+    res.statusCode = o ? 410 : 404;
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    return res.end(JSON.stringify({ ok: false, erro: R.motivoTexto(el), motivo: el.motivo }));
+  }
+  const svg = R.cardSVG(o, { unidades, precos });
+  res.setHeader('Content-Type', 'image/svg+xml; charset=utf-8');
+  res.setHeader('Cache-Control', 'private, no-store');
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('Content-Disposition', `attachment; filename="bracerum-oferta-${o.id}.svg"`);
+  await auditar(s, 'oferta.card_baixado', 'oferta', o.id);
+  res.end(svg);
+}
+
+/* ------------------------------------------------------------------ solicitações ao marketing */
 const TIPOS = ['peca', 'impresso', 'evento', 'video', 'traducao', 'visita', 'material', 'outro'];
-const PRODUTOS = ['park', 'residence', 'resort', 'hotel', 'outlet', 'geral'];
-const STATUS = ['recebido', 'producao', 'aprovacao', 'entregue', 'cancelado'];
-
-// Material pedido (formulário de 2026-11-18): o que é, se é digital ou impresso, quantas, medida, os dados que
-// vão na peça e exemplos anexados. "tipo" continua existindo para os pedidos antigos e para o ícone.
-const MATERIAIS_PEDIDO = {
-  post: 'peca', story: 'peca', banner: 'peca', folder: 'impresso', cartao: 'impresso', apresentacao: 'material',
-  video: 'video', placa: 'impresso', evento: 'evento', visita: 'visita', traducao: 'traducao', outro: 'outro',
-};
+const MATERIAIS_PEDIDO = { post: 'peca', story: 'peca', banner: 'peca', folder: 'impresso', cartao: 'impresso', apresentacao: 'material',
+  video: 'video', placa: 'impresso', evento: 'evento', visita: 'visita', traducao: 'traducao', outro: 'outro' };
 const FORMATOS = ['digital', 'impresso', 'ambos'];
-
+function normalizaPedido(p) {
+  return { ...p, status: R.statusPedido(p.status), mensagens: p.mensagens || [],
+    historico: (p.historico || []).map((h) => (h.status ? { ...h, status: R.statusPedido(h.status) } : h)) };
+}
 async function pedidoCriar(b, u) {
-  if (u.status !== 'aprovado') throw erro(403, 'Pedidos ao marketing são liberados depois da aprovação do seu cadastro.');
+  if (u.status !== 'aprovado') throw erro(403, 'Conta sem permissão para abrir solicitações.');
+  // Só os campos abaixo vêm do corretor; autor, situação, responsável e datas são do servidor.
   const material = Object.prototype.hasOwnProperty.call(MATERIAIS_PEDIDO, b.material) ? b.material : null;
   const tipo = material ? MATERIAIS_PEDIDO[material] : (TIPOS.includes(b.tipo) ? b.tipo : 'outro');
   const formato = FORMATOS.includes(b.formato) ? b.formato : null;
-  const produto = PRODUTOS.includes(b.produto) ? b.produto : 'geral';
-  const quantidade = Math.max(1, Math.min(100000, Math.round(Number(b.quantidade) || 1)));
-  const medida = limpa(b.medida, 80) || null;
   const dados = texto(b.dados, 1500) || null;
   const descricao = texto(b.descricao, 2000);
   const titulo = limpa(b.titulo, 100) || limpa(b.tituloAuto, 100);
   if (!material && titulo.length < 4) throw erro(422, 'Escolha o material');
   if (!formato && material) throw erro(422, 'Escolha digital ou impresso');
   if ((dados || '').length + descricao.length < 10) throw erro(422, 'Conte o que vai na peça ou descreva o que você precisa');
-  const prazo = /^\d{4}-\d{2}-\d{2}$/.test(b.prazo || '') ? b.prazo : null;
   const ref = limpa(b.referencia, 400);
   if (!urlOk(ref)) throw erro(422, 'O link de referência precisa começar com https://');
-  const id = `${Date.now().toString(36)}-${crypto.randomBytes(3).toString('hex')}`;
-  const numero = (await listar('portal/p/')).length + 1;
+  const id = novoId();
   const p = {
-    id, numero, tipo, material, formato, quantidade, medida, dados, anexos: [],
-    produto, titulo: titulo || 'Pedido', descricao, prazo, referencia: ref || null,
+    id, numero: (await listar('portal/p/')).length + 1, tipo, material, formato,
+    quantidade: Math.max(1, Math.min(100000, Math.round(Number(b.quantidade) || 1))), medida: limpa(b.medida, 80) || null, dados, anexos: [],
+    produto: PRODUTOS.includes(b.produto) ? b.produto : 'geral', titulo: titulo || 'Solicitação', descricao,
+    prazo: /^\d{4}-\d{2}-\d{2}$/.test(b.prazo || '') ? b.prazo : null, referencia: ref || null,
     idioma: ['pt', 'es', 'en'].includes(b.idioma) ? b.idioma : 'pt',
-    status: 'recebido', criado: agora(), atualizado: agora(),
+    status: 'enviada', criado: agora(), atualizado: agora(), responsavel: null, mensagens: [],
     corretor: { id: u.id, nome: u.nome, email: u.email, imobiliaria: u.imobiliaria, ddi: u.ddi, tel: u.tel },
-    historico: [{ em: agora(), status: 'recebido', por: u.nome }],
-    entrega: null, resposta: null,
+    historico: [{ em: agora(), status: 'enviada', por: u.nome }], entrega: null,
   };
   await gravar(caminhoP(id), p);
-  console.log('[portal] pedido novo', numero, tipo, produto, u.email);
+  await auditar({ u: u.id, n: u.nome }, 'solicitacao.criada', 'solicitacao', id, { material, tipo });
   return { pedido: p };
 }
-
 async function pedidosListar(s, u) {
   const blobs = (await listar('portal/p/')).sort((a, b) => b.pathname.localeCompare(a.pathname));
-  let lst = await lerVarios(blobs);
+  let lst = (await lerVarios(blobs, 1000)).map(normalizaPedido);
   if (s.p !== 'equipe') lst = lst.filter((p) => p.corretor && p.corretor.id === u.id);
   return { pedidos: lst.sort((a, b) => String(b.criado).localeCompare(String(a.criado))) };
 }
-
+async function pedidoDoUsuario(id, s, u) {
+  const p = await ler(caminhoP(limpa(id, 40)));
+  if (!p) throw erro(404, 'Solicitação não encontrada');
+  if (s.p !== 'equipe' && (!p.corretor || p.corretor.id !== u.id)) throw erro(404, 'Solicitação não encontrada');   // não revela que existe
+  return normalizaPedido(p);
+}
 async function pedidoAtualizar(b, s) {
-  const id = limpa(b.id, 40);
-  const p = await ler(caminhoP(id));
-  if (!p) throw erro(404, 'Pedido não encontrado');
-  if (b.status !== undefined) {
-    if (!STATUS.includes(b.status)) throw erro(422, 'Status inválido');
-    if (b.status !== p.status) p.historico = [...(p.historico || []), { em: agora(), status: b.status, por: s.n }];
-    p.status = b.status;
+  const p = await pedidoDoUsuario(b.id, s, null);
+  const reg = (campo, de, para) => p.historico.push({ em: agora(), por: s.n, campo, de, para, ...(campo === 'status' ? { status: para } : {}) });
+  if (b.status !== undefined && b.status !== p.status) {
+    if (!R.transicaoValida(p.status, b.status)) throw erro(409, `Transição inválida: ${p.status} → ${b.status}`);
+    reg('status', p.status, b.status); p.status = b.status;
   }
-  if (b.resposta !== undefined) p.resposta = texto(b.resposta, 2000) || null;
+  if (b.responsavelId !== undefined) {
+    let resp = null;
+    if (b.responsavelId) {
+      const g = await ler(caminhoU(limpa(b.responsavelId, 40)));
+      if (!g || PAPEL(g) !== 'equipe' || !ativo(g)) throw erro(422, 'Responsável precisa ser um gestor ativo');
+      resp = { id: g.id, nome: g.nome };
+    }
+    if ((p.responsavel && p.responsavel.id) !== (resp && resp.id)) { reg('responsavel', p.responsavel && p.responsavel.nome, resp && resp.nome); p.responsavel = resp; }
+  }
   if (b.entrega !== undefined) {
     const e = limpa(b.entrega, 400);
     if (!urlOk(e)) throw erro(422, 'O link de entrega precisa começar com https://');
-    p.entrega = e || null;
+    if ((p.entrega || '') !== e) { reg('entrega', p.entrega, e || null); p.entrega = e || null; }
   }
-  if (b.responsavel !== undefined) p.responsavel = limpa(b.responsavel, 40) || null;
   p.atualizado = agora();
-  await gravar(caminhoP(id), p);
+  await gravar(caminhoP(p.id), p);
+  await auditar(s, 'solicitacao.alterada', 'solicitacao', p.id, { status: p.status, responsavel: p.responsavel && p.responsavel.nome });
   return { pedido: p };
 }
-
-async function pedidoCancelarProprio(b, u) {
-  const p = await ler(caminhoP(limpa(b.id, 40)));
-  if (!p || !p.corretor || p.corretor.id !== u.id) throw erro(404, 'Pedido não encontrado');
-  if (p.status !== 'recebido') throw erro(409, 'O marketing já começou este pedido — fale com a equipe para cancelar.');
-  p.status = 'cancelado';
-  p.historico = [...(p.historico || []), { em: agora(), status: 'cancelado', por: u.nome }];
+async function pedidoMensagem(b, s, u) {
+  const p = await pedidoDoUsuario(b.id, s, u);
+  const t = texto(b.texto, 2000);
+  if (t.length < 1) throw erro(422, 'Escreva a mensagem');
+  if (s.p !== 'equipe' && R.TERMINAIS.includes(p.status)) throw erro(409, 'Solicitação encerrada');
+  p.mensagens.push({ id: crypto.randomBytes(4).toString('hex'), em: agora(), texto: t, autor: { id: s.u, nome: s.n, papel: s.p } });
   p.atualizado = agora();
   await gravar(caminhoP(p.id), p);
   return { pedido: p };
 }
+async function pedidoCancelarProprio(b, s, u) {
+  const p = await pedidoDoUsuario(b.id, s, u);
+  if (p.status !== 'enviada') throw erro(409, 'O marketing já começou esta solicitação — escreva uma mensagem para pedir o cancelamento.');
+  p.historico.push({ em: agora(), status: 'cancelada', campo: 'status', de: 'enviada', para: 'cancelada', por: u.nome });
+  p.status = 'cancelada'; p.atualizado = agora();
+  await gravar(caminhoP(p.id), p);
+  await auditar(s, 'solicitacao.cancelada', 'solicitacao', p.id);
+  return { pedido: p };
+}
+async function gestoresListar() {
+  return { gestores: (await todasContas()).filter((u) => PAPEL(u) === 'equipe' && ativo(u)).map((u) => ({ id: u.id, nome: u.nome })) };
+}
 
-/* ------------------------------------------------------------------ anexos dos pedidos */
-// Exemplos/referências que o corretor anexa. Vão um por chamada, em base64 (corpo da função ≤ 4,5 MB),
-// para portal/a/<pedido>/<n>-<nome>. O navegador comprime foto grande antes de mandar.
+/* ------------------------------------------------------------------ anexos das solicitações (≤ 3 MB, pela função) */
 const ANEXO_TIPOS = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'application/pdf'];
 const ANEXO_MAX = 3 * 1024 * 1024;
-const ANEXOS_POR_PEDIDO = 6;
+const ANEXOS_POR_PEDIDO = 10;
 async function anexoEnviar(b, s, u) {
-  const p = await ler(caminhoP(limpa(b.pedido, 40)));
-  if (!p) throw erro(404, 'Pedido não encontrado');
-  if (s.p !== 'equipe' && (!u || p.corretor.id !== u.id)) throw erro(404, 'Pedido não encontrado');
-  if ((p.anexos || []).length >= ANEXOS_POR_PEDIDO) throw erro(422, `Até ${ANEXOS_POR_PEDIDO} arquivos por pedido`);
+  const p = await pedidoDoUsuario(b.pedido, s, u);
+  if (p.anexos.length >= ANEXOS_POR_PEDIDO) throw erro(422, `Até ${ANEXOS_POR_PEDIDO} arquivos por solicitação`);
   const tipo = String(b.tipo || '');
   if (!ANEXO_TIPOS.includes(tipo)) throw erro(415, 'Envie imagem (JPG, PNG, WEBP) ou PDF');
   const buf = Buffer.from(String(b.dados || ''), 'base64');
   if (!buf.length) throw erro(422, 'Arquivo vazio');
   if (buf.length > ANEXO_MAX) throw erro(413, 'Arquivo maior que 3 MB');
-  const nome = limpa(b.nome, 80).normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^\w.\-]+/g, '-').replace(/^-+|-+$/g, '') || 'anexo';
-  const n = (p.anexos || []).length + 1;
-  const caminho = `portal/a/${p.id}/${n}-${nome}`;
+  const caminho = `portal/a/${p.id}/${p.anexos.length + 1}-${nomeArquivoSeguro(b.nome)}`;
   exigeStore();
   await B().put(caminho, buf, { access: 'private', addRandomSuffix: false, allowOverwrite: true, contentType: tipo });
-  p.anexos = [...(p.anexos || []), { nome: limpa(b.nome, 80) || nome, caminho, tipo, kb: Math.ceil(buf.length / 1024), por: s.n || (u && u.nome) || '', em: agora() }];
+  p.anexos.push({ nome: limpa(b.nome, 80) || 'anexo', caminho, tipo, kb: Math.ceil(buf.length / 1024), por: s.n, em: agora() });
   p.atualizado = agora();
   await gravar(caminhoP(p.id), p);
   return { pedido: p };
 }
-async function anexoBaixar(req, res) {
-  const s = lerSessao(req);
-  const caminho = String(new URL(req.url, 'http://x').searchParams.get('anexo') || '');
-  const m = caminho.match(/^portal\/a\/([a-z0-9-]{6,40})\/[\w.\-]+$/i);
-  if (!s || !m) { res.statusCode = 404; return res.end('não encontrado'); }
-  const p = await ler(caminhoP(m[1]));
-  let dono = false;
-  if (p && s.p === 'corretor') dono = p.corretor && p.corretor.id === s.u;
-  const anexo = p && (p.anexos || []).find((a) => a.caminho === caminho);
-  if (!anexo || !(s.p === 'equipe' || dono)) { res.statusCode = 404; return res.end('não encontrado'); }
-  const r = await B().get(caminho, { access: 'private', useCache: false });
-  if (!r || !r.stream) { res.statusCode = 404; return res.end('não encontrado'); }
-  res.setHeader('Content-Type', anexo.tipo);
-  res.setHeader('Cache-Control', 'private, no-store');
-  res.setHeader('X-Content-Type-Options', 'nosniff');
-  res.setHeader('Content-Disposition', `${anexo.tipo === 'application/pdf' || anexo.tipo.startsWith('image/') ? 'inline' : 'attachment'}; filename="${encodeURIComponent(anexo.nome)}"`);
-  const { Readable } = require('stream');
-  Readable.fromWeb(r.stream).pipe(res);
-}
 
-/* ------------------------------------------------------------------ mural */
-async function avisos() {
-  const a = await ler(CAMINHO_AVISOS);
-  return { avisos: Array.isArray(a) ? a : [] };
+/* ------------------------------------------------------------------ downloads (GET) */
+async function contaDaSessao(req) {
+  const s = lerSessao(req);
+  if (!s || !s.u) return null;
+  const u = await ler(caminhoU(s.u));
+  if (!u || !ativo(u) || PAPEL(u) !== s.p) return null;
+  return { s, u };
 }
-async function avisoSalvar(b, s) {
-  const lst = (await avisos()).avisos;
-  if (b.remover) {
-    const out = lst.filter((x) => x.id !== b.remover);
-    await gravar(CAMINHO_AVISOS, out);
-    return { avisos: out };
+async function baixar(req, res) {
+  const q = new URL(req.url, 'http://x').searchParams;
+  const c = await contaDaSessao(req);
+  if (!c) return nao(res);
+  const eq = c.s.p === 'equipe';
+  if (q.get('card')) return cardBaixar(req, res, c.s);
+  if (q.get('anexo')) {
+    const caminho = String(q.get('anexo'));
+    const m = caminho.match(/^portal\/a\/([a-z0-9-]{6,40})\/[\w.\-]+$/i);
+    if (!m) return nao(res);
+    const p = await ler(caminhoP(m[1]));
+    const a = p && (p.anexos || []).find((x) => x.caminho === caminho);
+    if (!a || !(eq || (p.corretor && p.corretor.id === c.u.id))) return nao(res);
+    return servirArquivo(res, caminho, a.tipo, a.nome, false);
   }
-  const titulo = limpa(b.titulo, 100);
-  const corpo = texto(b.texto, 600);
-  if (titulo.length < 3) throw erro(422, 'Dê um título ao aviso');
-  const link = limpa(b.link, 400);
-  if (!urlOk(link) && !/^#\//.test(link)) throw erro(422, 'Link inválido');
-  const novo = { id: crypto.randomBytes(4).toString('hex'), titulo, texto: corpo, link: link || null, fixo: !!b.fixo, por: s.n, em: agora() };
-  const out = [novo, ...lst].slice(0, 40);
-  await gravar(CAMINHO_AVISOS, out);
-  return { avisos: out };
+  if (q.get('material')) {
+    const caminho = String(q.get('material'));
+    if (!RX_ARQ.m.test(caminho)) return nao(res);
+    const it = (await biblioteca()).itens.find((x) => x.versoes.some((v) => v.caminho === caminho));
+    if (!it) return nao(res);
+    const v = it.versoes.find((x) => x.caminho === caminho);
+    // corretor: só material publicado e só a versão vigente
+    if (!eq && (it.status !== 'publicado' || versaoAtual(it).caminho !== caminho)) return nao(res);
+    return servirArquivo(res, caminho, v.conteudo, v.nomeArquivo || caminho.split('/').pop().replace(/^[a-f0-9]{10}-/, ''), !!q.get('baixar'));
+  }
+  if (q.get('tutorial')) {
+    const caminho = String(q.get('tutorial'));
+    if (!RX_ARQ.t.test(caminho)) return nao(res);
+    const it = (await tutoriais()).itens.find((x) => x.caminho === caminho);
+    if (!it || (!eq && it.status !== 'publicado')) return nao(res);
+    return servirArquivo(res, caminho, it.conteudo, it.nomeArquivo || 'tutorial', !!q.get('baixar'));
+  }
+  return nao(res);
 }
 
 /* ------------------------------------------------------------------ handler */
@@ -569,11 +857,8 @@ module.exports = async (req, res) => {
   res.setHeader('Cache-Control', 'no-store');
   res.setHeader('X-Robots-Tag', 'noindex');
   const fim = (status, obj) => { res.statusCode = status; res.end(JSON.stringify(obj)); };
-  if (req.method === 'GET' && /[?&]material=/.test(req.url || '')) {
-    try { return await materialBaixar(req, res); } catch (e) { console.error('[portal] material', e.message); res.statusCode = 500; return res.end('erro'); }
-  }
-  if (req.method === 'GET' && /[?&]anexo=/.test(req.url || '')) {
-    try { return await anexoBaixar(req, res); } catch (e) { console.error('[portal] anexo', e.message); res.statusCode = 500; return res.end('erro'); }
+  if (req.method === 'GET' && /[?&](anexo|material|tutorial|card)=/.test(req.url || '')) {
+    try { return await baixar(req, res); } catch (e) { console.error('[portal] download', e.message); res.statusCode = 500; return res.end('erro'); }
   }
   if (req.method !== 'POST') { res.setHeader('Allow', 'POST'); return fim(405, { ok: false, erro: 'método' }); }
   if (!/application\/json/i.test(String(req.headers['content-type'] || ''))) return fim(415, { ok: false, erro: 'tipo' });
@@ -583,8 +868,8 @@ module.exports = async (req, res) => {
 
   const ip = String(req.headers['x-forwarded-for'] || '').split(',')[0].trim() || 'ip';
   try {
-    // Sem cadastro aberto e sem senha compartilhada: as contas nascem na Gestão (gerenciador).
-    if (b.acao === 'cadastro' || b.acao === 'equipe') return fim(403, { ok: false, erro: 'As contas são criadas pelo gerenciador do portal.' });
+    // Não existe cadastro público nem senha compartilhada: contas nascem na Gestão.
+    if (b.acao === 'cadastro' || b.acao === 'equipe') return fim(403, { ok: false, erro: 'As contas são criadas pelo gestor do portal.' });
     if (b.acao === 'entrar') return fim(200, { ok: true, ...(await login(b, res, ip)) });
     if (b.acao === 'sair') { apagarCookie(res); return fim(200, { ok: true }); }
     if (b.acao === 'conviteVer') return fim(200, { ok: true, ...(await conviteVer(b)) });
@@ -594,72 +879,71 @@ module.exports = async (req, res) => {
       return fim(200, { ok: true, ...(await conviteAceitar(b, res)) });
     }
 
-    const s = lerSessao(req);
-    if (!s) return fim(401, { ok: false, erro: 'sessão', sair: true });
-    let u = null;
-    if (!s.u) { apagarCookie(res); return fim(401, { ok: false, erro: 'sessão', sair: true }); }   // sessões antigas da senha compartilhada
-    if (s.u) {
-      // corretor, ou alguém da equipe com conta própria (a senha compartilhada não tem s.u)
-      u = await ler(caminhoU(s.u));
-      if (!u || u.status === 'bloqueado' || (s.p === 'equipe' && u.papel !== 'equipe')) {
-        apagarCookie(res); return fim(401, { ok: false, erro: 'sessão', sair: true });
-      }
-    }
+    // Toda chamada autenticada relê a conta: bloqueio, exclusão ou troca de papel derrubam a sessão.
+    const c = await contaDaSessao(req);
+    if (!c) { apagarCookie(res); return fim(401, { ok: false, erro: 'sessão', sair: true }); }
+    const { s, u } = c;
     const eq = s.p === 'equipe';
-    const soEquipe = () => { if (!eq) throw erro(403, 'Só a equipe'); };
+    const soGestor = () => { if (!eq) throw erro(403, 'Só o gestor'); };
+    const ok = (obj) => fim(200, { ok: true, ...obj });
 
     switch (b.acao) {
-      case 'eu': {
-        const extra = await avisos();
-        return fim(200, { ok: true, usuario: eq ? (u ? equipePublico(u) : { papel: 'equipe', nome: s.n, id: 'equipe' }) : publico(u), ...extra });
-      }
-      case 'contas': soEquipe(); return fim(200, { ok: true, ...(await contasListar()) });
-      case 'contaCriar': soEquipe(); return fim(200, { ok: true, ...(await contaCriar(b, s, req)) });
-      case 'contaAtualizar': soEquipe(); return fim(200, { ok: true, ...(await contaAtualizar(b, s, req)) });
-      case 'contaLink': soEquipe(); return fim(200, { ok: true, ...(await contaLink(b, s, req)) });
-      case 'contaRemover': soEquipe(); return fim(200, { ok: true, ...(await contaRemover(b, s)) });
-      case 'materiais': return fim(200, { ok: true, ...(await biblioteca()) });
-      case 'materialToken': soEquipe(); return fim(200, { ok: true, ...(await materialToken(b)) });
-      case 'materialSalvar': soEquipe(); return fim(200, { ok: true, ...(await materialSalvar(b, s)) });
-      case 'materialRemover': soEquipe(); return fim(200, { ok: true, ...(await materialRemover(b)) });
-      case 'materialOcultar': soEquipe(); return fim(200, { ok: true, ...(await materialOcultar(b)) });
-      case 'senhaEquipe': {
-        // troca de senha de quem da equipe tem conta própria
-        if (!eq || !u) throw erro(400, 'Só para contas da equipe com e-mail');
-        if (!senhaConfere(b.senhaAtual, u.senha)) throw erro(401, 'A senha atual não confere');
-        u.senha = hashSenha(validarSenha(b.senhaNova));
-        await gravar(caminhoU(u.id), u);
-        return fim(200, { ok: true });
-      }
+      case 'eu': return ok({ usuario: publico(u) });
       case 'perfil': {
-        if (eq) throw erro(400, 'A equipe não tem perfil');
         Object.assign(u, validarConta(b, true));
         if (b.senhaNova) {
           if (!senhaConfere(b.senhaAtual, u.senha)) throw erro(401, 'A senha atual não confere');
           u.senha = hashSenha(validarSenha(b.senhaNova));
         }
         await gravar(caminhoU(u.id), u);
-        return fim(200, { ok: true, usuario: publico(u) });
+        return ok({ usuario: publico(u) });
       }
-      case 'excluirConta': {
-        // LGPD: o corretor apaga a própria conta (os pedidos já feitos ficam, com o nome, para o marketing)
-        if (eq) throw erro(400, 'A equipe não tem conta para excluir');
-        if (!senhaConfere(b.senha, u.senha)) throw erro(401, 'A senha não confere');
-        exigeStore();
-        await B().del(caminhoU(u.id));
-        apagarCookie(res);
-        console.log('[portal] conta excluída pelo corretor', u.id);
-        return fim(200, { ok: true });
+      case 'senhaEquipe': {
+        if (!senhaConfere(b.senhaAtual, u.senha)) throw erro(401, 'A senha atual não confere');
+        u.senha = hashSenha(validarSenha(b.senhaNova));
+        await gravar(caminhoU(u.id), u);
+        return ok({});
       }
-      case 'pedidos': return fim(200, { ok: true, ...(await pedidosListar(s, u)) });
-      case 'pedido': {
-        if (eq) throw erro(400, 'Abra o pedido com uma conta de corretor');
-        return fim(200, { ok: true, ...(await pedidoCriar(b, u)) });
-      }
-      case 'anexo': return fim(200, { ok: true, ...(await anexoEnviar(b, s, u)) });
-      case 'pedidoCancelar': if (eq) throw erro(400, 'Use o status do pedido'); return fim(200, { ok: true, ...(await pedidoCancelarProprio(b, u)) });
-      case 'pedidoAtualizar': soEquipe(); return fim(200, { ok: true, ...(await pedidoAtualizar(b, s)) });
-      case 'aviso': soEquipe(); return fim(200, { ok: true, ...(await avisoSalvar(b, s)) });
+      // dados comerciais
+      case 'comercial': return ok(await comercial());
+      case 'sincronizar': soGestor(); { const snap = await sincronizar(true); await auditar(s, 'comercial.sincronizar', 'sync', null, { resultado: snap.resultado }); return ok({ sync: resumoSync(snap) }); }
+      // contas e imobiliárias
+      case 'contas': soGestor(); return ok(await contasListar());
+      case 'contaCriar': soGestor(); return ok(await contaCriar(b, s, req));
+      case 'contaAtualizar': soGestor(); return ok(await contaAtualizar(b, s, req));
+      case 'contaRemover': soGestor(); return ok(await contaAtualizar({ id: b.id, status: 'excluido' }, s, req));   // exclusão lógica
+      case 'contaLink': soGestor(); return ok(await contaLink(b, s, req));
+      case 'gestores': soGestor(); return ok(await gestoresListar());
+      case 'imobiliarias': soGestor(); return ok(await imobiliariasComContagem());
+      case 'imobiliariaSalvar': soGestor(); return ok(await imobiliariaSalvar(b, s));
+      case 'imobiliariaArquivar': soGestor(); return ok(await imobiliariaArquivar(b, s));
+      case 'imobiliariaExcluir': soGestor(); return ok(await imobiliariaExcluir(b, s));
+      case 'auditoria': soGestor(); return ok(await auditoriaListar());
+      // envio de arquivos
+      case 'materialToken': case 'arquivoToken': soGestor(); return ok(await tokenEnvio(b));
+      // materiais
+      case 'materiais': return ok(bibliotecaPara(await biblioteca(), eq));
+      case 'materialSalvar': soGestor(); return ok(await materialSalvar(b, s));
+      case 'materialVersao': soGestor(); return ok(await materialVersao(b, s));
+      case 'materialStatus': soGestor(); return ok(await materialStatus(b, s));
+      case 'materialOcultar': soGestor(); return ok(await materialOcultar(b, s));
+      // tutoriais
+      case 'tutoriais': return ok(tutoriaisPara(await tutoriais(), eq));
+      case 'tutorialSalvar': soGestor(); return ok(await tutorialSalvar(b, s));
+      case 'tutorialStatus': soGestor(); return ok(await tutorialStatus(b, s));
+      case 'tutorialMover': soGestor(); return ok(await tutorialMover(b, s));
+      case 'tutorialOcultar': soGestor(); return ok(await tutorialOcultar(b, s));
+      // ofertas
+      case 'ofertas': return ok(await ofertasListar(eq));
+      case 'ofertaSalvar': soGestor(); return ok(await ofertaSalvar(b, s));
+      case 'ofertaStatus': soGestor(); return ok(await ofertaStatus(b, s));
+      // solicitações
+      case 'pedidos': return ok(await pedidosListar(s, u));
+      case 'pedido': if (eq) throw erro(400, 'Abra a solicitação com uma conta de corretor'); return ok(await pedidoCriar(b, u));
+      case 'pedidoMensagem': return ok(await pedidoMensagem(b, s, u));
+      case 'anexo': return ok(await anexoEnviar(b, s, u));
+      case 'pedidoCancelar': if (eq) throw erro(400, 'Use a situação da solicitação'); return ok(await pedidoCancelarProprio(b, s, u));
+      case 'pedidoAtualizar': soGestor(); return ok(await pedidoAtualizar(b, s));
       default: return fim(400, { ok: false, erro: 'ação' });
     }
   } catch (e) {
@@ -668,4 +952,4 @@ module.exports = async (req, res) => {
   }
 };
 
-module.exports._interno = { hashSenha, senhaConfere, slugDe, validarConta, idEmail };
+module.exports._interno = { hashSenha, senhaConfere, slugDe, validarConta, idEmail, normalizaMaterial, normalizaPedido, bibliotecaPara, _zerarBase: () => { BASE = null; } };

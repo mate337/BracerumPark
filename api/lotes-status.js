@@ -117,3 +117,4 @@ module.exports = async (req, res) => {
 
 module.exports.codigo = codigo;
 module.exports.idLote = idLote;
+module.exports.lerCV = lerCV;   // usado pelo Portal do Corretor (api/portal.js) para o retrato comercial

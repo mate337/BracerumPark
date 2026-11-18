@@ -120,6 +120,13 @@
     upload: ic('<path d="M12 16V5m0 0L7.5 9.5M12 5l4.5 4.5"/><path d="M4 16v4h16v-4"/>'),
     moon: ic('<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>'),
     star: ic('<path d="m12 3.5 2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/>'),
+    tag: ic('<path d="M3 12V4a1 1 0 0 1 1-1h8l9 9-9 9z"/><circle cx="7.5" cy="7.5" r="1.5"/>'),
+    building: ic('<path d="M4 21V5a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v16M15 9h4a1 1 0 0 1 1 1v11M3 21h18M8 8h3M8 12h3M8 16h3"/>'),
+    clock: ic('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'),
+    send: ic('<path d="M21 3 10 14M21 3l-7 18-4-7-7-4z"/>'),
+    up: ic('<path d="M12 19V5m0 0-6 6m6-6 6 6"/>'),
+    down: ic('<path d="M12 5v14m0 0-6-6m6 6 6-6"/>'),
+    refresh: ic('<path d="M20 11a8 8 0 1 0-2.3 5.7M20 5v6h-6"/>'),
   };
   const TIPO_ICONE = { peca: I.image, impresso: I.print, evento: I.calendar, visita: I.map, video: I.video, traducao: I.globe, material: I.file, outro: I.dots };
 
@@ -138,16 +145,23 @@
     return d;
   }
 
-  /* dados públicos: disponibilidade (CV) e tabela */
+  /* dados comerciais unificados (servidor): unidades do V14 + situação do CV (retrato com última
+     tentativa/sucesso) + referência de preço. Mapa, tabela e ofertas leem daqui. */
+  function aplicarComercial(d) {
+    S.com = d;
+    const sits = d.unidades.map((u) => u.situacao);
+    const n = (s) => sits.filter((x) => x === s).length;
+    S.lotes = { total: d.unidades.length, livres: n('disponivel'), r: n('reservado'), v: n('vendido'), b: n('indisponivel'), desconhecida: n('desconhecida'), sync: d.sync };
+    atualizarKpis();
+    if (S.route.name === 'tabela') { const y = window.scrollY; renderMain(); window.scrollTo(0, y); }   // o mapa só atualiza a legenda (não recarrega a maquete)
+  }
+  function carregarComercial(forcar) {
+    if (S.lotes && !forcar && !S.lotes.erro) return;
+    if (!S.lotes) S.lotes = { carregando: true };
+    api('comercial').then(aplicarComercial).catch(() => { S.lotes = { erro: true, total: 614 }; atualizarKpis(); });
+  }
   function carregarPublicos() {
-    if (!S.lotes) {
-      S.lotes = { carregando: true };
-      fetch('/api/lotes-status').then((r) => r.json()).then((d) => {
-        const st = d && d.lotes ? Object.values(d.lotes) : [];
-        S.lotes = { total: d.total || 614, r: st.filter((x) => x === 'r').length, v: st.filter((x) => x === 'v').length, b: st.filter((x) => x === 'b').length, ok: !!d.ok, em: d.atualizado };
-        atualizarKpis();
-      }).catch(() => { S.lotes = { erro: true, total: 614 }; atualizarKpis(); });
-    }
+    carregarComercial(false);
     if (!S.precos) {
       S.precos = { carregando: true };
       fetch('/3dmasterplan/data/precos.json').then((r) => r.json()).then((d) => {
@@ -161,6 +175,7 @@
   const precosOk = () => S.precos && S.precos.janelas;
   function hojeISO() { const d = new Date(); return new Date(d.getTime() - d.getTimezoneOffset() * 6e4).toISOString().slice(0, 10); }
   function janelaAtual() {
+    if (S.com && S.com.janela) { const j = S.precos.janelas.find((x) => x.id === S.com.janela.id); if (j) return j; }   // fuso comercial vem do servidor
     const h = hojeISO();
     const js = S.precos.janelas;
     return js.find((j) => (!j.de || j.de <= h) && (!j.ate || h <= j.ate)) || js[js.length - 1];
@@ -174,15 +189,17 @@
   const PAG_IDX = { '12x': 0, vista: 1, '36x': 2 };
 
   /* ============================================================ rotas */
-  // Dois tipos de conta: corretor (só consulta + solicitações) e gerenciador (tudo + Gestão).
+  // Dois perfis: corretor (consulta + solicitações) e gestor (tudo + Gestão). As seis áreas do briefing:
+  // mapa de disponibilidade, tabela de vendas, materiais, ofertas/cards, solicitações e aprender.
   const ROTAS_CORRETOR = [
-    ['inicio', 'nav.home', I.home], ['tabela', 'nav.prices', I.table], ['pedidos', 'nav.requests', I.megaphone],
-    ['materiais', 'nav.materials', I.grid], ['masterplan', 'nav.masterplan', I.cube], ['aprender', 'nav.learn', I.book],
+    ['inicio', 'nav.home', I.home], ['masterplan', 'nav.masterplan', I.cube], ['tabela', 'nav.prices', I.table],
+    ['ofertas', 'nav.offers', I.tag], ['materiais', 'nav.materials', I.grid], ['pedidos', 'nav.requests', I.megaphone],
+    ['aprender', 'nav.learn', I.book],
   ];
   const ROTAS_EQUIPE = [
     ['inicio', 'nav.home', I.home], ['gestao', 'nav.gestao', I.users], ['pedidos', 'nav.requests', I.inbox],
-    ['materiais', 'nav.materials', I.grid], ['tabela', 'nav.prices', I.table], ['masterplan', 'nav.masterplan', I.cube],
-    ['aprender', 'nav.learn', I.book],
+    ['ofertas', 'nav.offers', I.tag], ['materiais', 'nav.materials', I.grid], ['masterplan', 'nav.masterplan', I.cube],
+    ['tabela', 'nav.prices', I.table], ['aprender', 'nav.learn', I.book],
   ];
   const rotas = () => (isEquipe() ? ROTAS_EQUIPE : ROTAS_CORRETOR);
   function lerRota() {
@@ -234,8 +251,8 @@
   function bindLang(root) { $$('[data-lang]', root).forEach((b) => b.addEventListener('click', () => setLang(b.dataset.lang))); }
   function bottomBar() {
     const it = (id, k, ico) => `<a href="#/${id}" data-nav="${id}">${ico}<span>${esc(t(k))}</span></a>`;
-    const left = isEquipe() ? [it('inicio', 'nav.home', I.home), it('gestao', 'nav.gestao', I.users)] : [it('inicio', 'nav.home', I.home), it('tabela', 'nav.prices', I.table)];
-    const right = isEquipe() ? [it('pedidos', 'nav.requests', I.inbox)] : [it('materiais', 'nav.materials', I.grid)];
+    const left = isEquipe() ? [it('inicio', 'nav.home', I.home), it('gestao', 'nav.gestao', I.users)] : [it('inicio', 'nav.home', I.home), it('masterplan', 'nav.map', I.cube)];
+    const right = isEquipe() ? [it('pedidos', 'nav.requests', I.inbox)] : [it('ofertas', 'nav.offers', I.tag)];
     return `<nav class="bottombar" aria-label="${esc(t('brand'))}">${left.join('')}
       <button type="button" class="plus" id="bb-plus" aria-label="${esc(isEquipe() ? t('gest.new') : t('nav.new'))}">${I.plus}</button>
       ${right.join('')}<button type="button" id="bb-more">${I.dots}<span>Menu</span></button></nav>`;
@@ -351,18 +368,44 @@
 
   /* ============================================================ início */
   function saudacao() { const h = new Date().getHours(); return t(h < 12 ? 'home.hello.m' : h < 18 ? 'home.hello.a' : 'home.hello.n'); }
-  // Legenda do mapa de reservas: números ao vivo do CV + janela de preço.
+  // Situação do retrato comercial: quando veio do CV, se está atual, e o aviso se não estiver.
+  function idade(iso) {
+    if (!iso) return '—';
+    const min = Math.round((Date.now() - Date.parse(iso)) / 60000);
+    if (min < 1) return t('sync.now');
+    if (min < 60) return `${nf(min)} min`;
+    if (min < 48 * 60) return `${nf(Math.round(min / 60))} h`;
+    return data(iso, true);
+  }
+  function syncHTML(gestor) {
+    const sy = S.lotes && S.lotes.sync;
+    if (!sy) return '';
+    const cls = sy.estado === 'atual' ? '' : 'syncbar--alerta';
+    const msg = sy.estado === 'atual' ? `${t('sync.ok')} ${idade(sy.ultimoSucesso)}`
+      : sy.estado === 'desatualizado' ? `${t('sync.stale')} ${sy.ultimoSucesso ? data(sy.ultimoSucesso, true) : '—'}. ${t('sync.confirm')}`
+        : t('sync.none');
+    return `<div class="syncbar ${cls}" role="status">${sy.estado === 'atual' ? '<i class="dot-live"></i>' : I.info}<span>${esc(msg)}${sy.resultado === 'erro' && sy.estado !== 'indisponivel' ? ` <span class="muted">· ${esc(t('sync.lastFail'))} ${esc(data(sy.ultimaTentativa, true))}</span>` : ''}</span>
+      ${gestor && isEquipe() ? `<button type="button" class="btn btn--line btn--sm" id="sync-now">${I.refresh}${esc(t('sync.now2'))}</button>` : ''}</div>`;
+  }
+  function ligarSync(main) {
+    const b = $('#sync-now', main);
+    if (b) b.addEventListener('click', async () => {
+      b.disabled = true;
+      try { const d = await api('sincronizar'); toast(d.sync.resultado === 'ok' ? t('sync.done') : `${t('sync.fail')}: ${d.sync.erro || ''}`); carregarComercial(true); }
+      catch (e) { toast(e.message); b.disabled = false; }
+    });
+  }
+  // Legenda do mapa de reservas: números do retrato do CV + janela de preço.
   function kpisHTML() {
     const L = S.lotes || {};
     const total = L.total || 614;
-    const ocup = (L.r || 0) + (L.v || 0) + (L.b || 0);
-    const pronto = !(L.carregando || L.erro);
-    const livres = pronto ? total - ocup : null;
+    const pronto = !(L.carregando || L.erro) && L.sync && L.sync.estado !== 'indisponivel';
+    const livres = pronto ? L.livres : null;
     const jan = precosOk() ? janelaAtual() : null;
     const preco = jan ? S.precos.precos[jan.id].P[0][0] : null;
     const vir = jan ? proximaVirada() : null;
     const dias = vir ? Math.max(0, Math.ceil((new Date(vir + 'T00:00:00') - new Date()) / 864e5)) : null;
-    const n = (v) => (pronto ? nf(v) : '<span class="skel" style="display:inline-block;width:40px;height:22px"></span>');
+    const n = (v) => (pronto ? nf(v) : (L.carregando ? '<span class="skel" style="display:inline-block;width:40px;height:22px"></span>' : '—'));
     const item = (cls, rot, v) => `<div class="legend__item"><i class="legend__dot ${cls}"></i><span>${esc(rot)}</span><b class="num">${v}</b></div>`;
     return `
       ${item('is-free', t('home.k.avail'), n(livres))}
@@ -374,23 +417,27 @@
   function atualizarKpis() {
     const box = $('#kpis');
     if (box) box.innerHTML = kpisHTML();
+    const sb = $('#syncbox');
+    if (sb) { sb.innerHTML = syncHTML(true); ligarSync(sb); }
   }
   // Página inicial: "Bem-vindo, Nome", os tópicos no meio e, abaixo, o mapa de reservas ao vivo.
-  // Corretor: tabela, solicitações, materiais, masterplan 3D e aprender. Gerenciador: tudo isso + Gestão.
+  // Corretor: as seis áreas. Gestor: as seis + Gestão.
   const TOPICOS_CORRETOR = [
-    ['tabela', 'nav.prices', 'top.prices', I.table],
-    ['pedidos', 'nav.requests', 'top.requestsBroker', I.megaphone],
-    ['materiais', 'nav.materials', 'top.materials', I.grid],
     ['masterplan', 'nav.masterplan', 'top.masterplan', I.cube],
+    ['tabela', 'nav.prices', 'top.prices', I.table],
+    ['ofertas', 'nav.offers', 'top.offers', I.tag],
+    ['materiais', 'nav.materials', 'top.materials', I.grid],
+    ['pedidos', 'nav.requests', 'top.requestsBroker', I.megaphone],
     ['aprender', 'nav.learn', 'top.learn', I.book],
   ];
   const TOPICOS_EQUIPE = [
     ['gestao', 'nav.gestao', 'top.gestao', I.users],
     ['pedidos', 'nav.requests', 'top.requests', I.inbox],
+    ['ofertas', 'nav.offers', 'top.offersAdm', I.tag],
     ['materiais', 'nav.materials', 'top.materialsAdm', I.grid],
-    ['tabela', 'nav.prices', 'top.prices', I.table],
     ['masterplan', 'nav.masterplan', 'top.masterplan', I.cube],
-    ['aprender', 'nav.learn', 'top.learn', I.book],
+    ['tabela', 'nav.prices', 'top.prices', I.table],
+    ['aprender', 'nav.learn', 'top.learnAdm', I.book],
   ];
   VIEWS.inicio = () => {
     const hoje = new Intl.DateTimeFormat(locale(), { weekday: 'long', day: 'numeric', month: 'long' }).format(new Date());
@@ -423,6 +470,7 @@
       <section class="section reserv">
         <div class="section__head"><div><p class="eyebrow">${esc(t('home.k.live'))}</p><h2 class="h2" style="margin-top:6px">${esc(t('map.title'))}</h2></div>
           <a class="btn btn--line btn--sm" href="/3dmasterplan/#lotes" target="_blank" rel="noopener">${I.expand}${esc(t('home.mapFull'))}</a></div>
+        <div id="syncbox">${syncHTML(true)}</div>
         <div class="legend" id="kpis">${kpisHTML()}</div>
         <div class="stage stage--map" id="stage">
           <img class="stage__poster" src="/assets/web/fotos/park-aereo-rio.jpg" alt="" loading="lazy" />
@@ -449,18 +497,20 @@
       const io = new IntersectionObserver((es) => { if (es.some((e) => e.isIntersecting)) { io.disconnect(); carregar(); } }, { rootMargin: '200px' });
       io.observe(st);
     }
+    ligarSync(main);
     const q = $('#q-req', main);
     if (q) q.addEventListener('click', () => novoPedido());
     const badge = (id, n) => { const b = $(`[data-cnt="${id}"]`, main); if (b && n) { b.textContent = n; b.hidden = false; } };
-    carregarPedidos().then(() => {
-      const abertos = (S.pedidos || []).filter((p) => !['entregue', 'cancelado'].includes(p.status)).length;
+    carregarPedidos(true).then(() => {
+      const abertos = (S.pedidos || []).filter((p) => !['concluida', 'cancelada'].includes(p.status)).length;
       const c = $('#cnt-req', main); if (c && abertos) c.textContent = abertos;
-      if (isEquipe()) badge('pedidos', (S.pedidos || []).filter((p) => p.status === 'recebido').length);
+      if (isEquipe()) badge('pedidos', (S.pedidos || []).filter((p) => p.status === 'enviada').length);
     }).catch(() => {});
+    api('ofertas').then((d) => badge('ofertas', isEquipe() ? 0 : d.ofertas.length)).catch(() => {});
     if (isEquipe()) api('contas').then((d) => { S.contas = d.contas; badge('gestao', d.contas.filter((c) => !c.ativo && c.status !== 'bloqueado').length); }).catch(() => {});
   };
 
-  /* ============================================================ materiais */
+  /* ============================================================ materiais (rascunho / publicado / arquivado, com versões) */
   function linkRastreado(caminho, meio) {
     const u = new URL(caminho, location.origin);
     if (S.user && S.user.slug && S.user.papel !== 'equipe') {
@@ -474,48 +524,51 @@
   const kb = (n) => (n >= 1024 ? nf(n / 1024, 1) + ' MB' : nf(n) + ' KB');
   const urlArquivoEnviado = (caminho, baixar) => `/api/portal?material=${encodeURIComponent(caminho)}${baixar ? '&baixar=1' : ''}`;
   const extDe = (nome, tipo) => ((String(nome || '').match(/\.(\w{2,5})$/) || [])[1] || String(tipo || '').split('/').pop() || '').toUpperCase().slice(0, 5);
+  const versaoAtual = (x) => x.versoes.find((v) => v.n === x.atual) || x.versoes[x.versoes.length - 1];
 
-  // Lista única: materiais fixos (conteudo.js) + os enviados pelo gerenciador (servidor). "chave" identifica o item.
+  // Lista única: fixos do conteudo.js (sempre "publicados", podem ser retirados) + os enviados pelo gestor.
   function todosMateriais() {
     const bib = S.bib || { itens: [], ocultos: [] };
-    const fixos = C.MATERIAIS.map((m) => ({ ...m, origem: 'fixo', chave: m.arquivo || m.link, oculto: bib.ocultos.includes(m.arquivo || m.link) }));
+    const fixos = C.MATERIAIS.map((m) => ({ ...m, origem: 'fixo', chave: m.arquivo || m.link, status: bib.ocultos.includes(m.arquivo || m.link) ? 'arquivado' : 'publicado' }));
     const enviados = bib.itens.map((x) => {
-      const img = x.caminho && /^image\//.test(x.conteudo || '');
+      const v = versaoAtual(x);
+      const img = v.caminho && /^image\//.test(v.conteudo || '');
       return {
-        origem: 'enviado', chave: 'up:' + x.id, id: x.id, tipo: x.tipo, produto: x.produto, destaque: x.destaque,
-        titulo: x.titulo, desc: x.desc, kb: x.kb, caminho: x.caminho, linkExterno: x.link,
-        formato: x.caminho ? extDe(x.nomeArquivo || x.caminho, x.conteudo) : 'LINK',
-        previa: img ? urlArquivoEnviado(x.caminho) : null, conteudo: x.conteudo, criado: x.criado,
+        origem: 'enviado', chave: 'up:' + x.id, id: x.id, tipo: x.tipo, produto: x.produto, destaque: x.destaque, status: x.status,
+        titulo: x.titulo, desc: x.desc, kb: v.kb, caminho: v.caminho, linkExterno: v.link, versao: v.n, nVersoes: x.versoes.length, versoes: x.versoes,
+        formato: v.caminho ? extDe(v.nomeArquivo || v.caminho, v.conteudo) : 'LINK', previa: img ? urlArquivoEnviado(v.caminho) : null,
+        conteudo: v.conteudo, atualizado: x.atualizado || v.em,
       };
     });
     const lst = [...enviados, ...fixos];
-    return isEquipe() && S.mat.ocultos ? lst : lst.filter((m) => !m.oculto);
+    if (!isEquipe()) return lst.filter((m) => m.status === 'publicado');
+    const f = S.mat.st || 'publicado';
+    return f === 'todos' ? lst : lst.filter((m) => m.status === f);
   }
   function urlMaterial(m) {
     if (m.origem === 'enviado') return m.caminho ? abs(urlArquivoEnviado(m.caminho)) : m.linkExterno;
     return m.arquivo ? abs(m.arquivo) : (m.tipo === 'folder' || m.tipo === 'pagina' || m.link === '/3dmasterplan/') ? linkRastreado(m.link, 'corretor') : abs(m.link);
   }
+  const ST_MAT = { rascunho: 'mst.draft', publicado: 'mst.pub', arquivado: 'mst.arch' };
   function tileHTML(m, i) {
     const tipoCls = m.tipo === 'logo' && m.previa ? `is-logo${m.escuro ? ' is-dark' : ''}` : (!m.previa ? 'is-doc' : '');
     const media = m.previa ? `<img src="${esc(m.previa)}" alt="" loading="lazy" decoding="async" />` : `<span class="doc"><i></i><i></i>${esc(m.formato)}</span>`;
-    const meta = [m.formato, m.kb ? kb(m.kb) : null, tx(C.PRODUTOS[m.produto])].filter(Boolean).join(' · ');
-    const publico = m.origem === 'fixo' || !m.caminho;   // arquivo enviado é privado: o link só abre logado
+    const meta = [m.formato, m.kb ? kb(m.kb) : null, tx(C.PRODUTOS[m.produto]), m.origem === 'enviado' ? `v${m.versao}` : null].filter(Boolean).join(' · ');
+    const publico = m.origem === 'fixo';
     let principal;
     if (m.origem === 'enviado' && m.caminho) principal = `<a class="btn btn--ink" href="${esc(urlArquivoEnviado(m.caminho, true))}" aria-label="${esc(t('mat.download'))}">${I.download}<span class="lbl">${esc(t('mat.download'))}</span></a>`;
     else if (m.arquivo) principal = `<a class="btn btn--ink" href="${esc(m.arquivo)}" download aria-label="${esc(t('mat.download'))}">${I.download}<span class="lbl">${esc(t('mat.download'))}</span></a>`;
     else principal = `<a class="btn btn--ink" href="${esc(urlMaterial(m))}" target="_blank" rel="noopener" aria-label="${esc(t('mat.open'))}">${I.ext}<span class="lbl">${esc(t('mat.open'))}</span></a>`;
-    const gestao = !isEquipe() ? '' : m.origem === 'enviado'
-      ? `<button type="button" class="iconbtn" data-medit="${i}" aria-label="${esc(t('matadm.edit'))}" title="${esc(t('matadm.edit'))}">${I.pen}</button>
-         <button type="button" class="iconbtn" data-mdel="${i}" aria-label="${esc(t('team.remove'))}" title="${esc(t('team.remove'))}">${I.trash}</button>`
-      : `<button type="button" class="iconbtn" data-mhide="${i}" aria-label="${esc(t(m.oculto ? 'matadm.show' : 'matadm.hide'))}" title="${esc(t(m.oculto ? 'matadm.show' : 'matadm.hide'))}">${m.oculto ? I.eye : I.eyeOff}</button>`;
-    return `<article class="tile ${m.oculto ? 'is-hidden' : ''}">
+    const gestao = !isEquipe() ? '' : `<button type="button" class="iconbtn" data-mmenu="${i}" aria-label="${esc(t('gest.more'))}" title="${esc(t('gest.more'))}">${I.dots}</button>`;
+    return `<article class="tile ${m.status !== 'publicado' ? 'is-hidden' : ''}">
       <div class="tile__media ${tipoCls}">
         ${media}
         <button type="button" class="tile__open" data-ver="${i}" aria-label="${esc(tx(m.titulo))}"></button>
-        <span class="badge tile__fmt">${esc(m.oculto ? t('matadm.hidden') : tx(C.TIPOS_MATERIAL[m.tipo] || C.TIPOS_MATERIAL.documento))}</span>
-        ${m.origem === 'enviado' && isEquipe() ? `<span class="badge badge--ink tile__star">${esc(t('matadm.new'))}</span>` : m.destaque ? `<span class="badge badge--ink tile__star">${I.star.replace('<svg', '<svg width="12" height="12"')}</span>` : ''}
+        <span class="badge tile__fmt">${esc(isEquipe() && m.status !== 'publicado' ? t(ST_MAT[m.status]) : tx(C.TIPOS_MATERIAL[m.tipo] || C.TIPOS_MATERIAL.documento))}</span>
+        ${m.destaque ? `<span class="badge badge--ink tile__star">${I.star.replace('<svg', '<svg width="12" height="12"')}</span>` : ''}
       </div>
-      <div class="tile__body"><b class="tile__title">${esc(tx(m.titulo))}</b><span class="tile__meta">${esc(meta)}</span>${m.desc ? `<span class="tile__meta">${esc(tx(m.desc))}</span>` : ''}</div>
+      <div class="tile__body"><b class="tile__title">${esc(tx(m.titulo))}</b><span class="tile__meta">${esc(meta)}</span>${m.desc ? `<span class="tile__meta">${esc(tx(m.desc))}</span>` : ''}
+        ${isEquipe() && m.origem === 'enviado' ? `<span class="tile__meta">${esc(t('mst.updated'))} ${esc(data(m.atualizado, true))}</span>` : ''}</div>
       <div class="tile__actions">${principal}
         ${publico ? `<button type="button" class="iconbtn" data-copy="${i}" aria-label="${esc(t('mat.copy'))}" title="${esc(t('mat.copy'))}">${I.link}</button>` : ''}
         ${gestao}
@@ -533,14 +586,15 @@
   VIEWS.materiais = () => {
     const tipos = ['all', ...Object.keys(C.TIPOS_MATERIAL)];
     const prods = ['all', ...Object.keys(C.PRODUTOS)];
+    const st = S.mat.st || 'publicado';
     return `
       <header class="pagehead">
         <div class="pagehead__meta"><a href="#/inicio" class="linkbtn" style="text-decoration:none">← ${esc(t('nav.home'))}</a><span id="mat-count" class="num"></span></div>
         <div class="pagehead__body">
           <h1 class="h1">${esc(t('mat.title'))}</h1>
           <p class="lead">${esc(t(isEquipe() ? 'matadm.lead' : 'mat.lead'))}</p>
-          ${isEquipe() ? `<div style="display:flex;gap:10px;flex-wrap:wrap"><button type="button" class="btn btn--ink" id="mat-add">${I.plus}${esc(t('matadm.add'))}</button>
-            <button type="button" class="btn btn--line" id="mat-hidden" aria-pressed="${!!S.mat.ocultos}">${S.mat.ocultos ? I.eye : I.eyeOff}${esc(t(S.mat.ocultos ? 'matadm.hideHidden' : 'matadm.showHidden'))}</button></div>` : ''}
+          ${isEquipe() ? `<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center"><button type="button" class="btn btn--ink" id="mat-add">${I.plus}${esc(t('matadm.add'))}</button>
+            <div class="seg" role="group" aria-label="${esc(t('acc.status'))}">${[['publicado', 'mst.pubs'], ['rascunho', 'mst.drafts'], ['arquivado', 'mst.archs'], ['todos', 'req.all']].map(([v, k]) => `<button type="button" data-mst="${v}" aria-pressed="${st === v}">${esc(t(k))}</button>`).join('')}</div></div>` : ''}
           <div class="tags" role="group" aria-label="${esc(t('mat.title'))}">${tipos.map((k) => `<button type="button" data-mtipo="${k}" aria-pressed="${S.mat.tipo === k}">${esc(k === 'all' ? t('mat.all') : tx(C.TIPOS_MATERIAL[k]))}</button>`).join('')}</div>
         </div>
       </header>
@@ -548,7 +602,7 @@
         <div class="chips" role="group" aria-label="${esc(t('req.product'))}">${prods.map((k) => `<button type="button" class="chip" data-mprod="${k}" aria-pressed="${S.mat.produto === k}">${esc(k === 'all' ? t('mat.all') : tx(C.PRODUTOS[k]))}</button>`).join('')}</div>
         <label class="search"><span class="vh">${esc(t('mat.search'))}</span>${I.search}<input class="input" type="search" id="mat-q" placeholder="${esc(t('mat.search'))}" value="${esc(S.mat.q)}" /></label>
       </div>
-      <div class="grid" id="mat-grid"></div>
+      <div class="grid" id="mat-grid"><div class="skel" style="height:280px;grid-column:1/-1;border-radius:18px"></div></div>
       ${isEquipe() ? '' : `<p class="small muted" style="margin-top:28px">${esc(t('mat.missing'))} <button type="button" class="linkbtn" id="mat-ask">${esc(t('req.new'))} →</button></p>`}`;
   };
   function desenharGrade() {
@@ -558,29 +612,23 @@
     $('#mat-count').textContent = `${lst.length} ${t('mat.count')}`;
   }
   async function carregarBib() {
-    try { const d = await api('materiais'); S.bib = { itens: d.itens || [], ocultos: d.ocultos || [] }; } catch (e) { S.bib = S.bib || { itens: [], ocultos: [] }; }
-    desenharGrade();
+    try { const d = await api('materiais'); S.bib = { itens: d.itens || [], ocultos: d.ocultos || [] }; desenharGrade(); }
+    catch (e) { const g = $('#mat-grid'); if (g) g.innerHTML = `<div class="empty" style="grid-column:1/-1">${I.info}${esc(e.message)} <button type="button" class="linkbtn" id="mat-retry">${esc(t('c.retry'))}</button></div>`; }
   }
   VIEWS['materiais:after'] = (main) => {
-    desenharGrade();
+    if (S.bib) desenharGrade();
     carregarBib();
     main.addEventListener('click', async (ev) => {
       const b = ev.target.closest('button,a'); if (!b) return;
       if (b.dataset.mtipo) { S.mat.tipo = b.dataset.mtipo; $$('[data-mtipo]').forEach((x) => x.setAttribute('aria-pressed', x === b)); desenharGrade(); }
       else if (b.dataset.mprod) { S.mat.produto = b.dataset.mprod; $$('[data-mprod]').forEach((x) => x.setAttribute('aria-pressed', x === b)); desenharGrade(); }
+      else if (b.dataset.mst) { S.mat.st = b.dataset.mst; $$('[data-mst]').forEach((x) => x.setAttribute('aria-pressed', x === b)); desenharGrade(); }
       else if (b.dataset.copy) copiar(urlMaterial(MATS[+b.dataset.copy]));
       else if (b.dataset.ver) verMaterial(MATS[+b.dataset.ver]);
-      else if (b.dataset.medit) editarMaterial(MATS[+b.dataset.medit]);
-      else if (b.dataset.mdel) {
-        const m = MATS[+b.dataset.mdel];
-        if (!confirm(`${t('team.remove')}: ${m.titulo}?`)) return;
-        try { const d = await api('materialRemover', { id: m.id }); S.bib = d; desenharGrade(); toast(t('acc.saved')); } catch (e) { toast(e.message); }
-      } else if (b.dataset.mhide) {
-        const m = MATS[+b.dataset.mhide];
-        try { const d = await api('materialOcultar', { chave: m.chave, ocultar: !m.oculto }); S.bib = d; desenharGrade(); } catch (e) { toast(e.message); }
-      } else if (b.id === 'mat-add') editarMaterial(null);
-      else if (b.id === 'mat-hidden') { S.mat.ocultos = !S.mat.ocultos; renderMain(); }
+      else if (b.dataset.mmenu) menuMaterial(MATS[+b.dataset.mmenu]);
+      else if (b.id === 'mat-add') editarMaterial(null);
       else if (b.id === 'mat-ask') novoPedido('outro');
+      else if (b.id === 'mat-retry') carregarBib();
     });
     let tmr;
     $('#mat-q', main).addEventListener('input', (e) => { clearTimeout(tmr); tmr = setTimeout(() => { S.mat.q = e.target.value; desenharGrade(); }, 120); });
@@ -589,28 +637,83 @@
     const src = m.origem === 'enviado' ? (m.caminho ? urlArquivoEnviado(m.caminho) : m.linkExterno) : (m.arquivo || urlMaterial(m));
     const ehFoto = m.origem === 'enviado' ? /^image\//.test(m.conteudo || '') : (m.tipo === 'foto' && m.arquivo);
     if (!ehFoto) { window.open(src, '_blank', 'noopener'); return; }
-    const baixar = m.origem === 'enviado' ? urlArquivoEnviado(m.caminho, true) : m.arquivo;
+    const baixarUrl = m.origem === 'enviado' ? urlArquivoEnviado(m.caminho, true) : m.arquivo;
     abrirSheet({
       cls: 'viewer', titulo: tx(m.titulo),
       corpo: `<img class="viewer__img" src="${esc(src)}" alt="${esc(tx(m.titulo))}" />
         <p class="small muted" style="margin:0">${esc([m.formato, m.kb ? kb(m.kb) : null, tx(C.PRODUTOS[m.produto])].filter(Boolean).join(' · '))}</p>`,
       pe: `${m.origem === 'fixo' ? `<button type="button" class="btn btn--line" data-x="copy">${I.link}${esc(t('mat.copy'))}</button>` : ''}
-        <a class="btn btn--ink" href="${esc(baixar)}" ${m.origem === 'fixo' ? 'download' : ''}>${I.download}${esc(t('mat.download'))}</a>`,
+        <a class="btn btn--ink" href="${esc(baixarUrl)}" ${m.origem === 'fixo' ? 'download' : ''}>${I.download}${esc(t('mat.download'))}</a>`,
       depois: (p) => { const c = $('[data-x=copy]', p); if (c) c.addEventListener('click', () => copiar(abs(m.arquivo))); },
     });
   }
+  function menuMaterial(m) {
+    const it = (acao, ico, k) => `<button type="button" data-acao="${acao}">${ico}${esc(t(k))}</button>`;
+    const hist = m.origem === 'enviado' ? `<div><span class="eyebrow">${esc(t('mst.versions'))}</span><ul class="timeline" style="margin-top:10px">${m.versoes.slice().reverse().map((v) => `<li><span>v${v.n}${v.n === m.versao ? ` · <b>${esc(t('mst.current'))}</b>` : ''} · ${esc(v.nomeArquivo || v.link || '')} <span class="muted">· ${esc(v.por || '')} · ${esc(data(v.em, true))}</span>${v.caminho ? ` · <a class="linkbtn" href="${esc(urlArquivoEnviado(v.caminho, true))}">${esc(t('mat.download'))}</a>` : ''}</span></li>`).join('')}</ul></div>` : '';
+    abrirSheet({
+      titulo: tx(m.titulo),
+      corpo: `<p class="small muted" style="margin:0">${esc(t(ST_MAT[m.status]))}${m.origem === 'fixo' ? ` · ${esc(t('mst.fixed'))}` : ''}</p>
+        <nav class="menu">
+          ${m.status !== 'publicado' ? it('publicado', I.check, 'mst.publish') : ''}
+          ${m.origem === 'enviado' && m.status !== 'rascunho' ? it('rascunho', I.pen, 'mst.toDraft') : ''}
+          ${m.status !== 'arquivado' ? it('arquivado', I.eyeOff, 'mst.archive') : ''}
+          ${m.origem === 'enviado' ? it('versao', I.upload, 'mst.newVersion') + it('editar', I.pen, 'matadm.edit') : ''}
+        </nav>${hist}`,
+      depois: (p) => $$('[data-acao]', p).forEach((b) => b.addEventListener('click', async () => {
+        const a = b.dataset.acao;
+        if (a === 'editar') return editarMaterial(m);
+        if (a === 'versao') return editarMaterial(m, true);
+        try {
+          const d = m.origem === 'fixo'
+            ? await api('materialOcultar', { chave: m.chave, ocultar: a === 'arquivado' })
+            : await api('materialStatus', { id: m.id, status: a });
+          S.bib = d; fecharSheet(); desenharGrade(); toast(t('acc.saved'));
+        } catch (e) { toast(e.message); }
+      })),
+    });
+  }
 
-  /* gerenciador: adicionar / editar material (o arquivo vai direto do navegador para o Blob privado) */
+  /* gestor: novo material, nova versão ou edição (o arquivo vai direto do navegador para o Blob privado) */
   let blobClient = null;
-  function editarMaterial(m) {
+  async function enviarArquivo(arquivo, destino, prog, btn) {
+    const tk = await api('arquivoToken', { nome: arquivo.name, tipo: arquivo.type, tamanho: arquivo.size, destino });
+    if (!blobClient) blobClient = await import('/portalcorretores/vendor/vercel-blob-client-2.8.0.js');
+    if (prog) prog.hidden = false;
+    await blobClient.put(tk.caminho, arquivo, {
+      access: 'private', token: tk.token, contentType: arquivo.type || undefined, multipart: arquivo.size > 20 * 1024 * 1024,
+      onUploadProgress: (e) => { if (prog) $('i', prog).style.width = Math.round(e.percentage) + '%'; if (btn) btn.textContent = Math.round(e.percentage) + '%'; },
+    });
+    return { caminho: tk.caminho, conteudo: arquivo.type, kb: Math.ceil(arquivo.size / 1024), nomeArquivo: arquivo.name };
+  }
+  function blocoArquivo(id) {
+    return `<div class="seg" role="radiogroup" data-srcg="${id}"><button type="button" data-src="arq" aria-checked="true" aria-pressed="true">${esc(t('matadm.file'))}</button><button type="button" data-src="link" aria-checked="false" aria-pressed="false">${esc(t('matadm.link'))}</button></div>
+      <label class="drop" data-drop="${id}"><input type="file" data-file="${id}" /><span>${I.upload}</span><b data-fname="${id}">${esc(t('matadm.pick'))}</b><span>${esc(t('matadm.pickHint'))}</span></label>
+      <label class="field" data-linkf="${id}" hidden><span>${esc(t('matadm.link'))} (https://)</span><input class="input" type="url" name="link" placeholder="https://" /></label>`;
+  }
+  function ligarArquivo(p, id, aoEscolher) {
+    const st = { fonte: 'arq', arquivo: null };
+    $$(`[data-srcg="${id}"] [data-src]`, p).forEach((b) => b.addEventListener('click', () => {
+      st.fonte = b.dataset.src;
+      $$(`[data-srcg="${id}"] [data-src]`, p).forEach((x) => { x.setAttribute('aria-checked', x === b); x.setAttribute('aria-pressed', x === b); });
+      $(`[data-drop="${id}"]`, p).hidden = st.fonte !== 'arq'; $(`[data-linkf="${id}"]`, p).hidden = st.fonte !== 'link';
+    }));
+    const fi = $(`[data-file="${id}"]`, p);
+    fi.addEventListener('change', () => {
+      st.arquivo = fi.files[0] || null;
+      $(`[data-fname="${id}"]`, p).textContent = st.arquivo ? `${st.arquivo.name} · ${kb(Math.ceil(st.arquivo.size / 1024))}` : t('matadm.pick');
+      if (st.arquivo && aoEscolher) aoEscolher(st.arquivo);
+    });
+    return st;
+  }
+  function editarMaterial(m, soVersao) {
     const novo = !m;
     const opt = (obj, sel) => Object.keys(obj).map((k) => `<option value="${k}" ${k === sel ? 'selected' : ''}>${esc(tx(obj[k]))}</option>`).join('');
+    const titulo = soVersao ? t('mst.newVersion') : novo ? t('matadm.add') : t('matadm.edit');
     abrirSheet({
-      titulo: novo ? t('matadm.add') : t('matadm.edit'),
+      titulo,
       corpo: `<form id="f-mat" style="display:grid;gap:16px" novalidate>
-        ${novo ? `<div class="seg" role="radiogroup" id="mat-src"><button type="button" data-src="arq" aria-checked="true" aria-pressed="true">${esc(t('matadm.file'))}</button><button type="button" data-src="link" aria-checked="false" aria-pressed="false">${esc(t('matadm.link'))}</button></div>
-        <label class="drop" id="mat-drop"><input type="file" id="mat-file" /><span>${I.upload}</span><b id="mat-fname">${esc(t('matadm.pick'))}</b><span>${esc(t('matadm.pickHint'))}</span></label>
-        <label class="field" id="mat-linkf" hidden><span>${esc(t('matadm.link'))} (https://)</span><input class="input" type="url" name="link" placeholder="https://drive.google.com/…" /></label>` : ''}
+        ${novo || soVersao ? blocoArquivo('mat') : ''}
+        ${soVersao ? `<p class="small muted" style="margin:0">${esc(t('mst.versionInfo'))}</p><label class="field"><span>${esc(t('mst.note'))} <span class="muted">(${esc(t('c.optional'))})</span></span><input class="input" name="nota" maxlength="200" /></label>` : `
         <label class="field"><span>${esc(t('req.titleF'))}</span><input class="input" name="titulo" maxlength="120" value="${esc(m ? m.titulo : '')}" required /></label>
         <div class="grid2">
           <label class="field"><span>${esc(t('matadm.cat'))}</span><select class="select" name="tipo">${opt(C.TIPOS_MATERIAL, m ? m.tipo : 'apresentacao')}</select></label>
@@ -618,54 +721,36 @@
         </div>
         <label class="field"><span>${esc(t('matadm.desc'))} <span class="muted">(${esc(t('c.optional'))})</span></span><textarea class="textarea" name="desc" maxlength="400" style="min-height:80px">${esc(m ? m.desc || '' : '')}</textarea></label>
         <label class="check"><input type="checkbox" name="destaque" ${m && m.destaque ? 'checked' : ''} /><span>${esc(t('matadm.star'))}</span></label>
+        ${novo ? `<label class="check"><input type="checkbox" name="publicar" /><span>${esc(t('mst.publishNow'))}</span></label>` : ''}`}
         <div class="bar" id="mat-prog" hidden><i style="width:0%"></i></div>
         <p class="formmsg" role="alert"></p>
       </form>`,
-      pe: `<button type="button" class="btn btn--line" data-x="close">${esc(t('req.close'))}</button><button type="submit" form="f-mat" class="btn btn--ink">${esc(t(novo ? 'matadm.upload' : 'req.save'))}</button>`,
+      pe: `<button type="button" class="btn btn--line" data-x="close">${esc(t('req.close'))}</button><button type="submit" form="f-mat" class="btn btn--ink">${esc(t(novo || soVersao ? 'matadm.upload' : 'req.save'))}</button>`,
       depois: (p) => {
         const f = $('#f-mat', p);
-        let fonte = 'arq';
-        let arquivo = null;
-        $$('[data-src]', p).forEach((b) => b.addEventListener('click', () => {
-          fonte = b.dataset.src;
-          $$('[data-src]', p).forEach((x) => { x.setAttribute('aria-checked', x === b); x.setAttribute('aria-pressed', x === b); });
-          $('#mat-drop', p).hidden = fonte !== 'arq'; $('#mat-linkf', p).hidden = fonte !== 'link';
-        }));
-        const fi = $('#mat-file', p);
-        if (fi) fi.addEventListener('change', () => {
-          arquivo = fi.files[0] || null;
-          $('#mat-fname', p).textContent = arquivo ? `${arquivo.name} · ${kb(Math.ceil(arquivo.size / 1024))}` : t('matadm.pick');
+        const arq = (novo || soVersao) ? ligarArquivo(p, 'mat', (a) => {
           const tit = $('[name=titulo]', f);
-          if (arquivo && !tit.value) tit.value = arquivo.name.replace(/\.\w+$/, '').replace(/[-_]+/g, ' ');
-          if (arquivo) {
-            const sel = $('[name=tipo]', f);
-            if (/^image\//.test(arquivo.type)) sel.value = 'foto'; else if (/^video\//.test(arquivo.type)) sel.value = 'video'; else if (/pdf$/.test(arquivo.type)) sel.value = 'apresentacao';
-          }
-        });
+          if (tit && !tit.value) tit.value = a.name.replace(/\.\w+$/, '').replace(/[-_]+/g, ' ');
+          const sel = $('[name=tipo]', f);
+          if (sel) { if (/^image\//.test(a.type)) sel.value = 'foto'; else if (/^video\//.test(a.type)) sel.value = 'video'; else if (/pdf$/.test(a.type)) sel.value = 'apresentacao'; }
+        }) : null;
         f.addEventListener('submit', async (ev) => {
           ev.preventDefault();
           const fd = Object.fromEntries(new FormData(f).entries());
           const msg = $('.formmsg', f); msg.textContent = '';
-          if (!fd.titulo || fd.titulo.trim().length < 2) { msg.textContent = t('matadm.needTitle'); return; }
+          if (!soVersao && (!fd.titulo || fd.titulo.trim().length < 2)) { msg.textContent = t('matadm.needTitle'); return; }
           const btn = $('button[form=f-mat]', p); btn.disabled = true;
           try {
-            const base = { titulo: fd.titulo, tipo: fd.tipo, produto: fd.produto, desc: fd.desc, destaque: !!fd.destaque };
-            let d;
-            if (!novo) d = await api('materialSalvar', { id: m.id, ...base });
-            else if (fonte === 'link') d = await api('materialSalvar', { ...base, link: fd.link });
-            else {
-              if (!arquivo) { msg.textContent = t('matadm.needFile'); btn.disabled = false; return; }
-              const tk = await api('materialToken', { nome: arquivo.name, tipo: arquivo.type, tamanho: arquivo.size });
-              if (!blobClient) blobClient = await import('/portalcorretores/vendor/vercel-blob-client-2.8.0.js');
-              const prog = $('#mat-prog', p); prog.hidden = false;
-              await blobClient.put(tk.caminho, arquivo, {
-                access: 'private', token: tk.token, contentType: arquivo.type || undefined, multipart: arquivo.size > 20 * 1024 * 1024,
-                onUploadProgress: (e) => { $('i', prog).style.width = Math.round(e.percentage) + '%'; btn.textContent = Math.round(e.percentage) + '%'; },
-              });
-              d = await api('materialSalvar', { ...base, caminho: tk.caminho, conteudo: arquivo.type, kb: Math.ceil(arquivo.size / 1024), nomeArquivo: arquivo.name });
+            let fonte = {};
+            if (arq) {
+              if (arq.fonte === 'link') fonte = { link: fd.link };
+              else if (!arq.arquivo) { msg.textContent = t('matadm.needFile'); btn.disabled = false; return; }
+              else fonte = await enviarArquivo(arq.arquivo, 'material', $('#mat-prog', p), btn);
             }
+            const d = soVersao ? await api('materialVersao', { id: m.id, ...fonte, nota: fd.nota })
+              : await api('materialSalvar', { id: m ? m.id : undefined, titulo: fd.titulo, tipo: fd.tipo, produto: fd.produto, desc: fd.desc, destaque: !!fd.destaque, publicar: !!fd.publicar, ...fonte });
             S.bib = d; fecharSheet(); desenharGrade(); toast(t('acc.saved'));
-          } catch (e) { msg.textContent = e.message || t('c.error'); btn.disabled = false; btn.textContent = t(novo ? 'matadm.upload' : 'req.save'); }
+          } catch (e) { msg.textContent = e.message || t('c.error'); btn.disabled = false; btn.textContent = t(novo || soVersao ? 'matadm.upload' : 'req.save'); }
         });
       },
     });
@@ -722,9 +807,56 @@
           : `<div class="card card--dark" style="grid-column:span 2"><span class="card__label" style="color:var(--on-dark-muted)">${esc(tx(pag.nome))}</span><b>${usd(total)}</b></div>`}
         </div>
         <p class="small muted" style="margin:14px 0 0">${esc(t('price.note'))}</p>
-      </section>`;
+      </section>
+      ${lotesSecaoHTML(jid, pi)}`;
   };
+  /* lista lote a lote: mesma unidade da maquete (Q07.L014), situação do retrato do CV, preço da Tabela v3.1 */
+  const SIT_ROT = { disponivel: 'lot.free', reservado: 'map.res', vendido: 'map.sold', indisponivel: 'map.off', desconhecida: 'lot.unknown' };
+  const SIT_DOT = { disponivel: 'is-free', reservado: 'is-res', vendido: 'is-sold', indisponivel: 'is-off', desconhecida: 'is-unk' };
+  function lotesFiltrados() {
+    const f = S.lotf || (S.lotf = { q: '', sit: 'disponivel', cat: 'all', amin: '', busca: '', n: 60 });
+    const busca = f.busca.trim().toUpperCase();
+    return (S.com ? S.com.unidades : []).filter((u) => (!f.q || u.q === f.q) && (f.sit === 'all' || u.situacao === f.sit)
+      && (f.cat === 'all' || u.cat === f.cat) && (!f.amin || u.a >= +f.amin) && (!busca || u.id.includes(busca) || (u.nome || '').includes(busca)));
+  }
+  function lotesSecaoHTML(jid, pi) {
+    const f = S.lotf || (S.lotf = { q: '', sit: 'disponivel', cat: 'all', amin: '', busca: '', n: 60 });
+    if (!S.com) return `<section class="section"><h2 class="h2">${esc(t('lot.title'))}</h2><div class="skel" style="height:240px;border-radius:18px;margin-top:14px"></div></section>`;
+    const P = S.precos;
+    const quadras = [...new Set(S.com.unidades.map((u) => u.q))].sort();
+    const lst = lotesFiltrados();
+    const linhas = lst.slice(0, f.n).map((u) => {
+      const linha = ((P.precos[jid] || {})[u.cat] || [])[0];
+      const m2 = linha ? linha[pi] : null;
+      return `<tr><th scope="row" class="num">${esc(u.id)}</th><td>${esc(u.q)}</td><td class="num">${nf(u.a)} m²</td><td>${esc(tx(P.categorias[u.cat].nome))}</td>
+        <td><span class="sit"><i class="legend__dot ${SIT_DOT[u.situacao]}"></i>${esc(t(SIT_ROT[u.situacao]))}</span></td>
+        <td class="num">${m2 != null ? usd(m2 * u.a) : '—'}</td>
+        <td><a class="iconbtn" href="/3dmasterplan/#lote-${esc(u.id)}" target="_blank" rel="noopener" aria-label="${esc(t('lot.see'))} ${esc(u.id)}" title="${esc(t('lot.see'))}">${I.cube}</a></td></tr>`;
+    }).join('');
+    return `<section class="section" id="lotes">
+      <div class="section__head"><div><h2 class="h2">${esc(t('lot.title'))}</h2><p class="small muted" style="margin:6px 0 0">${esc(t('lot.lead'))}</p></div></div>
+      ${syncHTML(false)}
+      <div class="lotfilt">
+        <label class="field"><span>${esc(t('lot.search'))}</span><input class="input" id="lf-busca" value="${esc(f.busca)}" placeholder="Q07.L014" /></label>
+        <label class="field"><span>${esc(t('lot.block'))}</span><select class="select" id="lf-q"><option value="">${esc(t('mat.all'))}</option>${quadras.map((q) => `<option ${q === f.q ? 'selected' : ''}>${q}</option>`).join('')}</select></label>
+        <label class="field"><span>${esc(t('acc.status'))}</span><select class="select" id="lf-sit">${['all', 'disponivel', 'reservado', 'vendido', 'indisponivel'].map((s) => `<option value="${s}" ${s === f.sit ? 'selected' : ''}>${esc(s === 'all' ? t('mat.all') : t(SIT_ROT[s]))}</option>`).join('')}</select></label>
+        <label class="field"><span>${esc(t('price.cat'))}</span><select class="select" id="lf-cat"><option value="all">${esc(t('mat.all'))}</option>${['V', 'B', 'P', 'I'].map((c) => `<option value="${c}" ${c === f.cat ? 'selected' : ''}>${esc(tx(P.categorias[c].nome))}</option>`).join('')}</select></label>
+        <label class="field"><span>${esc(t('lot.minArea'))}</span><input class="input num" id="lf-amin" type="number" min="0" step="50" inputmode="numeric" value="${esc(f.amin)}" /></label>
+      </div>
+      <p class="small muted" style="margin:0 0 10px">${nf(lst.length)} ${esc(t('lot.found'))} · ${esc(t('lot.priceNote'))} ${esc(tx(P.janelas.find((j) => j.id === jid).curto))} · ${esc(tx(P.pagamentos.find((p) => PAG_IDX[p.id] === pi).nome))} · 1–8 ${esc(t('price.qty'))}</p>
+      ${lst.length ? `<div class="tablewrap"><table class="table table--lots"><caption class="vh">${esc(t('lot.title'))}</caption>
+        <thead><tr><th scope="col">${esc(t('lot.lot'))}</th><th scope="col">${esc(t('lot.block'))}</th><th scope="col">${esc(t('price.area'))}</th><th scope="col">${esc(t('price.cat'))}</th><th scope="col">${esc(t('acc.status'))}</th><th scope="col">${esc(t('price.total'))} (USD)</th><th></th></tr></thead>
+        <tbody>${linhas}</tbody></table></div>
+        ${lst.length > f.n ? `<button type="button" class="btn btn--line" id="lf-mais" style="margin-top:12px">${esc(t('lot.more'))} (${nf(lst.length - f.n)})</button>` : ''}`
+        : `<div class="empty">${I.search}${esc(S.com.sync.estado === 'indisponivel' && f.sit !== 'all' ? t('lot.noSync') : t('mat.none'))}</div>`}
+    </section>`;
+  }
   VIEWS['tabela:after'] = (main) => {
+    ligarSync(main);
+    const re = () => { const y = window.scrollY; renderMain(); window.scrollTo(0, y); };
+    const liga = (id, k, ev = 'change') => { const el = $(id, main); if (el) el.addEventListener(ev, (e) => { S.lotf[k] = e.target.value; S.lotf.n = 60; re(); const n = $(id); if (n && ev === 'input') { n.focus(); n.setSelectionRange(n.value.length, n.value.length); } }); };
+    liga('#lf-q', 'q'); liga('#lf-sit', 'sit'); liga('#lf-cat', 'cat'); liga('#lf-amin', 'amin'); liga('#lf-busca', 'busca', 'input');
+    const mais = $('#lf-mais', main); if (mais) mais.addEventListener('click', () => { S.lotf.n += 120; re(); });
     main.addEventListener('click', (ev) => {
       const b = ev.target.closest('button'); if (!b) return;
       if (b.dataset.jan) { S.price.janela = b.dataset.jan; renderMain(); }
@@ -743,21 +875,22 @@
     S.pedidos = d.pedidos || [];
     return S.pedidos;
   }
-  const ETAPAS = ['recebido', 'producao', 'aprovacao', 'entregue'];
+  // Fluxo do briefing: Enviada → Em análise → Em produção → Concluída; Cancelada como término alternativo.
+  const ETAPAS = ['enviada', 'analise', 'producao', 'concluida'];
   function reqCard(p) {
     const idx = ETAPAS.indexOf(p.status);
     const quem = isEquipe() ? `<span>${esc(p.corretor.nome)} · ${esc(p.corretor.imobiliaria)}</span>` : '';
     return `<button type="button" class="req" data-req="${esc(p.id)}">
       <div style="display:grid;gap:6px;min-width:0"><span class="req__title">${esc(p.titulo)}</span>
         <span class="req__meta"><span>#${esc(p.numero)}</span><span>${esc(rotuloMaterial(p))}${p.formato ? ' · ' + esc(t(p.formato === 'impresso' ? 'form.print' : p.formato === 'ambos' ? 'form.both' : 'form.digital')) : ''}${p.quantidade > 1 ? ' · ' + nf(p.quantidade) + '×' : ''}</span>${(p.anexos || []).length ? `<span>${I.file.replace('<svg', '<svg width="13" height="13" style="vertical-align:-2px"')} ${p.anexos.length}</span>` : ''}<span>${esc(tx(C.PRODUTOS[p.produto]))}</span>${p.prazo ? `<span>${I.calendar.replace('<svg', '<svg width="13" height="13" style="vertical-align:-2px"')} ${esc(data(p.prazo))}</span>` : ''}${quem}</span></div>
-      <span class="badge ${p.status === 'entregue' ? 'badge--ink' : ''}"><i></i>${esc(t('st.' + p.status))}</span>
-      ${p.status !== 'cancelado' ? `<div class="steps" aria-hidden="true">${ETAPAS.map((e, i) => `<i class="${i <= idx ? 'on' : ''}"></i>`).join('')}</div>` : ''}
+      <span class="badge ${p.status === 'concluida' ? 'badge--ink' : ''}"><i></i>${esc(t('st.' + p.status))}</span>
+      ${p.status !== 'cancelada' ? `<div class="steps" aria-hidden="true">${ETAPAS.map((e, i) => `<i class="${i <= idx ? 'on' : ''}"></i>`).join('')}</div>` : ''}
     </button>`;
   }
   VIEWS.pedidos = () => {
     if (S.route.arg === 'novo' && !isEquipe()) return formPedidoHTML();
     const travado = !isEquipe() && !aprovado();
-    const filtros = isEquipe() ? [['abertos', 'req.open'], ['cancelado', 'st.cancelado']] : [['abertos', 'req.open'], ['todos', 'req.all']];
+    const filtros = isEquipe() ? [['abertos', 'req.open'], ['cancelada', 'st.cancelada']] : [['abertos', 'req.open'], ['todos', 'req.all']];
     return `
       <header class="pagehead">
         <div class="pagehead__meta"><span id="req-count" class="num"></span></div>
@@ -773,7 +906,7 @@
     const box = $('#req-list'); if (!box) return;
     const lst = S.pedidos || [];
     const f = S.req.filtro;
-    const vis = lst.filter((p) => (f === 'todos' ? true : f === 'cancelado' ? p.status === 'cancelado' : !['cancelado'].includes(p.status) && (isEquipe() || p.status !== 'entregue')));
+    const vis = lst.filter((p) => (f === 'todos' ? true : f === 'cancelada' ? p.status === 'cancelada' : p.status !== 'cancelada' && (isEquipe() || p.status !== 'concluida')));
     $('#req-count').textContent = `${vis.length} / ${lst.length}`;
     if (isEquipe() && f === 'abertos') {
       box.innerHTML = `<div class="board">${ETAPAS.map((e) => { const it = vis.filter((p) => p.status === e); return `<section class="board__col"><header><span>${esc(t('st.' + e))}</span><span class="badge">${it.length}</span></header>${it.map(reqCard).join('') || `<p class="small muted" style="margin:6px">${esc(t('req.emptyTeam'))}</p>`}</section>`; }).join('')}</div>`;
@@ -942,24 +1075,27 @@
     const p = (S.pedidos || []).find((x) => x.id === id);
     if (!p) return;
     const idx = ETAPAS.indexOf(p.status);
+    const terminal = ['concluida', 'cancelada'].includes(p.status);
     const wa = `https://wa.me/${p.corretor.ddi}${p.corretor.tel}`;
+    const proximas = [...ETAPAS, 'cancelada'].filter((s) => s !== p.status);
     const edicao = isEquipe() ? `
       <form id="f-upd" style="display:grid;gap:14px" class="card card--flat">
         <div class="grid2">
-          <label class="field"><span>Status</span><select class="select" name="status">${[...ETAPAS, 'cancelado'].map((s) => `<option value="${s}" ${s === p.status ? 'selected' : ''}>${esc(t('st.' + s))}</option>`).join('')}</select></label>
-          <label class="field"><span>${esc(t('req.owner'))}</span><input class="input" name="responsavel" value="${esc(p.responsavel || S.user.nome)}" /></label>
+          <label class="field"><span>${esc(t('acc.status'))}</span><select class="select" name="status" ${terminal ? 'disabled' : ''}><option value="${esc(p.status)}" selected>${esc(t('st.' + p.status))}</option>${terminal ? '' : proximas.map((s) => `<option value="${s}">→ ${esc(t('st.' + s))}</option>`).join('')}</select>${terminal ? `<small>${esc(t('req.terminal'))}</small>` : ''}</label>
+          <label class="field"><span>${esc(t('req.owner'))}</span><select class="select" name="responsavelId" id="f-resp"><option value="">—</option>${p.responsavel ? `<option value="${esc(p.responsavel.id)}" selected>${esc(p.responsavel.nome)}</option>` : ''}</select></label>
         </div>
-        <label class="field"><span>${esc(t('req.answer'))}</span><textarea class="textarea" name="resposta" style="min-height:90px">${esc(p.resposta || '')}</textarea></label>
         <label class="field"><span>${esc(t('req.delivery'))} (https://)</span><input class="input" type="url" name="entrega" value="${esc(p.entrega || '')}" placeholder="https://drive.google.com/…" /></label>
         <p class="formmsg" role="alert"></p>
       </form>` : '';
+    const msgs = (p.mensagens || []).map((m) => `<li class="msg2 ${m.autor.papel === 'equipe' ? 'is-team' : ''}"><b>${esc(m.autor.nome)}${m.autor.papel === 'equipe' ? ` · ${esc(t('acc.manager'))}` : ''}</b><p>${esc(m.texto)}</p><time>${esc(data(m.em, true))}</time></li>`).join('');
+    const legado = p.resposta ? `<li class="msg2 is-team"><b>${esc(t('req.answer'))}</b><p>${esc(p.resposta)}</p></li>` : '';
+    const histTxt = (h) => (h.campo === 'responsavel' ? `${t('req.owner')}: ${h.para || '—'}` : h.campo === 'entrega' ? `${t('req.delivery')}: ${h.para ? t('req.linkSet') : '—'}` : t('st.' + (h.status || h.para)));
     abrirSheet({
       titulo: `#${p.numero} · ${p.titulo}`,
       corpo: `
-        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><span class="badge ${p.status === 'entregue' ? 'badge--ink' : ''}"><i></i>${esc(t('st.' + p.status))}</span><span class="small muted">${esc(data(p.atualizado, true))}</span></div>
-        ${p.status !== 'cancelado' ? `<div class="steps" style="grid-template-columns:repeat(4,1fr)">${ETAPAS.map((e, i) => `<i class="${i <= idx ? 'on' : ''}" title="${esc(t('st.' + e))}"></i>`).join('')}</div>` : ''}
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><span class="badge ${p.status === 'concluida' ? 'badge--ink' : ''}"><i></i>${esc(t('st.' + p.status))}</span>${p.responsavel ? `<span class="badge">${I.user.replace('<svg', '<svg width="12" height="12"')} ${esc(p.responsavel.nome)}</span>` : ''}<span class="small muted">${esc(data(p.atualizado, true))}</span></div>
+        ${p.status !== 'cancelada' ? `<div class="steps" style="grid-template-columns:repeat(4,1fr)">${ETAPAS.map((e, i) => `<i class="${i <= idx ? 'on' : ''}" title="${esc(t('st.' + e))}"></i>`).join('')}</div>` : ''}
         ${p.entrega ? `<a class="btn btn--ink" href="${esc(p.entrega)}" target="_blank" rel="noopener">${I.download}${esc(t('req.delivery'))}</a>` : ''}
-        ${p.resposta && !isEquipe() ? `<div class="card card--flat"><span class="eyebrow">${esc(t('req.answer'))}</span><p style="margin:8px 0 0;white-space:pre-line">${esc(p.resposta)}</p></div>` : ''}
         <dl class="kv">
           <dt>${esc(t('form.material'))}</dt><dd>${esc(rotuloMaterial(p))}</dd>
           ${p.formato ? `<dt>${esc(t('form.kind'))}</dt><dd>${esc(t(p.formato === 'impresso' ? 'form.print' : p.formato === 'ambos' ? 'form.both' : 'form.digital'))}</dd>` : ''}
@@ -973,25 +1109,53 @@
         </dl>
         ${p.dados ? `<div><span class="eyebrow">${esc(t('form.fill'))}</span><p style="margin:8px 0 0;white-space:pre-line">${esc(p.dados)}</p></div>` : ''}
         ${p.descricao ? `<div><span class="eyebrow">${esc(t('form.details'))}</span><p style="margin:8px 0 0;white-space:pre-line">${esc(p.descricao)}</p></div>` : ''}
-        ${(p.anexos || []).length ? `<div><span class="eyebrow">${esc(t('form.examples'))}</span><ul class="files" style="margin-top:10px">${p.anexos.map((x) => `<li class="file">${x.tipo.startsWith('image/') ? `<img src="${esc(urlAnexo(x))}" alt="" loading="lazy" />` : `<span class="file__ico">${I.file}</span>`}<span class="file__n">${esc(x.nome)}<small>${kb(x.kb)}</small></span><a class="iconbtn" href="${esc(urlAnexo(x))}" target="_blank" rel="noopener" aria-label="${esc(t('mat.open'))}">${I.ext}</a></li>`).join('')}</ul></div>` : ''}
+        ${(p.anexos || []).length ? `<div><span class="eyebrow">${esc(t('req.files'))}</span><ul class="files" style="margin-top:10px">${p.anexos.map((x) => `<li class="file">${x.tipo.startsWith('image/') ? `<img src="${esc(urlAnexo(x))}" alt="" loading="lazy" />` : `<span class="file__ico">${I.file}</span>`}<span class="file__n">${esc(x.nome)}<small>${kb(x.kb)} · ${esc(x.por || '')}</small></span><a class="iconbtn" href="${esc(urlAnexo(x))}" target="_blank" rel="noopener" aria-label="${esc(t('mat.open'))}">${I.ext}</a></li>`).join('')}</ul></div>` : ''}
+        <div><span class="eyebrow">${esc(t('req.messages'))}</span>
+          <ul class="thread">${legado}${msgs || (legado ? '' : `<li class="muted small">${esc(t('req.noMessages'))}</li>`)}</ul>
+          ${!terminal || isEquipe() ? `<form id="f-msg" class="msgform" novalidate>
+            <label class="vh" for="msg-txt">${esc(t('req.write'))}</label><textarea class="textarea" id="msg-txt" name="texto" maxlength="2000" placeholder="${esc(t('req.write'))}"></textarea>
+            <div style="display:flex;gap:8px;justify-content:space-between;align-items:center;flex-wrap:wrap">
+              <label class="btn btn--line btn--sm" style="position:relative;overflow:hidden">${I.file}${esc(t('req.attach'))}<input type="file" id="msg-file" accept="image/jpeg,image/png,image/webp,application/pdf" style="position:absolute;inset:0;opacity:0;cursor:pointer" /></label>
+              <button type="submit" class="btn btn--ink btn--sm">${I.send}${esc(t('req.send2'))}</button></div>
+            <p class="formmsg" role="alert"></p></form>` : ''}
+        </div>
         ${edicao}
-        <div><span class="eyebrow">${esc(t('req.history'))}</span><ul class="timeline" style="margin-top:12px">${(p.historico || []).map((h) => `<li><span>${esc(t('st.' + h.status))} · <span class="muted">${esc(h.por || '')} · ${esc(data(h.em, true))}</span></span></li>`).join('')}</ul></div>`,
+        <div><span class="eyebrow">${esc(t('req.history'))}</span><ul class="timeline" style="margin-top:12px">${(p.historico || []).map((h) => `<li><span>${esc(histTxt(h))} · <span class="muted">${esc(h.por || '')} · ${esc(data(h.em, true))}</span></span></li>`).join('')}</ul></div>`,
       pe: isEquipe()
         ? `<button type="button" class="btn btn--line" data-x="close">${esc(t('req.close'))}</button><button type="submit" form="f-upd" class="btn btn--ink">${esc(t('req.save'))}</button>`
-        : `${p.status === 'recebido' ? `<button type="button" class="btn btn--line" data-x="cancel">${esc(t('req.cancel'))}</button>` : ''}<button type="button" class="btn btn--ink" data-x="close">${esc(t('req.close'))}</button>`,
+        : `${p.status === 'enviada' ? `<button type="button" class="btn btn--line" data-x="cancel">${esc(t('req.cancel'))}</button>` : ''}<button type="button" class="btn btn--ink" data-x="close">${esc(t('req.close'))}</button>`,
       depois: (panel) => {
+        const atualizar = (d) => { Object.assign(p, d.pedido); const i = (S.pedidos || []).findIndex((x) => x.id === p.id); if (i >= 0) S.pedidos[i] = p; desenharPedidos(); };
+        if (isEquipe()) api('gestores').then((d) => {
+          const sel = $('#f-resp', panel); if (!sel) return;
+          sel.innerHTML = `<option value="">—</option>${d.gestores.map((g) => `<option value="${esc(g.id)}" ${p.responsavel && p.responsavel.id === g.id ? 'selected' : ''}>${esc(g.nome)}</option>`).join('')}`;
+        }).catch(() => {});
         const c = $('[data-x=cancel]', panel);
         if (c) c.addEventListener('click', async () => {
           c.disabled = true;
-          try { const d = await api('pedidoCancelar', { id: p.id }); Object.assign(p, d.pedido); fecharSheet(); desenharPedidos(); }
+          try { atualizar(await api('pedidoCancelar', { id: p.id })); fecharSheet(); }
           catch (e) { toast(e.message); c.disabled = false; }
+        });
+        const fm = $('#f-msg', panel);
+        if (fm) fm.addEventListener('submit', async (ev) => {
+          ev.preventDefault();
+          const txt = $('#msg-txt', fm).value.trim();
+          const file = $('#msg-file', fm).files[0];
+          if (!txt && !file) return;
+          const btn = $('button[type=submit]', fm); btn.disabled = true;
+          try {
+            if (file) atualizar(await api('anexo', { pedido: p.id, ...(await prepararArquivo(file)) }));
+            if (txt) atualizar(await api('pedidoMensagem', { id: p.id, texto: txt }));
+            abrirPedido(p.id);
+          } catch (e) { $('.formmsg', fm).textContent = e.message; btn.disabled = false; }
         });
         const f = $('#f-upd', panel);
         if (f) f.addEventListener('submit', async (ev) => {
           ev.preventDefault();
           const fd = Object.fromEntries(new FormData(f).entries());
+          if (fd.status === p.status || !fd.status) delete fd.status;
           const btn = $('button[form=f-upd]', panel); btn.disabled = true;
-          try { const d = await api('pedidoAtualizar', { id: p.id, ...fd }); Object.assign(p, d.pedido); fecharSheet(); toast(t('acc.saved')); desenharPedidos(); }
+          try { atualizar(await api('pedidoAtualizar', { id: p.id, ...fd })); fecharSheet(); toast(t('acc.saved')); }
           catch (e) { $('.formmsg', f).textContent = e.message; btn.disabled = false; }
         });
       },
@@ -1016,8 +1180,10 @@
       <a class="btn btn--line btn--sm" href="mailto:${esc(c.email)}">${I.mail}${esc(c.email)}</a></div></article>`).join('')}</div>`;
   }
   VIEWS.aprender = () => {
-    const g = C.GUIAS.find((x) => x.id === S.route.arg);
-    if (g) {
+    const tut = S.tut || { itens: [], ocultos: [] };
+    const fixos = C.GUIAS.map((x) => ({ ...x, fixo: true, status: tut.ocultos.includes(x.id) ? 'arquivado' : 'publicado' }));
+    const g = fixos.find((x) => x.id === S.route.arg);
+    if (g && g.status === 'publicado') {
       return `<article class="article">
         <a href="#/aprender" class="linkbtn" style="text-decoration:none;display:inline-flex;gap:8px;align-items:center">${I.back.replace('<svg', '<svg width="18" height="18"')}${esc(t('learn.back'))}</a>
         <p class="eyebrow" style="margin-top:28px">${g.min} ${esc(t('learn.min'))}</p>
@@ -1027,14 +1193,107 @@
         <div class="prose">${(g.corpo[S.lang] || g.corpo.pt).map(blocoHTML).join('')}</div>
       </article>`;
     }
+    const d = tut.itens.find((x) => 't-' + x.id === S.route.arg);
+    if (d) {
+      return `<article class="article">
+        <a href="#/aprender" class="linkbtn" style="text-decoration:none;display:inline-flex;gap:8px;align-items:center">${I.back.replace('<svg', '<svg width="18" height="18"')}${esc(t('learn.back'))}</a>
+        ${d.categoria ? `<p class="eyebrow" style="margin-top:28px">${esc(d.categoria)}</p>` : ''}
+        <h1 class="h1" style="margin-top:10px">${esc(d.titulo)}</h1>
+        ${d.resumo ? `<p class="lead" style="margin-top:14px">${esc(d.resumo)}</p>` : ''}
+        <div class="prose" style="margin-top:28px">${d.tipo === 'texto' ? d.corpo.split(/\n{2,}/).map((par) => `<p style="white-space:pre-line">${esc(par)}</p>`).join('')
+          : `<p><a class="btn btn--ink" href="${esc(d.tipo === 'link' ? d.link : `/api/portal?tutorial=${encodeURIComponent(d.caminho)}`)}" target="_blank" rel="noopener">${d.tipo === 'link' ? I.ext : I.download}${esc(t(d.tipo === 'link' ? 'tut.openLink' : 'tut.openFile'))}</a></p>`}</div>
+      </article>`;
+    }
+    const pub = (x) => isEquipe() || x.status === 'publicado';
+    const cards = [
+      ...tut.itens.filter(pub).map((x) => ({ href: `#/aprender/t-${x.id}`, capa: null, tit: x.titulo, res: x.resumo || '', meta: [x.categoria, t('tut.k.' + x.tipo)].filter(Boolean).join(' · '), st: x.status, id: x.id })),
+      ...fixos.filter(pub).map((x) => ({ href: `#/aprender/${x.id}`, capa: x.capa, tit: tx(x.titulo), res: tx(x.resumo), meta: `${x.min} ${t('learn.min')}`, st: x.status, chave: x.id })),
+    ];
     return `
-      <header class="pagehead"><div class="pagehead__meta"><span class="num">${C.GUIAS.length} ${esc(S.lang === 'en' ? 'guides' : 'guias')}</span></div>
-        <div class="pagehead__body"><h1 class="h1">${esc(t('learn.title'))}</h1><p class="lead">${esc(t('learn.lead'))}</p></div></header>
-      <div class="guides">${C.GUIAS.map((x) => `<a class="guide" href="#/aprender/${x.id}"><div class="guide__media"><img src="${esc(x.capa)}" alt="" loading="lazy" /></div>
-        <span class="eyebrow">${x.min} ${esc(t('learn.min'))}</span><b>${esc(tx(x.titulo))}</b><p>${esc(tx(x.resumo))}</p></a>`).join('')}</div>
+      <header class="pagehead"><div class="pagehead__meta"><span class="num">${cards.length} ${esc(t('tut.count'))}</span></div>
+        <div class="pagehead__body"><h1 class="h1">${esc(t('learn.title'))}</h1><p class="lead">${esc(t('learn.lead'))}</p>
+          ${isEquipe() ? `<div><button type="button" class="btn btn--ink" id="tut-new">${I.plus}${esc(t('tut.new'))}</button></div>` : ''}</div></header>
+      ${cards.length ? `<div class="guides">${cards.map((c) => `<div class="guide ${c.st !== 'publicado' ? 'is-hidden' : ''}"><a href="${c.href}" style="display:grid;gap:12px;text-decoration:none">
+        <div class="guide__media">${c.capa ? `<img src="${esc(c.capa)}" alt="" loading="lazy" />` : `<span class="guide__ph">${I.book}</span>`}</div>
+        <span class="eyebrow">${esc(c.meta)}${isEquipe() && c.st !== 'publicado' ? ` · ${esc(t(ST_MAT[c.st]))}` : ''}</span><b>${esc(c.tit)}</b><p>${esc(c.res)}</p></a>
+        ${isEquipe() ? `<div class="tile__actions">${c.id ? `<button type="button" class="iconbtn" data-tup="${esc(c.id)}" aria-label="${esc(t('tut.up'))}" title="${esc(t('tut.up'))}">${I.up}</button><button type="button" class="iconbtn" data-tdown="${esc(c.id)}" aria-label="${esc(t('tut.down'))}" title="${esc(t('tut.down'))}">${I.down}</button>` : ''}
+          <button type="button" class="btn btn--line btn--sm" data-tmenu="${esc(c.id || '')}" data-tfixo="${esc(c.chave || '')}">${I.dots}${esc(t('gest.more'))}</button></div>` : ''}
+      </div>`).join('')}</div>` : `<div class="empty">${I.book}${esc(t('tut.empty'))}</div>`}
       <section class="section"><h2 class="h2" style="margin-bottom:12px">${esc(t('learn.faq'))}</h2>
         <div class="faq">${C.FAQ.map((f) => `<details><summary>${esc(tx(f.q))}</summary><p>${esc(tx(f.a))}</p></details>`).join('')}</div></section>
       <section class="section"><h2 class="h2" style="margin-bottom:16px">${esc(t('learn.contacts'))}</h2>${contatosHTML()}</section>`;
+  };
+  async function carregarTut(redesenhar) {
+    try { S.tut = await api('tutoriais'); if (redesenhar && S.route.name === 'aprender') renderMain(); } catch (e) { toast(e.message); }
+  }
+  function editarTutorial(x) {
+    const tipo0 = x ? x.tipo : 'texto';
+    abrirSheet({
+      titulo: x ? t('tut.edit') : t('tut.new'),
+      corpo: `<form id="f-tut" style="display:grid;gap:14px" novalidate>
+        <label class="field"><span>${esc(t('req.titleF'))}</span><input class="input" name="titulo" maxlength="120" value="${esc(x ? x.titulo : '')}" required /></label>
+        <div class="grid2"><label class="field"><span>${esc(t('tut.cat'))} <span class="muted">(${esc(t('c.optional'))})</span></span><input class="input" name="categoria" maxlength="60" value="${esc(x ? x.categoria || '' : '')}" placeholder="${esc(t('tut.catPh'))}" /></label>
+          <label class="field"><span>${esc(t('tut.kind'))}</span><select class="select" name="tipo" id="tut-tipo">${['texto', 'link', 'arquivo'].map((k) => `<option value="${k}" ${k === tipo0 ? 'selected' : ''}>${esc(t('tut.k.' + k))}</option>`).join('')}</select></label></div>
+        <label class="field"><span>${esc(t('tut.summary'))} <span class="muted">(${esc(t('c.optional'))})</span></span><input class="input" name="resumo" maxlength="240" value="${esc(x ? x.resumo || '' : '')}" /></label>
+        <label class="field" data-tk="texto"><span>${esc(t('tut.body'))}</span><textarea class="textarea" name="corpo" style="min-height:200px" maxlength="20000">${esc(x ? x.corpo || '' : '')}</textarea><small>${esc(t('tut.bodyHint'))}</small></label>
+        <label class="field" data-tk="link"><span>${esc(t('tut.link'))} (https://)</span><input class="input" type="url" name="link" value="${esc(x && x.tipo === 'link' ? x.link || '' : '')}" placeholder="https://youtube.com/…" /></label>
+        <div data-tk="arquivo" style="display:grid;gap:10px"><label class="drop"><input type="file" id="tut-file" /><span>${I.upload}</span><b id="tut-fname">${esc(x && x.nomeArquivo ? x.nomeArquivo : t('matadm.pick'))}</b><span>${esc(t('matadm.pickHint'))}</span></label></div>
+        <div class="bar" id="tut-prog" hidden><i style="width:0%"></i></div>
+        <p class="small muted" style="margin:0">${esc(t('tut.draftInfo'))}</p>
+        <p class="formmsg" role="alert"></p>
+      </form>`,
+      pe: `<button type="button" class="btn btn--line" data-x="close">${esc(t('req.close'))}</button><button type="submit" form="f-tut" class="btn btn--ink">${esc(t('req.save'))}</button>`,
+      depois: (p) => {
+        const f = $('#f-tut', p);
+        const mostra = () => { const v = $('#tut-tipo', p).value; $$('[data-tk]', p).forEach((el) => { el.hidden = el.dataset.tk !== v; }); };
+        $('#tut-tipo', p).addEventListener('change', mostra); mostra();
+        let arquivo = null;
+        $('#tut-file', p).addEventListener('change', (e) => { arquivo = e.target.files[0] || null; $('#tut-fname', p).textContent = arquivo ? arquivo.name : t('matadm.pick'); });
+        f.addEventListener('submit', async (ev) => {
+          ev.preventDefault();
+          const fd = Object.fromEntries(new FormData(f).entries());
+          const btn = $('button[form=f-tut]', p); btn.disabled = true;
+          try {
+            let extra = {};
+            if (fd.tipo === 'arquivo' && arquivo) extra = await enviarArquivo(arquivo, 'tutorial', $('#tut-prog', p), btn);
+            if (fd.tipo !== 'link') delete fd.link;
+            S.tut = await api('tutorialSalvar', { id: x ? x.id : undefined, ...fd, ...extra });
+            fecharSheet(); renderMain(); toast(t('acc.saved'));
+          } catch (e) { $('.formmsg', f).textContent = e.message; btn.disabled = false; btn.textContent = t('req.save'); }
+        });
+      },
+    });
+  }
+  function menuTutorial(id, chave) {
+    const x = id ? S.tut.itens.find((i) => i.id === id) : null;
+    const st = x ? x.status : (S.tut.ocultos.includes(chave) ? 'arquivado' : 'publicado');
+    const it = (acao, ico, k) => `<button type="button" data-acao="${acao}">${ico}${esc(t(k))}</button>`;
+    abrirSheet({
+      titulo: x ? x.titulo : tx(C.GUIAS.find((g) => g.id === chave).titulo),
+      corpo: `<p class="small muted" style="margin:0">${esc(t(ST_MAT[st]))}${x ? '' : ` · ${esc(t('mst.fixed'))}`}</p><nav class="menu">
+        ${st !== 'publicado' ? it('publicado', I.check, 'mst.publish') : ''}
+        ${x && st !== 'rascunho' ? it('rascunho', I.pen, 'mst.toDraft') : ''}
+        ${st !== 'arquivado' ? it('arquivado', I.eyeOff, 'tut.retire') : ''}
+        ${x ? it('editar', I.pen, 'tut.edit') : ''}</nav>`,
+      depois: (p) => $$('[data-acao]', p).forEach((b) => b.addEventListener('click', async () => {
+        if (b.dataset.acao === 'editar') return editarTutorial(x);
+        try {
+          S.tut = x ? await api('tutorialStatus', { id, status: b.dataset.acao }) : await api('tutorialOcultar', { chave, ocultar: b.dataset.acao === 'arquivado' });
+          fecharSheet(); renderMain(); toast(t('acc.saved'));
+        } catch (e) { toast(e.message); }
+      })),
+    });
+  }
+  VIEWS['aprender:after'] = (main) => {
+    if (!S.tutPedido) { S.tutPedido = true; carregarTut(true).finally(() => { S.tutPedido = false; }); }
+    main.addEventListener('click', async (ev) => {
+      const b = ev.target.closest('button'); if (!b) return;
+      if (b.id === 'tut-new') editarTutorial(null);
+      else if (b.dataset.tmenu !== undefined && (b.dataset.tmenu || b.dataset.tfixo)) menuTutorial(b.dataset.tmenu, b.dataset.tfixo);
+      else if (b.dataset.tup || b.dataset.tdown) {
+        try { S.tut = await api('tutorialMover', { id: b.dataset.tup || b.dataset.tdown, dir: b.dataset.tup ? -1 : 1 }); renderMain(); } catch (e) { toast(e.message); }
+      }
+    });
   };
 
   /* ============================================================ conta */
@@ -1070,7 +1329,7 @@
             <label class="field"><span>${esc(t('auth.name'))}</span><input class="input" name="nome" value="${esc(u.nome)}" required /></label>
             <div class="grid2">
               <label class="field"><span>${esc(t('auth.wa'))}</span><span class="phone"><select class="select" name="ddi">${ddiOpts}</select><input class="input" name="tel" value="${esc(u.tel)}" inputmode="tel" required /></span></label>
-              <label class="field"><span>${esc(t('auth.agency'))}</span><input class="input" name="imobiliaria" value="${esc(u.imobiliaria)}" required /></label>
+              <div class="field"><span>${esc(t('auth.agency'))}</span><p class="input" style="margin:0;display:flex;align-items:center;background:var(--surface-2)">${esc(u.imobiliaria || '—')}</p><small>${esc(t('acc.agencyByManager'))}</small></div>
             </div>
             <label class="field"><span>${esc(t('auth.creci'))}</span><input class="input" name="creci" value="${esc(u.creci || '')}" /></label>
             <details><summary class="linkbtn" style="cursor:pointer;list-style:none">${esc(t('acc.pass'))}</summary>
@@ -1085,13 +1344,7 @@
         ${prefs}
       </div>
       <section class="section"><h2 class="h2" style="margin-bottom:16px">${esc(t('learn.contacts'))}</h2>${contatosHTML()}</section>
-      <section class="section"><details class="card card--flat"><summary class="linkbtn" style="cursor:pointer;list-style:none">${esc(t('acc.delete'))}</summary>
-        <form id="f-del" style="display:grid;gap:12px;margin-top:14px;max-width:420px" novalidate>
-          <p class="small muted" style="margin:0">${esc(t('acc.deleteInfo'))}</p>
-          <label class="field"><span>${esc(t('auth.pass'))}</span><input class="input" type="password" name="senha" autocomplete="current-password" required /></label>
-          <p class="formmsg" role="alert"></p>
-          <button type="submit" class="btn btn--line" style="justify-self:start">${esc(t('acc.delete'))}</button>
-        </form></details></section>`;
+      <p class="small muted">${esc(t('acc.deleteByManager'))}</p>`;
   };
   VIEWS['conta:after'] = (main) => {
     bindLang(main);
@@ -1103,15 +1356,6 @@
       const fd = Object.fromEntries(new FormData(fse).entries());
       try { await api('senhaEquipe', fd); fse.reset(); toast(t('acc.saved')); }
       catch (e) { $('.formmsg', fse).textContent = e.message; }
-    });
-    const fdel = $('#f-del', main);
-    if (fdel) fdel.addEventListener('submit', async (ev) => {
-      ev.preventDefault();
-      const senha = new FormData(fdel).get('senha');
-      if (!senha) return;
-      if (!confirm(t('acc.deleteInfo'))) return;
-      try { await api('excluirConta', { senha }); S.user = null; S.pedidos = null; history.replaceState(null, '', location.pathname); render(); }
-      catch (e) { $('.formmsg', fdel).textContent = e.message; }
     });
     const f = $('#f-perfil', main);
     if (f) f.addEventListener('submit', async (ev) => {
@@ -1131,34 +1375,182 @@
       <div class="pagehead__body"><h1 class="h1">${esc(t('nav.masterplan'))}</h1><p class="lead">${esc(t('map.desc'))}</p>
         <div><a class="btn btn--line btn--sm" href="/3dmasterplan/#lotes" target="_blank" rel="noopener">${I.expand}${esc(t('home.mapFull'))}</a></div></div>
     </header>
+    <div id="syncbox">${syncHTML(true)}</div>
     <div class="legend" id="kpis">${kpisHTML()}</div>
     <div class="stage stage--map stage--tall is-live"><iframe class="stage__frame" title="${esc(t('nav.masterplan'))}" src="/3dmasterplan/?embed=1#lotes" allow="fullscreen"></iframe></div>
-    <p class="small muted" style="margin:10px 0 0">${esc(t('map.note'))}</p>`;
+    <p class="small muted" style="margin:10px 0 0">${esc(t('map.note2'))}</p>`;
+  VIEWS['masterplan:after'] = (main) => { ligarSync(main); carregarComercial(true); };
 
-  /* ============================================================ gestão de contas (gerenciador) */
+  /* ============================================================ ofertas / campanhas / cards de WhatsApp */
+  const OF_ST = { rascunho: 'of.draft', publicada: 'of.pub', encerrada: 'of.closed' };
+  const fmtUSD = (s) => { const [i, d] = String(s).split('.'); return `US$ ${i.replace(/\B(?=(\d{3})+(?!\d))/g, S.lang === 'en' ? ',' : '.')}${d ? (S.lang === 'en' ? '.' : ',') + d.padEnd(2, '0') : ''}`; };
+  const quando = (iso) => new Intl.DateTimeFormat(locale(), { timeZone: (S.of && S.of.fuso) || undefined, day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }).format(new Date(iso));
+  // ISO UTC → "AAAA-MM-DDTHH:MM" no fuso comercial (para o campo datetime-local)
+  function paraLocal(iso) {
+    if (!iso) return '';
+    const p = Object.fromEntries(new Intl.DateTimeFormat('en-CA', { timeZone: S.of.fuso, hourCycle: 'h23', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }).formatToParts(new Date(iso)).map((x) => [x.type, x.value]));
+    return `${p.year}-${p.month}-${p.day}T${p.hour}:${p.minute}`;
+  }
+  function ofertaCardHTML(o) {
+    const el = o.elegibilidade || { ok: true };
+    const lots = (o.unidades || []).map((id) => { const u = S.com && S.com.unidades.find((x) => x.id === id); return u ? `${id} · ${nf(u.a)} m²` : id; });
+    return `<article class="offer ${el.ok ? '' : 'is-off'}">
+      <div class="offer__card">
+        <span class="offer__brand">BRACERUM PARK</span><span class="offer__camp">${esc(o.campanha || t('of.offer'))}</span>
+        <b class="offer__title">${esc(o.titulo)}</b>
+        <p class="offer__cond">${esc(o.condicoes)}</p>
+        <div class="offer__box">${o.valor ? `<b class="num">${esc(fmtUSD(o.valor))}</b><span>${esc(o.valorRotulo || t('of.value'))}</span>` : ''}
+          ${lots.length ? `<ul>${lots.slice(0, 4).map((l) => `<li class="num">${esc(l)}</li>`).join('')}${lots.length > 4 ? `<li>+ ${lots.length - 4}</li>` : ''}</ul>` : ''}
+          <small>${esc(t('of.validUntil'))} ${esc(quando(o.fim))}</small></div>
+      </div>
+      <div class="offer__body">
+        ${isEquipe() ? `<div style="display:flex;gap:6px;flex-wrap:wrap"><span class="badge ${o.status === 'publicada' ? 'badge--ink' : ''}"><i></i>${esc(t(OF_ST[o.status]))}</span><span class="badge">${esc(el.ok ? t('of.eligible') : o.motivo)}</span></div>` : ''}
+        ${o.descricao ? `<p class="small" style="margin:0;white-space:pre-line">${esc(o.descricao)}</p>` : ''}
+        <p class="small muted" style="margin:0">${esc(t('of.period'))} ${esc(quando(o.inicio))} → ${esc(quando(o.fim))} (${esc(S.of.nomeFuso)})</p>
+        <div class="tile__actions">
+          <button type="button" class="btn btn--ink" data-card="${esc(o.id)}" ${el.ok ? '' : 'disabled'}>${I.download}<span class="lbl">${esc(t('of.png'))}</span></button>
+          <button type="button" class="iconbtn" data-cardsvg="${esc(o.id)}" ${el.ok ? '' : 'disabled'} aria-label="SVG" title="SVG">${I.file}</button>
+          ${isEquipe() ? `<button type="button" class="iconbtn" data-omenu="${esc(o.id)}" aria-label="${esc(t('gest.more'))}" title="${esc(t('gest.more'))}">${I.dots}</button>` : ''}
+        </div>
+      </div>
+    </article>`;
+  }
+  VIEWS.ofertas = () => `
+    <header class="pagehead">
+      <div class="pagehead__meta"><a href="#/inicio" class="linkbtn" style="text-decoration:none">← ${esc(t('nav.home'))}</a><span id="of-count" class="num"></span></div>
+      <div class="pagehead__body"><h1 class="h1">${esc(t('nav.offers'))}</h1><p class="lead">${esc(t(isEquipe() ? 'of.leadAdm' : 'of.lead'))}</p>
+        ${isEquipe() ? `<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center"><button type="button" class="btn btn--ink" id="of-new">${I.plus}${esc(t('of.new'))}</button>
+          <div class="seg" role="group">${[['ativas', 'of.active'], ['rascunho', 'of.drafts'], ['encerrada', 'of.closeds'], ['todos', 'req.all']].map(([v, k]) => `<button type="button" data-of="${v}" aria-pressed="${(S.ofFiltro || 'ativas') === v}">${esc(t(k))}</button>`).join('')}</div></div>` : ''}</div>
+    </header>
+    <div id="of-sync"></div>
+    <div class="offers" id="of-list"><div class="skel" style="height:320px;border-radius:18px"></div></div>
+    <p class="small muted" style="margin-top:20px">${esc(t('of.rules'))}</p>`;
+  function desenharOfertas() {
+    const box = $('#of-list'); if (!box || !S.of) return;
+    const f = S.ofFiltro || 'ativas';
+    const lst = S.of.ofertas.filter((o) => !isEquipe() || f === 'todos' || (f === 'ativas' ? o.status === 'publicada' : o.status === f));
+    $('#of-count').textContent = `${lst.length}`;
+    const sb = $('#of-sync');
+    if (sb) sb.innerHTML = S.of.sync.estado === 'atual' ? '' : `<div class="syncbar syncbar--alerta">${I.info}<span>${esc(t('of.syncWarn'))} ${esc(S.of.sync.ultimoSucesso ? data(S.of.sync.ultimoSucesso, true) : '—')}</span></div>`;
+    box.innerHTML = lst.length ? lst.map(ofertaCardHTML).join('') : `<div class="empty" style="grid-column:1/-1">${I.tag}${esc(t(isEquipe() ? 'of.emptyAdm' : 'of.empty'))}</div>`;
+  }
+  async function carregarOfertas() {
+    try { S.of = await api('ofertas'); desenharOfertas(); }
+    catch (e) { const b = $('#of-list'); if (b) b.innerHTML = `<div class="empty" style="grid-column:1/-1">${I.info}${esc(e.message)}</div>`; }
+  }
+  // O card é gerado e validado no servidor (SVG); aqui só vira PNG para o WhatsApp.
+  async function baixarCard(id, png) {
+    const r = await fetch(`/api/portal?card=${encodeURIComponent(id)}`, { credentials: 'same-origin' });
+    if (!r.ok) { let m = t('c.error'); try { m = (await r.json()).erro || m; } catch (e) {} toast(m); carregarOfertas(); return; }
+    const svg = await r.text();
+    const nome = `bracerum-oferta-${id}`;
+    if (!png) return baixar(nome + '.svg', new Blob([svg], { type: 'image/svg+xml' }));
+    const img = new Image();
+    const url = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' }));
+    img.onload = () => {
+      const cv = document.createElement('canvas'); cv.width = 1080; cv.height = 1350;
+      cv.getContext('2d').drawImage(img, 0, 0, 1080, 1350); URL.revokeObjectURL(url);
+      cv.toBlob((b) => baixar(nome + '.png', b), 'image/png');
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); baixar(nome + '.svg', new Blob([svg], { type: 'image/svg+xml' })); };
+    img.src = url;
+  }
+  function editarOferta(o) {
+    abrirSheet({
+      titulo: o ? t('of.edit') : t('of.new'),
+      corpo: `<form id="f-of" style="display:grid;gap:14px" novalidate>
+        <label class="field"><span>${esc(t('req.titleF'))}</span><input class="input" name="titulo" maxlength="90" value="${esc(o ? o.titulo : '')}" required /></label>
+        <label class="field"><span>${esc(t('of.campaign'))} <span class="muted">(${esc(t('c.optional'))})</span></span><input class="input" name="campanha" maxlength="60" value="${esc(o ? o.campanha || '' : '')}" placeholder="Pós-Expo" /></label>
+        <label class="field"><span>${esc(t('of.conditions'))}</span><textarea class="textarea" name="condicoes" maxlength="600" style="min-height:90px" required>${esc(o ? o.condicoes : '')}</textarea><small>${esc(t('of.conditionsHint'))}</small></label>
+        <label class="field"><span>${esc(t('of.desc'))} <span class="muted">(${esc(t('c.optional'))})</span></span><textarea class="textarea" name="descricao" maxlength="1200" style="min-height:70px">${esc(o ? o.descricao || '' : '')}</textarea></label>
+        <label class="field"><span>${esc(t('of.units'))}</span><input class="input" name="unidades" value="${esc(o ? (o.unidades || []).join(', ') : '')}" placeholder="Q01.L001, Q01.L002" /><small>${esc(t('of.unitsHint'))}</small></label>
+        <div class="grid2">
+          <label class="field"><span>${esc(t('of.value'))} (USD) <span class="muted">(${esc(t('c.optional'))})</span></span><input class="input num" name="valor" inputmode="decimal" value="${esc(o ? o.valor || '' : '')}" placeholder="150000" /></label>
+          <label class="field"><span>${esc(t('of.valueLabel'))} <span class="muted">(${esc(t('c.optional'))})</span></span><input class="input" name="valorRotulo" maxlength="60" value="${esc(o ? o.valorRotulo || '' : '')}" placeholder="${esc(t('of.valueLabelPh'))}" /></label>
+        </div>
+        <div class="grid2">
+          <label class="field"><span>${esc(t('of.start'))}</span><input class="input" type="datetime-local" name="inicio" value="${esc(o ? paraLocal(o.inicio) : '')}" required /></label>
+          <label class="field"><span>${esc(t('of.end'))}</span><input class="input" type="datetime-local" name="fim" value="${esc(o ? paraLocal(o.fim) : '')}" required /></label>
+        </div>
+        <p class="small muted" style="margin:0">${esc(t('of.tz'))} ${esc(S.of.nomeFuso)} (${esc(S.of.fuso)}). ${esc(t('of.endRule'))}</p>
+        <p class="formmsg" role="alert"></p>
+      </form>`,
+      pe: `<button type="button" class="btn btn--line" data-x="close">${esc(t('req.close'))}</button><button type="submit" form="f-of" class="btn btn--ink">${esc(t('req.save'))}</button>`,
+      depois: (p) => {
+        const f = $('#f-of', p);
+        f.addEventListener('submit', async (ev) => {
+          ev.preventDefault();
+          const fd = Object.fromEntries(new FormData(f).entries());
+          const btn = $('button[form=f-of]', p); btn.disabled = true;
+          try { S.of = await api('ofertaSalvar', { id: o ? o.id : undefined, ...fd }); fecharSheet(); desenharOfertas(); toast(t('of.savedDraft')); }
+          catch (e) { $('.formmsg', f).textContent = e.message; btn.disabled = false; }
+        });
+      },
+    });
+  }
+  function menuOferta(o) {
+    const it = (acao, ico, k) => `<button type="button" data-acao="${acao}">${ico}${esc(t(k))}</button>`;
+    abrirSheet({
+      titulo: o.titulo,
+      corpo: `<p class="small muted" style="margin:0">${esc(t(OF_ST[o.status]))} · ${esc(o.elegibilidade.ok ? t('of.eligible') : o.motivo)}</p>
+        <nav class="menu">
+          ${o.status !== 'publicada' ? it('publicada', I.check, 'of.publish') : ''}
+          ${o.status === 'publicada' ? it('encerrada', I.x, 'of.close') : ''}
+          ${o.status === 'encerrada' ? it('rascunho', I.pen, 'mst.toDraft') : ''}
+          ${it('editar', I.pen, 'of.edit')}
+        </nav>
+        <div><span class="eyebrow">${esc(t('req.history'))}</span><ul class="timeline" style="margin-top:10px">${(o.historico || []).map((h) => `<li><span>${esc(h.acao)} <span class="muted">· ${esc(h.por || '')} · ${esc(data(h.em, true))}</span></span></li>`).join('')}</ul></div>`,
+      depois: (p) => $$('[data-acao]', p).forEach((b) => b.addEventListener('click', async () => {
+        if (b.dataset.acao === 'editar') return editarOferta(o);
+        try { S.of = await api('ofertaStatus', { id: o.id, status: b.dataset.acao }); fecharSheet(); desenharOfertas(); toast(t('acc.saved')); }
+        catch (e) { toast(e.message); }
+      })),
+    });
+  }
+  VIEWS['ofertas:after'] = (main) => {
+    carregarOfertas();
+    if (!S.com) carregarComercial(true);
+    main.addEventListener('click', (ev) => {
+      const b = ev.target.closest('button'); if (!b || b.disabled) return;
+      if (b.dataset.card) baixarCard(b.dataset.card, true);
+      else if (b.dataset.cardsvg) baixarCard(b.dataset.cardsvg, false);
+      else if (b.dataset.omenu) menuOferta(S.of.ofertas.find((x) => x.id === b.dataset.omenu));
+      else if (b.dataset.of) { S.ofFiltro = b.dataset.of; $$('[data-of]').forEach((x) => x.setAttribute('aria-pressed', x === b)); desenharOfertas(); }
+      else if (b.id === 'of-new') editarOferta(null);
+    });
+  };
+
+  /* ============================================================ gestão: contas, imobiliárias e atividade (só gestor) */
   const papelNome = (p) => t(p === 'equipe' ? 'acc.manager' : 'acc.broker');
   function situacao(c) {
+    if (c.status === 'excluido') return ['gest.deleted', ''];
     if (c.status === 'bloqueado') return ['acc.bloqueado', ''];
     if (!c.ativo) return ['gest.waiting', ''];
     return ['gest.active', 'badge--ink'];
   }
-  VIEWS.gestao = () => `
-    <header class="pagehead"><div class="pagehead__meta"><span id="ct-count" class="num"></span></div>
-      <div class="pagehead__body"><h1 class="h1">${esc(t('nav.gestao'))}</h1><p class="lead">${esc(t('gest.lead'))}</p>
-        <div><button type="button" class="btn btn--ink" id="ct-new">${I.plus}${esc(t('gest.new'))}</button></div></div></header>
-    <div class="toolbar"><div class="seg" role="group">${[['todos', 'req.all'], ['corretor', 'gest.brokers'], ['equipe', 'gest.managers'], ['aguardando', 'gest.waiting'], ['bloqueado', 'acc.bloqueado']].map(([id, k]) => `<button type="button" data-cf="${id}" aria-pressed="${S.team.filtro === id}">${esc(t(k))}</button>`).join('')}</div>
+  VIEWS.gestao = () => {
+    const aba = ['contas', 'imobiliarias', 'atividade'].includes(S.route.arg) ? S.route.arg : 'contas';
+    const abas = `<div class="seg" role="tablist" style="margin-bottom:18px">${[['contas', 'gest.tabAccounts'], ['imobiliarias', 'gest.tabAgencies'], ['atividade', 'gest.tabActivity']].map(([id, k]) => `<a role="tab" href="#/gestao/${id}" aria-current="${aba === id ? 'page' : 'false'}" aria-selected="${aba === id}">${esc(t(k))}</a>`).join('')}</div>`;
+    const head = (botao) => `<header class="pagehead"><div class="pagehead__meta"><span id="ct-count" class="num"></span></div>
+      <div class="pagehead__body"><h1 class="h1">${esc(t('nav.gestao'))}</h1><p class="lead">${esc(t('gest.lead'))}</p>${botao}</div></header>${abas}`;
+    if (aba === 'imobiliarias') return `${head(`<div><button type="button" class="btn btn--ink" id="im-new">${I.plus}${esc(t('imob.new'))}</button></div>`)}
+      <p class="small muted" style="margin:0 0 14px">${esc(t('imob.lead'))}</p><div id="im-list"><div class="skel" style="height:200px;border-radius:18px"></div></div>`;
+    if (aba === 'atividade') return `${head('')}<p class="small muted" style="margin:0 0 14px">${esc(t('aud.lead'))}</p><div id="au-list"><div class="skel" style="height:240px;border-radius:18px"></div></div>`;
+    return `${head(`<div><button type="button" class="btn btn--ink" id="ct-new">${I.plus}${esc(t('gest.new'))}</button></div>`)}
+    <div class="toolbar"><div class="seg" role="group">${[['todos', 'req.all'], ['corretor', 'gest.brokers'], ['equipe', 'gest.managers'], ['aguardando', 'gest.waiting'], ['bloqueado', 'acc.bloqueado'], ['excluido', 'gest.deletedPl']].map(([id, k]) => `<button type="button" data-cf="${id}" aria-pressed="${S.team.filtro === id}">${esc(t(k))}</button>`).join('')}</div>
       <div style="display:flex;gap:8px;flex:1 1 260px;justify-content:flex-end;flex-wrap:wrap">
         <label class="search"><span class="vh">${esc(t('mat.search'))}</span>${I.search}<input class="input" type="search" id="ct-q" placeholder="${esc(t('gest.search'))}" /></label>
         <button type="button" class="btn btn--line btn--sm" id="ct-csv" style="min-height:44px">${I.download}CSV</button></div></div>
     <div id="ct-list"><div class="skel" style="height:240px;border-radius:18px"></div></div>`;
+  };
   function desenharContas() {
     const box = $('#ct-list'); if (!box) return;
     const lst = S.contas || [];
     const f = S.team.filtro;
     const q = ($('#ct-q') && $('#ct-q').value || '').trim().toLowerCase();
-    const vis = lst.filter((c) => (f === 'todos' || (f === 'aguardando' ? !c.ativo && c.status !== 'bloqueado' : f === 'bloqueado' ? c.status === 'bloqueado' : c.papel === f))
+    const vis = lst.filter((c) => (f === 'excluido' ? c.status === 'excluido' : c.status !== 'excluido' && (f === 'todos' || (f === 'aguardando' ? !c.ativo && c.status !== 'bloqueado' : f === 'bloqueado' ? c.status === 'bloqueado' : c.papel === f)))
       && (!q || [c.nome, c.email, c.imobiliaria].join(' ').toLowerCase().includes(q)));
-    $('#ct-count').textContent = `${vis.length} / ${lst.length}`;
+    $('#ct-count').textContent = `${vis.length} / ${lst.filter((c) => c.status !== 'excluido').length}`;
     if (!vis.length) { box.innerHTML = `<div class="empty">${I.users}${esc(t('team.noBrokers'))}</div>`; return; }
     box.innerHTML = `<div class="tablewrap"><table class="table table--cards"><thead><tr><th>${esc(t('auth.name'))}</th><th>${esc(t('gest.kind'))}</th><th>${esc(t('auth.wa'))} · ${esc(t('auth.agency'))}</th><th>${esc(t('acc.status'))}</th><th></th></tr></thead><tbody>
       ${vis.map((c) => { const [st, cls] = situacao(c); const eu = c.id === S.user.id; return `<tr>
@@ -1167,7 +1559,7 @@
         <td>${c.tel ? `<a class="linkbtn" href="https://wa.me/${esc(c.ddi)}${esc(c.tel)}" target="_blank" rel="noopener">+${esc(c.ddi)} ${esc(c.tel)}</a>` : '<span class="muted">—</span>'}<div class="small muted">${esc(c.imobiliaria || '')}${c.creci ? ` · ${esc(c.creci)}` : ''}</div></td>
         <td><span class="badge ${cls}"><i></i>${esc(t(st))}</span></td>
         <td>${eu ? '' : `<div class="row">
-          ${!c.ativo && c.status !== 'bloqueado' ? `<button type="button" class="btn btn--ink btn--sm" data-clink="${esc(c.id)}">${I.link}${esc(t('gest.copyLink'))}</button>` : ''}
+          ${!c.ativo && c.status === 'aprovado' ? `<button type="button" class="btn btn--ink btn--sm" data-clink="${esc(c.id)}">${I.link}${esc(t('gest.copyLink'))}</button>` : ''}
           <button type="button" class="iconbtn" data-cmenu="${esc(c.id)}" aria-label="${esc(t('gest.more'))}" title="${esc(t('gest.more'))}">${I.dots}</button></div>`}</td></tr>`; }).join('')}
     </tbody></table></div>`;
   }
@@ -1183,9 +1575,15 @@
       depois: (p) => $('[data-x=cp]', p).addEventListener('click', () => copiar(link)),
     });
   }
-  function novaConta() {
+  async function imobsAtivas() {
+    if (!S.imobs) { try { S.imobs = (await api('imobiliarias')).itens; } catch (e) { S.imobs = []; } }
+    return S.imobs.filter((x) => x.status === 'ativa');
+  }
+  const opcoesImob = (lst, sel) => `<option value="">${esc(t('imob.none'))}</option>${lst.map((x) => `<option value="${esc(x.id)}" ${x.id === sel ? 'selected' : ''}>${esc(x.nome)}</option>`).join('')}`;
+  async function novaConta() {
     let papel = 'corretor';
     const ddi = ['55', '595', '54', '598', '1', '351'].map((d) => `<option value="${d}">+${d}</option>`).join('');
+    const imobs = await imobsAtivas();
     abrirSheet({
       titulo: t('gest.new'),
       corpo: `<form id="f-conta" style="display:grid;gap:16px" novalidate>
@@ -1196,8 +1594,11 @@
         <label class="field"><span>${esc(t('auth.name'))}</span><input class="input" name="nome" autocomplete="off" required /></label>
         <label class="field"><span>${esc(t('auth.email'))}</span><input class="input" type="email" name="email" autocomplete="off" required /></label>
         <label class="field"><span>${esc(t('auth.wa'))} <span class="muted" data-opc hidden>(${esc(t('c.optional'))})</span></span><span class="phone"><select class="select" name="ddi">${ddi}</select><input class="input" name="tel" type="tel" inputmode="tel" /></span></label>
-        <div class="grid2" data-so-corretor>
-          <label class="field"><span>${esc(t('auth.agency'))}</span><input class="input" name="imobiliaria" /><small>${esc(t('auth.agencyHint'))}</small></label>
+        <div style="display:grid;gap:14px" data-so-corretor>
+          <div class="grid2">
+            <label class="field"><span>${esc(t('auth.agency'))}</span><select class="select" name="imobiliariaId" id="nc-imob">${opcoesImob(imobs, '')}</select></label>
+            <label class="field" id="nc-imob-txt"><span>${esc(t('imob.orText'))}</span><input class="input" name="imobiliaria" placeholder="${esc(t('imob.autonomo'))}" /></label>
+          </div>
           <label class="field"><span>${esc(t('auth.creci'))}</span><input class="input" name="creci" /></label>
         </div>
         <p class="small muted" style="margin:0">${esc(t('gest.newInfo'))}</p>
@@ -1211,6 +1612,8 @@
           $('[data-so-corretor]', p).hidden = papel !== 'corretor';
           $('[data-opc]', p).hidden = papel === 'corretor';
         }));
+        const im = $('#nc-imob', p);
+        im.addEventListener('change', () => { $('#nc-imob-txt', p).hidden = !!im.value; });
         const f = $('#f-conta', p);
         f.addEventListener('submit', async (ev) => {
           ev.preventDefault();
@@ -1228,37 +1631,117 @@
       },
     });
   }
+  async function trocarImobiliaria(c) {
+    const imobs = await imobsAtivas();
+    abrirSheet({
+      titulo: `${t('imob.change')} · ${c.nome}`,
+      corpo: `<form id="f-ci" style="display:grid;gap:14px" novalidate>
+        <label class="field"><span>${esc(t('auth.agency'))}</span><select class="select" name="imobiliariaId">${opcoesImob(imobs, c.imobiliariaId)}</select></label>
+        <label class="field"><span>${esc(t('imob.orText'))}</span><input class="input" name="imobiliaria" value="${esc(c.imobiliariaId ? '' : c.imobiliaria || '')}" placeholder="${esc(t('imob.autonomo'))}" /></label>
+        <p class="formmsg" role="alert"></p></form>`,
+      pe: `<button type="button" class="btn btn--line" data-x="close">${esc(t('req.close'))}</button><button type="submit" form="f-ci" class="btn btn--ink">${esc(t('req.save'))}</button>`,
+      depois: (p) => $('#f-ci', p).addEventListener('submit', async (ev) => {
+        ev.preventDefault();
+        const fd = Object.fromEntries(new FormData(ev.target).entries());
+        try { const d = await api('contaAtualizar', { id: c.id, imobiliariaId: fd.imobiliariaId, imobiliaria: fd.imobiliaria }); Object.assign(c, d.conta); fecharSheet(); desenharContas(); toast(t('acc.saved')); }
+        catch (e) { $('.formmsg', p).textContent = e.message; }
+      }),
+    });
+  }
   function menuConta(c) {
-    const it = (acao, ico, k, extra = '') => `<button type="button" data-acao="${acao}" ${extra}>${ico}${esc(t(k))}</button>`;
+    const it = (acao, ico, k) => `<button type="button" data-acao="${acao}">${ico}${esc(t(k))}</button>`;
+    const exc = c.status === 'excluido';
     abrirSheet({
       titulo: c.nome || c.email,
-      corpo: `<p class="small muted" style="margin:0">${esc(c.email)} · ${esc(papelNome(c.papel))}</p><nav class="menu">
-        ${c.ativo ? it('reset', I.link, 'gest.resetLink') : it('link', I.link, 'gest.copyLink')}
-        ${it('papel', c.papel === 'equipe' ? I.user : I.lock, c.papel === 'equipe' ? 'gest.toBroker' : 'gest.toManager')}
-        ${c.status === 'bloqueado' ? it('reativar', I.check, 'team.unblock') : it('suspender', I.x, 'team.block')}
-        ${it('remover', I.trash, 'gest.remove', 'style="color:inherit"')}
-      </nav>`,
+      corpo: `<p class="small muted" style="margin:0">${esc(c.email)} · ${esc(papelNome(c.papel))} · ${esc(t(situacao(c)[0]))}</p><nav class="menu">
+        ${exc ? it('reativar', I.check, 'gest.restore') : `
+          ${c.status === 'aprovado' ? (c.ativo ? it('reset', I.link, 'gest.resetLink') : it('link', I.link, 'gest.copyLink')) : ''}
+          ${c.papel === 'corretor' ? it('imob', I.building, 'imob.change') : ''}
+          ${it('papel', c.papel === 'equipe' ? I.user : I.lock, c.papel === 'equipe' ? 'gest.toBroker' : 'gest.toManager')}
+          ${c.status === 'bloqueado' ? it('reativar', I.check, 'team.unblock') : it('suspender', I.x, 'team.block')}
+          ${it('remover', I.trash, 'gest.remove')}`}
+      </nav>${c.status !== 'excluido' ? `<p class="small muted" style="margin:0">${esc(t('gest.removeInfo'))}</p>` : ''}`,
       depois: (p) => $$('[data-acao]', p).forEach((b) => b.addEventListener('click', async () => {
         const a = b.dataset.acao;
         try {
+          if (a === 'imob') return trocarImobiliaria(c);
           if (a === 'link') { const d = await api('contaLink', { id: c.id }); mostrarLink(c, d.link); return; }
           if (a === 'reset') {
             if (!confirm(t('gest.resetConfirm'))) return;
             const d = await api('contaAtualizar', { id: c.id, novoLink: true }); Object.assign(c, d.conta); desenharContas(); mostrarLink(c, d.link); return;
           }
           if (a === 'remover') {
-            if (!confirm(`${t('gest.remove')}: ${c.nome || c.email}?`)) return;
-            await api('contaRemover', { id: c.id }); S.contas = S.contas.filter((x) => x.id !== c.id);
+            if (!confirm(`${t('gest.remove')}: ${c.nome || c.email}? ${t('gest.removeInfo')}`)) return;
+            const d = await api('contaRemover', { id: c.id }); Object.assign(c, d.conta);
           } else {
             const mud = a === 'papel' ? { papel: c.papel === 'equipe' ? 'corretor' : 'equipe' } : { status: a === 'suspender' ? 'bloqueado' : 'aprovado' };
             const d = await api('contaAtualizar', { id: c.id, ...mud }); Object.assign(c, d.conta);
+            if (a === 'reativar' && exc) { fecharSheet(); desenharContas(); toast(t('gest.restored')); return; }
           }
           fecharSheet(); desenharContas(); toast(t('acc.saved'));
         } catch (e) { toast(e.message); }
       })),
     });
   }
+  /* imobiliárias */
+  function desenharImobs() {
+    const box = $('#im-list'); if (!box) return;
+    const lst = (S.imobs || []).slice().sort((a, b) => (a.status === b.status ? a.nome.localeCompare(b.nome) : a.status === 'ativa' ? -1 : 1));
+    $('#ct-count').textContent = `${lst.filter((x) => x.status === 'ativa').length}`;
+    box.innerHTML = lst.length ? `<div class="tablewrap"><table class="table table--cards"><thead><tr><th>${esc(t('imob.name'))}</th><th>${esc(t('imob.contact'))}</th><th>${esc(t('gest.brokers'))}</th><th>${esc(t('acc.status'))}</th><th></th></tr></thead><tbody>
+      ${lst.map((x) => `<tr><td><b>${esc(x.nome)}</b>${x.documento ? `<div class="small muted">${esc(x.documento)}</div>` : ''}${x.cidade ? `<div class="small muted">${esc(x.cidade)}</div>` : ''}</td>
+        <td>${esc(x.contato || '—')}<div class="small muted">${esc([x.telefone, x.email].filter(Boolean).join(' · '))}</div></td>
+        <td class="num">${nf(x.corretores || 0)}</td>
+        <td><span class="badge ${x.status === 'ativa' ? 'badge--ink' : ''}"><i></i>${esc(t(x.status === 'ativa' ? 'imob.active' : 'imob.archived'))}</span></td>
+        <td><div class="row"><button type="button" class="btn btn--line btn--sm" data-imed="${esc(x.id)}">${I.pen}${esc(t('matadm.edit'))}</button>
+          <button type="button" class="iconbtn" data-imarq="${esc(x.id)}" aria-label="${esc(t(x.status === 'ativa' ? 'imob.archive' : 'imob.restore'))}" title="${esc(t(x.status === 'ativa' ? 'imob.archive' : 'imob.restore'))}">${x.status === 'ativa' ? I.eyeOff : I.eye}</button>
+          ${x.corretores ? '' : `<button type="button" class="iconbtn" data-imdel="${esc(x.id)}" aria-label="${esc(t('team.remove'))}" title="${esc(t('team.remove'))}">${I.trash}</button>`}</div></td></tr>`).join('')}
+      </tbody></table></div>` : `<div class="empty">${I.building}${esc(t('imob.empty'))}</div>`;
+  }
+  function editarImob(x) {
+    const campo = (n, k, v, extra = '') => `<label class="field"><span>${esc(t(k))}</span><input class="input" name="${n}" value="${esc(v || '')}" ${extra} /></label>`;
+    abrirSheet({
+      titulo: x ? t('matadm.edit') : t('imob.new'),
+      corpo: `<form id="f-im" style="display:grid;gap:14px" novalidate>
+        ${campo('nome', 'imob.name', x && x.nome, 'required maxlength="100"')}
+        <div class="grid2">${campo('documento', 'imob.doc', x && x.documento)}${campo('cidade', 'imob.city', x && x.cidade)}</div>
+        ${campo('contato', 'imob.contact', x && x.contato)}
+        <div class="grid2">${campo('telefone', 'auth.wa', x && x.telefone)}${campo('email', 'auth.email', x && x.email, 'type="email"')}</div>
+        <p class="formmsg" role="alert"></p></form>`,
+      pe: `<button type="button" class="btn btn--line" data-x="close">${esc(t('req.close'))}</button><button type="submit" form="f-im" class="btn btn--ink">${esc(t('req.save'))}</button>`,
+      depois: (p) => $('#f-im', p).addEventListener('submit', async (ev) => {
+        ev.preventDefault();
+        const fd = Object.fromEntries(new FormData(ev.target).entries());
+        try { S.imobs = (await api('imobiliariaSalvar', { id: x ? x.id : undefined, ...fd })).itens; fecharSheet(); desenharImobs(); toast(t('acc.saved')); }
+        catch (e) { $('.formmsg', p).textContent = e.message; }
+      }),
+    });
+  }
+  /* atividade (auditoria) */
+  function desenharAuditoria(ev) {
+    const box = $('#au-list'); if (!box) return;
+    box.innerHTML = ev.length ? `<ul class="timeline audit">${ev.map((e) => `<li><span><b>${esc(e.acao)}</b>${e.id ? ` <span class="muted">· ${esc(e.entidade)} ${esc(String(e.id).slice(0, 14))}</span>` : ''}${e.det ? ` <span class="muted">· ${esc(JSON.stringify(e.det).slice(0, 140))}</span>` : ''}<br/><span class="muted small">${esc(e.por ? e.por.nome || '' : '')} · ${esc(data(e.em, true))}</span></span></li>`).join('')}</ul>`
+      : `<div class="empty">${I.clock}${esc(t('aud.empty'))}</div>`;
+  }
   VIEWS['gestao:after'] = (main) => {
+    const aba = ['contas', 'imobiliarias', 'atividade'].includes(S.route.arg) ? S.route.arg : 'contas';
+    if (aba === 'imobiliarias') {
+      api('imobiliarias').then((d) => { S.imobs = d.itens; desenharImobs(); }).catch((e) => { $('#im-list').innerHTML = `<div class="empty">${esc(e.message)}</div>`; });
+      main.addEventListener('click', async (ev) => {
+        const b = ev.target.closest('button'); if (!b) return;
+        try {
+          if (b.id === 'im-new') editarImob(null);
+          else if (b.dataset.imed) editarImob(S.imobs.find((x) => x.id === b.dataset.imed));
+          else if (b.dataset.imarq) { const x = S.imobs.find((i) => i.id === b.dataset.imarq); S.imobs = (await api('imobiliariaArquivar', { id: x.id, arquivar: x.status === 'ativa' })).itens; desenharImobs(); }
+          else if (b.dataset.imdel) { if (!confirm(t('imob.delConfirm'))) return; S.imobs = (await api('imobiliariaExcluir', { id: b.dataset.imdel })).itens; desenharImobs(); }
+        } catch (e) { toast(e.message); }
+      });
+      return;
+    }
+    if (aba === 'atividade') {
+      api('auditoria').then((d) => desenharAuditoria(d.eventos)).catch((e) => { $('#au-list').innerHTML = `<div class="empty">${esc(e.message)}</div>`; });
+      return;
+    }
     api('contas').then((d) => { S.contas = d.contas; desenharContas(); }).catch((e) => { $('#ct-list').innerHTML = `<div class="empty">${esc(e.message)}</div>`; });
     $('#ct-q', main).addEventListener('input', desenharContas);
     main.addEventListener('click', async (ev) => {

@@ -19,6 +19,11 @@ maquete 3D embutida, que as seis páginas internas baixavam e interpretavam à t
   Vercel Blob privado `portal-corretores`). Preto e branco, Urbanist — **não usa a identidade do site** (pedido).
   Corretor cria conta → "Em análise" (pedido ao marketing só aprovado); equipe entra com a `ADMIN_SENHA`.
   Textos/biblioteca/guias em `portalcorretores/conteudo.js`. Tudo em `docs/portal-corretores.md` §6.
+- **Briefing `BRACERUM_PORTAL_CLAUDE_CODE.md` (2026-11-18, só no branch, sem produção):** regras no servidor
+  (`api/_portal-regras.js`), imobiliárias, sincronização com o CV registrada (dado velho avisado, nunca falso sucesso),
+  ofertas com card de WhatsApp validado na listagem e no download (fuso `PORTAL_FUSO`, padrão Assunção), materiais com
+  versões, solicitações Enviada→Em análise→Em produção→Concluída com conversa, tutoriais, auditoria. Mural e
+  autoexclusão saíram. `npm test` (18 testes). Tudo em `docs/portal-corretores.md` §7.
 - **Desde 2026-11-18 (fim do dia): só "Entrar"; contas criadas pelo gerenciador na aba Gestão** (link de primeiro
   acesso; "novo link" = esqueci a senha). Gerenciador = papel `equipe` (Gestão + envio de materiais); corretor = tabela,
   solicitações, materiais, masterplan 3D e aprender. `ADMIN_SENHA` não abre mais o portal. Modo claro com fundo branco.

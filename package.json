@@ -1,8 +1,11 @@
 {
   "name": "bracerum-park-site",
   "private": true,
-  "description": "Site estático + funções da Vercel (api/). Dependência só das funções: @vercel/blob (Portal do Corretor).",
+  "description": "Site estático + funções da Vercel (api/). Dependência só das funções: @vercel/blob (Portal do Corretor). Testes: npm test.",
   "dependencies": {
     "@vercel/blob": "2.8.0"
+  },
+  "scripts": {
+    "test": "node --test tests/portal.test.js"
   }
 }

@@ -316,3 +316,64 @@ e-mail/WhatsApp quando o pedido muda de etapa; fotos/vídeos novos e apresentaç
   "copiar link" (não abre para o cliente final; o corretor baixa e encaminha).
 - **Masterplan 3D** em página própria (`#/masterplan`, maquete em `#lotes`) além do mapa de reservas do Início.
 - **Tema:** botão sol/lua no topo e na entrada; **modo claro = fundo branco**. Foto da entrada: `portalcorretores/img/galpao-avenida.{webp,jpg}` (enviada pelo cliente).
+
+## 7. Briefing de 2026-11-18 (`BRACERUM_PORTAL_CLAUDE_CODE.md`) — regras no servidor, dados comerciais, ofertas
+
+**Estado:** implementado e testado localmente; **enviado só ao branch `claude/brave-hamilton-wps9hz` (prévia)**.
+Produção só com autorização do Matheus.
+
+### 7.1 O que mudou
+- **Regras no servidor** (`api/_portal-regras.js`, funções puras, e `api/portal.js`): sem cadastro público
+  (`cadastro`/`equipe` → 403); só gestor cria conta e muda papel/situação; a sessão relê a conta a cada chamada,
+  então **bloquear, excluir ou trocar o papel derruba a sessão na hora**; exclusão é **lógica** (`status: excluido`,
+  histórico e solicitações ficam; dá para reativar); o sistema **nunca fica sem gestor ativo** (409).
+- **Imobiliárias** viraram cadastro próprio (`portal/i/index.json`), ligado ao corretor por `imobiliariaId`.
+  Com corretor vinculado, **não exclui — arquiva** (409; nada em cascata). Aba Gestão → Imobiliárias.
+- **Dados comerciais unificados:** identidade do lote = `3dmasterplan/data/lotes.json` (V14, mesmo id da maquete e do
+  CV: `Q07.L014`); situação = **último retrato do CV** (`portal/sync/comercial.json`); preço = `precos.json`
+  (Tabela v3.1). Mapa, tabela de lotes e ofertas leem a mesma fonte.
+- **Sincronização com o CV:** registro com última tentativa, último sucesso, resultado e erro. Falha **não apaga** o
+  último retrato bom nem finge sucesso. Retrato com mais de `PORTAL_DADOS_MAX_MIN` (60) min = **desatualizado**
+  (faixa de aviso, ofertas com lote ficam fora do ar); sem retrato = situação **desconhecida**. Nova consulta ao CV
+  no máximo a cada `PORTAL_SYNC_MIN` (5) min; o gestor tem "Sincronizar agora". A maquete continua lendo o CV ao vivo.
+- **Ofertas e cards de WhatsApp** (aba Ofertas): rascunho → publicada → encerrada. O corretor só vê oferta
+  **publicada, dentro da vigência e com todos os lotes disponíveis** no retrato atual; a regra roda **na listagem e
+  de novo no download** (`GET /api/portal?card=<id>` → 410 com o motivo). Datas guardadas em UTC, digitadas no fuso
+  comercial `PORTAL_FUSO` (padrão `America/Asuncion`); fim exclusivo. O card (1080×1350, SVG gerado no servidor,
+  PNG convertido no navegador) traz condições, valor ou lotes com preço de tabela e "Válida até … (horário de
+  Assunção)". **Nada é enviado automaticamente**: o corretor baixa e manda pelo WhatsApp dele. Não dá publicar
+  oferta já vencida.
+- **Materiais:** rascunho / publicado / arquivado, com **versões** (a nova vira a única que o corretor baixa; as antigas
+  ficam no histórico). O corretor só lista e baixa publicado + versão atual (conferido também no download).
+- **Solicitações:** Enviada → Em análise → Em produção → Concluída (+ Cancelada); concluída/cancelada não reabre.
+  Conversa (mensagens + anexos dos dois lados), responsável (só gestor ativo), link de entrega https e histórico.
+  O corretor só lê as próprias, só cancela enquanto "Enviada" e não mexe em campo de gestão (campos extras são
+  ignorados). Status antigos (`recebido`, `aprovacao`, `entregue`, `cancelado`) são lidos como os novos.
+- **Aprender:** tutoriais gerenciáveis (texto, link/vídeo ou arquivo; rascunho/publicado/arquivado; ordem); os seis
+  guias fixos podem ser retirados.
+- **Auditoria:** cada ação de gestão grava `portal/log/…` (quem, quando, o quê — sem senha nem token); aba
+  Gestão → Atividade mostra as últimas 150.
+- **Saiu:** o mural (a pedido, o corretor não cadastra nada; os avisos viraram ofertas/tutoriais) e a exclusão da
+  própria conta (agora só o gestor).
+- **Fora do escopo, de propósito:** reservas, pagamentos, comissões, gestão de leads, chatbot, envio automático de
+  WhatsApp e integrações novas. Nenhum MCP do CV foi criado.
+
+### 7.2 Variáveis (`.env.example` lista os nomes, nunca os valores)
+Já existem em Production: `BLOB_READ_WRITE_TOKEN`, `PORTAL_CONVITE`, `PORTAL_ADMINS`, `CVCRM_EMAIL`, `CVCRM_TOKEN`.
+Novas e **opcionais** (têm padrão): `PORTAL_FUSO` (America/Asuncion), `PORTAL_SYNC_MIN` (5), `PORTAL_DADOS_MAX_MIN` (60).
+**Na prévia** só há o Blob: link de convite dá 503 e a sincronização registra "integração com o CV não configurada"
+(dados aparecem como desconhecidos/desatualizados e ofertas com lote ficam fora do ar) — é o comportamento certo.
+
+### 7.3 Testes
+- `npm install` e `npm test` → `node --test tests/portal.test.js`: **18 testes** (Blob e CV simulados em memória)
+  cobrindo cadastro público, papéis, bloqueio derrubando sessão, exclusão lógica, nunca sem gestor, imobiliária,
+  isolamento entre corretores, fluxo de solicitação, sincronização com falha, mesma identidade de lote, limites de
+  vigência e fuso, elegibilidade de oferta e download do card, materiais/versões, tutoriais e auditoria sem segredo.
+- Navegador (Playwright, servidor local com os mesmos simulados): gestor e corretor de ponta a ponta, desktop e
+  iPhone 13, sem rolagem lateral — tudo passou. O roteiro fica fora do repositório (scratchpad da sessão).
+- **Não validado com serviço real:** gravação no Blob de produção pela nova versão e leitura do CV pela rotina de
+  sincronização (o código chama o mesmo `lerCV` da `/api/lotes-status`, que está no ar). Conferir no primeiro uso.
+
+### 7.4 A confirmar com o cliente
+- Fuso comercial das ofertas (assumido **Assunção**, UTC−3); se for Brasília, mudar `PORTAL_FUSO`.
+- Texto jurídico/rodapé do card (hoje: condições + validade + referência da oferta).
