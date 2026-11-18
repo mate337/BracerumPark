@@ -4,10 +4,11 @@
    barra de abas inferior com botão central e cartões arredondados (app bancário), vidro fosco e
    tipografia leve em tamanho grande (Notis). */
 
+/* modo claro = fundo branco (pedido de 2026-11-18); cartões se separam por borda e sombra leve */
 :root {
-  --bg: #f2f2f0;
+  --bg: #ffffff;
   --surface: #ffffff;
-  --surface-2: #f7f7f5;
+  --surface-2: #f5f5f4;
   --ink: #0b0b0b;
   --ink-2: #2b2b2b;
   --muted: #6e6e6b;
@@ -463,8 +464,8 @@ button { cursor: pointer; background: none; border: 0; padding: 0; }
 .auth__top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .auth__mid { flex: 1; display: grid; align-content: center; gap: 28px; max-width: 520px; width: 100%; }
 .auth__panel { position: relative; margin: 12px; border-radius: 28px; overflow: hidden; background: #0b0b0b; color: #f5f5f3; isolation: isolate; min-height: 560px; }
-.auth__panel img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: grayscale(1) contrast(1.15) brightness(.55); z-index: -1; }
-.auth__panel::after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(180deg, rgba(0,0,0,.1) 0%, rgba(0,0,0,.0) 40%, rgba(0,0,0,.75) 100%); }
+.auth__panel img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 62% 50%; z-index: -1; }
+.auth__panel::after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(180deg, rgba(0,0,0,.18) 0%, rgba(0,0,0,0) 32%, rgba(0,0,0,.08) 55%, rgba(0,0,0,.72) 100%); }
 .auth__panelin { position: absolute; inset: 0; padding: clamp(22px, 3vw, 40px); display: flex; flex-direction: column; justify-content: space-between; }
 .auth__panel .display { color: #f5f5f3; font-size: clamp(36px, 4.4vw, 64px); max-width: 14ch; }
 .auth__stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
@@ -503,6 +504,10 @@ button { cursor: pointer; background: none; border: 0; padding: 0; }
 .welcome .lead { text-align: center; }
 .topics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; max-width: 1180px; margin: 0 auto; }
 .topics--6 { grid-template-columns: repeat(3, minmax(0, 1fr)); max-width: 1040px; }
+.topics--5 { grid-template-columns: repeat(6, minmax(0, 1fr)); max-width: 1120px; }
+.topics--5 .topic { grid-column: span 2; }
+.topics--5 .topic:nth-child(4) { grid-column: 2 / span 2; }   /* 3 em cima, 2 centralizados embaixo */
+@media (max-width: 1023px) { .topics--5 .topic, .topics--5 .topic:nth-child(4) { grid-column: auto; } .topics--5 .topic:last-child { grid-column: 1 / -1; } }
 .topic {
   position: relative; display: grid; grid-template-rows: auto 1fr auto auto; gap: 6px; min-height: 236px; padding: 22px;
   border-radius: var(--r-lg); background: var(--surface); border: 1px solid var(--line); text-decoration: none; overflow: hidden;
@@ -589,6 +594,37 @@ button { cursor: pointer; background: none; border: 0; padding: 0; }
 .reqform__foot { position: sticky; bottom: 0; z-index: 5; padding: 14px 0; background: var(--bg); border-top: 1px solid var(--line); display: grid; gap: 10px; }
 .reqform__actions { display: flex; gap: 10px; justify-content: flex-end; }
 @media (max-width: 1023px) { .reqform__foot { bottom: calc(var(--tab) + 12px); } }
+
+/* tabela da Gestão vira cartões no celular */
+@media (max-width: 700px) {
+  .table--cards { min-width: 0; }
+  .table--cards thead { display: none; }
+  .table--cards tr { display: grid; grid-template-columns: auto auto 1fr; gap: 10px; align-items: center; padding: 16px; border-bottom: 1px solid var(--line); }
+  .table--cards tr:last-child { border-bottom: 0; }
+  .table--cards td { display: block; padding: 0; border: 0; }
+  .table--cards td:nth-child(1), .table--cards td:nth-child(3) { grid-column: 1 / -1; }
+  .table--cards td:nth-child(5) { grid-column: 1 / -1; }
+  .table--cards td:nth-child(5):empty { display: none; }
+}
+
+/* masterplan em página própria */
+.stage--tall { height: calc(100svh - var(--head) - 240px); min-height: 520px; }
+@media (max-width: 1023px) { .stage--tall { height: 72svh; min-height: 420px; } }
+
+/* materiais ocultos (só o gerenciador vê) */
+.tile.is-hidden .tile__media { opacity: .45; }
+.tile.is-hidden .tile__title { text-decoration: line-through; text-decoration-color: var(--faint); }
+
+/* tipo de conta no formulário da Gestão */
+.kinds { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.kind { text-align: left; display: grid; gap: 4px; padding: 16px; border-radius: 16px; border: 1px solid var(--line-2); background: var(--surface); transition: border-color .2s, background .2s, color .2s; }
+.kind svg { width: 20px; height: 20px; margin-bottom: 6px; }
+.kind b { font-weight: 600; }
+.kind span { font-size: 12px; color: var(--muted); line-height: 1.35; }
+.kind[aria-checked="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.kind[aria-checked="true"] span { color: color-mix(in srgb, var(--bg) 70%, transparent); }
+@media (max-width: 420px) { .kinds { grid-template-columns: 1fr; } }
+.drop > span:first-of-type svg { width: 24px; height: 24px; }
 
 /* menu "mais" no celular */
 .menu { display: grid; gap: 4px; }

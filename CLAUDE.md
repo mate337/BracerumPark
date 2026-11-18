@@ -19,6 +19,9 @@ maquete 3D embutida, que as seis páginas internas baixavam e interpretavam à t
   Vercel Blob privado `portal-corretores`). Preto e branco, Urbanist — **não usa a identidade do site** (pedido).
   Corretor cria conta → "Em análise" (pedido ao marketing só aprovado); equipe entra com a `ADMIN_SENHA`.
   Textos/biblioteca/guias em `portalcorretores/conteudo.js`. Tudo em `docs/portal-corretores.md` §6.
+- **Desde 2026-11-18 (fim do dia): só "Entrar"; contas criadas pelo gerenciador na aba Gestão** (link de primeiro
+  acesso; "novo link" = esqueci a senha). Gerenciador = papel `equipe` (Gestão + envio de materiais); corretor = tabela,
+  solicitações, materiais, masterplan 3D e aprender. `ADMIN_SENHA` não abre mais o portal. Modo claro com fundo branco.
 
 ### ✅ Publicação pelo GitHub voltou (2026-11-12)
 - Em 2026-11-12 o push no `main` **voltou a publicar sozinho** na Vercel (deploy de produção `source: git`,

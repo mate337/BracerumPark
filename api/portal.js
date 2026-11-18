@@ -8,19 +8,20 @@
 
   Variáveis:
     BLOB_READ_WRITE_TOKEN    store privado do portal                                  [segredo]
-    ADMIN_SENHA              mesma senha do /admin — entra como "equipe" no portal    [segredo]
-    CORRETORES_PLANILHA_URL  (opcional) cada conta nova também vira linha na planilha
-                             "Leads Corretores", como o cadastro de /corretores       [segredo]
-    PORTAL_SEGREDO           (opcional) chave da sessão; sem ela deriva das outras
+    PORTAL_CONVITE           chave que assina os links de primeiro acesso             [segredo]
+    PORTAL_ADMINS            e-mails que podem virar o primeiro gerenciador (sem conta ainda)
+    PORTAL_SEGREDO           (opcional) chave da sessão; sem ela deriva de ADMIN_SENHA/BLOB/CVCRM
 
   Arquivos no store:
-    portal/u/<id>.json       conta do corretor (id = sha256 do e-mail, 24 hex)
-    portal/p/<id>.json       pedido ao marketing
-    portal/avisos.json       mural (lista)
+    portal/u/<id>.json       conta (id = sha256 do e-mail, 24 hex); papel "equipe" = gerenciador | "corretor"
+    portal/p/<id>.json       pedido ao marketing · portal/a/<pedido>/… anexos do pedido
+    portal/m/index.json      biblioteca enviada pelo gerenciador · portal/m/f/… arquivos
+    portal/avisos.json       mural (fora do menu desde 2026-11-18)
 
   Sessão: cookie HttpOnly "bp_portal" (HMAC, 30 dias, SameSite=Strict). Todo pedido é POST JSON
-  com { acao, ... }. Papéis: "corretor" (status pendente | aprovado | bloqueado) e "equipe".
-  Corretor pendente entra e usa materiais, tabela e divulgação; abrir pedido ao marketing só aprovado.
+  com { acao, ... }; GET só para baixar anexo (?anexo=) e material (?material=).
+  Contas: só o gerenciador cria (Gestão), com link de primeiro acesso — não há cadastro aberto nem
+  senha compartilhada.
 */
 'use strict';
 
@@ -55,14 +56,6 @@ function senhaConfere(senha, reg) {
   const b = Buffer.from(reg.h, 'hex');
   return a.length === b.length && crypto.timingSafeEqual(a, b);
 }
-function senhaEquipeOk(s) {
-  const certa = process.env.ADMIN_SENHA;
-  if (!certa) return false;
-  const a = crypto.createHash('sha256').update(String(s || '')).digest();
-  const b = crypto.createHash('sha256').update(certa).digest();
-  return crypto.timingSafeEqual(a, b);
-}
-
 /* ------------------------------------------------------------------ sessão (cookie assinado) */
 const COOKIE = 'bp_portal';
 const DIAS = 30;
@@ -191,46 +184,6 @@ function validarSenha(s) {
   return s;
 }
 
-async function avisarPlanilha(u) {
-  const url = process.env.CORRETORES_PLANILHA_URL;
-  if (!url) return;
-  const ctrl = new AbortController();
-  const t = setTimeout(() => ctrl.abort(), 8000);
-  try {
-    const tel = u.ddi === '55' && u.tel.length >= 10
-      ? `+55 ${u.tel.slice(0, 2)} ${u.tel.slice(2, -4)}-${u.tel.slice(-4)}` : `+${u.ddi} ${u.tel}`;
-    await fetch(url, {
-      method: 'POST', redirect: 'follow', signal: ctrl.signal,
-      headers: { 'content-type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({
-        data: agora(), nome: u.nome, whatsapp: tel, imobiliaria: u.imobiliaria,
-        conversa: `https://wa.me/${u.ddi}${u.tel}`, idioma: u.idioma || 'pt',
-        origem: 'portal do corretor', pagina: `/PortalCorretores · ${u.email}`,
-      }),
-    });
-  } catch (e) {
-    console.error('[portal] planilha', e.message);
-  } finally { clearTimeout(t); }
-}
-
-async function cadastro(b, res) {
-  const email = limpa(b.email, 120).toLowerCase();
-  if (!emailOk(email)) throw erro(422, 'E-mail inválido');
-  const senha = validarSenha(b.senha);
-  const v = validarConta({ ...b, pais: b.pais || 'BR', idioma: b.idioma || 'pt' });
-  if (!b.termo) throw erro(422, 'É preciso aceitar os termos de uso do portal');
-  const id = idEmail(email);
-  if (await ler(caminhoU(id))) throw erro(409, 'Já existe uma conta com esse e-mail. Entre com a sua senha.');
-  const u = {
-    id, email, ...v, slug: slugDe(v.nome, id), senha: hashSenha(senha), status: 'pendente',
-    criado: agora(), termo: { versao: '2026-11', aceito: agora() }, acessos: [agora()],
-  };
-  await gravar(caminhoU(id), u);
-  await avisarPlanilha(u);
-  emitir(res, { p: 'corretor', u: id });
-  return { usuario: publico(u) };
-}
-
 async function login(b, res, ip) {
   const email = limpa(b.email, 120).toLowerCase();
   const chave = `${ip}|${email}`;
@@ -252,12 +205,14 @@ async function login(b, res, ip) {
   return { usuario: publico(u) };
 }
 
-/* ------------------------------------------------------------------ contas da equipe (convite) */
-/* Administrador com e-mail próprio. O primeiro acesso é por um link de convite:
-   /PortalCorretores#/convite/<e-mail em base64url>.<assinatura>, assinatura = HMAC(PORTAL_CONVITE, e-mail).
-   O link só vale enquanto a conta não tem senha — depois de usado, morre.
-   Quem pode receber convite: e-mails em PORTAL_ADMINS (lista separada por vírgula) ou contas que a
-   equipe convidou pelo portal (registro com papel "equipe" ainda sem senha). */
+/* ------------------------------------------------------------------ contas: gerenciador × corretor */
+/* Dois tipos de conta (2026-11-18): papel "equipe" = GERENCIADOR (gestão de contas, materiais, pedidos e
+   tudo o que o corretor vê) e papel "corretor" (tabela, solicitações ao marketing, materiais, masterplan 3D,
+   aprender). Não existe cadastro aberto nem senha compartilhada: o gerenciador cria a conta na Gestão e
+   recebe um LINK DE PRIMEIRO ACESSO, que a pessoa abre para definir a senha:
+     /PortalCorretores#/convite/<e-mail em base64url>.<HMAC(PORTAL_CONVITE, e-mail)>
+   O link vale enquanto a conta não tem senha; "novo link de acesso" zera a senha e gera outro (esqueceu a senha).
+   PORTAL_ADMINS (lista de e-mails) só serve para criar o PRIMEIRO gerenciador, quando ainda não há conta. */
 const equipePublico = (u) => ({ papel: 'equipe', nome: u.nome, id: u.id, email: u.email, conta: true });
 const listaAdmins = () => String(process.env.PORTAL_ADMINS || '').toLowerCase().split(/[,;\s]+/).filter(emailOk);
 function assinaConvite(email) {
@@ -265,6 +220,7 @@ function assinaConvite(email) {
   if (!chave) throw erro(503, 'Convites não configurados (PORTAL_CONVITE)');
   return crypto.createHmac('sha256', chave).update(`convite|${email}`).digest('hex').slice(0, 32);
 }
+const origemDe = (req) => `https://${String(req.headers['x-forwarded-host'] || req.headers.host || 'bracerumpark.com')}`;
 const linkConvite = (origem, email) => `${origem}/PortalCorretores#/convite/${Buffer.from(email).toString('base64url')}.${assinaConvite(email)}`;
 function lerConvite(token) {
   const [e64, sig] = String(token || '').split('.');
@@ -278,50 +234,179 @@ function lerConvite(token) {
 async function conviteVer(b) {
   const email = lerConvite(b.token);
   const u = await ler(caminhoU(idEmail(email)));
-  if (u && u.senha) throw erro(410, 'Este convite já foi usado. Entre com o seu e-mail e senha.');
-  if (!(u && u.papel === 'equipe') && !listaAdmins().includes(email)) throw erro(403, 'Convite sem permissão');
-  return { email, nome: (u && u.nome) || '' };
+  if (u && u.senha) throw erro(410, 'Este link já foi usado. Entre com o seu e-mail e senha.');
+  if (u && u.status === 'bloqueado') throw erro(403, 'Acesso suspenso. Fale com o gerenciador.');
+  if (!u && !listaAdmins().includes(email)) throw erro(403, 'Link sem permissão');
+  return { email, nome: (u && u.nome) || '', papel: (u && u.papel) || 'equipe' };
 }
 async function conviteAceitar(b, res) {
   const { email } = await conviteVer(b);
-  const nome = limpa(b.nome, 60);
+  const nome = limpa(b.nome, 80);
   if (nome.length < 2) throw erro(422, 'Escreva o seu nome');
   const senha = validarSenha(b.senha);
   const id = idEmail(email);
   const antes = (await ler(caminhoU(id))) || {};
+  const papel = antes.papel || 'equipe';
   const u = {
-    ...antes, id, email, nome, papel: 'equipe', status: 'aprovado', senha: hashSenha(senha),
+    ...antes, id, email, nome, papel, status: antes.status === 'pendente' ? 'aprovado' : (antes.status || 'aprovado'),
+    slug: antes.slug || slugDe(nome, id), senha: hashSenha(senha),
     criado: antes.criado || agora(), ativado: agora(), acessos: [agora()],
   };
   await gravar(caminhoU(id), u);
-  console.log('[portal] conta da equipe ativada', id);
-  emitir(res, { p: 'equipe', n: nome, u: id });
-  return { usuario: equipePublico(u) };
+  console.log('[portal] conta ativada', papel, id);
+  if (papel === 'equipe') { emitir(res, { p: 'equipe', n: nome, u: id }); return { usuario: equipePublico(u) }; }
+  emitir(res, { p: 'corretor', u: id });
+  return { usuario: publico(u) };
 }
-async function convidarEquipe(b, s, req) {
+function contaResumo(u) {
+  return {
+    id: u.id, nome: u.nome, email: u.email, papel: u.papel === 'equipe' ? 'equipe' : 'corretor',
+    status: u.status || 'aprovado', ativo: !!u.senha, ddi: u.ddi || '', tel: u.tel || '', imobiliaria: u.imobiliaria || '',
+    creci: u.creci || '', pais: u.pais || '', slug: u.slug || '', criado: u.criado, criadoPor: u.criadoPor || null,
+    ultimoAcesso: (u.acessos || [])[0] || null,
+  };
+}
+async function contasListar() {
+  const lst = await lerVarios(await listar('portal/u/'), 2000);
+  return { contas: lst.map(contaResumo).sort((a, b) => String(b.criado).localeCompare(String(a.criado))) };
+}
+async function contaCriar(b, s, req) {
+  const papel = b.papel === 'equipe' ? 'equipe' : 'corretor';
   const email = limpa(b.email, 120).toLowerCase();
   if (!emailOk(email)) throw erro(422, 'E-mail inválido');
   const id = idEmail(email);
-  const u = await ler(caminhoU(id));
-  if (u && u.papel !== 'equipe') throw erro(409, 'Esse e-mail já tem conta de corretor');
-  if (u && u.senha) throw erro(409, 'Essa pessoa já ativou o acesso');
-  if (!u) await gravar(caminhoU(id), { id, email, nome: limpa(b.nome, 60), papel: 'equipe', status: 'aprovado', criado: agora(), convidadoPor: s.n });
-  const host = String(req.headers['x-forwarded-host'] || req.headers.host || 'bracerumpark.com');
-  return { link: linkConvite(`https://${host}`, email) };
+  if (await ler(caminhoU(id))) throw erro(409, 'Já existe uma conta com esse e-mail');
+  let dados;
+  if (papel === 'corretor') dados = validarConta({ ...b, pais: b.pais || 'BR', idioma: b.idioma || 'pt' });
+  else {
+    const nome = limpa(b.nome, 80);
+    if (nome.length < 2) throw erro(422, 'Escreva o nome');
+    dados = { nome };
+    if (b.tel) Object.assign(dados, validarConta({ ddi: b.ddi, tel: b.tel }, true));
+  }
+  const u = { id, email, ...dados, papel, status: 'aprovado', slug: slugDe(dados.nome, id), criado: agora(), criadoPor: s.n };
+  await gravar(caminhoU(id), u);
+  console.log('[portal] conta criada', papel, id, 'por', s.n);
+  return { conta: contaResumo(u), link: linkConvite(origemDe(req), email) };
 }
-async function equipeListar() {
-  const lst = await lerVarios(await listar('portal/u/'), 1000);
-  return lst.filter((u) => u.papel === 'equipe').map((u) => ({ nome: u.nome, email: u.email, ativo: !!u.senha, ultimoAcesso: (u.acessos || [])[0] || null }));
+async function contaAlvo(b, s) {
+  const u = await ler(caminhoU(limpa(b.id, 40)));
+  if (!u) throw erro(404, 'Conta não encontrada');
+  if (u.id === s.u) throw erro(409, 'Isso não vale para a sua própria conta');
+  return u;
+}
+async function contaAtualizar(b, s, req) {
+  const u = await contaAlvo(b, s);
+  let link = null;
+  if (b.status !== undefined) {
+    if (!['aprovado', 'bloqueado'].includes(b.status)) throw erro(422, 'Situação inválida');
+    u.status = b.status;
+  }
+  if (b.papel !== undefined) u.papel = b.papel === 'equipe' ? 'equipe' : 'corretor';
+  if (b.novoLink) { delete u.senha; link = linkConvite(origemDe(req), u.email); }   // esqueceu a senha: zera e gera link
+  if (!u.slug) u.slug = slugDe(u.nome, u.id);
+  await gravar(caminhoU(u.id), u);
+  return { conta: contaResumo(u), link };
+}
+async function contaLink(b, s, req) {
+  const u = await ler(caminhoU(limpa(b.id, 40)));
+  if (!u) throw erro(404, 'Conta não encontrada');
+  if (u.senha) throw erro(409, 'Essa pessoa já criou a senha. Use "Novo link de acesso" para zerar.');
+  return { link: linkConvite(origemDe(req), u.email) };
+}
+async function contaRemover(b, s) {
+  const u = await contaAlvo(b, s);
+  exigeStore();
+  await B().del(caminhoU(u.id));
+  console.log('[portal] conta removida', u.id, 'por', s.n);
+  return { removida: u.id };
 }
 
-function loginEquipe(b, res, ip) {
-  if (!process.env.ADMIN_SENHA) throw erro(503, 'Senha da equipe não configurada');
-  if (bloqueado(`eq|${ip}`)) throw erro(429, 'Muitas tentativas. Espere 10 minutos.');
-  if (!senhaEquipeOk(b.senha)) { falhou(`eq|${ip}`); throw erro(401, 'Senha incorreta'); }
-  const nome = limpa(b.nome, 40);
-  if (nome.length < 2) throw erro(422, 'Escreva o seu nome');
-  emitir(res, { p: 'equipe', n: nome });
-  return { usuario: { papel: 'equipe', nome, id: 'equipe' } };
+/* ------------------------------------------------------------------ biblioteca: materiais enviados pelo gerenciador */
+/* Índice em portal/m/index.json = { itens: [...], ocultos: [chaves dos materiais fixos do conteudo.js] }.
+   Arquivos em portal/m/f/<aleatório>-<nome>, enviados DIRETO do navegador ao Blob com um token de 30 min
+   (generateClientTokenFromReadWriteToken) — assim vídeo e PDF grande não passam pelo limite de 4,5 MB da função.
+   Download por GET /api/portal?material=<caminho> (qualquer conta logada; o arquivo não é público). */
+const CAMINHO_MAT = 'portal/m/index.json';
+const MAT_TIPOS = ['tabela', 'folder', 'foto', 'video', 'logo', 'pagina', 'apresentacao', 'documento'];
+const MAT_CONTEUDO = ['image/*', 'video/*', 'application/pdf', 'application/zip', 'application/x-zip-compressed',
+  'application/vnd.openxmlformats-officedocument.presentationml.presentation', 'application/vnd.ms-powerpoint',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/msword',
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel', 'image/svg+xml'];
+async function biblioteca() {
+  const d = await ler(CAMINHO_MAT);
+  return { itens: (d && Array.isArray(d.itens)) ? d.itens : [], ocultos: (d && Array.isArray(d.ocultos)) ? d.ocultos : [] };
+}
+async function materialToken(b) {
+  const nome = limpa(b.nome, 120).normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^\w.\-]+/g, '-').replace(/^-+|-+$/g, '') || 'arquivo';
+  const caminho = `portal/m/f/${crypto.randomBytes(5).toString('hex')}-${nome}`;
+  const { generateClientTokenFromReadWriteToken } = require('@vercel/blob/client');
+  exigeStore();
+  const token = await generateClientTokenFromReadWriteToken({
+    token: process.env.BLOB_READ_WRITE_TOKEN, pathname: caminho, maximumSizeInBytes: 500 * 1024 * 1024,
+    allowedContentTypes: MAT_CONTEUDO, validUntil: Date.now() + 30 * 60e3, addRandomSuffix: false, allowOverwrite: false,
+  });
+  return { token, caminho };
+}
+async function materialSalvar(b, s) {
+  const bib = await biblioteca();
+  const titulo = limpa(b.titulo, 120);
+  if (titulo.length < 2) throw erro(422, 'Dê um título ao material');
+  const tipo = MAT_TIPOS.includes(b.tipo) ? b.tipo : 'documento';
+  const produto = PRODUTOS.includes(b.produto) ? b.produto : 'geral';
+  let item = b.id ? bib.itens.find((x) => x.id === b.id) : null;
+  if (b.id && !item) throw erro(404, 'Material não encontrado');
+  if (!item) {
+    const caminho = String(b.caminho || '');
+    const link = limpa(b.link, 500);
+    if (caminho && !/^portal\/m\/f\/[a-f0-9]{10}-[\w.\-]+$/.test(caminho)) throw erro(422, 'Arquivo inválido');
+    if (!caminho && !/^https:\/\/\S+$/.test(link)) throw erro(422, 'Envie um arquivo ou informe um link https://');
+    item = { id: crypto.randomBytes(5).toString('hex'), caminho: caminho || null, link: caminho ? null : link,
+      conteudo: limpa(b.conteudo, 120) || null, kb: Math.max(0, Math.round(Number(b.kb) || 0)), nomeArquivo: limpa(b.nomeArquivo, 120) || null,
+      criado: agora(), por: s.n };
+    bib.itens.unshift(item);
+  }
+  Object.assign(item, { titulo, tipo, produto, desc: texto(b.desc, 400) || null, destaque: !!b.destaque, atualizado: agora() });
+  await gravar(CAMINHO_MAT, bib);
+  return bib;
+}
+async function materialRemover(b) {
+  const bib = await biblioteca();
+  const item = bib.itens.find((x) => x.id === b.id);
+  if (!item) throw erro(404, 'Material não encontrado');
+  bib.itens = bib.itens.filter((x) => x.id !== b.id);
+  if (item.caminho) await B().del(item.caminho).catch((e) => console.error('[portal] del material', e.message));
+  await gravar(CAMINHO_MAT, bib);
+  return bib;
+}
+async function materialOcultar(b) {
+  const bib = await biblioteca();
+  const chave = limpa(b.chave, 300);
+  if (!chave) throw erro(422, 'Material inválido');
+  bib.ocultos = b.ocultar ? [...new Set([...bib.ocultos, chave])] : bib.ocultos.filter((x) => x !== chave);
+  await gravar(CAMINHO_MAT, bib);
+  return bib;
+}
+async function materialBaixar(req, res) {
+  const s = lerSessao(req);
+  const q = new URL(req.url, 'http://x').searchParams;
+  const caminho = String(q.get('material') || '');
+  if (!s || !s.u || !/^portal\/m\/f\/[a-f0-9]{10}-[\w.\-]+$/.test(caminho)) { res.statusCode = 404; return res.end('não encontrado'); }
+  const u = await ler(caminhoU(s.u));
+  if (!u || u.status === 'bloqueado') { res.statusCode = 404; return res.end('não encontrado'); }
+  const item = (await biblioteca()).itens.find((x) => x.caminho === caminho);
+  if (!item) { res.statusCode = 404; return res.end('não encontrado'); }
+  const r = await B().get(caminho, { access: 'private', useCache: false });
+  if (!r || !r.stream) { res.statusCode = 404; return res.end('não encontrado'); }
+  const tipo = (r.blob && r.blob.contentType) || item.conteudo || 'application/octet-stream';
+  res.setHeader('Content-Type', tipo);
+  if (r.blob && r.blob.size) res.setHeader('Content-Length', String(r.blob.size));
+  res.setHeader('Cache-Control', 'private, max-age=300');
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  const nome = item.nomeArquivo || caminho.split('/').pop().replace(/^[a-f0-9]{10}-/, '');
+  res.setHeader('Content-Disposition', `${q.get('baixar') ? 'attachment' : 'inline'}; filename*=UTF-8''${encodeURIComponent(nome)}`);
+  const { Readable } = require('stream');
+  Readable.fromWeb(r.stream).pipe(res);
 }
 
 /* ------------------------------------------------------------------ pedidos ao marketing */
@@ -478,38 +563,15 @@ async function avisoSalvar(b, s) {
   return { avisos: out };
 }
 
-/* ------------------------------------------------------------------ equipe: corretores */
-async function corretoresListar() {
-  const lst = (await lerVarios(await listar('portal/u/'), 1000)).filter((u) => u.papel !== 'equipe');
-  return {
-    equipe: await equipeListar(),
-    corretores: lst.map((u) => ({ ...publico(u), ultimoAcesso: (u.acessos || [])[0] || null }))
-      .sort((a, b) => String(b.criado).localeCompare(String(a.criado))),
-  };
-}
-async function corretorAtualizar(b, s) {
-  const u = await ler(caminhoU(limpa(b.id, 40)));
-  if (!u || u.papel === 'equipe') throw erro(404, 'Corretor não encontrado');
-  if (b.status !== undefined) {
-    if (!['pendente', 'aprovado', 'bloqueado'].includes(b.status)) throw erro(422, 'Status inválido');
-    if (b.status === 'aprovado' && u.status !== 'aprovado') u.aprovado = { em: agora(), por: s.n };
-    u.status = b.status;
-  }
-  let senhaNova = null;
-  if (b.novaSenha) {
-    senhaNova = crypto.randomBytes(6).toString('base64url').replace(/[-_]/g, 'x');
-    u.senha = hashSenha(senhaNova);
-  }
-  await gravar(caminhoU(u.id), u);
-  return { corretor: publico(u), senhaNova };
-}
-
 /* ------------------------------------------------------------------ handler */
 module.exports = async (req, res) => {
   res.setHeader('Content-Type', 'application/json; charset=utf-8');
   res.setHeader('Cache-Control', 'no-store');
   res.setHeader('X-Robots-Tag', 'noindex');
   const fim = (status, obj) => { res.statusCode = status; res.end(JSON.stringify(obj)); };
+  if (req.method === 'GET' && /[?&]material=/.test(req.url || '')) {
+    try { return await materialBaixar(req, res); } catch (e) { console.error('[portal] material', e.message); res.statusCode = 500; return res.end('erro'); }
+  }
   if (req.method === 'GET' && /[?&]anexo=/.test(req.url || '')) {
     try { return await anexoBaixar(req, res); } catch (e) { console.error('[portal] anexo', e.message); res.statusCode = 500; return res.end('erro'); }
   }
@@ -521,14 +583,9 @@ module.exports = async (req, res) => {
 
   const ip = String(req.headers['x-forwarded-for'] || '').split(',')[0].trim() || 'ip';
   try {
-    if (b.acao === 'cadastro') {
-      if (b.hp) return fim(200, { ok: true });                       // campo-isca: robô
-      if (bloqueado(`cad|${ip}`)) throw erro(429, 'Muitos cadastros deste endereço. Tente mais tarde.');
-      falhou(`cad|${ip}`);
-      return fim(200, { ok: true, ...(await cadastro(b, res)) });
-    }
+    // Sem cadastro aberto e sem senha compartilhada: as contas nascem na Gestão (gerenciador).
+    if (b.acao === 'cadastro' || b.acao === 'equipe') return fim(403, { ok: false, erro: 'As contas são criadas pelo gerenciador do portal.' });
     if (b.acao === 'entrar') return fim(200, { ok: true, ...(await login(b, res, ip)) });
-    if (b.acao === 'equipe') return fim(200, { ok: true, ...loginEquipe(b, res, ip) });
     if (b.acao === 'sair') { apagarCookie(res); return fim(200, { ok: true }); }
     if (b.acao === 'conviteVer') return fim(200, { ok: true, ...(await conviteVer(b)) });
     if (b.acao === 'convite') {
@@ -540,6 +597,7 @@ module.exports = async (req, res) => {
     const s = lerSessao(req);
     if (!s) return fim(401, { ok: false, erro: 'sessão', sair: true });
     let u = null;
+    if (!s.u) { apagarCookie(res); return fim(401, { ok: false, erro: 'sessão', sair: true }); }   // sessões antigas da senha compartilhada
     if (s.u) {
       // corretor, ou alguém da equipe com conta própria (a senha compartilhada não tem s.u)
       u = await ler(caminhoU(s.u));
@@ -555,7 +613,16 @@ module.exports = async (req, res) => {
         const extra = await avisos();
         return fim(200, { ok: true, usuario: eq ? (u ? equipePublico(u) : { papel: 'equipe', nome: s.n, id: 'equipe' }) : publico(u), ...extra });
       }
-      case 'convidar': soEquipe(); return fim(200, { ok: true, ...(await convidarEquipe(b, s, req)) });
+      case 'contas': soEquipe(); return fim(200, { ok: true, ...(await contasListar()) });
+      case 'contaCriar': soEquipe(); return fim(200, { ok: true, ...(await contaCriar(b, s, req)) });
+      case 'contaAtualizar': soEquipe(); return fim(200, { ok: true, ...(await contaAtualizar(b, s, req)) });
+      case 'contaLink': soEquipe(); return fim(200, { ok: true, ...(await contaLink(b, s, req)) });
+      case 'contaRemover': soEquipe(); return fim(200, { ok: true, ...(await contaRemover(b, s)) });
+      case 'materiais': return fim(200, { ok: true, ...(await biblioteca()) });
+      case 'materialToken': soEquipe(); return fim(200, { ok: true, ...(await materialToken(b)) });
+      case 'materialSalvar': soEquipe(); return fim(200, { ok: true, ...(await materialSalvar(b, s)) });
+      case 'materialRemover': soEquipe(); return fim(200, { ok: true, ...(await materialRemover(b)) });
+      case 'materialOcultar': soEquipe(); return fim(200, { ok: true, ...(await materialOcultar(b)) });
       case 'senhaEquipe': {
         // troca de senha de quem da equipe tem conta própria
         if (!eq || !u) throw erro(400, 'Só para contas da equipe com e-mail');
@@ -592,8 +659,6 @@ module.exports = async (req, res) => {
       case 'anexo': return fim(200, { ok: true, ...(await anexoEnviar(b, s, u)) });
       case 'pedidoCancelar': if (eq) throw erro(400, 'Use o status do pedido'); return fim(200, { ok: true, ...(await pedidoCancelarProprio(b, u)) });
       case 'pedidoAtualizar': soEquipe(); return fim(200, { ok: true, ...(await pedidoAtualizar(b, s)) });
-      case 'corretores': soEquipe(); return fim(200, { ok: true, ...(await corretoresListar()) });
-      case 'corretor': soEquipe(); return fim(200, { ok: true, ...(await corretorAtualizar(b, s)) });
       case 'aviso': soEquipe(); return fim(200, { ok: true, ...(await avisoSalvar(b, s)) });
       default: return fim(400, { ok: false, erro: 'ação' });
     }

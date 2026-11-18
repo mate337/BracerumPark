@@ -297,3 +297,22 @@ e-mail/WhatsApp quando o pedido muda de etapa; fotos/vídeos novos e apresentaç
   cada; foto grande é reduzida no navegador) + link · 06 Prazo e idioma.
 - **Anexos** no store privado em `portal/a/<pedido>/<n>-<nome>`; baixados por `GET /api/portal?anexo=<caminho>` —
   só o dono do pedido e a equipe (outro corretor ou sem sessão = 404).
+
+### Dois tipos de conta: gerenciador × corretor (2026-11-18, pedido do Matheus)
+- **Login só com "Entrar".** Não existe mais cadastro aberto nem a senha compartilhada da equipe (`ADMIN_SENHA` não
+  entra mais no portal; continua valendo só no `/admin`). Sessões antigas da senha compartilhada caem no login.
+- **Gerenciador** (`papel: "equipe"`): Início, **Gestão**, Solicitações (quadro do marketing), Materiais (com envio),
+  Tabela, Masterplan 3D, Aprender. **Corretor**: Início, Tabela, Solicitações (formulário), Materiais, Masterplan 3D,
+  Aprender. Mural e Divulgar saíram do menu (o código do mural ficou só no servidor).
+- **Gestão** (`#/gestao`): "Nova conta" → tipo (corretor/gerenciador), nome, e-mail, WhatsApp, imobiliária, CRECI →
+  a conta nasce liberada e gera o **link de primeiro acesso** (copiar, WhatsApp, e-mail). Por conta: link de acesso
+  (enquanto não ativou), **novo link (zera a senha — "esqueci a senha")**, tornar corretor/gerenciador, suspender/
+  reativar, remover; filtros, busca e CSV. Ninguém mexe na própria conta.
+- **Materiais do gerenciador:** "Adicionar material" (arquivo até 500 MB ou link) com título, categoria, produto,
+  descrição e destaque; editar e remover os enviados; **ocultar/mostrar** os fixos do `conteudo.js`. O arquivo vai
+  **direto do navegador para o Blob privado** com token de 30 min (`materialToken`; uploader empacotado em
+  `portalcorretores/vendor/vercel-blob-client-2.8.0.js`, esbuild de `@vercel/blob/client`). Índice em
+  `portal/m/index.json`; download por `GET /api/portal?material=…` só logado — por isso arquivo enviado não tem
+  "copiar link" (não abre para o cliente final; o corretor baixa e encaminha).
+- **Masterplan 3D** em página própria (`#/masterplan`, maquete em `#lotes`) além do mapa de reservas do Início.
+- **Tema:** botão sol/lua no topo e na entrada; **modo claro = fundo branco**. Foto da entrada: `portalcorretores/img/galpao-avenida.{webp,jpg}` (enviada pelo cliente).

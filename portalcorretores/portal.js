@@ -14,7 +14,7 @@
     lotes: null, precos: null, pedidos: null, corretores: null,
     mat: { tipo: 'all', produto: 'all', q: '' },
     share: { dest: 'park', msgLang: null },
-    req: { filtro: 'abertos' }, team: { filtro: 'pendente' },
+    req: { filtro: 'abertos' }, team: { filtro: 'todos' },
     price: { janela: null, pag: '12x', cat: 'P', area: 1250, faixa: 0 },
     mapLive: false,
   };
@@ -114,6 +114,11 @@
     expand: ic('<path d="M14 4h6v6M10 20H4v-6M20 4l-6 6M4 20l6-6"/>'),
     sun: ic('<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>'),
     info: ic('<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8v.01"/>'),
+    trash: ic('<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>'),
+    eye: ic('<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>'),
+    eyeOff: ic('<path d="M3 3l18 18M10.6 5.1A10 10 0 0 1 12 5c6.5 0 10 7 10 7a17 17 0 0 1-3.2 4.1M6.6 6.6C3.9 8.4 2 12 2 12s3.5 7 10 7a9.7 9.7 0 0 0 4.4-1"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/>'),
+    upload: ic('<path d="M12 16V5m0 0L7.5 9.5M12 5l4.5 4.5"/><path d="M4 16v4h16v-4"/>'),
+    moon: ic('<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>'),
     star: ic('<path d="m12 3.5 2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/>'),
   };
   const TIPO_ICONE = { peca: I.image, impresso: I.print, evento: I.calendar, visita: I.map, video: I.video, traducao: I.globe, material: I.file, outro: I.dots };
@@ -169,15 +174,14 @@
   const PAG_IDX = { '12x': 0, vista: 1, '36x': 2 };
 
   /* ============================================================ rotas */
-  // O corretor só lê o mural; "Corretores" (aprovação) existe só para a equipe.
+  // Dois tipos de conta: corretor (só consulta + solicitações) e gerenciador (tudo + Gestão).
   const ROTAS_CORRETOR = [
-    ['inicio', 'nav.home', I.home], ['materiais', 'nav.materials', I.grid], ['mural', 'nav.board', I.megaphone],
-    ['tabela', 'nav.prices', I.table], ['aprender', 'nav.learn', I.book], ['pedidos', 'nav.requests', I.inbox],
-    ['divulgar', 'nav.share', I.share],
+    ['inicio', 'nav.home', I.home], ['tabela', 'nav.prices', I.table], ['pedidos', 'nav.requests', I.megaphone],
+    ['materiais', 'nav.materials', I.grid], ['masterplan', 'nav.masterplan', I.cube], ['aprender', 'nav.learn', I.book],
   ];
   const ROTAS_EQUIPE = [
-    ['inicio', 'nav.home', I.home], ['pedidos', 'nav.requests', I.inbox], ['corretores', 'nav.brokers', I.users],
-    ['mural', 'nav.board', I.megaphone], ['materiais', 'nav.materials', I.grid], ['tabela', 'nav.prices', I.table],
+    ['inicio', 'nav.home', I.home], ['gestao', 'nav.gestao', I.users], ['pedidos', 'nav.requests', I.inbox],
+    ['materiais', 'nav.materials', I.grid], ['tabela', 'nav.prices', I.table], ['masterplan', 'nav.masterplan', I.cube],
     ['aprender', 'nav.learn', I.book],
   ];
   const rotas = () => (isEquipe() ? ROTAS_EQUIPE : ROTAS_CORRETOR);
@@ -196,7 +200,7 @@
     lerRota();
     carregarPublicos();
     const rs = rotas();
-    const nome = isEquipe() ? t('team.hi') + ' · ' + S.user.nome : S.user.nome;
+    const nome = `${S.user.nome} · ${t(isEquipe() ? 'acc.manager' : 'acc.broker')}`;
     app.innerHTML = `
       <div class="app">
         <header class="top" id="top">
@@ -209,6 +213,7 @@
             ${rs.map(([id, k]) => `<a href="#/${id}" data-nav="${id}" class="segl">${esc(t(k))}</a>`).join('')}
           </nav>
           <div class="top__end">
+            ${temaBtn()}
             ${langSwitch()}
             <a href="#/conta" class="avatar" data-nav="conta" title="${esc(nome)}" aria-label="${esc(t('nav.account'))}">${esc(iniciais(S.user.nome))}</a>
           </div>
@@ -216,9 +221,9 @@
         <main class="main" id="main" tabindex="-1"></main>
         ${bottomBar()}
       </div>`;
-    bindLang(app);
+    bindLang(app); bindTema(app);
     $('#bb-more') && $('#bb-more').addEventListener('click', abrirMais);
-    $('#bb-plus') && $('#bb-plus').addEventListener('click', () => (isEquipe() ? (location.hash = '#/mural') : novoPedido()));
+    $('#bb-plus') && $('#bb-plus').addEventListener('click', () => (isEquipe() ? (location.hash = '#/gestao', setTimeout(novaConta, 60)) : novoPedido()));
     renderMain();
     marcarNav();
     onScrollTop();
@@ -229,10 +234,10 @@
   function bindLang(root) { $$('[data-lang]', root).forEach((b) => b.addEventListener('click', () => setLang(b.dataset.lang))); }
   function bottomBar() {
     const it = (id, k, ico) => `<a href="#/${id}" data-nav="${id}">${ico}<span>${esc(t(k))}</span></a>`;
-    const left = isEquipe() ? [it('inicio', 'nav.home', I.home), it('pedidos', 'nav.requests', I.inbox)] : [it('inicio', 'nav.home', I.home), it('materiais', 'nav.materials', I.grid)];
-    const right = isEquipe() ? [it('corretores', 'nav.brokers', I.users)] : [it('mural', 'nav.board', I.megaphone)];
+    const left = isEquipe() ? [it('inicio', 'nav.home', I.home), it('gestao', 'nav.gestao', I.users)] : [it('inicio', 'nav.home', I.home), it('tabela', 'nav.prices', I.table)];
+    const right = isEquipe() ? [it('pedidos', 'nav.requests', I.inbox)] : [it('materiais', 'nav.materials', I.grid)];
     return `<nav class="bottombar" aria-label="${esc(t('brand'))}">${left.join('')}
-      <button type="button" class="plus" id="bb-plus" aria-label="${esc(isEquipe() ? t('team.boardTitle') : t('nav.new'))}">${I.plus}</button>
+      <button type="button" class="plus" id="bb-plus" aria-label="${esc(isEquipe() ? t('gest.new') : t('nav.new'))}">${I.plus}</button>
       ${right.join('')}<button type="button" id="bb-more">${I.dots}<span>Menu</span></button></nav>`;
   }
   function marcarNav() {
@@ -260,103 +265,69 @@
     document.title = `${t(rotas().concat([['conta', 'nav.account']]).find((r) => r[0] === S.route.name)?.[1] || 'brand')} · ${t('brand')}`;
   }
 
-  /* ============================================================ entrada */
-  let authTab = 'in';
+  /* ============================================================ entrada (só "Entrar": as contas nascem na Gestão) */
+  // painel da direita da entrada e do primeiro acesso: foto do galpão (enviada pelo cliente em 2026-11-18)
+  function painelAuth(chip) {
+    return `<aside class="auth__panel" aria-hidden="true">
+      <picture><source srcset="/portalcorretores/img/galpao-avenida.webp" type="image/webp" /><img src="/portalcorretores/img/galpao-avenida.jpg" alt="" /></picture>
+      <div class="auth__panelin">
+        <span class="glass stage__chip" style="align-self:flex-start">${chip}</span>
+        <div style="display:grid;gap:22px">
+          <p class="display">Bracerum<br/>Park</p>
+          <div class="auth__stats">
+            <div class="glass"><b>614</b><span>${esc(t('auth.stat1'))}</span></div>
+            <div class="glass"><b>1.250</b><span>${esc(t('auth.stat2'))}</span></div>
+            <div class="glass"><b>1%</b><span>${esc(t('auth.stat3'))}</span></div>
+          </div>
+        </div>
+      </div>
+    </aside>`;
+  }
+  const topoAuth = () => `<div class="auth__top">
+      <a class="brand" href="/" aria-label="Bracerum Park">
+        <img class="brand__logo logo--ink" src="/assets/logo/logo-horizontal-black.svg" alt="Bracerum Park" width="150" height="18" />
+        <img class="brand__logo logo--paper" src="/assets/logo/logo-horizontal-white.svg" alt="" width="150" height="18" />
+      </a>
+      <div style="display:flex;gap:8px;align-items:center">${temaBtn()}${langSwitch()}</div>
+    </div>`;
   function renderAuth() {
     document.title = `${t('brand')} · Bracerum Park`;
-    const ddi = `<select class="select" name="ddi" aria-label="DDI">
-        <option value="55">🇧🇷 +55</option><option value="595">🇵🇾 +595</option><option value="54">🇦🇷 +54</option><option value="598">🇺🇾 +598</option><option value="1">+1</option><option value="351">🇵🇹 +351</option></select>`;
-    const forms = {
-      in: `<form id="f-in" novalidate>
-          <label class="field"><span>${esc(t('auth.email'))}</span><input class="input" type="email" name="email" autocomplete="username" required inputmode="email" /></label>
-          <label class="field"><span>${esc(t('auth.pass'))}</span><input class="input" type="password" name="senha" autocomplete="current-password" required /></label>
-          <p class="formmsg" role="alert"></p>
-          <button class="btn btn--ink btn--block" type="submit">${esc(t('auth.go'))}${I.arrow}</button>
-          <p class="small muted">${esc(t('auth.forgot'))}</p>
-        </form>`,
-      up: `<form id="f-up" novalidate>
-          <label class="field"><span>${esc(t('auth.name'))}</span><input class="input" name="nome" autocomplete="name" required /></label>
-          <div class="grid2">
-            <label class="field"><span>${esc(t('auth.email'))}</span><input class="input" type="email" name="email" autocomplete="email" required inputmode="email" /></label>
-            <label class="field"><span>${esc(t('auth.wa'))}</span><span class="phone">${ddi}<input class="input" name="tel" type="tel" autocomplete="tel-national" inputmode="tel" required /></span></label>
-          </div>
-          <div class="grid2">
-            <label class="field"><span>${esc(t('auth.agency'))}</span><input class="input" name="imobiliaria" autocomplete="organization" required /><small>${esc(t('auth.agencyHint'))}</small></label>
-            <label class="field"><span>${esc(t('auth.creci'))}</span><input class="input" name="creci" /></label>
-          </div>
-          <label class="field"><span>${esc(t('auth.pass8'))}</span><input class="input" type="password" name="senha" autocomplete="new-password" minlength="8" required /></label>
-          <label class="check"><input type="checkbox" name="termo" required /><span>${esc(t('auth.terms'))}</span></label>
-          <p class="formmsg" role="alert"></p>
-          <button class="btn btn--ink btn--block" type="submit">${esc(t('auth.create'))}${I.arrow}</button>
-        </form>`,
-      team: `<form id="f-team" novalidate>
-          <label class="field"><span>${esc(t('auth.teamName'))}</span><input class="input" name="nome" autocomplete="name" required /></label>
-          <label class="field"><span>${esc(t('auth.teamPass'))}</span><input class="input" type="password" name="senha" autocomplete="current-password" required /></label>
-          <p class="formmsg" role="alert"></p>
-          <button class="btn btn--ink btn--block" type="submit">${esc(t('auth.go'))}${I.arrow}</button>
-        </form>`,
-    };
     app.innerHTML = `
       <div class="auth view">
         <section class="auth__form">
-          <div class="auth__top">
-            <a class="brand" href="/" aria-label="Bracerum Park">
-              <img class="brand__logo logo--ink" src="/assets/logo/logo-horizontal-black.svg" alt="Bracerum Park" width="150" height="18" />
-              <img class="brand__logo logo--paper" src="/assets/logo/logo-horizontal-white.svg" alt="" width="150" height="18" />
-            </a>
-            ${langSwitch()}
-          </div>
+          ${topoAuth()}
           <div class="auth__mid" id="main" tabindex="-1">
             <div style="display:grid;gap:14px">
               <p class="eyebrow">${esc(t('brand'))}</p>
               <h1 class="h1">${esc(t('auth.title'))}</h1>
               <p class="lead">${esc(t('auth.lead'))}</p>
             </div>
-            <div class="seg" role="tablist" aria-label="${esc(t('brand'))}">
-              ${[['in', 'auth.in'], ['up', 'auth.up'], ['team', 'auth.team']].map(([id, k]) => `<button type="button" role="tab" data-auth="${id}" aria-selected="${authTab === id}">${esc(t(k))}</button>`).join('')}
-            </div>
-            ${forms[authTab]}
+            <form id="f-in" novalidate>
+              <label class="field"><span>${esc(t('auth.email'))}</span><input class="input" type="email" name="email" autocomplete="username" required inputmode="email" /></label>
+              <label class="field"><span>${esc(t('auth.pass'))}</span><input class="input" type="password" name="senha" autocomplete="current-password" required /></label>
+              <p class="formmsg" role="alert"></p>
+              <button class="btn btn--ink btn--block" type="submit">${esc(t('auth.go'))}${I.arrow}</button>
+              <p class="small muted">${esc(t('auth.noAccount'))}</p>
+            </form>
           </div>
           <p class="auth__foot">© Bracerum Park · Villeta, Paraguay · <a class="linkbtn" href="/">bracerumpark.com</a></p>
         </section>
-        <aside class="auth__panel" aria-hidden="true">
-          <img src="/assets/web/fotos/park-aereo-rio.jpg" alt="" />
-          <div class="auth__panelin">
-            <span class="glass stage__chip" style="align-self:flex-start"><i class="dot-live" style="background:#f5f5f3"></i> Villeta · Paraguay</span>
-            <div style="display:grid;gap:22px">
-              <p class="display">Bracerum<br/>Park</p>
-              <div class="auth__stats">
-                <div class="glass"><b>614</b><span>${esc(t('auth.stat1'))}</span></div>
-                <div class="glass"><b>1.250</b><span>${esc(t('auth.stat2'))}</span></div>
-                <div class="glass"><b>1%</b><span>${esc(t('auth.stat3'))}</span></div>
-              </div>
-            </div>
-          </div>
-        </aside>
+        ${painelAuth(`<i class="dot-live" style="background:#f5f5f3"></i> Villeta · Paraguay`)}
       </div>`;
-    bindLang(app);
-    $$('[data-auth]').forEach((b) => b.addEventListener('click', () => { authTab = b.dataset.auth; renderAuth(); const f = $('form input'); f && f.focus(); }));
-    const f = $('form');
+    bindLang(app); bindTema(app);
+    const f = $('#f-in');
     f.addEventListener('submit', async (ev) => {
       ev.preventDefault();
       const fd = Object.fromEntries(new FormData(f).entries());
       const msg = $('.formmsg', f); msg.textContent = '';
       const btn = $('button[type=submit]', f); const htmlBtn = btn.innerHTML;
       $$('.input', f).forEach((i) => i.removeAttribute('aria-invalid'));
-      const falta = $$('[required]', f).filter((i) => (i.type === 'checkbox' ? !i.checked : !i.value.trim()));
-      if (falta.length) { falta.forEach((i) => i.setAttribute('aria-invalid', 'true')); falta[0].focus(); msg.textContent = t('c.error'); return; }
+      const falta = $$('[required]', f).filter((i) => !i.value.trim());
+      if (falta.length) { falta.forEach((i) => i.setAttribute('aria-invalid', 'true')); falta[0].focus(); msg.textContent = t('auth.fill'); return; }
       btn.disabled = true; btn.innerHTML = '<span class="spin"></span>';
       try {
-        let d;
-        if (authTab === 'in') d = await api('entrar', { email: fd.email, senha: fd.senha });
-        else if (authTab === 'team') d = await api('equipe', { nome: fd.nome, senha: fd.senha });
-        else {
-          const pais = { 55: 'BR', 595: 'PY', 54: 'AR', 598: 'UY' }[fd.ddi] || 'OUTRO';
-          d = await api('cadastro', { ...fd, termo: !!fd.termo, pais, idioma: S.lang });
-        }
-        S.user = d.usuario; S.pedidos = null; S.corretores = null;
-        const a = await api('eu').catch(() => null);
-        if (a) S.avisos = a.avisos || [];
+        const d = await api('entrar', { email: fd.email, senha: fd.senha });
+        S.user = d.usuario; S.pedidos = null; S.contas = null; S.bib = null;
         location.hash = '#/inicio';
         render();
       } catch (e) {
@@ -365,6 +336,18 @@
       }
     });
   }
+
+  /* tema: claro (fundo branco) / escuro / sistema — botão no topo e na entrada */
+  function temaAtual() { try { return localStorage.getItem('bp-portal-tema') || 'auto'; } catch (e) { return 'auto'; } }
+  function temaEfetivo() { const v = temaAtual(); return v === 'auto' ? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : v; }
+  function aplicarTema(v) {
+    try { if (v === 'auto') localStorage.removeItem('bp-portal-tema'); else localStorage.setItem('bp-portal-tema', v); } catch (e) {}
+    if (v === 'auto') delete document.documentElement.dataset.theme; else document.documentElement.dataset.theme = v;
+    $$('[data-tema-btn]').forEach((b) => { b.innerHTML = temaEfetivo() === 'dark' ? I.sun : I.moon; b.setAttribute('aria-label', t(temaEfetivo() === 'dark' ? 'acc.toLight' : 'acc.toDark')); b.title = b.getAttribute('aria-label'); });
+    $$('[data-tema]').forEach((x) => x.setAttribute('aria-pressed', x.dataset.tema === v));
+  }
+  const temaBtn = () => `<button type="button" class="iconbtn" data-tema-btn aria-label="${esc(t(temaEfetivo() === 'dark' ? 'acc.toLight' : 'acc.toDark'))}" title="${esc(t(temaEfetivo() === 'dark' ? 'acc.toLight' : 'acc.toDark'))}">${temaEfetivo() === 'dark' ? I.sun : I.moon}</button>`;
+  function bindTema(root) { $$('[data-tema-btn]', root).forEach((b) => b.addEventListener('click', () => aplicarTema(temaEfetivo() === 'dark' ? 'light' : 'dark'))); }
 
   /* ============================================================ início */
   function saudacao() { const h = new Date().getHours(); return t(h < 12 ? 'home.hello.m' : h < 18 ? 'home.hello.a' : 'home.hello.n'); }
@@ -392,43 +375,21 @@
     const box = $('#kpis');
     if (box) box.innerHTML = kpisHTML();
   }
-  function avisosAuto() {
-    const out = [];
-    if (precosOk()) {
-      const vir = proximaVirada();
-      if (vir) {
-        const dias = Math.ceil((new Date(vir + 'T00:00:00') - new Date()) / 864e5);
-        if (dias <= 45) out.push({ titulo: `${t('home.window.auto')} · ${data(vir)}`, texto: tx(janelaAtual().nome) + ' → ' + tx(S.precos.janelas[S.precos.janelas.indexOf(janelaAtual()) + 1].nome), link: '#/tabela', auto: true });
-      }
-    }
-    return out;
-  }
-  function noticeHTML(a) {
-    const inner = `<span class="notice__ico">${a.fixo ? I.star : a.auto ? I.calendar : I.bell}</span>
-      <div><b>${esc(a.titulo)}</b>${a.texto ? `<p>${esc(a.texto)}</p>` : ''}${a.em ? `<time datetime="${esc(a.em)}">${esc(data(a.em, true))}</time>` : ''}</div>`;
-    if (a.link) {
-      const ext = /^https:/.test(a.link);
-      return `<a class="notice" href="${esc(a.link)}" ${ext ? 'target="_blank" rel="noopener"' : ''}>${inner}</a>`;
-    }
-    return `<div class="notice">${inner}</div>`;
-  }
-  function muralHTML(max = 6) {
-    const lst = [...avisosAuto(), ...(S.avisos || []).slice().sort((a, b) => (b.fixo ? 1 : 0) - (a.fixo ? 1 : 0))].slice(0, max);
-    return lst.length ? `<div class="feed">${lst.map(noticeHTML).join('')}</div>` : `<p class="muted small" style="margin:0">${esc(t('home.boardEmpty'))}</p>`;
-  }
   // Página inicial: "Bem-vindo, Nome", os tópicos no meio e, abaixo, o mapa de reservas ao vivo.
+  // Corretor: tabela, solicitações, materiais, masterplan 3D e aprender. Gerenciador: tudo isso + Gestão.
   const TOPICOS_CORRETOR = [
-    ['materiais', 'nav.materials', 'top.materials', I.grid],
-    ['mural', 'nav.board', 'top.board', I.megaphone],
     ['tabela', 'nav.prices', 'top.prices', I.table],
+    ['pedidos', 'nav.requests', 'top.requestsBroker', I.megaphone],
+    ['materiais', 'nav.materials', 'top.materials', I.grid],
+    ['masterplan', 'nav.masterplan', 'top.masterplan', I.cube],
     ['aprender', 'nav.learn', 'top.learn', I.book],
   ];
   const TOPICOS_EQUIPE = [
+    ['gestao', 'nav.gestao', 'top.gestao', I.users],
     ['pedidos', 'nav.requests', 'top.requests', I.inbox],
-    ['corretores', 'nav.brokers', 'top.brokers', I.users],
-    ['mural', 'nav.board', 'top.boardTeam', I.megaphone],
-    ['materiais', 'nav.materials', 'top.materials', I.grid],
+    ['materiais', 'nav.materials', 'top.materialsAdm', I.grid],
     ['tabela', 'nav.prices', 'top.prices', I.table],
+    ['masterplan', 'nav.masterplan', 'top.masterplan', I.cube],
     ['aprender', 'nav.learn', 'top.learn', I.book],
   ];
   VIEWS.inicio = () => {
@@ -438,7 +399,6 @@
       ? ''
       : `<div class="extras">
           <button type="button" class="extra" id="q-req" ${aprovado() ? '' : 'aria-disabled="true"'}>${I.megaphone}<span>${esc(t('home.q.req'))}</span>${aprovado() ? I.arrow : I.lock}</button>
-          <a class="extra" href="#/divulgar">${I.qr}<span>${esc(t('home.q.link'))}</span>${I.arrow}</a>
           <a class="extra" href="#/pedidos">${I.inbox}<span>${esc(t('home.myReq'))}</span><b class="num" id="cnt-req"></b>${I.arrow}</a>
           <a class="extra" href="${C.CV.corretor}" target="_blank" rel="noopener">${I.ext}<span>${esc(t('home.q.cv'))}</span>${I.arrow}</a>
         </div>`;
@@ -449,7 +409,7 @@
         <h1 class="display">${esc(t('home.welcome'))}, ${esc(primeiro(S.user.nome))}</h1>
         <p class="lead">${esc(t(isEquipe() ? 'home.subTeam' : 'home.sub2'))}</p>
       </section>
-      <nav class="topics ${tops.length > 4 ? 'topics--6' : ''}" aria-label="${esc(t('brand'))}">
+      <nav class="topics topics--${tops.length}" aria-label="${esc(t('brand'))}">
         ${tops.map(([id, k, d, ico], i) => `<a class="topic" href="#/${id}">
           <span class="topic__n num">0${i + 1}</span>
           <span class="topic__ico">${ico}</span>
@@ -497,15 +457,13 @@
       const c = $('#cnt-req', main); if (c && abertos) c.textContent = abertos;
       if (isEquipe()) badge('pedidos', (S.pedidos || []).filter((p) => p.status === 'recebido').length);
     }).catch(() => {});
-    if (isEquipe()) api('corretores').then((d) => { S.corretores = d.corretores; badge('corretores', d.corretores.filter((u) => u.status === 'pendente').length); }).catch(() => {});
-    const novos = (S.avisos || []).filter((a) => Date.now() - new Date(a.em).getTime() < 7 * 864e5).length + avisosAuto().length;
-    if (!isEquipe()) badge('mural', novos);
+    if (isEquipe()) api('contas').then((d) => { S.contas = d.contas; badge('gestao', d.contas.filter((c) => !c.ativo && c.status !== 'bloqueado').length); }).catch(() => {});
   };
 
   /* ============================================================ materiais */
   function linkRastreado(caminho, meio) {
     const u = new URL(caminho, location.origin);
-    if (S.user && S.user.slug) {
+    if (S.user && S.user.slug && S.user.papel !== 'equipe') {
       u.searchParams.set('utm_source', 'corretor');
       u.searchParams.set('utm_medium', meio || 'corretor');
       u.searchParams.set('utm_campaign', 'corretor-' + S.user.slug);
@@ -514,31 +472,61 @@
     return u.href;
   }
   const kb = (n) => (n >= 1024 ? nf(n / 1024, 1) + ' MB' : nf(n) + ' KB');
-  function urlMaterial(m) { return m.arquivo ? abs(m.arquivo) : (m.tipo === 'folder' || m.tipo === 'pagina' || m.link === '/3dmasterplan/') ? linkRastreado(m.link, 'corretor') : abs(m.link); }
+  const urlArquivoEnviado = (caminho, baixar) => `/api/portal?material=${encodeURIComponent(caminho)}${baixar ? '&baixar=1' : ''}`;
+  const extDe = (nome, tipo) => ((String(nome || '').match(/\.(\w{2,5})$/) || [])[1] || String(tipo || '').split('/').pop() || '').toUpperCase().slice(0, 5);
+
+  // Lista única: materiais fixos (conteudo.js) + os enviados pelo gerenciador (servidor). "chave" identifica o item.
+  function todosMateriais() {
+    const bib = S.bib || { itens: [], ocultos: [] };
+    const fixos = C.MATERIAIS.map((m) => ({ ...m, origem: 'fixo', chave: m.arquivo || m.link, oculto: bib.ocultos.includes(m.arquivo || m.link) }));
+    const enviados = bib.itens.map((x) => {
+      const img = x.caminho && /^image\//.test(x.conteudo || '');
+      return {
+        origem: 'enviado', chave: 'up:' + x.id, id: x.id, tipo: x.tipo, produto: x.produto, destaque: x.destaque,
+        titulo: x.titulo, desc: x.desc, kb: x.kb, caminho: x.caminho, linkExterno: x.link,
+        formato: x.caminho ? extDe(x.nomeArquivo || x.caminho, x.conteudo) : 'LINK',
+        previa: img ? urlArquivoEnviado(x.caminho) : null, conteudo: x.conteudo, criado: x.criado,
+      };
+    });
+    const lst = [...enviados, ...fixos];
+    return isEquipe() && S.mat.ocultos ? lst : lst.filter((m) => !m.oculto);
+  }
+  function urlMaterial(m) {
+    if (m.origem === 'enviado') return m.caminho ? abs(urlArquivoEnviado(m.caminho)) : m.linkExterno;
+    return m.arquivo ? abs(m.arquivo) : (m.tipo === 'folder' || m.tipo === 'pagina' || m.link === '/3dmasterplan/') ? linkRastreado(m.link, 'corretor') : abs(m.link);
+  }
   function tileHTML(m, i) {
-    const tipoCls = m.tipo === 'logo' ? `is-logo${m.escuro ? ' is-dark' : ''}` : (!m.previa ? 'is-doc' : '');
+    const tipoCls = m.tipo === 'logo' && m.previa ? `is-logo${m.escuro ? ' is-dark' : ''}` : (!m.previa ? 'is-doc' : '');
     const media = m.previa ? `<img src="${esc(m.previa)}" alt="" loading="lazy" decoding="async" />` : `<span class="doc"><i></i><i></i>${esc(m.formato)}</span>`;
     const meta = [m.formato, m.kb ? kb(m.kb) : null, tx(C.PRODUTOS[m.produto])].filter(Boolean).join(' · ');
-    const acoes = m.arquivo
-      ? `<a class="btn btn--ink" href="${esc(m.arquivo)}" download aria-label="${esc(t('mat.download'))}">${I.download}<span class="lbl">${esc(t('mat.download'))}</span></a>`
-      : `<a class="btn btn--ink" href="${esc(urlMaterial(m))}" target="_blank" rel="noopener" aria-label="${esc(t('mat.open'))}">${I.ext}<span class="lbl">${esc(t('mat.open'))}</span></a>`;
-    return `<article class="tile">
+    const publico = m.origem === 'fixo' || !m.caminho;   // arquivo enviado é privado: o link só abre logado
+    let principal;
+    if (m.origem === 'enviado' && m.caminho) principal = `<a class="btn btn--ink" href="${esc(urlArquivoEnviado(m.caminho, true))}" aria-label="${esc(t('mat.download'))}">${I.download}<span class="lbl">${esc(t('mat.download'))}</span></a>`;
+    else if (m.arquivo) principal = `<a class="btn btn--ink" href="${esc(m.arquivo)}" download aria-label="${esc(t('mat.download'))}">${I.download}<span class="lbl">${esc(t('mat.download'))}</span></a>`;
+    else principal = `<a class="btn btn--ink" href="${esc(urlMaterial(m))}" target="_blank" rel="noopener" aria-label="${esc(t('mat.open'))}">${I.ext}<span class="lbl">${esc(t('mat.open'))}</span></a>`;
+    const gestao = !isEquipe() ? '' : m.origem === 'enviado'
+      ? `<button type="button" class="iconbtn" data-medit="${i}" aria-label="${esc(t('matadm.edit'))}" title="${esc(t('matadm.edit'))}">${I.pen}</button>
+         <button type="button" class="iconbtn" data-mdel="${i}" aria-label="${esc(t('team.remove'))}" title="${esc(t('team.remove'))}">${I.trash}</button>`
+      : `<button type="button" class="iconbtn" data-mhide="${i}" aria-label="${esc(t(m.oculto ? 'matadm.show' : 'matadm.hide'))}" title="${esc(t(m.oculto ? 'matadm.show' : 'matadm.hide'))}">${m.oculto ? I.eye : I.eyeOff}</button>`;
+    return `<article class="tile ${m.oculto ? 'is-hidden' : ''}">
       <div class="tile__media ${tipoCls}">
         ${media}
         <button type="button" class="tile__open" data-ver="${i}" aria-label="${esc(tx(m.titulo))}"></button>
-        <span class="badge tile__fmt">${esc(tx(C.TIPOS_MATERIAL[m.tipo]))}</span>
-        ${m.destaque ? `<span class="badge badge--ink tile__star">${I.star.replace('<svg', '<svg width="12" height="12"')}</span>` : ''}
+        <span class="badge tile__fmt">${esc(m.oculto ? t('matadm.hidden') : tx(C.TIPOS_MATERIAL[m.tipo] || C.TIPOS_MATERIAL.documento))}</span>
+        ${m.origem === 'enviado' && isEquipe() ? `<span class="badge badge--ink tile__star">${esc(t('matadm.new'))}</span>` : m.destaque ? `<span class="badge badge--ink tile__star">${I.star.replace('<svg', '<svg width="12" height="12"')}</span>` : ''}
       </div>
       <div class="tile__body"><b class="tile__title">${esc(tx(m.titulo))}</b><span class="tile__meta">${esc(meta)}</span>${m.desc ? `<span class="tile__meta">${esc(tx(m.desc))}</span>` : ''}</div>
-      <div class="tile__actions">${acoes}
-        <button type="button" class="iconbtn" data-copy="${i}" aria-label="${esc(t('mat.copy'))}" title="${esc(t('mat.copy'))}">${I.link}</button>
-        <button type="button" class="iconbtn" data-share="${i}" aria-label="${esc(t('mat.share'))}" title="${esc(t('mat.share'))}">${I.share}</button>
+      <div class="tile__actions">${principal}
+        ${publico ? `<button type="button" class="iconbtn" data-copy="${i}" aria-label="${esc(t('mat.copy'))}" title="${esc(t('mat.copy'))}">${I.link}</button>` : ''}
+        ${gestao}
       </div>
     </article>`;
   }
+  let MATS = [];
   function filtrarMateriais() {
     const q = S.mat.q.trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
-    return C.MATERIAIS.map((m, i) => [m, i]).filter(([m]) => (S.mat.tipo === 'all' || m.tipo === S.mat.tipo)
+    MATS = todosMateriais();
+    return MATS.map((m, i) => [m, i]).filter(([m]) => (S.mat.tipo === 'all' || m.tipo === S.mat.tipo)
       && (S.mat.produto === 'all' || m.produto === S.mat.produto)
       && (!q || [tx(m.titulo), tx(m.desc), tx(C.PRODUTOS[m.produto]), m.formato].join(' ').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').includes(q)));
   }
@@ -547,10 +535,12 @@
     const prods = ['all', ...Object.keys(C.PRODUTOS)];
     return `
       <header class="pagehead">
-        <div class="pagehead__meta"><a href="#/${rotas()[0][0]}" class="linkbtn" style="text-decoration:none">← ${esc(t(rotas()[0][1]))}</a><span id="mat-count" class="num"></span></div>
+        <div class="pagehead__meta"><a href="#/inicio" class="linkbtn" style="text-decoration:none">← ${esc(t('nav.home'))}</a><span id="mat-count" class="num"></span></div>
         <div class="pagehead__body">
           <h1 class="h1">${esc(t('mat.title'))}</h1>
-          <p class="lead">${esc(t('mat.lead'))}</p>
+          <p class="lead">${esc(t(isEquipe() ? 'matadm.lead' : 'mat.lead'))}</p>
+          ${isEquipe() ? `<div style="display:flex;gap:10px;flex-wrap:wrap"><button type="button" class="btn btn--ink" id="mat-add">${I.plus}${esc(t('matadm.add'))}</button>
+            <button type="button" class="btn btn--line" id="mat-hidden" aria-pressed="${!!S.mat.ocultos}">${S.mat.ocultos ? I.eye : I.eyeOff}${esc(t(S.mat.ocultos ? 'matadm.hideHidden' : 'matadm.showHidden'))}</button></div>` : ''}
           <div class="tags" role="group" aria-label="${esc(t('mat.title'))}">${tipos.map((k) => `<button type="button" data-mtipo="${k}" aria-pressed="${S.mat.tipo === k}">${esc(k === 'all' ? t('mat.all') : tx(C.TIPOS_MATERIAL[k]))}</button>`).join('')}</div>
         </div>
       </header>
@@ -559,125 +549,127 @@
         <label class="search"><span class="vh">${esc(t('mat.search'))}</span>${I.search}<input class="input" type="search" id="mat-q" placeholder="${esc(t('mat.search'))}" value="${esc(S.mat.q)}" /></label>
       </div>
       <div class="grid" id="mat-grid"></div>
-      <p class="small muted" style="margin-top:28px">${esc(t('mat.missing'))} <button type="button" class="linkbtn" id="mat-ask">${esc(t('req.new'))} →</button></p>`;
+      ${isEquipe() ? '' : `<p class="small muted" style="margin-top:28px">${esc(t('mat.missing'))} <button type="button" class="linkbtn" id="mat-ask">${esc(t('req.new'))} →</button></p>`}`;
   };
   function desenharGrade() {
     const lst = filtrarMateriais();
-    const g = $('#mat-grid');
+    const g = $('#mat-grid'); if (!g) return;
     g.innerHTML = lst.length ? lst.map(([m, i]) => tileHTML(m, i)).join('') : `<div class="empty" style="grid-column:1/-1">${I.search}${esc(t('mat.none'))}</div>`;
     $('#mat-count').textContent = `${lst.length} ${t('mat.count')}`;
   }
+  async function carregarBib() {
+    try { const d = await api('materiais'); S.bib = { itens: d.itens || [], ocultos: d.ocultos || [] }; } catch (e) { S.bib = S.bib || { itens: [], ocultos: [] }; }
+    desenharGrade();
+  }
   VIEWS['materiais:after'] = (main) => {
     desenharGrade();
-    main.addEventListener('click', (ev) => {
+    carregarBib();
+    main.addEventListener('click', async (ev) => {
       const b = ev.target.closest('button,a'); if (!b) return;
       if (b.dataset.mtipo) { S.mat.tipo = b.dataset.mtipo; $$('[data-mtipo]').forEach((x) => x.setAttribute('aria-pressed', x === b)); desenharGrade(); }
       else if (b.dataset.mprod) { S.mat.produto = b.dataset.mprod; $$('[data-mprod]').forEach((x) => x.setAttribute('aria-pressed', x === b)); desenharGrade(); }
-      else if (b.dataset.copy) copiar(urlMaterial(C.MATERIAIS[+b.dataset.copy]));
-      else if (b.dataset.share) { const m = C.MATERIAIS[+b.dataset.share]; compartilhar(tx(m.titulo), urlMaterial(m)); }
-      else if (b.dataset.ver) verMaterial(C.MATERIAIS[+b.dataset.ver]);
-      else if (b.id === 'mat-ask') novoPedido('material');
+      else if (b.dataset.copy) copiar(urlMaterial(MATS[+b.dataset.copy]));
+      else if (b.dataset.ver) verMaterial(MATS[+b.dataset.ver]);
+      else if (b.dataset.medit) editarMaterial(MATS[+b.dataset.medit]);
+      else if (b.dataset.mdel) {
+        const m = MATS[+b.dataset.mdel];
+        if (!confirm(`${t('team.remove')}: ${m.titulo}?`)) return;
+        try { const d = await api('materialRemover', { id: m.id }); S.bib = d; desenharGrade(); toast(t('acc.saved')); } catch (e) { toast(e.message); }
+      } else if (b.dataset.mhide) {
+        const m = MATS[+b.dataset.mhide];
+        try { const d = await api('materialOcultar', { chave: m.chave, ocultar: !m.oculto }); S.bib = d; desenharGrade(); } catch (e) { toast(e.message); }
+      } else if (b.id === 'mat-add') editarMaterial(null);
+      else if (b.id === 'mat-hidden') { S.mat.ocultos = !S.mat.ocultos; renderMain(); }
+      else if (b.id === 'mat-ask') novoPedido('outro');
     });
     let tmr;
     $('#mat-q', main).addEventListener('input', (e) => { clearTimeout(tmr); tmr = setTimeout(() => { S.mat.q = e.target.value; desenharGrade(); }, 120); });
   };
   function verMaterial(m) {
-    if (!m.arquivo || m.tipo !== 'foto') { window.open(m.arquivo || urlMaterial(m), '_blank', 'noopener'); return; }
+    const src = m.origem === 'enviado' ? (m.caminho ? urlArquivoEnviado(m.caminho) : m.linkExterno) : (m.arquivo || urlMaterial(m));
+    const ehFoto = m.origem === 'enviado' ? /^image\//.test(m.conteudo || '') : (m.tipo === 'foto' && m.arquivo);
+    if (!ehFoto) { window.open(src, '_blank', 'noopener'); return; }
+    const baixar = m.origem === 'enviado' ? urlArquivoEnviado(m.caminho, true) : m.arquivo;
     abrirSheet({
       cls: 'viewer', titulo: tx(m.titulo),
-      corpo: `<img class="viewer__img" src="${esc(m.arquivo)}" alt="${esc(tx(m.titulo))}" />
-        <p class="small muted" style="margin:0">${esc([m.formato, kb(m.kb), tx(C.PRODUTOS[m.produto])].join(' · '))}</p>`,
-      pe: `<button type="button" class="btn btn--line" data-x="copy">${I.link}${esc(t('mat.copy'))}</button>
-        <a class="btn btn--ink" href="${esc(m.arquivo)}" download>${I.download}${esc(t('mat.download'))}</a>`,
-      depois: (p) => { $('[data-x=copy]', p).addEventListener('click', () => copiar(abs(m.arquivo))); },
+      corpo: `<img class="viewer__img" src="${esc(src)}" alt="${esc(tx(m.titulo))}" />
+        <p class="small muted" style="margin:0">${esc([m.formato, m.kb ? kb(m.kb) : null, tx(C.PRODUTOS[m.produto])].filter(Boolean).join(' · '))}</p>`,
+      pe: `${m.origem === 'fixo' ? `<button type="button" class="btn btn--line" data-x="copy">${I.link}${esc(t('mat.copy'))}</button>` : ''}
+        <a class="btn btn--ink" href="${esc(baixar)}" ${m.origem === 'fixo' ? 'download' : ''}>${I.download}${esc(t('mat.download'))}</a>`,
+      depois: (p) => { const c = $('[data-x=copy]', p); if (c) c.addEventListener('click', () => copiar(abs(m.arquivo))); },
     });
   }
 
-  /* ============================================================ divulgar */
-  function qrDe(texto) {
-    const q = window.qrcode(0, 'M'); q.addData(texto); q.make(); return q;
-  }
-  function qrSVG(q) {
-    const n = q.getModuleCount(); let d = '';
-    for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) if (q.isDark(r, c)) d += `M${c} ${r}h1v1h-1z`;
-    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="-2 -2 ${n + 4} ${n + 4}" shape-rendering="crispEdges"><rect x="-2" y="-2" width="${n + 4}" height="${n + 4}" fill="#fff"/><path d="${d}" fill="#0b0b0b"/></svg>`;
-  }
-  function baixar(nome, blob) {
-    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = nome; document.body.appendChild(a); a.click();
-    setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
-  }
-  function qrPNG(q, nome) {
-    const n = q.getModuleCount(); const s = Math.floor(1600 / (n + 8)); const lado = s * (n + 8);
-    const cv = document.createElement('canvas'); cv.width = cv.height = lado; const x = cv.getContext('2d');
-    x.fillStyle = '#fff'; x.fillRect(0, 0, lado, lado); x.fillStyle = '#0b0b0b';
-    for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) if (q.isDark(r, c)) x.fillRect((c + 4) * s, (r + 4) * s, s, s);
-    cv.toBlob((b) => baixar(nome, b), 'image/png');
-  }
-  const destAtual = () => C.DESTINOS.find((d) => d.id === S.share.dest) || C.DESTINOS[0];
-  function mensagem(m, lang) {
-    const d = destAtual();
-    const vir = precosOk() ? proximaVirada() : null;
-    const virTxt = vir ? new Intl.DateTimeFormat({ pt: 'pt-BR', es: 'es-PY', en: 'en-US' }[lang], { day: '2-digit', month: '2-digit', year: 'numeric' }).format(new Date(vir + 'T12:00:00')) : '—';
-    return m[lang].replace('{nome}', S.user.nome || '').replace('{link}', linkRastreado(d.caminho, 'whatsapp')).replace('{virada}', virTxt);
-  }
-  VIEWS.divulgar = () => {
-    const d = destAtual();
-    const ml = S.share.msgLang || S.lang;
-    const msgs = C.MENSAGENS.filter((m) => m.id !== 'prazo' || (precosOk() && proximaVirada()));
-    return `
-      <header class="pagehead">
-        <div class="pagehead__meta"><span>${esc(t('share.code'))}</span><b class="num" style="color:var(--ink)">${esc(S.user.slug || '—')}</b></div>
-        <div class="pagehead__body"><h1 class="h1">${esc(t('share.title'))}</h1><p class="lead">${esc(t('share.lead'))}</p></div>
-      </header>
-      <div class="sharegrid">
-        <section class="card" style="display:grid;gap:18px;align-content:start">
-          <h2 class="h3">${esc(t('share.dest'))}</h2>
-          <div class="dests" role="group" aria-label="${esc(t('share.dest'))}">
-            ${C.DESTINOS.map((x) => `<button type="button" class="dest" data-dest="${x.id}" aria-pressed="${x.id === d.id}"><b>${esc(tx(x.nome))}</b><span>${esc(x.caminho)}</span></button>`).join('')}
-          </div>
-          <h2 class="h3">${esc(t('share.link'))}</h2>
-          <div class="linkbox"><code id="my-link">${esc(linkRastreado(d.caminho, 'corretor'))}</code>
-            <button type="button" class="btn btn--ink btn--sm" id="copy-link">${I.copy}${esc(t('mat.copy'))}</button>
-            <button type="button" class="iconbtn" id="share-link" aria-label="${esc(t('mat.share'))}">${I.share}</button>
-          </div>
-        </section>
-        <section class="card card--dark qrwrap">
-          <div style="display:flex;justify-content:space-between;width:100%;align-items:center"><span class="eyebrow">${esc(t('share.qr'))}</span><span class="small" style="color:var(--on-dark-muted)">${esc(tx(d.nome))}</span></div>
-          <div class="qr" id="qr" role="img" aria-label="${esc(t('share.qr'))}: ${esc(tx(d.nome))}"></div>
-          <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center">
-            <button type="button" class="btn btn--light btn--sm" id="qr-png">${I.download}${esc(t('share.png'))}</button>
-            <button type="button" class="btn btn--sm" style="border-color:var(--on-dark-muted);color:var(--on-dark)" id="qr-svg">${I.download}${esc(t('share.svg'))}</button>
-          </div>
-        </section>
-      </div>
-      <section class="section">
-        <div class="section__head"><div><h2 class="h2">${esc(t('share.msgs'))}</h2><p class="muted small" style="margin:6px 0 0">${esc(t('share.msgsd'))}</p></div>
-          <div class="seg" role="group" aria-label="${esc(t('share.lang'))}">${['pt', 'es', 'en'].map((l) => `<button type="button" data-ml="${l}" aria-pressed="${ml === l}">${l.toUpperCase()}</button>`).join('')}</div>
+  /* gerenciador: adicionar / editar material (o arquivo vai direto do navegador para o Blob privado) */
+  let blobClient = null;
+  function editarMaterial(m) {
+    const novo = !m;
+    const opt = (obj, sel) => Object.keys(obj).map((k) => `<option value="${k}" ${k === sel ? 'selected' : ''}>${esc(tx(obj[k]))}</option>`).join('');
+    abrirSheet({
+      titulo: novo ? t('matadm.add') : t('matadm.edit'),
+      corpo: `<form id="f-mat" style="display:grid;gap:16px" novalidate>
+        ${novo ? `<div class="seg" role="radiogroup" id="mat-src"><button type="button" data-src="arq" aria-checked="true" aria-pressed="true">${esc(t('matadm.file'))}</button><button type="button" data-src="link" aria-checked="false" aria-pressed="false">${esc(t('matadm.link'))}</button></div>
+        <label class="drop" id="mat-drop"><input type="file" id="mat-file" /><span>${I.upload}</span><b id="mat-fname">${esc(t('matadm.pick'))}</b><span>${esc(t('matadm.pickHint'))}</span></label>
+        <label class="field" id="mat-linkf" hidden><span>${esc(t('matadm.link'))} (https://)</span><input class="input" type="url" name="link" placeholder="https://drive.google.com/…" /></label>` : ''}
+        <label class="field"><span>${esc(t('req.titleF'))}</span><input class="input" name="titulo" maxlength="120" value="${esc(m ? m.titulo : '')}" required /></label>
+        <div class="grid2">
+          <label class="field"><span>${esc(t('matadm.cat'))}</span><select class="select" name="tipo">${opt(C.TIPOS_MATERIAL, m ? m.tipo : 'apresentacao')}</select></label>
+          <label class="field"><span>${esc(t('req.product'))}</span><select class="select" name="produto">${opt(C.PRODUTOS, m ? m.produto : 'geral')}</select></label>
         </div>
-        <div class="msgs">
-          ${msgs.map((m) => `<article class="card msg"><div style="display:grid;gap:8px"><span class="eyebrow">${esc(tx(m.titulo))}</span><p>${esc(mensagem(m, ml))}</p></div>
-            <div class="row"><button type="button" class="btn btn--line btn--sm" data-mcopy="${m.id}">${I.copy}${esc(t('mat.copy').split(' ')[0])}</button>
-            <a class="btn btn--ink btn--sm" href="https://wa.me/?text=${encodeURIComponent(mensagem(m, ml))}" target="_blank" rel="noopener">${I.wa.replace('<svg', '<svg width="16" height="16"')}${esc(t('share.wa'))}</a></div></article>`).join('')}
-        </div>
-      </section>`;
-  };
-  VIEWS['divulgar:after'] = (main) => {
-    const d = destAtual();
-    const linkQR = linkRastreado(d.caminho, 'qr');
-    let q = null;
-    if (window.qrcode) { q = qrDe(linkQR); $('#qr').innerHTML = qrSVG(q); }
-    const nomeArq = `qr-bracerum-${d.id}-${(S.user.slug || 'equipe')}`;
-    main.addEventListener('click', (ev) => {
-      const b = ev.target.closest('button'); if (!b) return;
-      if (b.dataset.dest) { S.share.dest = b.dataset.dest; renderMain(); }
-      else if (b.dataset.ml) { S.share.msgLang = b.dataset.ml; renderMain(); }
-      else if (b.dataset.mcopy) copiar(mensagem(C.MENSAGENS.find((m) => m.id === b.dataset.mcopy), S.share.msgLang || S.lang));
-      else if (b.id === 'copy-link') copiar(linkRastreado(d.caminho, 'corretor'));
-      else if (b.id === 'share-link') compartilhar('Bracerum Park', linkRastreado(d.caminho, 'corretor'));
-      else if (b.id === 'qr-png' && q) qrPNG(q, nomeArq + '.png');
-      else if (b.id === 'qr-svg' && q) baixar(nomeArq + '.svg', new Blob([qrSVG(q)], { type: 'image/svg+xml' }));
+        <label class="field"><span>${esc(t('matadm.desc'))} <span class="muted">(${esc(t('c.optional'))})</span></span><textarea class="textarea" name="desc" maxlength="400" style="min-height:80px">${esc(m ? m.desc || '' : '')}</textarea></label>
+        <label class="check"><input type="checkbox" name="destaque" ${m && m.destaque ? 'checked' : ''} /><span>${esc(t('matadm.star'))}</span></label>
+        <div class="bar" id="mat-prog" hidden><i style="width:0%"></i></div>
+        <p class="formmsg" role="alert"></p>
+      </form>`,
+      pe: `<button type="button" class="btn btn--line" data-x="close">${esc(t('req.close'))}</button><button type="submit" form="f-mat" class="btn btn--ink">${esc(t(novo ? 'matadm.upload' : 'req.save'))}</button>`,
+      depois: (p) => {
+        const f = $('#f-mat', p);
+        let fonte = 'arq';
+        let arquivo = null;
+        $$('[data-src]', p).forEach((b) => b.addEventListener('click', () => {
+          fonte = b.dataset.src;
+          $$('[data-src]', p).forEach((x) => { x.setAttribute('aria-checked', x === b); x.setAttribute('aria-pressed', x === b); });
+          $('#mat-drop', p).hidden = fonte !== 'arq'; $('#mat-linkf', p).hidden = fonte !== 'link';
+        }));
+        const fi = $('#mat-file', p);
+        if (fi) fi.addEventListener('change', () => {
+          arquivo = fi.files[0] || null;
+          $('#mat-fname', p).textContent = arquivo ? `${arquivo.name} · ${kb(Math.ceil(arquivo.size / 1024))}` : t('matadm.pick');
+          const tit = $('[name=titulo]', f);
+          if (arquivo && !tit.value) tit.value = arquivo.name.replace(/\.\w+$/, '').replace(/[-_]+/g, ' ');
+          if (arquivo) {
+            const sel = $('[name=tipo]', f);
+            if (/^image\//.test(arquivo.type)) sel.value = 'foto'; else if (/^video\//.test(arquivo.type)) sel.value = 'video'; else if (/pdf$/.test(arquivo.type)) sel.value = 'apresentacao';
+          }
+        });
+        f.addEventListener('submit', async (ev) => {
+          ev.preventDefault();
+          const fd = Object.fromEntries(new FormData(f).entries());
+          const msg = $('.formmsg', f); msg.textContent = '';
+          if (!fd.titulo || fd.titulo.trim().length < 2) { msg.textContent = t('matadm.needTitle'); return; }
+          const btn = $('button[form=f-mat]', p); btn.disabled = true;
+          try {
+            const base = { titulo: fd.titulo, tipo: fd.tipo, produto: fd.produto, desc: fd.desc, destaque: !!fd.destaque };
+            let d;
+            if (!novo) d = await api('materialSalvar', { id: m.id, ...base });
+            else if (fonte === 'link') d = await api('materialSalvar', { ...base, link: fd.link });
+            else {
+              if (!arquivo) { msg.textContent = t('matadm.needFile'); btn.disabled = false; return; }
+              const tk = await api('materialToken', { nome: arquivo.name, tipo: arquivo.type, tamanho: arquivo.size });
+              if (!blobClient) blobClient = await import('/portalcorretores/vendor/vercel-blob-client-2.8.0.js');
+              const prog = $('#mat-prog', p); prog.hidden = false;
+              await blobClient.put(tk.caminho, arquivo, {
+                access: 'private', token: tk.token, contentType: arquivo.type || undefined, multipart: arquivo.size > 20 * 1024 * 1024,
+                onUploadProgress: (e) => { $('i', prog).style.width = Math.round(e.percentage) + '%'; btn.textContent = Math.round(e.percentage) + '%'; },
+              });
+              d = await api('materialSalvar', { ...base, caminho: tk.caminho, conteudo: arquivo.type, kb: Math.ceil(arquivo.size / 1024), nomeArquivo: arquivo.name });
+            }
+            S.bib = d; fecharSheet(); desenharGrade(); toast(t('acc.saved'));
+          } catch (e) { msg.textContent = e.message || t('c.error'); btn.disabled = false; btn.textContent = t(novo ? 'matadm.upload' : 'req.save'); }
+        });
+      },
     });
-  };
+  }
 
   /* ============================================================ tabela */
   VIEWS.tabela = () => {
@@ -1061,7 +1053,7 @@
           <label class="field"><span>${esc(t('acc.passNew'))}</span><input class="input" type="password" name="senhaNova" autocomplete="new-password" minlength="8" required /></label>
           <p class="formmsg" role="alert"></p><button type="submit" class="btn btn--ink" style="justify-self:start">${esc(t('acc.save'))}</button></form>`
         : `<section class="card"><h2 class="h3" style="margin-bottom:12px">${esc(t('learn.contacts'))}</h2>${contatosHTML()}</section>`;
-      return `<header class="pagehead"><div class="pagehead__meta"><span>${esc(t('team.hi'))}</span>${u.email ? `<span>${esc(u.email)}</span>` : ''}</div><div class="pagehead__body"><h1 class="h1">${esc(u.nome)}</h1></div></header>
+      return `<header class="pagehead"><div class="pagehead__meta"><span>${esc(t('acc.manager'))}</span>${u.email ? `<span>${esc(u.email)}</span>` : ''}</div><div class="pagehead__body"><h1 class="h1">${esc(u.nome)}</h1></div></header>
         <div class="split">${prefs}${senha}</div>`;
     }
     const ddiOpts = ['55', '595', '54', '598', '1', '351'].map((d) => `<option value="${d}" ${d === u.ddi ? 'selected' : ''}>+${d}</option>`).join('');
@@ -1103,13 +1095,8 @@
   };
   VIEWS['conta:after'] = (main) => {
     bindLang(main);
-    $$('[data-tema]', main).forEach((b) => b.addEventListener('click', () => {
-      const v = b.dataset.tema;
-      try { if (v === 'auto') localStorage.removeItem('bp-portal-tema'); else localStorage.setItem('bp-portal-tema', v); } catch (e) {}
-      if (v === 'auto') delete document.documentElement.dataset.theme; else document.documentElement.dataset.theme = v;
-      $$('[data-tema]', main).forEach((x) => x.setAttribute('aria-pressed', x === b));
-    }));
-    $('#sair', main).addEventListener('click', async () => { await api('sair').catch(() => {}); S.user = null; S.pedidos = null; S.corretores = null; authTab = 'in'; history.replaceState(null, '', location.pathname); render(); });
+    $$('[data-tema]', main).forEach((b) => b.addEventListener('click', () => aplicarTema(b.dataset.tema)));
+    $('#sair', main).addEventListener('click', async () => { await api('sair').catch(() => {}); S.user = null; S.pedidos = null; S.contas = null; history.replaceState(null, '', location.pathname); render(); });
     const fse = $('#f-senha-eq', main);
     if (fse) fse.addEventListener('submit', async (ev) => {
       ev.preventDefault();
@@ -1123,7 +1110,7 @@
       const senha = new FormData(fdel).get('senha');
       if (!senha) return;
       if (!confirm(t('acc.deleteInfo'))) return;
-      try { await api('excluirConta', { senha }); S.user = null; S.pedidos = null; authTab = 'in'; history.replaceState(null, '', location.pathname); render(); }
+      try { await api('excluirConta', { senha }); S.user = null; S.pedidos = null; history.replaceState(null, '', location.pathname); render(); }
       catch (e) { $('.formmsg', fdel).textContent = e.message; }
     });
     const f = $('#f-perfil', main);
@@ -1137,128 +1124,161 @@
     });
   };
 
-  /* ============================================================ equipe: corretores */
-  VIEWS.corretores = () => `
-    <header class="pagehead"><div class="pagehead__meta"><span id="br-count" class="num"></span></div>
-      <div class="pagehead__body"><h1 class="h1">${esc(t('team.brokers'))}</h1></div></header>
-    <div class="toolbar"><div class="seg" role="group">${[['pendente', 'team.pending'], ['aprovado', 'acc.aprovado'], ['bloqueado', 'acc.bloqueado'], ['todos', 'req.all']].map(([id, k]) => `<button type="button" data-bf="${id}" aria-pressed="${S.team.filtro === id}">${esc(t(k))}</button>`).join('')}</div>
-      <button type="button" class="btn btn--line btn--sm" id="br-csv">${I.download}${esc(t('team.csv'))}</button></div>
-    <div id="br-list"><div class="skel" style="height:240px;border-radius:18px"></div></div>
-    <section class="section split">
-      <div class="card"><h2 class="h3" style="margin-bottom:12px">${esc(t('inv.team'))}</h2><div id="eq-list" class="feed"></div></div>
-      <form class="card" id="f-conv" style="display:grid;gap:12px;align-content:start" novalidate>
-        <h2 class="h3">${esc(t('inv.invite'))}</h2><p class="small muted" style="margin:0">${esc(t('inv.inviteInfo'))}</p>
-        <div class="grid2"><label class="field"><span>${esc(t('inv.name'))}</span><input class="input" name="nome" /></label>
-        <label class="field"><span>${esc(t('auth.email'))}</span><input class="input" type="email" name="email" required /></label></div>
-        <p class="formmsg" role="alert"></p>
-        <button type="submit" class="btn btn--ink" style="justify-self:start">${I.link}${esc(t('inv.make'))}</button>
-      </form>
-    </section>`;
-  function desenharCorretores() {
-    const box = $('#br-list'); if (!box) return;
-    const lst = S.corretores || [];
-    const vis = lst.filter((u) => S.team.filtro === 'todos' || u.status === S.team.filtro);
-    $('#br-count').textContent = `${vis.length} / ${lst.length}`;
+  /* ============================================================ masterplan 3D (mapa de reservas) */
+  VIEWS.masterplan = () => `
+    <header class="pagehead">
+      <div class="pagehead__meta"><a href="#/inicio" class="linkbtn" style="text-decoration:none">← ${esc(t('nav.home'))}</a></div>
+      <div class="pagehead__body"><h1 class="h1">${esc(t('nav.masterplan'))}</h1><p class="lead">${esc(t('map.desc'))}</p>
+        <div><a class="btn btn--line btn--sm" href="/3dmasterplan/#lotes" target="_blank" rel="noopener">${I.expand}${esc(t('home.mapFull'))}</a></div></div>
+    </header>
+    <div class="legend" id="kpis">${kpisHTML()}</div>
+    <div class="stage stage--map stage--tall is-live"><iframe class="stage__frame" title="${esc(t('nav.masterplan'))}" src="/3dmasterplan/?embed=1#lotes" allow="fullscreen"></iframe></div>
+    <p class="small muted" style="margin:10px 0 0">${esc(t('map.note'))}</p>`;
+
+  /* ============================================================ gestão de contas (gerenciador) */
+  const papelNome = (p) => t(p === 'equipe' ? 'acc.manager' : 'acc.broker');
+  function situacao(c) {
+    if (c.status === 'bloqueado') return ['acc.bloqueado', ''];
+    if (!c.ativo) return ['gest.waiting', ''];
+    return ['gest.active', 'badge--ink'];
+  }
+  VIEWS.gestao = () => `
+    <header class="pagehead"><div class="pagehead__meta"><span id="ct-count" class="num"></span></div>
+      <div class="pagehead__body"><h1 class="h1">${esc(t('nav.gestao'))}</h1><p class="lead">${esc(t('gest.lead'))}</p>
+        <div><button type="button" class="btn btn--ink" id="ct-new">${I.plus}${esc(t('gest.new'))}</button></div></div></header>
+    <div class="toolbar"><div class="seg" role="group">${[['todos', 'req.all'], ['corretor', 'gest.brokers'], ['equipe', 'gest.managers'], ['aguardando', 'gest.waiting'], ['bloqueado', 'acc.bloqueado']].map(([id, k]) => `<button type="button" data-cf="${id}" aria-pressed="${S.team.filtro === id}">${esc(t(k))}</button>`).join('')}</div>
+      <div style="display:flex;gap:8px;flex:1 1 260px;justify-content:flex-end;flex-wrap:wrap">
+        <label class="search"><span class="vh">${esc(t('mat.search'))}</span>${I.search}<input class="input" type="search" id="ct-q" placeholder="${esc(t('gest.search'))}" /></label>
+        <button type="button" class="btn btn--line btn--sm" id="ct-csv" style="min-height:44px">${I.download}CSV</button></div></div>
+    <div id="ct-list"><div class="skel" style="height:240px;border-radius:18px"></div></div>`;
+  function desenharContas() {
+    const box = $('#ct-list'); if (!box) return;
+    const lst = S.contas || [];
+    const f = S.team.filtro;
+    const q = ($('#ct-q') && $('#ct-q').value || '').trim().toLowerCase();
+    const vis = lst.filter((c) => (f === 'todos' || (f === 'aguardando' ? !c.ativo && c.status !== 'bloqueado' : f === 'bloqueado' ? c.status === 'bloqueado' : c.papel === f))
+      && (!q || [c.nome, c.email, c.imobiliaria].join(' ').toLowerCase().includes(q)));
+    $('#ct-count').textContent = `${vis.length} / ${lst.length}`;
     if (!vis.length) { box.innerHTML = `<div class="empty">${I.users}${esc(t('team.noBrokers'))}</div>`; return; }
-    box.innerHTML = `<div class="tablewrap"><table class="table"><thead><tr><th>${esc(t('auth.name'))}</th><th>${esc(t('auth.agency'))}</th><th>${esc(t('auth.wa'))} · ${esc(t('auth.email'))}</th><th>${esc(t('acc.status'))}</th><th></th></tr></thead><tbody>
-      ${vis.map((u) => `<tr><td><b>${esc(u.nome)}</b><div class="small muted">${esc(data(u.criado))}${u.ultimoAcesso ? ` · ${esc(t('team.lastSeen'))} ${esc(data(u.ultimoAcesso, true))}` : ''}</div></td>
-        <td>${esc(u.imobiliaria)}${u.creci ? `<div class="small muted">${esc(u.creci)}</div>` : ''}</td>
-        <td><a class="linkbtn" href="https://wa.me/${esc(u.ddi)}${esc(u.tel)}" target="_blank" rel="noopener">+${esc(u.ddi)} ${esc(u.tel)}</a><div class="small"><a href="mailto:${esc(u.email)}">${esc(u.email)}</a></div></td>
-        <td><span class="badge ${u.status === 'aprovado' ? 'badge--ink' : ''}"><i></i>${esc(t('acc.' + u.status))}</span></td>
-        <td><div class="row">
-          ${u.status !== 'aprovado' ? `<button type="button" class="btn btn--ink btn--sm" data-ba="${esc(u.id)}" data-st="aprovado">${I.check}${esc(t(u.status === 'bloqueado' ? 'team.unblock' : 'team.approve'))}</button>` : ''}
-          ${u.status !== 'bloqueado' ? `<button type="button" class="btn btn--line btn--sm" data-ba="${esc(u.id)}" data-st="bloqueado">${esc(t('team.block'))}</button>` : ''}
-          <button type="button" class="btn btn--ghost btn--sm" data-reset="${esc(u.id)}">${esc(t('team.reset'))}</button></div></td></tr>`).join('')}
+    box.innerHTML = `<div class="tablewrap"><table class="table table--cards"><thead><tr><th>${esc(t('auth.name'))}</th><th>${esc(t('gest.kind'))}</th><th>${esc(t('auth.wa'))} · ${esc(t('auth.agency'))}</th><th>${esc(t('acc.status'))}</th><th></th></tr></thead><tbody>
+      ${vis.map((c) => { const [st, cls] = situacao(c); const eu = c.id === S.user.id; return `<tr>
+        <td><b>${esc(c.nome || '—')}</b>${eu ? ` <span class="badge">${esc(t('gest.you'))}</span>` : ''}<div class="small muted">${esc(c.email)}</div><div class="small muted">${c.ultimoAcesso ? `${esc(t('team.lastSeen'))} ${esc(data(c.ultimoAcesso, true))}` : `${esc(t('gest.created'))} ${esc(data(c.criado))}`}</div></td>
+        <td><span class="badge ${c.papel === 'equipe' ? 'badge--ink' : ''}">${esc(papelNome(c.papel))}</span></td>
+        <td>${c.tel ? `<a class="linkbtn" href="https://wa.me/${esc(c.ddi)}${esc(c.tel)}" target="_blank" rel="noopener">+${esc(c.ddi)} ${esc(c.tel)}</a>` : '<span class="muted">—</span>'}<div class="small muted">${esc(c.imobiliaria || '')}${c.creci ? ` · ${esc(c.creci)}` : ''}</div></td>
+        <td><span class="badge ${cls}"><i></i>${esc(t(st))}</span></td>
+        <td>${eu ? '' : `<div class="row">
+          ${!c.ativo && c.status !== 'bloqueado' ? `<button type="button" class="btn btn--ink btn--sm" data-clink="${esc(c.id)}">${I.link}${esc(t('gest.copyLink'))}</button>` : ''}
+          <button type="button" class="iconbtn" data-cmenu="${esc(c.id)}" aria-label="${esc(t('gest.more'))}" title="${esc(t('gest.more'))}">${I.dots}</button></div>`}</td></tr>`; }).join('')}
     </tbody></table></div>`;
   }
-  VIEWS['corretores:after'] = (main) => {
-    const desenharEquipe = (lst) => {
-      const box = $('#eq-list'); if (!box) return;
-      box.innerHTML = (lst || []).length ? lst.map((p) => `<div class="notice"><span class="avatar" style="width:36px;height:36px;font-size:12px">${esc(iniciais(p.nome || p.email))}</span><div><b>${esc(p.nome || p.email)}</b><p>${esc(p.email)} · ${esc(p.ativo ? t('acc.aprovado') : t('inv.waiting'))}${p.ultimoAcesso ? ` · ${esc(t('team.lastSeen'))} ${esc(data(p.ultimoAcesso, true))}` : ''}</p></div></div>`).join('')
-        : `<p class="small muted" style="margin:0">${esc(t('inv.none'))}</p>`;
-    };
-    const carregar = () => api('corretores').then((d) => { S.corretores = d.corretores; desenharCorretores(); desenharEquipe(d.equipe); }).catch((e) => { $('#br-list').innerHTML = `<div class="empty">${esc(e.message)}</div>`; });
-    carregar();
-    const fc = $('#f-conv', main);
-    fc.addEventListener('submit', async (ev) => {
-      ev.preventDefault();
-      const fd = Object.fromEntries(new FormData(fc).entries());
-      const msg = $('.formmsg', fc); msg.textContent = '';
-      try {
-        const d = await api('convidar', fd);
-        const txt = `Bracerum Park · ${t('brand')}\n${t('inv.msg')}\n${d.link}`;
-        abrirSheet({ titulo: t('inv.invite'), corpo: `<p style="margin:0">${esc(t('inv.linkInfo'))}</p><div class="linkbox"><code>${esc(d.link)}</code><button type="button" class="btn btn--ink btn--sm" data-x="cp">${I.copy}</button></div>`,
-          pe: `<a class="btn btn--line" href="mailto:${esc(fd.email)}?subject=${encodeURIComponent('Bracerum Park · ' + t('brand'))}&body=${encodeURIComponent(txt)}">${I.mail}E-mail</a><a class="btn btn--ink" href="https://wa.me/?text=${encodeURIComponent(txt)}" target="_blank" rel="noopener">${I.wa.replace('<svg', '<svg width="16" height="16"')}WhatsApp</a>`,
-          depois: (p) => $('[data-x=cp]', p).addEventListener('click', () => copiar(d.link)) });
-        fc.reset(); carregar();
-      } catch (e) { msg.textContent = e.message; }
+  function mostrarLink(c, link, titulo) {
+    const msg = `${t('gest.msgHi')} ${primeiro(c.nome)}! ${t('gest.msgBody')}\n${link}`;
+    abrirSheet({
+      titulo: titulo || t('gest.linkTitle'),
+      corpo: `<p style="margin:0">${esc(t('gest.linkInfo'))}</p>
+        <dl class="kv"><dt>${esc(t('auth.name'))}</dt><dd>${esc(c.nome)}</dd><dt>${esc(t('auth.email'))}</dt><dd>${esc(c.email)}</dd><dt>${esc(t('gest.kind'))}</dt><dd>${esc(papelNome(c.papel))}</dd></dl>
+        <div class="linkbox"><code>${esc(link)}</code><button type="button" class="btn btn--ink btn--sm" data-x="cp">${I.copy}${esc(t('mat.copy').split(' ')[0])}</button></div>`,
+      pe: `<a class="btn btn--line" href="mailto:${esc(c.email)}?subject=${encodeURIComponent('Bracerum Park · ' + t('brand'))}&body=${encodeURIComponent(msg)}">${I.mail}E-mail</a>
+        <a class="btn btn--ink" href="https://wa.me/${c.tel ? esc(c.ddi) + esc(c.tel) : ''}?text=${encodeURIComponent(msg)}" target="_blank" rel="noopener">${I.wa.replace('<svg', '<svg width="16" height="16"')}WhatsApp</a>`,
+      depois: (p) => $('[data-x=cp]', p).addEventListener('click', () => copiar(link)),
     });
+  }
+  function novaConta() {
+    let papel = 'corretor';
+    const ddi = ['55', '595', '54', '598', '1', '351'].map((d) => `<option value="${d}">+${d}</option>`).join('');
+    abrirSheet({
+      titulo: t('gest.new'),
+      corpo: `<form id="f-conta" style="display:grid;gap:16px" novalidate>
+        <div class="kinds" role="radiogroup" aria-label="${esc(t('gest.kind'))}">
+          <button type="button" class="kind" role="radio" data-papel="corretor" aria-checked="true">${I.user}<b>${esc(t('acc.broker'))}</b><span>${esc(t('gest.brokerInfo'))}</span></button>
+          <button type="button" class="kind" role="radio" data-papel="equipe" aria-checked="false">${I.lock}<b>${esc(t('acc.manager'))}</b><span>${esc(t('gest.managerInfo'))}</span></button>
+        </div>
+        <label class="field"><span>${esc(t('auth.name'))}</span><input class="input" name="nome" autocomplete="off" required /></label>
+        <label class="field"><span>${esc(t('auth.email'))}</span><input class="input" type="email" name="email" autocomplete="off" required /></label>
+        <label class="field"><span>${esc(t('auth.wa'))} <span class="muted" data-opc hidden>(${esc(t('c.optional'))})</span></span><span class="phone"><select class="select" name="ddi">${ddi}</select><input class="input" name="tel" type="tel" inputmode="tel" /></span></label>
+        <div class="grid2" data-so-corretor>
+          <label class="field"><span>${esc(t('auth.agency'))}</span><input class="input" name="imobiliaria" /><small>${esc(t('auth.agencyHint'))}</small></label>
+          <label class="field"><span>${esc(t('auth.creci'))}</span><input class="input" name="creci" /></label>
+        </div>
+        <p class="small muted" style="margin:0">${esc(t('gest.newInfo'))}</p>
+        <p class="formmsg" role="alert"></p>
+      </form>`,
+      pe: `<button type="button" class="btn btn--line" data-x="close">${esc(t('req.close'))}</button><button type="submit" form="f-conta" class="btn btn--ink">${esc(t('gest.create'))}${I.arrow}</button>`,
+      depois: (p) => {
+        $$('[data-papel]', p).forEach((b) => b.addEventListener('click', () => {
+          papel = b.dataset.papel;
+          $$('[data-papel]', p).forEach((x) => x.setAttribute('aria-checked', x === b));
+          $('[data-so-corretor]', p).hidden = papel !== 'corretor';
+          $('[data-opc]', p).hidden = papel === 'corretor';
+        }));
+        const f = $('#f-conta', p);
+        f.addEventListener('submit', async (ev) => {
+          ev.preventDefault();
+          const fd = Object.fromEntries(new FormData(f).entries());
+          const msg = $('.formmsg', f); msg.textContent = '';
+          const btn = $('button[form=f-conta]', p); btn.disabled = true;
+          try {
+            const pais = { 55: 'BR', 595: 'PY', 54: 'AR', 598: 'UY' }[fd.ddi] || 'OUTRO';
+            const d = await api('contaCriar', { ...fd, papel, pais });
+            S.contas = [d.conta, ...(S.contas || [])];
+            desenharContas();
+            mostrarLink(d.conta, d.link, t('gest.created2'));
+          } catch (e) { msg.textContent = e.message; btn.disabled = false; }
+        });
+      },
+    });
+  }
+  function menuConta(c) {
+    const it = (acao, ico, k, extra = '') => `<button type="button" data-acao="${acao}" ${extra}>${ico}${esc(t(k))}</button>`;
+    abrirSheet({
+      titulo: c.nome || c.email,
+      corpo: `<p class="small muted" style="margin:0">${esc(c.email)} · ${esc(papelNome(c.papel))}</p><nav class="menu">
+        ${c.ativo ? it('reset', I.link, 'gest.resetLink') : it('link', I.link, 'gest.copyLink')}
+        ${it('papel', c.papel === 'equipe' ? I.user : I.lock, c.papel === 'equipe' ? 'gest.toBroker' : 'gest.toManager')}
+        ${c.status === 'bloqueado' ? it('reativar', I.check, 'team.unblock') : it('suspender', I.x, 'team.block')}
+        ${it('remover', I.trash, 'gest.remove', 'style="color:inherit"')}
+      </nav>`,
+      depois: (p) => $$('[data-acao]', p).forEach((b) => b.addEventListener('click', async () => {
+        const a = b.dataset.acao;
+        try {
+          if (a === 'link') { const d = await api('contaLink', { id: c.id }); mostrarLink(c, d.link); return; }
+          if (a === 'reset') {
+            if (!confirm(t('gest.resetConfirm'))) return;
+            const d = await api('contaAtualizar', { id: c.id, novoLink: true }); Object.assign(c, d.conta); desenharContas(); mostrarLink(c, d.link); return;
+          }
+          if (a === 'remover') {
+            if (!confirm(`${t('gest.remove')}: ${c.nome || c.email}?`)) return;
+            await api('contaRemover', { id: c.id }); S.contas = S.contas.filter((x) => x.id !== c.id);
+          } else {
+            const mud = a === 'papel' ? { papel: c.papel === 'equipe' ? 'corretor' : 'equipe' } : { status: a === 'suspender' ? 'bloqueado' : 'aprovado' };
+            const d = await api('contaAtualizar', { id: c.id, ...mud }); Object.assign(c, d.conta);
+          }
+          fecharSheet(); desenharContas(); toast(t('acc.saved'));
+        } catch (e) { toast(e.message); }
+      })),
+    });
+  }
+  VIEWS['gestao:after'] = (main) => {
+    api('contas').then((d) => { S.contas = d.contas; desenharContas(); }).catch((e) => { $('#ct-list').innerHTML = `<div class="empty">${esc(e.message)}</div>`; });
+    $('#ct-q', main).addEventListener('input', desenharContas);
     main.addEventListener('click', async (ev) => {
       const b = ev.target.closest('button'); if (!b) return;
-      if (b.dataset.bf) { S.team.filtro = b.dataset.bf; $$('[data-bf]').forEach((x) => x.setAttribute('aria-pressed', x === b)); desenharCorretores(); }
-      else if (b.dataset.ba) {
-        b.disabled = true;
-        try { const d = await api('corretor', { id: b.dataset.ba, status: b.dataset.st }); Object.assign(S.corretores.find((u) => u.id === d.corretor.id), d.corretor); desenharCorretores(); toast(t('acc.saved')); }
-        catch (e) { toast(e.message); b.disabled = false; }
-      } else if (b.dataset.reset) {
-        const u = S.corretores.find((x) => x.id === b.dataset.reset);
-        if (!confirm(`${t('team.reset')}: ${u.nome}?`)) return;
-        try {
-          const d = await api('corretor', { id: u.id, novaSenha: true });
-          const txt = `Bracerum Park · ${t('brand')}\n${location.origin}/PortalCorretores\n${t('auth.email')}: ${u.email}\n${t('auth.pass')}: ${d.senhaNova}`;
-          abrirSheet({ titulo: t('team.reset'), corpo: `<p>${esc(t('team.newPass'))}</p><div class="linkbox"><code>${esc(d.senhaNova)}</code><button type="button" class="btn btn--ink btn--sm" data-x="cp">${I.copy}</button></div>`,
-            pe: `<a class="btn btn--ink" href="https://wa.me/${esc(u.ddi)}${esc(u.tel)}?text=${encodeURIComponent(txt)}" target="_blank" rel="noopener">${I.wa.replace('<svg', '<svg width="16" height="16"')}WhatsApp</a>`,
-            depois: (p) => $('[data-x=cp]', p).addEventListener('click', () => copiar(d.senhaNova)) });
-        } catch (e) { toast(e.message); }
-      } else if (b.id === 'br-csv') {
-        const lin = [['nome', 'email', 'whatsapp', 'imobiliaria', 'creci', 'pais', 'status', 'criado', 'ultimo_acesso', 'codigo']]
-          .concat((S.corretores || []).map((u) => [u.nome, u.email, `+${u.ddi}${u.tel}`, u.imobiliaria, u.creci || '', u.pais || '', u.status, u.criado, u.ultimoAcesso || '', u.slug]));
-        const csv = lin.map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(';')).join('\n');
-        baixar(`corretores-bracerum-${hojeISO()}.csv`, new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' }));
+      if (b.dataset.cf) { S.team.filtro = b.dataset.cf; $$('[data-cf]').forEach((x) => x.setAttribute('aria-pressed', x === b)); desenharContas(); }
+      else if (b.id === 'ct-new') novaConta();
+      else if (b.dataset.clink) { const c = S.contas.find((x) => x.id === b.dataset.clink); try { const d = await api('contaLink', { id: c.id }); mostrarLink(c, d.link); } catch (e) { toast(e.message); } }
+      else if (b.dataset.cmenu) menuConta(S.contas.find((x) => x.id === b.dataset.cmenu));
+      else if (b.id === 'ct-csv') {
+        const lin = [['nome', 'email', 'tipo', 'situacao', 'whatsapp', 'imobiliaria', 'creci', 'pais', 'criado', 'ultimo_acesso', 'codigo']]
+          .concat((S.contas || []).map((c) => [c.nome, c.email, papelNome(c.papel), t(situacao(c)[0]), c.tel ? `+${c.ddi}${c.tel}` : '', c.imobiliaria, c.creci, c.pais, c.criado, c.ultimoAcesso || '', c.slug]));
+        const csv = lin.map((r) => r.map((x) => `"${String(x == null ? '' : x).replace(/"/g, '""')}"`).join(';')).join('\n');
+        baixar(`contas-portal-bracerum-${hojeISO()}.csv`, new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' }));
       }
     });
   };
-
-  /* ============================================================ mural (corretor lê; equipe publica) */
-  VIEWS.mural = () => (isEquipe() ? muralEquipe() : `
-    <header class="pagehead"><div class="pagehead__meta"><span>${esc(t('top.board'))}</span></div>
-      <div class="pagehead__body"><h1 class="h1">${esc(t('home.board'))}</h1><p class="lead">${esc(t('board.lead'))}</p></div></header>
-    <section class="card board-read"><div id="av-list"><div class="skel" style="height:80px"></div></div></section>`);
-  const muralEquipe = () => `
-    <header class="pagehead"><div class="pagehead__meta"><span>${esc(t('home.board'))}</span></div>
-      <div class="pagehead__body"><h1 class="h1">${esc(t('team.boardTitle'))}</h1></div></header>
-    <div class="split">
-      <section class="card"><form id="f-aviso" style="display:grid;gap:14px" novalidate>
-        <label class="field"><span>${esc(t('req.titleF'))}</span><input class="input" name="titulo" maxlength="100" required /></label>
-        <label class="field"><span>${esc(t('team.boardText'))}</span><textarea class="textarea" name="texto" maxlength="600"></textarea></label>
-        <label class="field"><span>${esc(t('team.boardLink'))}</span><input class="input" name="link" placeholder="https://… ${S.lang === 'en' ? 'or' : 'ou'} #/tabela" /></label>
-        <label class="check"><input type="checkbox" name="fixo" /><span>${esc(t('team.boardPin'))}</span></label>
-        <p class="formmsg" role="alert"></p>
-        <button type="submit" class="btn btn--ink" style="justify-self:start">${I.megaphone}${esc(t('team.publish'))}</button>
-      </form></section>
-      <section class="card"><h2 class="h3" style="margin-bottom:8px">${esc(t('home.board'))}</h2><div id="av-list"></div></section>
-    </div>`;
-  function desenharAvisos() {
-    const box = $('#av-list'); if (!box) return;
-    if (!isEquipe()) { box.innerHTML = muralHTML(40); return; }
-    const lst = S.avisos || [];
-    box.innerHTML = lst.length ? `<div class="feed">${lst.map((a) => `<div style="display:grid;grid-template-columns:1fr auto;gap:12px;align-items:start">${noticeHTML(a)}<button type="button" class="btn btn--ghost btn--sm" data-rm="${esc(a.id)}">${esc(t('team.remove'))}</button></div>`).join('')}</div>` : `<p class="muted small">${esc(t('home.boardEmpty'))}</p>`;
+  function baixar(nome, blob) {
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = nome; document.body.appendChild(a); a.click();
+    setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
   }
-  VIEWS['mural:after'] = (main) => {
-    api('eu').then((d) => { S.avisos = d.avisos || []; desenharAvisos(); }).catch(() => desenharAvisos());
-    const f = $('#f-aviso', main);
-    if (!f) return;
-    f.addEventListener('submit', async (ev) => {
-      ev.preventDefault();
-      const fd = Object.fromEntries(new FormData(f).entries());
-      try { const d = await api('aviso', { ...fd, fixo: !!fd.fixo }); S.avisos = d.avisos; f.reset(); desenharAvisos(); toast(t('acc.saved')); }
-      catch (e) { $('.formmsg', f).textContent = e.message; }
-    });
-    main.addEventListener('click', async (ev) => {
-      const b = ev.target.closest('[data-rm]'); if (!b) return;
-      try { const d = await api('aviso', { remover: b.dataset.rm }); S.avisos = d.avisos; desenharAvisos(); } catch (e) { toast(e.message); }
-    });
-  };
 
   /* ============================================================ folha lateral */
   let ultimoFoco = null;
@@ -1326,12 +1346,12 @@
     app.innerHTML = `
       <div class="auth view">
         <section class="auth__form">
-          <div class="auth__top"><a class="brand" href="/"><img class="brand__logo logo--ink" src="/assets/logo/logo-horizontal-black.svg" alt="Bracerum Park" width="150" height="18" /><img class="brand__logo logo--paper" src="/assets/logo/logo-horizontal-white.svg" alt="" width="150" height="18" /></a>${langSwitch()}</div>
+          ${topoAuth()}
           <div class="auth__mid" id="main" tabindex="-1">
-            <div style="display:grid;gap:14px"><p class="eyebrow">${esc(t('auth.team'))}</p><h1 class="h1">${esc(t('inv.title'))}</h1><p class="lead">${esc(t('inv.lead'))}</p></div>
+            <div style="display:grid;gap:14px"><p class="eyebrow">${esc(t(info.papel === 'equipe' ? 'acc.manager' : 'acc.broker'))}</p><h1 class="h1">${esc(t('inv.title'))}</h1><p class="lead">${esc(t('inv.lead'))}</p></div>
             <form id="f-inv" novalidate>
               <label class="field"><span>${esc(t('auth.email'))}</span><input class="input" type="email" value="${esc(info.email)}" autocomplete="username" readonly /></label>
-              <label class="field"><span>${esc(t('auth.teamName'))}</span><input class="input" name="nome" value="${esc(info.nome)}" autocomplete="name" required /></label>
+              <label class="field"><span>${esc(t('auth.name'))}</span><input class="input" name="nome" value="${esc(info.nome)}" autocomplete="name" required /></label>
               <label class="field"><span>${esc(t('auth.pass8'))}</span><input class="input" type="password" name="senha" autocomplete="new-password" minlength="8" required /></label>
               <label class="field"><span>${esc(t('inv.repeat'))}</span><input class="input" type="password" name="senha2" autocomplete="new-password" minlength="8" required /></label>
               <p class="formmsg" role="alert"></p>
@@ -1340,9 +1360,9 @@
           </div>
           <p class="auth__foot">© Bracerum Park</p>
         </section>
-        <aside class="auth__panel" aria-hidden="true"><img src="/assets/web/fotos/park-aereo-rio.jpg" alt="" /><div class="auth__panelin"><span class="glass stage__chip" style="align-self:flex-start">${I.lock.replace('<svg', '<svg width="16" height="16"')} ${esc(t('auth.team'))}</span><p class="display">Bracerum<br/>Park</p></div></aside>
+        ${painelAuth(`${I.lock.replace('<svg', '<svg width="16" height="16"')} ${esc(t('inv.title'))}`)}
       </div>`;
-    bindLang(app);
+    bindLang(app); bindTema(app);
     const f = $('#f-inv');
     f.addEventListener('submit', async (ev) => {
       ev.preventDefault();
