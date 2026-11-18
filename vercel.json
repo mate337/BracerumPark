@@ -1,76 +1,301 @@
 {
   "redirects": [
-    { "source": "/3dmasterplan", "destination": "/3dmasterplan/", "permanent": true },
-    { "source": "/3DMasterplan", "destination": "/3dmasterplan/", "permanent": true },
-    { "source": "/3DMasterplan/", "destination": "/3dmasterplan/", "permanent": true },
-    { "source": "/CleberPavao", "destination": "/cleberpavao", "permanent": true },
-    { "source": "/SydneySavi", "destination": "/sydneysavi", "permanent": true },
-    { "source": "/AthosPavao", "destination": "/athospavao", "permanent": true },
-    { "source": "/JunioPadua", "destination": "/juniopadua", "permanent": true },
-    { "source": "/VaniaRosa", "destination": "/vaniarosa", "permanent": true },
-    { "source": "/OmarApetz", "destination": "/omarapetz", "permanent": true },
-    { "source": "/corretor", "destination": "/corretores", "permanent": false },
-    { "source": "/Corretor", "destination": "/corretores", "permanent": false },
-    { "source": "/admin", "destination": "/admin/", "permanent": false },
-    { "source": "/Admin", "destination": "/admin/", "permanent": false },
-    { "source": "/Admin/", "destination": "/admin/", "permanent": false },
-    { "source": "/cadastro", "destination": "/cadastro/", "permanent": false },
-    { "source": "/Cadastro", "destination": "/cadastro/", "permanent": false },
-    { "source": "/Cadastro/", "destination": "/cadastro/", "permanent": false }
+    {
+      "source": "/3dmasterplan",
+      "destination": "/3dmasterplan/",
+      "permanent": true
+    },
+    {
+      "source": "/3DMasterplan",
+      "destination": "/3dmasterplan/",
+      "permanent": true
+    },
+    {
+      "source": "/3DMasterplan/",
+      "destination": "/3dmasterplan/",
+      "permanent": true
+    },
+    {
+      "source": "/CleberPavao",
+      "destination": "/cleberpavao",
+      "permanent": true
+    },
+    {
+      "source": "/SydneySavi",
+      "destination": "/sydneysavi",
+      "permanent": true
+    },
+    {
+      "source": "/AthosPavao",
+      "destination": "/athospavao",
+      "permanent": true
+    },
+    {
+      "source": "/JunioPadua",
+      "destination": "/juniopadua",
+      "permanent": true
+    },
+    {
+      "source": "/VaniaRosa",
+      "destination": "/vaniarosa",
+      "permanent": true
+    },
+    {
+      "source": "/OmarApetz",
+      "destination": "/omarapetz",
+      "permanent": true
+    },
+    {
+      "source": "/corretor",
+      "destination": "/corretores",
+      "permanent": false
+    },
+    {
+      "source": "/Corretor",
+      "destination": "/corretores",
+      "permanent": false
+    },
+    {
+      "source": "/admin",
+      "destination": "/admin/",
+      "permanent": false
+    },
+    {
+      "source": "/Admin",
+      "destination": "/admin/",
+      "permanent": false
+    },
+    {
+      "source": "/Admin/",
+      "destination": "/admin/",
+      "permanent": false
+    },
+    {
+      "source": "/cadastro",
+      "destination": "/cadastro/",
+      "permanent": false
+    },
+    {
+      "source": "/Cadastro",
+      "destination": "/cadastro/",
+      "permanent": false
+    },
+    {
+      "source": "/Cadastro/",
+      "destination": "/cadastro/",
+      "permanent": false
+    },
+    {
+      "source": "/portalcorretores",
+      "destination": "/PortalCorretores",
+      "permanent": false
+    },
+    {
+      "source": "/portalcorretores/",
+      "destination": "/PortalCorretores",
+      "permanent": false
+    },
+    {
+      "source": "/PortalCorretores/",
+      "destination": "/PortalCorretores",
+      "permanent": false
+    },
+    {
+      "source": "/portalcorretor",
+      "destination": "/PortalCorretores",
+      "permanent": false
+    },
+    {
+      "source": "/PortalCorretor",
+      "destination": "/PortalCorretores",
+      "permanent": false
+    }
   ],
   "rewrites": [
-    { "source": "/linktree", "destination": "/linktree/index.html" },
-    { "source": "/cleberpavao", "destination": "/cleberpavao/index.html" },
-    { "source": "/sydneysavi", "destination": "/sydneysavi/index.html" },
-    { "source": "/athospavao", "destination": "/athospavao/index.html" },
-    { "source": "/juniopadua", "destination": "/juniopadua/index.html" },
-    { "source": "/vaniarosa", "destination": "/vaniarosa/index.html" },
-    { "source": "/omarapetz", "destination": "/omarapetz/index.html" },
-    { "source": "/folderpark", "destination": "/folderpark/index.html" },
-    { "source": "/FolderPark", "destination": "/folderpark/index.html" },
-    { "source": "/FolderPark/", "destination": "/folderpark/index.html" },
-    { "source": "/folderresidence", "destination": "/folderresidence/index.html" },
-    { "source": "/FolderResidence", "destination": "/folderresidence/index.html" },
-    { "source": "/FolderResidence/", "destination": "/folderresidence/index.html" },
-    { "source": "/folderresort", "destination": "/folderresort/index.html" },
-    { "source": "/FolderResort", "destination": "/folderresort/index.html" },
-    { "source": "/FolderResort/", "destination": "/folderresort/index.html" },
-    { "source": "/folderbusinesscenter", "destination": "/folderbusinesscenter/index.html" },
-    { "source": "/FolderBusinessCenter", "destination": "/folderbusinesscenter/index.html" },
-    { "source": "/FolderBusinessCenter/", "destination": "/folderbusinesscenter/index.html" },
-    { "source": "/foldermapadisponibilidade", "destination": "/foldermapadisponibilidade/index.html" },
-    { "source": "/Foldermapadisponibilidade", "destination": "/foldermapadisponibilidade/index.html" },
-    { "source": "/Foldermapadisponibilidade/", "destination": "/foldermapadisponibilidade/index.html" },
-    { "source": "/folderlp", "destination": "/folderlp/index.html" },
-    { "source": "/FolderLP", "destination": "/folderlp/index.html" },
-    { "source": "/FolderLP/", "destination": "/folderlp/index.html" },
-    { "source": "/corretores", "destination": "/corretores/index.html" },
-    { "source": "/Corretores", "destination": "/corretores/index.html" },
-    { "source": "/Corretores/", "destination": "/corretores/index.html" }
+    {
+      "source": "/linktree",
+      "destination": "/linktree/index.html"
+    },
+    {
+      "source": "/cleberpavao",
+      "destination": "/cleberpavao/index.html"
+    },
+    {
+      "source": "/sydneysavi",
+      "destination": "/sydneysavi/index.html"
+    },
+    {
+      "source": "/athospavao",
+      "destination": "/athospavao/index.html"
+    },
+    {
+      "source": "/juniopadua",
+      "destination": "/juniopadua/index.html"
+    },
+    {
+      "source": "/vaniarosa",
+      "destination": "/vaniarosa/index.html"
+    },
+    {
+      "source": "/omarapetz",
+      "destination": "/omarapetz/index.html"
+    },
+    {
+      "source": "/folderpark",
+      "destination": "/folderpark/index.html"
+    },
+    {
+      "source": "/FolderPark",
+      "destination": "/folderpark/index.html"
+    },
+    {
+      "source": "/FolderPark/",
+      "destination": "/folderpark/index.html"
+    },
+    {
+      "source": "/folderresidence",
+      "destination": "/folderresidence/index.html"
+    },
+    {
+      "source": "/FolderResidence",
+      "destination": "/folderresidence/index.html"
+    },
+    {
+      "source": "/FolderResidence/",
+      "destination": "/folderresidence/index.html"
+    },
+    {
+      "source": "/folderresort",
+      "destination": "/folderresort/index.html"
+    },
+    {
+      "source": "/FolderResort",
+      "destination": "/folderresort/index.html"
+    },
+    {
+      "source": "/FolderResort/",
+      "destination": "/folderresort/index.html"
+    },
+    {
+      "source": "/folderbusinesscenter",
+      "destination": "/folderbusinesscenter/index.html"
+    },
+    {
+      "source": "/FolderBusinessCenter",
+      "destination": "/folderbusinesscenter/index.html"
+    },
+    {
+      "source": "/FolderBusinessCenter/",
+      "destination": "/folderbusinesscenter/index.html"
+    },
+    {
+      "source": "/foldermapadisponibilidade",
+      "destination": "/foldermapadisponibilidade/index.html"
+    },
+    {
+      "source": "/Foldermapadisponibilidade",
+      "destination": "/foldermapadisponibilidade/index.html"
+    },
+    {
+      "source": "/Foldermapadisponibilidade/",
+      "destination": "/foldermapadisponibilidade/index.html"
+    },
+    {
+      "source": "/folderlp",
+      "destination": "/folderlp/index.html"
+    },
+    {
+      "source": "/FolderLP",
+      "destination": "/folderlp/index.html"
+    },
+    {
+      "source": "/FolderLP/",
+      "destination": "/folderlp/index.html"
+    },
+    {
+      "source": "/corretores",
+      "destination": "/corretores/index.html"
+    },
+    {
+      "source": "/Corretores",
+      "destination": "/corretores/index.html"
+    },
+    {
+      "source": "/Corretores/",
+      "destination": "/corretores/index.html"
+    },
+    {
+      "source": "/PortalCorretores",
+      "destination": "/portalcorretores/index.html"
+    }
   ],
   "functions": {
-    "api/admin.js": { "maxDuration": 60 },
-    "api/corretor.js": { "maxDuration": 20 }
+    "api/admin.js": {
+      "maxDuration": 60
+    },
+    "api/corretor.js": {
+      "maxDuration": 20
+    },
+    "api/portal.js": {
+      "maxDuration": 30
+    }
   },
   "headers": [
     {
       "source": "/admin/(.*)",
       "headers": [
-        { "key": "X-Robots-Tag", "value": "noindex, nofollow" },
-        { "key": "Cache-Control", "value": "no-cache" }
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "no-cache"
+        }
       ]
     },
     {
       "source": "/cadastro/(.*)",
       "headers": [
-        { "key": "X-Robots-Tag", "value": "noindex, nofollow" },
-        { "key": "Cache-Control", "value": "no-cache" }
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "no-cache"
+        }
       ]
     },
     {
       "source": "/(.*)\\.vcf",
       "headers": [
-        { "key": "Content-Type", "value": "text/vcard; charset=utf-8" }
+        {
+          "key": "Content-Type",
+          "value": "text/vcard; charset=utf-8"
+        }
+      ]
+    },
+    {
+      "source": "/portalcorretores/(.*)",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
+      ]
+    },
+    {
+      "source": "/PortalCorretores",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "no-cache"
+        }
       ]
     }
   ]

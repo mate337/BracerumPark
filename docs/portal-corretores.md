@@ -225,3 +225,49 @@ biblioteca; aviso de cookies do `tracking.js` vale também aqui.
 - WhatsApp MCP (oficial em beta × comunitários): https://www.dragapp.com/blog/whatsapp-mcp-server/ · https://mcpservers.org/servers/whatsapp-business-tools-mcp
 - MCPs oficiais para marketing (Google Analytics, Meta Ads, Notion, Asana, Google Workspace): https://www.digitalapplied.com/blog/official-mcp-servers-for-marketing-teams
 - ECC: https://github.com/affaan-m/ECC (pacote `ecc-universal@2.2.3`)
+
+---
+
+## 6. Implementado — bracerumpark.com/PortalCorretores (2026-11-18)
+
+Primeira versão no ar, preto e branco (pedido: sem a identidade do site), fonte Urbanist. Referências
+de interface aplicadas: cartões com rótulo pequeno e número grande + painel escuro com a maquete
+(dashboard de energia), página editorial com linhas finas e filtros sublinhados (portfólio), barra
+inferior com botão central e cartões arredondados no celular (app bancário), vidro fosco e títulos
+leves e grandes (Notis).
+
+**Arquivos**
+- `portalcorretores/index.html` · `portal.css` · `portal.js` (aplicação, rotas `#/inicio`, `#/materiais`,
+  `#/divulgar`, `#/tabela`, `#/pedidos`, `#/aprender[/guia]`, `#/conta`; equipe: `#/pedidos`, `#/corretores`, `#/mural`)
+- `portalcorretores/conteudo.js` — **todos os textos (PT/ES/EN), a biblioteca, os destinos dos links,
+  as mensagens prontas, os guias, o FAQ e os contatos. Material novo = uma linha aqui.**
+- `portalcorretores/materiais/` (PDFs da tabela v3.1 e do mapa MP14), `thumbs/` (miniaturas 640 px),
+  `vendor/qrcode-1.4.4.js` (MIT, Kazuhiko Arase).
+- `api/portal.js` — servidor. `package.json` — só `@vercel/blob` (para a função).
+- `vercel.json` — `/PortalCorretores` (rewrite); `/portalcorretores`, `/PortalCorretor` etc. redirecionam; noindex.
+
+**Armazenamento:** Vercel Blob **privado** `portal-corretores` (store `store_k8Ojbo3ByMB9PkHZ`, gru1),
+ligado ao projeto pela `BLOB_READ_WRITE_TOKEN` (todos os ambientes — prévia e produção usam o mesmo).
+`portal/u/<id>.json` contas · `portal/p/<id>.json` pedidos · `portal/avisos.json` mural.
+
+**Acesso**
+- Corretor: cria a conta (nome, e-mail, WhatsApp, imobiliária, CRECI opcional, senha ≥ 8, aceite dos
+  termos) e entra na hora como **"Em análise"**: usa materiais, tabela, links e guias; **pedido ao
+  marketing só depois de aprovado**. Senha com scrypt; sessão em cookie HttpOnly assinado (30 dias).
+  Cada conta nova também vai para a planilha "Leads Corretores" (mesma `CORRETORES_PLANILHA_URL`).
+- Equipe: aba "Equipe Bracerum" com **a mesma senha do `/admin` (`ADMIN_SENHA`)** — só existe em
+  Production, então na prévia a equipe não entra. Aprova/suspende corretor, gera senha nova (abre o
+  WhatsApp do corretor com a senha), exporta CSV, publica no mural e move os pedidos no quadro
+  (Recebido → Em produção → Para aprovação → Entregue), com resposta e link de entrega.
+- Esqueceu a senha: a equipe gera outra. "Excluir minha conta" (LGPD) na aba Conta.
+
+**Links rastreados:** `?utm_source=corretor&utm_medium=corretor|whatsapp|qr&utm_campaign=corretor-<código>&utm_content=<código>`;
+o `api/lead.js` grava `corretor-<código>` como **mídia do lead no CV** e a origem (WhatsApp/QR/site).
+O código é primeiro + último nome + 4 caracteres do id (ex.: `maria-souza-5f83`).
+
+**Dados ao vivo:** disponibilidade pelo `/api/lotes-status` (CV) e a janela/preço pelo
+`3dmasterplan/data/precos.json` — o aviso "a tabela muda de janela" entra sozinho no mural 45 dias antes.
+
+**Pendências:** termo de parceria/comissão (texto jurídico do cliente) — hoje o aceite é um parágrafo
+curto; acesso ao painel do CV por corretor (criação dos usuários no CV continua manual); avisos por
+e-mail/WhatsApp quando o pedido muda de etapa; fotos/vídeos novos e apresentações em PDF para a biblioteca.

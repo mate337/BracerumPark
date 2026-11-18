@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Portal do Corretor · Bracerum Park</title>
+<meta name="description" content="Área dos corretores parceiros do Bracerum Park: materiais, tabela vigente, links rastreados e pedidos ao marketing." />
+<meta name="robots" content="noindex, nofollow" />
+<meta name="theme-color" content="#f2f2f0" media="(prefers-color-scheme: light)" />
+<meta name="theme-color" content="#0a0a0a" media="(prefers-color-scheme: dark)" />
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png" />
+<link rel="manifest" href="/portalcorretores/manifest.webmanifest" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Urbanist:wght@300;400;500;600;700&display=swap" />
+<link rel="stylesheet" href="/portalcorretores/portal.css?v=1" />
+<script>
+  /* tema antes do primeiro quadro, sem piscar */
+  try { var t = localStorage.getItem('bp-portal-tema'); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch (e) {}
+</script>
+</head>
+<body>
+<a class="skip" href="#main" data-t="c.skip">Pular para o conteúdo</a>
+<div id="app" aria-live="polite"><div class="boot"><span class="spin" aria-label="Carregando"></span></div></div>
+<div class="toasts" id="toasts" role="status" aria-live="polite"></div>
+<noscript><p style="padding:24px">O Portal do Corretor precisa de JavaScript ligado.</p></noscript>
+<script src="/portalcorretores/vendor/qrcode-1.4.4.js" defer></script>
+<script src="/portalcorretores/conteudo.js?v=1" defer></script>
+<script src="/portalcorretores/portal.js?v=1" defer></script>
+</body>
+</html>

@@ -15,6 +15,10 @@ maquete 3D embutida, que as seis páginas internas baixavam e interpretavam à t
   pedidos ao marketing, treinamento), mapa dos endpoints do CV úteis, MCPs viáveis e estrutura `portal/` + `api/portal-*`.
 - O CV já tem o painel do corretor no ar (`bracerum.cvcrm.com.br/corretor/`): o portal leva até ele, não duplica.
 - **Não existe MCP do CV** — proposto um `bracerum-cv` próprio (leitura primeiro). Nada publicado; 7 decisões do cliente no §5.
+- **Implementado em 2026-11-18: `bracerumpark.com/PortalCorretores`** (pasta `portalcorretores/` + `api/portal.js`,
+  Vercel Blob privado `portal-corretores`). Preto e branco, Urbanist — **não usa a identidade do site** (pedido).
+  Corretor cria conta → "Em análise" (pedido ao marketing só aprovado); equipe entra com a `ADMIN_SENHA`.
+  Textos/biblioteca/guias em `portalcorretores/conteudo.js`. Tudo em `docs/portal-corretores.md` §6.
 
 ### ✅ Publicação pelo GitHub voltou (2026-11-12)
 - Em 2026-11-12 o push no `main` **voltou a publicar sozinho** na Vercel (deploy de produção `source: git`,
