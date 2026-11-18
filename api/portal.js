@@ -244,8 +244,74 @@ async function login(b, res, ip) {
   if (u.status === 'bloqueado') throw erro(403, 'Acesso suspenso. Fale com a equipe Bracerum.');
   u.acessos = [agora(), ...(u.acessos || [])].slice(0, 20);
   await gravar(caminhoU(u.id), u);
+  if (u.papel === 'equipe') {
+    emitir(res, { p: 'equipe', n: u.nome, u: u.id });
+    return { usuario: equipePublico(u) };
+  }
   emitir(res, { p: 'corretor', u: u.id });
   return { usuario: publico(u) };
+}
+
+/* ------------------------------------------------------------------ contas da equipe (convite) */
+/* Administrador com e-mail próprio. O primeiro acesso é por um link de convite:
+   /PortalCorretores#/convite/<e-mail em base64url>.<assinatura>, assinatura = HMAC(PORTAL_CONVITE, e-mail).
+   O link só vale enquanto a conta não tem senha — depois de usado, morre.
+   Quem pode receber convite: e-mails em PORTAL_ADMINS (lista separada por vírgula) ou contas que a
+   equipe convidou pelo portal (registro com papel "equipe" ainda sem senha). */
+const equipePublico = (u) => ({ papel: 'equipe', nome: u.nome, id: u.id, email: u.email, conta: true });
+const listaAdmins = () => String(process.env.PORTAL_ADMINS || '').toLowerCase().split(/[,;\s]+/).filter(emailOk);
+function assinaConvite(email) {
+  const chave = process.env.PORTAL_CONVITE;
+  if (!chave) throw erro(503, 'Convites não configurados (PORTAL_CONVITE)');
+  return crypto.createHmac('sha256', chave).update(`convite|${email}`).digest('hex').slice(0, 32);
+}
+const linkConvite = (origem, email) => `${origem}/PortalCorretores#/convite/${Buffer.from(email).toString('base64url')}.${assinaConvite(email)}`;
+function lerConvite(token) {
+  const [e64, sig] = String(token || '').split('.');
+  let email = '';
+  try { email = Buffer.from(e64 || '', 'base64url').toString().toLowerCase(); } catch (err) { email = ''; }
+  if (!emailOk(email) || !sig) throw erro(400, 'Convite inválido');
+  const certo = assinaConvite(email);
+  if (sig.length !== certo.length || !crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(certo))) throw erro(400, 'Convite inválido');
+  return email;
+}
+async function conviteVer(b) {
+  const email = lerConvite(b.token);
+  const u = await ler(caminhoU(idEmail(email)));
+  if (u && u.senha) throw erro(410, 'Este convite já foi usado. Entre com o seu e-mail e senha.');
+  if (!(u && u.papel === 'equipe') && !listaAdmins().includes(email)) throw erro(403, 'Convite sem permissão');
+  return { email, nome: (u && u.nome) || '' };
+}
+async function conviteAceitar(b, res) {
+  const { email } = await conviteVer(b);
+  const nome = limpa(b.nome, 60);
+  if (nome.length < 2) throw erro(422, 'Escreva o seu nome');
+  const senha = validarSenha(b.senha);
+  const id = idEmail(email);
+  const antes = (await ler(caminhoU(id))) || {};
+  const u = {
+    ...antes, id, email, nome, papel: 'equipe', status: 'aprovado', senha: hashSenha(senha),
+    criado: antes.criado || agora(), ativado: agora(), acessos: [agora()],
+  };
+  await gravar(caminhoU(id), u);
+  console.log('[portal] conta da equipe ativada', id);
+  emitir(res, { p: 'equipe', n: nome, u: id });
+  return { usuario: equipePublico(u) };
+}
+async function convidarEquipe(b, s, req) {
+  const email = limpa(b.email, 120).toLowerCase();
+  if (!emailOk(email)) throw erro(422, 'E-mail inválido');
+  const id = idEmail(email);
+  const u = await ler(caminhoU(id));
+  if (u && u.papel !== 'equipe') throw erro(409, 'Esse e-mail já tem conta de corretor');
+  if (u && u.senha) throw erro(409, 'Essa pessoa já ativou o acesso');
+  if (!u) await gravar(caminhoU(id), { id, email, nome: limpa(b.nome, 60), papel: 'equipe', status: 'aprovado', criado: agora(), convidadoPor: s.n });
+  const host = String(req.headers['x-forwarded-host'] || req.headers.host || 'bracerumpark.com');
+  return { link: linkConvite(`https://${host}`, email) };
+}
+async function equipeListar() {
+  const lst = await lerVarios(await listar('portal/u/'), 1000);
+  return lst.filter((u) => u.papel === 'equipe').map((u) => ({ nome: u.nome, email: u.email, ativo: !!u.senha, ultimoAcesso: (u.acessos || [])[0] || null }));
 }
 
 function loginEquipe(b, res, ip) {
@@ -353,15 +419,16 @@ async function avisoSalvar(b, s) {
 
 /* ------------------------------------------------------------------ equipe: corretores */
 async function corretoresListar() {
-  const lst = await lerVarios(await listar('portal/u/'), 1000);
+  const lst = (await lerVarios(await listar('portal/u/'), 1000)).filter((u) => u.papel !== 'equipe');
   return {
+    equipe: await equipeListar(),
     corretores: lst.map((u) => ({ ...publico(u), ultimoAcesso: (u.acessos || [])[0] || null }))
       .sort((a, b) => String(b.criado).localeCompare(String(a.criado))),
   };
 }
 async function corretorAtualizar(b, s) {
   const u = await ler(caminhoU(limpa(b.id, 40)));
-  if (!u) throw erro(404, 'Corretor não encontrado');
+  if (!u || u.papel === 'equipe') throw erro(404, 'Corretor não encontrado');
   if (b.status !== undefined) {
     if (!['pendente', 'aprovado', 'bloqueado'].includes(b.status)) throw erro(422, 'Status inválido');
     if (b.status === 'aprovado' && u.status !== 'aprovado') u.aprovado = { em: agora(), por: s.n };
@@ -399,13 +466,22 @@ module.exports = async (req, res) => {
     if (b.acao === 'entrar') return fim(200, { ok: true, ...(await login(b, res, ip)) });
     if (b.acao === 'equipe') return fim(200, { ok: true, ...loginEquipe(b, res, ip) });
     if (b.acao === 'sair') { apagarCookie(res); return fim(200, { ok: true }); }
+    if (b.acao === 'conviteVer') return fim(200, { ok: true, ...(await conviteVer(b)) });
+    if (b.acao === 'convite') {
+      if (bloqueado(`conv|${ip}`)) throw erro(429, 'Muitas tentativas. Espere 10 minutos.');
+      falhou(`conv|${ip}`);
+      return fim(200, { ok: true, ...(await conviteAceitar(b, res)) });
+    }
 
     const s = lerSessao(req);
     if (!s) return fim(401, { ok: false, erro: 'sessão', sair: true });
     let u = null;
-    if (s.p === 'corretor') {
+    if (s.u) {
+      // corretor, ou alguém da equipe com conta própria (a senha compartilhada não tem s.u)
       u = await ler(caminhoU(s.u));
-      if (!u || u.status === 'bloqueado') { apagarCookie(res); return fim(401, { ok: false, erro: 'sessão', sair: true }); }
+      if (!u || u.status === 'bloqueado' || (s.p === 'equipe' && u.papel !== 'equipe')) {
+        apagarCookie(res); return fim(401, { ok: false, erro: 'sessão', sair: true });
+      }
     }
     const eq = s.p === 'equipe';
     const soEquipe = () => { if (!eq) throw erro(403, 'Só a equipe'); };
@@ -413,7 +489,16 @@ module.exports = async (req, res) => {
     switch (b.acao) {
       case 'eu': {
         const extra = await avisos();
-        return fim(200, { ok: true, usuario: eq ? { papel: 'equipe', nome: s.n, id: 'equipe' } : publico(u), ...extra });
+        return fim(200, { ok: true, usuario: eq ? (u ? equipePublico(u) : { papel: 'equipe', nome: s.n, id: 'equipe' }) : publico(u), ...extra });
+      }
+      case 'convidar': soEquipe(); return fim(200, { ok: true, ...(await convidarEquipe(b, s, req)) });
+      case 'senhaEquipe': {
+        // troca de senha de quem da equipe tem conta própria
+        if (!eq || !u) throw erro(400, 'Só para contas da equipe com e-mail');
+        if (!senhaConfere(b.senhaAtual, u.senha)) throw erro(401, 'A senha atual não confere');
+        u.senha = hashSenha(validarSenha(b.senhaNova));
+        await gravar(caminhoU(u.id), u);
+        return fim(200, { ok: true });
       }
       case 'perfil': {
         if (eq) throw erro(400, 'A equipe não tem perfil');

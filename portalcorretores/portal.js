@@ -937,8 +937,13 @@
         <button type="button" class="btn btn--line" id="sair" style="justify-self:start">${I.out}${esc(t('acc.out'))}</button>
       </section>`;
     if (isEquipe()) {
-      return `<header class="pagehead"><div class="pagehead__meta"><span>${esc(t('team.hi'))}</span></div><div class="pagehead__body"><h1 class="h1">${esc(u.nome)}</h1></div></header>
-        <div class="split">${prefs}<section class="card"><h2 class="h3" style="margin-bottom:12px">${esc(t('learn.contacts'))}</h2>${contatosHTML()}</section></div>`;
+      const senha = u.conta ? `<form id="f-senha-eq" class="card" style="display:grid;gap:12px;align-content:start" novalidate><h2 class="h3">${esc(t('acc.pass'))}</h2>
+          <label class="field"><span>${esc(t('acc.passNow'))}</span><input class="input" type="password" name="senhaAtual" autocomplete="current-password" required /></label>
+          <label class="field"><span>${esc(t('acc.passNew'))}</span><input class="input" type="password" name="senhaNova" autocomplete="new-password" minlength="8" required /></label>
+          <p class="formmsg" role="alert"></p><button type="submit" class="btn btn--ink" style="justify-self:start">${esc(t('acc.save'))}</button></form>`
+        : `<section class="card"><h2 class="h3" style="margin-bottom:12px">${esc(t('learn.contacts'))}</h2>${contatosHTML()}</section>`;
+      return `<header class="pagehead"><div class="pagehead__meta"><span>${esc(t('team.hi'))}</span>${u.email ? `<span>${esc(u.email)}</span>` : ''}</div><div class="pagehead__body"><h1 class="h1">${esc(u.nome)}</h1></div></header>
+        <div class="split">${prefs}${senha}</div>`;
     }
     const ddiOpts = ['55', '595', '54', '598', '1', '351'].map((d) => `<option value="${d}" ${d === u.ddi ? 'selected' : ''}>+${d}</option>`).join('');
     return `
@@ -986,6 +991,13 @@
       $$('[data-tema]', main).forEach((x) => x.setAttribute('aria-pressed', x === b));
     }));
     $('#sair', main).addEventListener('click', async () => { await api('sair').catch(() => {}); S.user = null; S.pedidos = null; S.corretores = null; authTab = 'in'; history.replaceState(null, '', location.pathname); render(); });
+    const fse = $('#f-senha-eq', main);
+    if (fse) fse.addEventListener('submit', async (ev) => {
+      ev.preventDefault();
+      const fd = Object.fromEntries(new FormData(fse).entries());
+      try { await api('senhaEquipe', fd); fse.reset(); toast(t('acc.saved')); }
+      catch (e) { $('.formmsg', fse).textContent = e.message; }
+    });
     const fdel = $('#f-del', main);
     if (fdel) fdel.addEventListener('submit', async (ev) => {
       ev.preventDefault();
@@ -1012,13 +1024,23 @@
       <div class="pagehead__body"><h1 class="h1">${esc(t('team.brokers'))}</h1></div></header>
     <div class="toolbar"><div class="seg" role="group">${[['pendente', 'team.pending'], ['aprovado', 'acc.aprovado'], ['bloqueado', 'acc.bloqueado'], ['todos', 'req.all']].map(([id, k]) => `<button type="button" data-bf="${id}" aria-pressed="${S.team.filtro === id}">${esc(t(k))}</button>`).join('')}</div>
       <button type="button" class="btn btn--line btn--sm" id="br-csv">${I.download}${esc(t('team.csv'))}</button></div>
-    <div id="br-list"><div class="skel" style="height:240px;border-radius:18px"></div></div>`;
+    <div id="br-list"><div class="skel" style="height:240px;border-radius:18px"></div></div>
+    <section class="section split">
+      <div class="card"><h2 class="h3" style="margin-bottom:12px">${esc(t('inv.team'))}</h2><div id="eq-list" class="feed"></div></div>
+      <form class="card" id="f-conv" style="display:grid;gap:12px;align-content:start" novalidate>
+        <h2 class="h3">${esc(t('inv.invite'))}</h2><p class="small muted" style="margin:0">${esc(t('inv.inviteInfo'))}</p>
+        <div class="grid2"><label class="field"><span>${esc(t('inv.name'))}</span><input class="input" name="nome" /></label>
+        <label class="field"><span>${esc(t('auth.email'))}</span><input class="input" type="email" name="email" required /></label></div>
+        <p class="formmsg" role="alert"></p>
+        <button type="submit" class="btn btn--ink" style="justify-self:start">${I.link}${esc(t('inv.make'))}</button>
+      </form>
+    </section>`;
   function desenharCorretores() {
     const box = $('#br-list'); if (!box) return;
     const lst = S.corretores || [];
     const vis = lst.filter((u) => S.team.filtro === 'todos' || u.status === S.team.filtro);
     $('#br-count').textContent = `${vis.length} / ${lst.length}`;
-    if (!vis.length) { box.innerHTML = `<div class="empty">${I.users}${esc(t('req.emptyTeam'))}</div>`; return; }
+    if (!vis.length) { box.innerHTML = `<div class="empty">${I.users}${esc(t('team.noBrokers'))}</div>`; return; }
     box.innerHTML = `<div class="tablewrap"><table class="table"><thead><tr><th>${esc(t('auth.name'))}</th><th>${esc(t('auth.agency'))}</th><th>${esc(t('auth.wa'))} · ${esc(t('auth.email'))}</th><th>${esc(t('acc.status'))}</th><th></th></tr></thead><tbody>
       ${vis.map((u) => `<tr><td><b>${esc(u.nome)}</b><div class="small muted">${esc(data(u.criado))}${u.ultimoAcesso ? ` · ${esc(t('team.lastSeen'))} ${esc(data(u.ultimoAcesso, true))}` : ''}</div></td>
         <td>${esc(u.imobiliaria)}${u.creci ? `<div class="small muted">${esc(u.creci)}</div>` : ''}</td>
@@ -1031,8 +1053,27 @@
     </tbody></table></div>`;
   }
   VIEWS['corretores:after'] = (main) => {
-    const carregar = () => api('corretores').then((d) => { S.corretores = d.corretores; desenharCorretores(); }).catch((e) => { $('#br-list').innerHTML = `<div class="empty">${esc(e.message)}</div>`; });
+    const desenharEquipe = (lst) => {
+      const box = $('#eq-list'); if (!box) return;
+      box.innerHTML = (lst || []).length ? lst.map((p) => `<div class="notice"><span class="avatar" style="width:36px;height:36px;font-size:12px">${esc(iniciais(p.nome || p.email))}</span><div><b>${esc(p.nome || p.email)}</b><p>${esc(p.email)} · ${esc(p.ativo ? t('acc.aprovado') : t('inv.waiting'))}${p.ultimoAcesso ? ` · ${esc(t('team.lastSeen'))} ${esc(data(p.ultimoAcesso, true))}` : ''}</p></div></div>`).join('')
+        : `<p class="small muted" style="margin:0">${esc(t('inv.none'))}</p>`;
+    };
+    const carregar = () => api('corretores').then((d) => { S.corretores = d.corretores; desenharCorretores(); desenharEquipe(d.equipe); }).catch((e) => { $('#br-list').innerHTML = `<div class="empty">${esc(e.message)}</div>`; });
     carregar();
+    const fc = $('#f-conv', main);
+    fc.addEventListener('submit', async (ev) => {
+      ev.preventDefault();
+      const fd = Object.fromEntries(new FormData(fc).entries());
+      const msg = $('.formmsg', fc); msg.textContent = '';
+      try {
+        const d = await api('convidar', fd);
+        const txt = `Bracerum Park · ${t('brand')}\n${t('inv.msg')}\n${d.link}`;
+        abrirSheet({ titulo: t('inv.invite'), corpo: `<p style="margin:0">${esc(t('inv.linkInfo'))}</p><div class="linkbox"><code>${esc(d.link)}</code><button type="button" class="btn btn--ink btn--sm" data-x="cp">${I.copy}</button></div>`,
+          pe: `<a class="btn btn--line" href="mailto:${esc(fd.email)}?subject=${encodeURIComponent('Bracerum Park · ' + t('brand'))}&body=${encodeURIComponent(txt)}">${I.mail}E-mail</a><a class="btn btn--ink" href="https://wa.me/?text=${encodeURIComponent(txt)}" target="_blank" rel="noopener">${I.wa.replace('<svg', '<svg width="16" height="16"')}WhatsApp</a>`,
+          depois: (p) => $('[data-x=cp]', p).addEventListener('click', () => copiar(d.link)) });
+        fc.reset(); carregar();
+      } catch (e) { msg.textContent = e.message; }
+    });
     main.addEventListener('click', async (ev) => {
       const b = ev.target.closest('button'); if (!b) return;
       if (b.dataset.bf) { S.team.filtro = b.dataset.bf; $$('[data-bf]').forEach((x) => x.setAttribute('aria-pressed', x === b)); desenharCorretores(); }
@@ -1146,12 +1187,63 @@
   }
 
   /* ============================================================ início do app */
+  /* primeiro acesso de alguém da equipe: #/convite/<token> */
+  async function renderConvite(token) {
+    let info;
+    try { info = await api('conviteVer', { token }); }
+    catch (e) {
+      history.replaceState(null, '', location.pathname);
+      render();
+      setTimeout(() => { const m = $('.formmsg'); if (m) m.textContent = e.message; }, 50);
+      return;
+    }
+    document.title = `${t('inv.title')} · ${t('brand')}`;
+    app.innerHTML = `
+      <div class="auth view">
+        <section class="auth__form">
+          <div class="auth__top"><a class="brand" href="/"><img class="brand__logo logo--ink" src="/assets/logo/logo-horizontal-black.svg" alt="Bracerum Park" width="150" height="18" /><img class="brand__logo logo--paper" src="/assets/logo/logo-horizontal-white.svg" alt="" width="150" height="18" /></a>${langSwitch()}</div>
+          <div class="auth__mid" id="main" tabindex="-1">
+            <div style="display:grid;gap:14px"><p class="eyebrow">${esc(t('auth.team'))}</p><h1 class="h1">${esc(t('inv.title'))}</h1><p class="lead">${esc(t('inv.lead'))}</p></div>
+            <form id="f-inv" novalidate>
+              <label class="field"><span>${esc(t('auth.email'))}</span><input class="input" type="email" value="${esc(info.email)}" autocomplete="username" readonly /></label>
+              <label class="field"><span>${esc(t('auth.teamName'))}</span><input class="input" name="nome" value="${esc(info.nome)}" autocomplete="name" required /></label>
+              <label class="field"><span>${esc(t('auth.pass8'))}</span><input class="input" type="password" name="senha" autocomplete="new-password" minlength="8" required /></label>
+              <label class="field"><span>${esc(t('inv.repeat'))}</span><input class="input" type="password" name="senha2" autocomplete="new-password" minlength="8" required /></label>
+              <p class="formmsg" role="alert"></p>
+              <button class="btn btn--ink btn--block" type="submit">${esc(t('inv.go'))}${I.arrow}</button>
+            </form>
+          </div>
+          <p class="auth__foot">© Bracerum Park</p>
+        </section>
+        <aside class="auth__panel" aria-hidden="true"><img src="/assets/web/fotos/park-aereo-rio.jpg" alt="" /><div class="auth__panelin"><span class="glass stage__chip" style="align-self:flex-start">${I.lock.replace('<svg', '<svg width="16" height="16"')} ${esc(t('auth.team'))}</span><p class="display">Bracerum<br/>Park</p></div></aside>
+      </div>`;
+    bindLang(app);
+    const f = $('#f-inv');
+    f.addEventListener('submit', async (ev) => {
+      ev.preventDefault();
+      const fd = Object.fromEntries(new FormData(f).entries());
+      const msg = $('.formmsg', f);
+      if (!fd.nome || !fd.senha) { msg.textContent = t('c.error'); return; }
+      if (fd.senha.length < 8) { msg.textContent = t('auth.pass8'); return; }
+      if (fd.senha !== fd.senha2) { msg.textContent = t('inv.mismatch'); return; }
+      const btn = $('button[type=submit]', f); btn.disabled = true;
+      try {
+        const d = await api('convite', { token, nome: fd.nome, senha: fd.senha });
+        S.user = d.usuario;
+        history.replaceState(null, '', location.pathname + '#/pedidos');
+        render(); toast(t('inv.done'));
+      } catch (e) { msg.textContent = e.message; btn.disabled = false; }
+    });
+  }
+
   async function iniciar() {
     document.documentElement.lang = S.lang === 'pt' ? 'pt-BR' : S.lang;
     try {
       const d = await api('eu');
       S.user = d.usuario; S.avisos = d.avisos || [];
     } catch (e) { S.user = null; }
+    const conv = location.hash.match(/^#\/convite\/([A-Za-z0-9_\-.]+)$/);
+    if (conv && !S.user) return renderConvite(conv[1]);
     render();
   }
   // o idioma trocado no site (outra aba) vale aqui também

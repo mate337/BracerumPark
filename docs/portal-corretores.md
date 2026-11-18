@@ -271,3 +271,15 @@ O código é primeiro + último nome + 4 caracteres do id (ex.: `maria-souza-5f8
 **Pendências:** termo de parceria/comissão (texto jurídico do cliente) — hoje o aceite é um parágrafo
 curto; acesso ao painel do CV por corretor (criação dos usuários no CV continua manual); avisos por
 e-mail/WhatsApp quando o pedido muda de etapa; fotos/vídeos novos e apresentações em PDF para a biblioteca.
+
+### Contas da equipe com e-mail próprio (2026-11-18)
+- Além da senha compartilhada (`ADMIN_SENHA`), quem é da equipe pode ter **login próprio por e-mail**:
+  a conta fica no mesmo store (`portal/u/<id>.json`, `papel: "equipe"`) e entra pela aba **Entrar**.
+- **Primeiro acesso por convite:** `/PortalCorretores#/convite/<e-mail base64url>.<HMAC(PORTAL_CONVITE, e-mail)>`.
+  A pessoa define nome e senha; **o link morre depois de usado** (a conta passa a ter senha).
+- Quem pode receber convite: e-mails em **`PORTAL_ADMINS`** (variável plain, separada por vírgula) ou quem a
+  equipe convidar pela aba **Corretores → Convidar para a equipe** (gera o link e abre WhatsApp/e-mail).
+- **`PORTAL_CONVITE`** (sensitive, Production) assina os links. Trocar o valor invalida convites ainda não usados.
+- Primeiro admin: `matheus337.martins@gmail.com` (em `PORTAL_ADMINS` desde 2026-11-18).
+- Conta da equipe troca a senha na aba Conta; esqueceu → outro admin convida de novo não funciona (a conta já
+  tem senha) — por ora, pedir ao Claude para zerar a senha no store.
