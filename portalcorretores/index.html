@@ -6,18 +6,19 @@
 <title>Portal do Corretor · Bracerum Park</title>
 <meta name="description" content="Área dos corretores parceiros do Bracerum Park: materiais, tabela vigente, links rastreados e pedidos ao marketing." />
 <meta name="robots" content="noindex, nofollow" />
-<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
-<meta name="theme-color" content="#0a0a0a" media="(prefers-color-scheme: dark)" />
+<meta name="theme-color" content="#ffffff" />
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png" />
 <link rel="manifest" href="/portalcorretores/manifest.webmanifest" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Urbanist:wght@300;400;500;600;700&display=swap" />
-<link rel="stylesheet" href="/portalcorretores/portal.css?v=5" />
+<link rel="stylesheet" href="/portalcorretores/portal.css?v=7" />
 <script>
   /* tema antes do primeiro quadro, sem piscar */
-  try { var t = localStorage.getItem('bp-portal-tema'); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch (e) {}
+  /* abre sempre claro; escuro só se a pessoa escolheu no portal */
+  var t = 'light'; try { if (localStorage.getItem('bp-portal-tema2') === 'dark') t = 'dark'; } catch (e) {}
+  document.documentElement.dataset.theme = t;
 </script>
 </head>
 <body>
@@ -25,7 +26,7 @@
 <div id="app" aria-live="polite"><div class="boot"><span class="spin" aria-label="Carregando"></span></div></div>
 <div class="toasts" id="toasts" role="status" aria-live="polite"></div>
 <noscript><p style="padding:24px">O Portal do Corretor precisa de JavaScript ligado.</p></noscript>
-<script src="/portalcorretores/conteudo.js?v=5" defer></script>
-<script src="/portalcorretores/portal.js?v=5" defer></script>
+<script src="/portalcorretores/conteudo.js?v=7" defer></script>
+<script src="/portalcorretores/portal.js?v=7" defer></script>
 </body>
 </html>

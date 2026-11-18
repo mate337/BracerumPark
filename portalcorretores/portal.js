@@ -1,7 +1,7 @@
 /*
   Portal do Corretor — aplicação de uma página só (rotas por #/).
   Conteúdo editável em conteudo.js; servidor em /api/portal (api/portal.js).
-  Idioma pela mesma chave do site (bp-lang); tema em bp-portal-tema.
+  Idioma pela mesma chave do site (bp-lang); tema: sempre claro, escuro só por escolha (bp-portal-tema2).
 */
 (function () {
   'use strict';
@@ -354,12 +354,14 @@
     });
   }
 
-  /* tema: claro (fundo branco) / escuro / sistema — botão no topo e na entrada */
-  function temaAtual() { try { return localStorage.getItem('bp-portal-tema') || 'auto'; } catch (e) { return 'auto'; } }
-  function temaEfetivo() { const v = temaAtual(); return v === 'auto' ? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : v; }
+  /* tema: abre sempre claro (fundo branco); escuro só se a pessoa escolher — botão no topo e na conta.
+     Chave nova (bp-portal-tema2) para todo mundo recomeçar no claro, mesmo quem tinha escolhido escuro antes. */
+  function temaAtual() { try { return localStorage.getItem('bp-portal-tema2') === 'dark' ? 'dark' : 'light'; } catch (e) { return 'light'; } }
+  function temaEfetivo() { return temaAtual(); }
   function aplicarTema(v) {
-    try { if (v === 'auto') localStorage.removeItem('bp-portal-tema'); else localStorage.setItem('bp-portal-tema', v); } catch (e) {}
-    if (v === 'auto') delete document.documentElement.dataset.theme; else document.documentElement.dataset.theme = v;
+    v = v === 'dark' ? 'dark' : 'light';
+    try { if (v === 'dark') localStorage.setItem('bp-portal-tema2', 'dark'); else localStorage.removeItem('bp-portal-tema2'); } catch (e) {}
+    document.documentElement.dataset.theme = v;
     $$('[data-tema-btn]').forEach((b) => { b.innerHTML = temaEfetivo() === 'dark' ? I.sun : I.moon; b.setAttribute('aria-label', t(temaEfetivo() === 'dark' ? 'acc.toLight' : 'acc.toDark')); b.title = b.getAttribute('aria-label'); });
     $$('[data-tema]').forEach((x) => x.setAttribute('aria-pressed', x.dataset.tema === v));
   }
@@ -584,9 +586,10 @@
       && (!q || [tx(m.titulo), tx(m.desc), tx(C.PRODUTOS[m.produto]), m.formato].join(' ').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').includes(q)));
   }
   VIEWS.materiais = () => {
-    const tipos = ['all', ...Object.keys(C.TIPOS_MATERIAL)];
-    const prods = ['all', ...Object.keys(C.PRODUTOS)];
     const st = S.mat.st || 'publicado';
+    const vis = todosMateriais().filter((m) => st === 'todos' || m.status === st);   // só filtros que têm material
+    const tipos = ['all', ...Object.keys(C.TIPOS_MATERIAL).filter((k) => k === S.mat.tipo || vis.some((m) => m.tipo === k))];
+    const prods = ['all', ...Object.keys(C.PRODUTOS).filter((k) => k === S.mat.produto || vis.some((m) => m.produto === k))];
     return `
       <header class="pagehead">
         <div class="pagehead__meta"><a href="#/inicio" class="linkbtn" style="text-decoration:none">← ${esc(t('nav.home'))}</a><span id="mat-count" class="num"></span></div>
@@ -1173,12 +1176,7 @@
     if (k === 'n') return `<div class="numbers">${v.map(([n, d]) => `<div><b>${esc(n)}</b><span>${esc(d)}</span></div>`).join('')}</div>`;
     return '';
   }
-  function contatosHTML() {
-    return `<div class="people">${C.CONTATOS.map((c) => `<article class="card person"><span class="avatar">${esc(iniciais(c.nome))}</span>
-      <div><b class="h3">${esc(c.nome)}</b><div class="small muted">${esc(tx(c.papel))} · <span class="num">${esc(c.tel)}</span></div></div>
-      <div class="row"><a class="btn btn--ink btn--sm" href="https://wa.me/${c.wa}" target="_blank" rel="noopener">${I.wa.replace('<svg', '<svg width="16" height="16"')}WhatsApp</a>
-      <a class="btn btn--line btn--sm" href="mailto:${esc(c.email)}">${I.mail}${esc(c.email)}</a></div></article>`).join('')}</div>`;
-  }
+
   VIEWS.aprender = () => {
     const tut = S.tut || { itens: [], ocultos: [] };
     const fixos = C.GUIAS.map((x) => ({ ...x, fixo: true, status: tut.ocultos.includes(x.id) ? 'arquivado' : 'publicado' }));
@@ -1220,8 +1218,7 @@
           <button type="button" class="btn btn--line btn--sm" data-tmenu="${esc(c.id || '')}" data-tfixo="${esc(c.chave || '')}">${I.dots}${esc(t('gest.more'))}</button></div>` : ''}
       </div>`).join('')}</div>` : `<div class="empty">${I.book}${esc(t('tut.empty'))}</div>`}
       <section class="section"><h2 class="h2" style="margin-bottom:12px">${esc(t('learn.faq'))}</h2>
-        <div class="faq">${C.FAQ.map((f) => `<details><summary>${esc(tx(f.q))}</summary><p>${esc(tx(f.a))}</p></details>`).join('')}</div></section>
-      <section class="section"><h2 class="h2" style="margin-bottom:16px">${esc(t('learn.contacts'))}</h2>${contatosHTML()}</section>`;
+        <div class="faq">${C.FAQ.map((f) => `<details><summary>${esc(tx(f.q))}</summary><p>${esc(tx(f.a))}</p></details>`).join('')}</div></section>`;
   };
   async function carregarTut(redesenhar) {
     try { S.tut = await api('tutoriais'); if (redesenhar && S.route.name === 'aprender') renderMain(); } catch (e) { toast(e.message); }
@@ -1299,11 +1296,11 @@
   /* ============================================================ conta */
   VIEWS.conta = () => {
     const u = S.user;
-    const tema = (() => { try { return localStorage.getItem('bp-portal-tema') || 'auto'; } catch (e) { return 'auto'; } })();
+    const tema = temaAtual();
     const prefs = `<section class="card" style="display:grid;gap:16px;align-content:start">
         <h2 class="h3">${esc(t('acc.lang'))}</h2>${langSwitch()}
         <h2 class="h3">${esc(t('acc.theme'))}</h2>
-        <div class="seg" role="group">${[['light', 'acc.light'], ['dark', 'acc.dark'], ['auto', 'acc.auto']].map(([v, k]) => `<button type="button" data-tema="${v}" aria-pressed="${tema === v}">${esc(t(k))}</button>`).join('')}</div>
+        <div class="seg" role="group">${[['light', 'acc.light'], ['dark', 'acc.dark']].map(([v, k]) => `<button type="button" data-tema="${v}" aria-pressed="${tema === v}">${esc(t(k))}</button>`).join('')}</div>
         <button type="button" class="btn btn--line" id="sair" style="justify-self:start">${I.out}${esc(t('acc.out'))}</button>
       </section>`;
     if (isEquipe()) {
@@ -1311,7 +1308,7 @@
           <label class="field"><span>${esc(t('acc.passNow'))}</span><input class="input" type="password" name="senhaAtual" autocomplete="current-password" required /></label>
           <label class="field"><span>${esc(t('acc.passNew'))}</span><input class="input" type="password" name="senhaNova" autocomplete="new-password" minlength="8" required /></label>
           <p class="formmsg" role="alert"></p><button type="submit" class="btn btn--ink" style="justify-self:start">${esc(t('acc.save'))}</button></form>`
-        : `<section class="card"><h2 class="h3" style="margin-bottom:12px">${esc(t('learn.contacts'))}</h2>${contatosHTML()}</section>`;
+        : '';
       return `<header class="pagehead"><div class="pagehead__meta"><span>${esc(t('acc.manager'))}</span>${u.email ? `<span>${esc(u.email)}</span>` : ''}</div><div class="pagehead__body"><h1 class="h1">${esc(u.nome)}</h1></div></header>
         <div class="split">${prefs}${senha}</div>`;
     }
@@ -1343,7 +1340,6 @@
         </section>
         ${prefs}
       </div>
-      <section class="section"><h2 class="h2" style="margin-bottom:16px">${esc(t('learn.contacts'))}</h2>${contatosHTML()}</section>
       <p class="small muted">${esc(t('acc.deleteByManager'))}</p>`;
   };
   VIEWS['conta:after'] = (main) => {

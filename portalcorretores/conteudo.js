@@ -158,7 +158,6 @@
     'learn.lead': T('O essencial para conversar com indústria, investidor e família — em leituras de poucos minutos.', 'Lo esencial para hablar con industria, inversor y familia — en lecturas de pocos minutos.', 'The essentials for talking to industry, investors and families — in short reads.'),
     'learn.min': T('min de leitura', 'min de lectura', 'min read'),
     'learn.back': T('Voltar', 'Volver', 'Back'),
-    'learn.contacts': T('Fale com a equipe', 'Hable con el equipo', 'Talk to the team'),
     'learn.faq': T('Perguntas que o cliente faz', 'Preguntas que hace el cliente', 'Questions clients ask'),
 
     'acc.title': T('Sua conta', 'Su cuenta', 'Your account'),
@@ -387,7 +386,7 @@
     'top.board': T('Avisos da Bracerum para os corretores', 'Avisos de Bracerum para los corredores', 'Notices from Bracerum to brokers'),
     'top.boardTeam': T('Publicar avisos para os corretores', 'Publicar avisos para los corredores', 'Post notices to brokers'),
     'top.prices': T('Preço vigente e simulador de lote', 'Precio vigente y simulador de lote', 'Current price and lot simulator'),
-    'top.learn': T('Guias rápidos, perguntas e contatos', 'Guías rápidas, preguntas y contactos', 'Quick guides, FAQ and contacts'),
+    'top.learn': T('Guias rápidos e perguntas frequentes', 'Guías rápidas y preguntas frecuentes', 'Quick guides and FAQ'),
     'top.requests': T('Fila do marketing, por etapa', 'Fila del marketing, por etapa', 'Marketing queue by stage'),
     'top.brokers': T('Aprovar, suspender e convidar', 'Aprobar, suspender e invitar', 'Approve, suspend and invite'),
     'map.title': T('Mapa de reservas', 'Mapa de reservas', 'Reservation map'),
@@ -514,98 +513,22 @@
   };
 
   /* ------------------------------------------------------------ biblioteca */
-  const FOTO = (arq, produto, pt, es, en, kb, pasta) => ({
-    tipo: 'foto', produto, titulo: T(pt, es, en), arquivo: `/${pasta || 'assets/web/fotos'}/${arq}`,
-    previa: `/portalcorretores/thumbs/${arq}`, formato: 'JPG', kb,
+  /* Biblioteca fixa: só os quatro folders digitais enviados pelo cliente em 2026-11-18.
+     (Os PDFs vieram com "Aptos" e "Casas" trocados no nome; aqui valem pelo conteúdo.) */
+  const PDF = (slug, produto, kb, pt, es, en, dpt, des, den) => ({
+    tipo: 'folder', produto, destaque: true, titulo: T(pt, es, en), desc: T(dpt, des, den),
+    arquivo: `/portalcorretores/materiais/bracerum-${slug}-folder-digital.pdf`, previa: `/portalcorretores/thumbs/folder-${slug}.jpg`,
+    formato: 'PDF', kb, idioma: 'PT',
   });
-  const FOLDER = (slug, produto, pt, es, en) => ({
-    tipo: 'folder', produto, titulo: T(pt, es, en), link: `/${slug}/`, previa: `/portalcorretores/thumbs/og-${slug}.jpg`,
-    formato: 'LP', desc: T('Versão digital do folder, com formulário que cai no CV.', 'Versión digital del folleto, con formulario que llega al CV.', 'Digital brochure with a form that feeds the CV.'),
-  });
-  const LOGO = (arq, pt, es, en, escuro) => ({
-    tipo: 'logo', produto: 'geral', titulo: T(pt, es, en), arquivo: `/assets/logo/${arq}`, previa: `/assets/logo/${arq}`,
-    formato: 'SVG', escuro: !!escuro,
-  });
-
   const MATERIAIS = [
-    { tipo: 'tabela', produto: 'park', destaque: true, titulo: T('Tabela de preços · lotes industriais', 'Tabla de precios · lotes industriales', 'Price list · industrial lots'),
-      desc: T('Política Comercial P1 · Tabela v3.1 · rev. 14/10/2026 · versão pública', 'Política Comercial P1 · Tabla v3.1 · rev. 14/10/2026 · versión pública', 'Commercial Policy P1 · List v3.1 · rev. 14 Oct 2026 · public version'),
-      arquivo: '/portalcorretores/materiais/bracerum-park-tabela-de-precos-v3.1.pdf', formato: 'PDF', kb: 181, idioma: 'PT' },
-    { tipo: 'tabela', produto: 'park', destaque: true, titulo: T('Mapa de lotes e categorias', 'Mapa de lotes y categorías', 'Lot & category map'),
-      desc: T('Masterplan MP14 com Vitrine, Business, Padrão e Interna por lote', 'Masterplan MP14 con Vitrina, Business, Estándar e Interna por lote', 'MP14 masterplan with Showcase, Business, Standard and Inner per lot'),
-      arquivo: '/portalcorretores/materiais/bracerum-park-mapa-de-lotes-mp14.pdf', formato: 'PDF', kb: 1440, idioma: 'PT' },
-    { tipo: 'video', produto: 'geral', destaque: true, titulo: T('Maquete 3D interativa', 'Maqueta 3D interactiva', 'Interactive 3D model'),
-      desc: T('614 lotes com disponibilidade ao vivo, preço e simulação. Mande o link de um lote: /3dmasterplan/#lote-Q07.L014', '614 lotes con disponibilidad en vivo, precio y simulación. Envíe el enlace de un lote: /3dmasterplan/#lote-Q07.L014', '614 lots with live availability, price and simulation. Link a lot: /3dmasterplan/#lote-Q07.L014'),
-      link: '/3dmasterplan/', previa: '/portalcorretores/thumbs/park-aereo-rio.jpg', formato: '3D' },
-    { tipo: 'video', produto: 'geral', titulo: T('Vídeo · voo sobre o parque', 'Video · vuelo sobre el parque', 'Video · flight over the park'),
-      arquivo: '/assets/video/voo-passaro-01.mp4', previa: '/portalcorretores/thumbs/park-boulevard-aereo.jpg', formato: 'MP4', kb: 6597 },
-
-    FOLDER('folderpark', 'park', 'Folder · Bracerum Park', 'Folleto · Bracerum Park', 'Brochure · Bracerum Park'),
-    FOLDER('foldermapadisponibilidade', 'park', 'Folder · Mapa de disponibilidade', 'Folleto · Mapa de disponibilidad', 'Brochure · Availability map'),
-    FOLDER('folderresidence', 'residence', 'Folder · Residence', 'Folleto · Residence', 'Brochure · Residence'),
-    FOLDER('folderresort', 'resort', 'Folder · Resort', 'Folleto · Resort', 'Brochure · Resort'),
-    FOLDER('folderbusinesscenter', 'outlet', 'Folder · Business Center', 'Folleto · Business Center', 'Brochure · Business Center'),
-    FOLDER('folderlp', 'geral', 'Folder · Visão geral', 'Folleto · Visión general', 'Brochure · Overview'),
-
-    { tipo: 'pagina', produto: 'geral', titulo: T('Site · Bracerum Park', 'Sitio · Bracerum Park', 'Website · Bracerum Park'), link: '/', previa: '/portalcorretores/thumbs/park-aereo-rio.jpg', formato: 'WEB' },
-    { tipo: 'pagina', produto: 'park', titulo: T('Tributação no Paraguai', 'Tributación en Paraguay', 'Taxation in Paraguay'),
-      desc: T('Maquila, Ley de Inversiones e Mercosul — a tese fiscal completa', 'Maquila, Ley de Inversiones y Mercosur — la tesis fiscal completa', 'Maquila, Investment Law and Mercosur — the full tax case'),
-      link: '/tributacao.html', previa: '/portalcorretores/thumbs/galpao-docas.jpg', formato: 'WEB' },
-    { tipo: 'pagina', produto: 'hotel', titulo: T('Página do Hotel', 'Página del Hotel', 'Hotel page'), link: '/hotel.html', previa: '/portalcorretores/thumbs/hotel-cupula-dia.jpg', formato: 'WEB' },
-    { tipo: 'pagina', produto: 'resort', titulo: T('Página do Resort', 'Página del Resort', 'Resort page'), link: '/resort.html', previa: '/portalcorretores/thumbs/resort-lago.jpg', formato: 'WEB' },
-
-    FOTO('park-aereo-rio.jpg', 'geral', 'Vista aérea com o rio', 'Vista aérea con el río', 'Aerial view with the river', 426),
-    FOTO('park-boulevard-aereo.jpg', 'geral', 'Boulevard visto do alto', 'Boulevard desde lo alto', 'Boulevard from above', 311),
-    FOTO('park-boulevard-aereo-2.jpg', 'geral', 'Boulevard visto do alto (2)', 'Boulevard desde lo alto (2)', 'Boulevard from above (2)', 340),
-    FOTO('portaria.jpg', 'park', 'Portaria', 'Portería', 'Gatehouse', 236),
-    FOTO('galpao-docas.jpg', 'park', 'Galpão com docas', 'Galpón con andenes', 'Warehouse with docks', 267),
-    FOTO('galpao-portico-azul.jpg', 'park', 'Galpão · pórtico', 'Galpón · pórtico', 'Warehouse · portal', 284),
-    FOTO('galpao-via.jpg', 'park', 'Galpões na via interna', 'Galpones en la vía interna', 'Warehouses on the inner road', 217),
-    FOTO('park-galpao-avenida.jpg', 'park', 'Galpão na avenida (alta)', 'Galpón en la avenida (alta)', 'Warehouse on the avenue (hi-res)', 256, 'assets/lp'),
-    FOTO('vias-boulevard.jpg', 'park', 'Vias · boulevard', 'Vías · boulevard', 'Roads · boulevard', 254),
-    FOTO('vias-rotatoria.jpg', 'park', 'Vias · rotatória', 'Vías · rotonda', 'Roads · roundabout', 289),
-    FOTO('posto-caminhoes.jpg', 'park', 'Posto e pátio de caminhões', 'Estación y playa de camiones', 'Fuel station and truck yard', 247),
-    FOTO('aero-pista-aerea.jpg', 'park', 'Pista de pouso · 1.460 m', 'Pista de aterrizaje · 1.460 m', 'Airstrip · 1,460 m', 261),
-    FOTO('aero-cabeceira.jpg', 'park', 'Cabeceira da pista', 'Cabecera de la pista', 'Runway threshold', 204),
-    FOTO('aero-patio-jato.jpg', 'park', 'Pátio dos hangares', 'Patio de hangares', 'Hangar apron', 153),
-    FOTO('park-hangar-jato.jpg', 'park', 'Hangar com jato (alta)', 'Hangar con jet (alta)', 'Hangar with jet (hi-res)', 206, 'assets/lp'),
-    FOTO('hangar-bracerum.jpg', 'park', 'Hangar', 'Hangar', 'Hangar', 228),
-    FOTO('hangar-interior.jpg', 'park', 'Hangar · interior', 'Hangar · interior', 'Hangar · interior', 248),
-    FOTO('hotel-cupula-dia.jpg', 'hotel', 'Hotel · cúpula', 'Hotel · cúpula', 'Hotel · dome', 343),
-    FOTO('hotel-cupula-piscina.jpg', 'hotel', 'Hotel · piscina', 'Hotel · piscina', 'Hotel · pool', 230),
-    FOTO('hotel-fachada-varandas.jpg', 'hotel', 'Hotel · fachada', 'Hotel · fachada', 'Hotel · façade', 394),
-    FOTO('hotel-recepcao.jpg', 'hotel', 'Hotel · recepção', 'Hotel · recepción', 'Hotel · lobby', 239),
-    FOTO('hotel-quarto.jpg', 'hotel', 'Hotel · quarto', 'Hotel · habitación', 'Hotel · room', 252),
-    FOTO('hotel-suite.jpg', 'hotel', 'Hotel · suíte', 'Hotel · suite', 'Hotel · suite', 272),
-    FOTO('hotel-varanda-vista.jpg', 'hotel', 'Hotel · varanda', 'Hotel · balcón', 'Hotel · balcony', 335),
-    FOTO('convencoes-auditorio.jpg', 'hotel', 'Convenções · auditório', 'Convenciones · auditorio', 'Conventions · auditorium', 271),
-    FOTO('convencoes-auditorio-2.jpg', 'hotel', 'Convenções · auditório (2)', 'Convenciones · auditorio (2)', 'Conventions · auditorium (2)', 237),
-    FOTO('convencoes-foyer.jpg', 'hotel', 'Convenções · foyer', 'Convenciones · foyer', 'Conventions · foyer', 336),
-    FOTO('convencoes-galeria.jpg', 'hotel', 'Convenções · galeria', 'Convenciones · galería', 'Conventions · gallery', 351),
-    FOTO('convencoes-galeria-2.jpg', 'hotel', 'Convenções · galeria (2)', 'Convenciones · galería (2)', 'Conventions · gallery (2)', 321),
-    FOTO('convencoes-restaurante.jpg', 'hotel', 'Restaurante', 'Restaurante', 'Restaurant', 371),
-    FOTO('convencoes-restaurante-noite.jpg', 'hotel', 'Restaurante · noite', 'Restaurante · noche', 'Restaurant · night', 342),
-    FOTO('residence-torre.jpg', 'residence', 'Residence · torre', 'Residence · torre', 'Residence · tower', 259, 'assets/lp'),
-    FOTO('residence-praia.jpg', 'residence', 'Residence · praia', 'Residence · playa', 'Residence · beach', 383, 'assets/lp'),
-    FOTO('resort-casa-modelo.jpg', 'resort', 'Resort · casa modelo', 'Resort · casa modelo', 'Resort · model house', 218, 'assets/lp'),
-    FOTO('resort-casa.jpg', 'resort', 'Resort · casa', 'Resort · casa', 'Resort · house', 268),
-    FOTO('resort-casas-rua.jpg', 'resort', 'Resort · rua das casas', 'Resort · calle de las casas', 'Resort · street', 333),
-    FOTO('resort-lago.jpg', 'resort', 'Resort · lago', 'Resort · lago', 'Resort · lake', 285),
-    FOTO('resort-rua-arborizada.jpg', 'resort', 'Resort · rua arborizada', 'Resort · calle arbolada', 'Resort · tree-lined street', 352),
-    FOTO('amen-piscina-quincho.jpg', 'resort', 'Lazer · piscina e quincho', 'Ocio · piscina y quincho', 'Leisure · pool and quincho', 228),
-    FOTO('amen-quadra.jpg', 'resort', 'Lazer · quadra', 'Ocio · cancha', 'Leisure · court', 262),
-    FOTO('outlet-fachada.jpg', 'outlet', 'Outlet · fachada', 'Outlet · fachada', 'Outlet · façade', 221, 'assets/lp'),
-    FOTO('outlet-boulevard.jpg', 'outlet', 'Outlet · boulevard', 'Outlet · boulevard', 'Outlet · boulevard', 292, 'assets/lp'),
-
-    LOGO('logo-horizontal-black.svg', 'Logo horizontal · preto', 'Logo horizontal · negro', 'Horizontal logo · black'),
-    LOGO('logo-horizontal-white.svg', 'Logo horizontal · branco', 'Logo horizontal · blanco', 'Horizontal logo · white', true),
-    LOGO('logo-stacked-wide-black.svg', 'Logo empilhado · preto', 'Logo apilado · negro', 'Stacked logo · black'),
-    LOGO('logo-stacked-wide-white.svg', 'Logo empilhado · branco', 'Logo apilado · blanco', 'Stacked logo · white', true),
-    LOGO('logo-compact-black.svg', 'Símbolo · preto', 'Símbolo · negro', 'Symbol · black'),
-    LOGO('logo-compact-white.svg', 'Símbolo · branco', 'Símbolo · blanco', 'Symbol · white', true),
-    LOGO('hotel-ink.svg', 'Selo · Bracerum Hotel', 'Sello · Bracerum Hotel', 'Seal · Bracerum Hotel'),
-    LOGO('resort-ink.svg', 'Selo · Bracerum Resort', 'Sello · Bracerum Resort', 'Seal · Bracerum Resort'),
-    LOGO('select-ink.svg', 'Selo · Bracerum Select', 'Sello · Bracerum Select', 'Seal · Bracerum Select'),
+    PDF('park-loteamentos-industriais', 'park', 8838, 'Folder · Bracerum Park · Loteamentos industriais', 'Folleto · Bracerum Park · Lotes industriales', 'Brochure · Bracerum Park · Industrial lots',
+      'Cidade industrial: lotes, infraestrutura e localização', 'Ciudad industrial: lotes, infraestructura y ubicación', 'Industrial city: lots, infrastructure and location'),
+    PDF('residence-aptos', 'residence', 5680, 'Folder · Bracerum Residence · Apartamentos', 'Folleto · Bracerum Residence · Departamentos', 'Brochure · Bracerum Residence · Apartments',
+      '1, 2 e 3 quartos e cobertura: plantas, quadras e diferenciais', '1, 2 y 3 dormitorios y penthouse: plantas, manzanas y diferenciales', '1, 2 and 3 bedrooms and penthouse: floor plans and highlights'),
+    PDF('residence-casas', 'residence', 8081, 'Folder · Bracerum Residence · Casas', 'Folleto · Bracerum Residence · Casas', 'Brochure · Bracerum Residence · Houses',
+      'Condomínio clube junto ao parque: lotes a partir de 600 m², lazer e planta', 'Condominio club junto al parque: lotes desde 600 m², ocio y planta', 'Club condominium next to the park: lots from 600 m², leisure and floor plan'),
+    PDF('outlet-premium', 'outlet', 4724, 'Folder · Bracerum Outlet Premium', 'Folleto · Bracerum Outlet Premium', 'Brochure · Bracerum Outlet Premium',
+      'Centro comercial e tecnológico integrado', 'Centro comercial y tecnológico integrado', 'Integrated retail and technology hub'),
   ];
 
   /* ------------------------------------------------------------ destinos dos links rastreados */
@@ -753,15 +676,10 @@
       a: T('Pela PY-19, a cerca de 65 km de Assunção; o parque tem pista de pouso própria de 1.460 m. Visitas guiadas: abra um pedido.', 'Por la PY-19, a unos 65 km de Asunción; el parque tiene pista propia de 1.460 m. Visitas guiadas: abra un pedido.', 'Via PY-19, about 65 km from Asunción; the park has its own 1,460 m airstrip. Guided visits: open a request.') },
   ];
 
-  const CONTATOS = [
-    { nome: 'Sydney Savi', papel: T('Comercial · Brasil', 'Comercial · Brasil', 'Sales · Brazil'), wa: '5547988030200', tel: '+55 47 98803-0200', email: 'sydney@bracerum.com' },
-    { nome: 'Cleber Pavão', papel: T('Comercial · Paraguai', 'Comercial · Paraguay', 'Sales · Paraguay'), wa: '595985516065', tel: '+595 985 516 065', email: 'cleber@bracerum.com' },
-  ];
-
   const CV = {
     corretor: 'https://bracerum.cvcrm.com.br/corretor/',
     imobiliaria: 'https://bracerum.cvcrm.com.br/imobiliaria/',
   };
 
-  window.BP_CONTEUDO = { T, UI, MATERIAIS_PEDIDO, PRODUTOS, TIPOS_MATERIAL, TIPOS_PEDIDO, MATERIAIS, DESTINOS, MENSAGENS, GUIAS, FAQ, CONTATOS, CV };
+  window.BP_CONTEUDO = { T, UI, MATERIAIS_PEDIDO, PRODUTOS, TIPOS_MATERIAL, TIPOS_PEDIDO, MATERIAIS, DESTINOS, MENSAGENS, GUIAS, FAQ, CV };
 })();

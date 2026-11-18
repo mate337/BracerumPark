@@ -377,3 +377,18 @@ Novas e **opcionais** (têm padrão): `PORTAL_FUSO` (America/Asuncion), `PORTAL_
 ### 7.4 A confirmar com o cliente
 - Fuso comercial das ofertas (assumido **Assunção**, UTC−3); se for Brasília, mudar `PORTAL_FUSO`.
 - Texto jurídico/rodapé do card (hoje: condições + validade + referência da oferta).
+
+### 7.5 Ajustes de 2026-11-18 (noite, pedidos do Matheus)
+- **Biblioteca só com os 4 folders digitais** enviados pelo cliente, em `portalcorretores/materiais/`
+  (`bracerum-{park-loteamentos-industriais,residence-aptos,residence-casas,outlet-premium}-folder-digital.pdf`,
+  capas em `thumbs/folder-*.jpg` geradas da 1ª página com `pdftoppm`). Saíram da biblioteca fixa fotos, logos,
+  vídeo, páginas, LPs e os PDFs de tabela/mapa (estes continuam na tela **Tabela**). Miniaturas sem uso apagadas.
+  **Os PDFs vieram com "Aptos" e "Casas" trocados no nome** (o "Aptos" é o das casas/Resort, lotes a partir de
+  600 m²; o "Casas" é o dos apartamentos 1–3 quartos) — no portal valem pelo conteúdo.
+  Os filtros de categoria/produto só mostram o que tem material. Materiais enviados pela Gestão (Blob) continuam
+  aparecendo se existirem — arquivar pela própria aba.
+- **Saíram os contatos do Cleber e do Sydney** do portal (bloco "Fale com a equipe" em Aprender e em Minha conta;
+  `CONTATOS` removido de `conteudo.js`). O site, o linktree, os cartões e a LP de corretores não foram mexidos.
+- **Abre sempre no modo claro** (fundo branco), mesmo em aparelho com modo escuro; escuro só se a pessoa escolher
+  no botão do topo ou em Minha conta (opção "Sistema" saiu). Chave nova `bp-portal-tema2`, para todo mundo
+  recomeçar no claro.
