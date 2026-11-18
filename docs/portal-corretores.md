@@ -1,0 +1,227 @@
+# Portal do Corretor — pesquisa e estrutura inicial (2026-11-18)
+
+Proposta de um **portal para os corretores e imobiliárias parceiras** do Bracerum Park: materiais,
+pedidos ao marketing, materiais digitais e os acessos ao CV CRM num lugar só. Este documento é
+pesquisa + proposta de estrutura. **Nada foi publicado e nada no site mudou.**
+
+Método: pesquisa com o ECC (`ecc-universal@2.2.3`, instalado como plugin do Claude Code; skills
+`deep-research`, `market-research` e `mcp-server-patterns`, e o catálogo `mcp-configs/mcp-servers.json`),
+mais a documentação do CV CRM (`desenvolvedor.cvcrm.com.br/llms.txt`, 706 endpoints listados) e o que
+já existe neste repositório.
+
+---
+
+## 1. O que a pesquisa mostrou
+
+### 1.1 O CV CRM já tem um painel do corretor — o portal não deve competir com ele
+
+- O CV vende o **Painel do Corretor** para a incorporadora, que o distribui às imobiliárias. Lá o
+  corretor **gerencia os próprios leads, vê o mapa de disponibilidade, faz reserva, gera e assina
+  contrato, acompanha venda e vê comissão**; há também um **mural** de recados da incorporadora
+  (convites para treinamento, avisos). Fonte: blog e central de ajuda do CV.
+- **Na conta da Bracerum ele já está no ar:** `bracerum.cvcrm.com.br/corretor/` e
+  `bracerum.cvcrm.com.br/imobiliaria/` respondem (conferido em 18/11).
+- O que os portais do mercado (Sienge/CV, TOTVS, Helbor, MRV) somam ao CRM é quase sempre a mesma
+  coisa: **espelho de vendas, tabelas atualizadas, download de material (tabelas, plantas, fotos),
+  pré-cadastro, análise de crédito, assinatura eletrônica e suporte (jurídico, comercial)**.
+  **Nenhum dos pesquisados traz um módulo de pedidos ao marketing** — é um diferencial nosso.
+
+**Conclusão:** o portal Bracerum é a **"porta de entrada"** do corretor: tudo que o CV não faz
+(material, marketing, treinamento, regras, peças personalizadas) + **atalhos e números do CV**,
+puxados pela API. Lead, reserva, contrato e comissão continuam sendo feitos no CV — o portal leva
+até lá, não duplica.
+
+### 1.2 O que a API do CV permite puxar para o portal
+
+| Uso no portal | Endpoint (doc do CV) | Autenticação |
+|---|---|---|
+| Disponibilidade ao vivo (já usamos) | `GET /api/v1/comercial/mapadisponibilidade/{id}` | e-mail + token |
+| Tabela de preço vigente | `tabelas de preço` (v1 detalhada e v3 lista/exibe) | token / Bearer |
+| Validar o corretor no login (CPF/e-mail cadastrado) | `Retorna um ou vários corretores` | e-mail + token |
+| Cadastrar corretor/imobiliária novos (substituir a planilha do `/corretores`) | `Cadastra corretor`, `Cadastra corretor PJ`, `Cadastra imobiliária`, `Adicionar usuário de imobiliária` | e-mail + token |
+| Liberar o empreendimento para o corretor | `Associar corretor/imobiliária a um empreendimento` (v2, abr/2025) | e-mail + token |
+| "Minhas reservas" e status | `Retorna as reservas de acordo com os filtros` | e-mail + token |
+| "Minhas comissões" | `Retorna lote de pagamentos de comissão`, `Retorna repasses` | e-mail + token / Bearer |
+| Enviar lead indicado pelo corretor | `POST /api/v1/comercial/leads` → **migrar para v4** (aviso do CV) | e-mail + token |
+| Avisos em tempo real (reserva aprovada, lote vendido) | `Adicionar webhook` | e-mail + token |
+| Painéis | API analítica **CVDW** ("Monte dashboards com o CVCRM") | usuário CVDW |
+
+**Não existe MCP do CV CRM** (nem oficial, nem comunitário). Se quisermos o Claude conversando com o
+CV, é preciso construir — ver §3.
+
+---
+
+## 2. Itens sugeridos para o portal
+
+Prioridade: **P1** = primeira versão, **P2** = segunda onda, **P3** = quando houver volume.
+
+### A. Entrada e conta
+- **P1 · Login do corretor** por e-mail + código (link mágico no e-mail ou código no WhatsApp) — sem
+  senha para esquecer. Só entra quem está cadastrado no CV (checagem pela API de corretores).
+- **P1 · Cadastro/credenciamento** — evolução do `/corretores`: nome, CPF, CRECI (BR) ou registro
+  equivalente (PY), imobiliária, WhatsApp; cai no CV como corretor e fica "aguardando aprovação".
+- **P1 · Aceite do termo de parceria** (comissão, uso de marca, LGPD) com data e versão registradas.
+- **P2 · Perfil** com foto, idiomas que atende, região — alimenta as peças personalizadas (item D).
+
+### B. Painel inicial ("hoje")
+- **P1 · Mural de avisos** (tabela nova, janela de preço virando, evento, treinamento) com destaque
+  para o que vence: a janela **Pós-Expo → Fase 1 em 01/04/2027** já está no `precos.json`.
+- **P1 · Números ao vivo**: lotes disponíveis/reservados/vendidos (do `/api/lotes-status`).
+- **P1 · Atalhos do CV**: "Meus leads", "Reservar", "Minhas comissões" → `bracerum.cvcrm.com.br/corretor/`.
+- **P2 · "Minhas reservas" e "Minhas comissões"** lidos da API, sem precisar abrir o CV.
+- **P3 · Ranking/campanha de incentivo** (meta do mês, prêmio) — só com regra comercial definida.
+
+### C. Biblioteca de materiais (o coração do portal)
+Organizada por **produto** (Park/lotes industriais · Residence · Resort · Hotel · Business Center/Outlet)
+e por **tipo**, sempre nos três idiomas quando houver:
+- **P1 · Apresentações** (PDF), **folders** (os seis já existentes), **tabela de preços vigente**
+  (com data de validade bem visível — tabela vencida na mão do corretor é o erro mais caro).
+- **P1 · Mapa de lotes / masterplan** — link para a maquete 3D com o lote do cliente
+  (`/3dmasterplan/#lote-Q38.L001`) e o PDF do V14.
+- **P1 · Fotos e renders** em alta (os 35 de `assets/web/fotos/` + originais do Drive), **vídeos**
+  e **logos** (pacote de marca com regras de uso).
+- **P1 · Kit tributário** — resumo da Lei de Maquila/regime do Paraguai, com os números de
+  `tributacao.html` (1% · 100% · 20 anos · 10 anos) e a ressalva de que não substitui assessoria.
+- **P2 · Documentos para o cliente**: ficha de reserva, checklist de documentos (PF/PJ, estrangeiro),
+  passo a passo de compra por um brasileiro no Paraguai.
+- **P2 · FAQ / objeções** com respostas aprovadas ("por que Villeta?", logística, energia, mão de obra,
+  segurança jurídica) — vem do site e das LPs.
+- Cada item mostra **versão e data**; quando sai versão nova, a antiga some e o mural avisa.
+
+### D. Materiais digitais prontos para enviar
+- **P1 · Links rastreados por corretor**: as LPs dos folders com `utm_source=corretor&utm_content=<id>`
+  (o `tracking.js` e o `api/lead.js` já leem utm) → o lead chega ao CV **já com o corretor de origem**.
+- **P1 · Mensagens de WhatsApp prontas** (PT/ES/EN) com o link rastreado, para copiar ou abrir direto.
+- **P1 · QR Code do corretor** (o `build_cartoes.py` já gera QR com `segno`).
+- **P2 · Cartão digital do corretor parceiro** no mesmo padrão dos cartões da equipe (`/cleberpavao` etc.).
+- **P2 · Peças personalizadas** (post, story, banner) com nome, foto e WhatsApp do corretor — via
+  modelos do **Canva** (MCP oficial, §3) ou gerador próprio em HTML → PNG.
+- **P3 · Simulador de proposta** em PDF, com o cálculo que a maquete já faz (categoria × janela ×
+  quantidade × forma de pagamento) e a marca do corretor.
+
+### E. Pedidos ao marketing
+- **P1 · Formulário de solicitação**: tipo (peça personalizada, material impresso, apoio em evento,
+  tradução, vídeo, visita guiada, outro), produto, idioma, prazo, descrição e anexo.
+- **P1 · Fila com status** visível para o corretor: Recebido → Em produção → Para aprovação → Entregue
+  (entrega cai na biblioteca pessoal dele). Aviso por e-mail/WhatsApp a cada mudança.
+- **P1 · Lado do marketing**: a fila num quadro (Notion, Asana ou planilha — ver §3) com prazo e responsável.
+- **P2 · Agendar visita ao parque / reunião com o comercial** (Google Calendar).
+- **P2 · Pedido de material impresso** (folders, banners) com endereço de entrega.
+
+### F. Treinamento
+- **P1 · Trilha curta** (vídeos de 3–5 min): o parque, os produtos, a tabela, como reservar no CV,
+  tributação. **P2 · Certificado** "corretor credenciado Bracerum" ao concluir.
+- **P2 · Agenda de treinamentos e eventos** (Expo, visitas técnicas) com inscrição.
+
+### G. Suporte
+- **P1 · Contatos certos por assunto** (comercial BR/PY, marketing, jurídico, financeiro/comissão).
+- **P3 · Assistente "Pergunte ao Bracerum"** — chat que responde com base nos materiais aprovados
+  (e em disponibilidade/preço pela API). Só depois que a biblioteca estiver organizada.
+
+---
+
+## 3. MCP — o que é viável e o que vale a pena
+
+MCP serve a **dois públicos diferentes**, e convém separar:
+1. **A equipe interna** (marketing/comercial usando o Claude): "quantos lotes vendemos esta semana?",
+   "gere o post deste corretor", "o que entrou na fila do marketing?".
+2. **O próprio portal** — aqui MCP **não é necessário**: o portal fala com as APIs direto, por
+   funções da Vercel, como `api/lead.js` e `api/lotes-status.js` já fazem.
+
+### 3.1 Já conectados nesta conta (usar agora)
+| MCP | Para o portal |
+|---|---|
+| **Google Drive** | Fonte da biblioteca (pastas por produto); leitura da planilha "Leads Corretores". |
+| **Vercel** | Publicar, variáveis, logs, analytics do portal. |
+| **GitHub** | Código do portal neste repositório. |
+| **Miro** | Desenhar fluxos e o mapa do portal com a equipe. |
+| **Higgsfield** | Gerar imagens/vídeos de campanha para a biblioteca. |
+| **Notion, Slack, Figma, Linear, Atlassian, Intercom** (plugin design) | Configurados, mas **pedem login** nas configurações de conectores do claude.ai. **Asana** falhou ao conectar. |
+
+### 3.2 Oficiais, recomendados para adicionar
+| MCP | Situação | Uso |
+|---|---|---|
+| **Canva** (`mcp.canva.com/mcp`, OAuth) | Oficial | **Peças personalizadas por corretor** a partir de modelos da marca — o item com mais retorno. |
+| **Notion** (`mcp.notion.com/mcp`) ou **Asana** | Oficiais | Quadro da **fila de pedidos ao marketing**; o Claude lê/atualiza status. Escolher **um**. |
+| **Gmail / Google Calendar** (Google) | Oficiais | Avisos aos corretores, agendamento de visitas e treinamentos. |
+| **Google Analytics** (Google, open source) | Oficial | Desempenho dos links rastreados por corretor (o GA4 `G-0MZSYRTHND` já está no ar). |
+| **WhatsApp Business Tools** (Meta, `mcp.facebook.com/whatsapp_business_tools`) | **Beta**, liberação gradual | Modelos de mensagem e avisos de status pela API oficial. **Evitar servidores comunitários de WhatsApp** (risco de banimento do número). |
+| **Meta Ads** | Beta | Só se o marketing for impulsionar campanhas de captação de corretores. |
+
+Do catálogo do ECC, servem como apoio: **firecrawl/exa** (pesquisa), **playwright** (testar o portal),
+**supabase** (banco, se for o caminho do §4), **context7** (documentação de bibliotecas).
+
+### 3.3 O que vale construir: **MCP do CV CRM (`bracerum-cv`)**
+Não existe; é o mais útil para a equipe. Pequeno, **somente leitura no começo**, rodando como função
+na Vercel (transporte HTTP) com as mesmas `CVCRM_EMAIL`/`CVCRM_TOKEN`:
+- `disponibilidade(produto)` · `tabela_vigente(produto)` · `reservas(periodo, corretor?)`
+- `corretores(status)` · `comissoes(corretor, periodo)` · `leads_por_origem(periodo)` (utm → corretor)
+- Escrita (fase 2, com confirmação): `aprovar_corretor`, `associar_corretor_empreendimento`.
+- Regras: não devolver CPF/telefone de cliente final; registrar quem consultou; ler o token só do servidor.
+- Base para construir: skill `mcp-builder` (Anthropic) + `mcp-server-patterns` / `api-connector-builder` (ECC).
+
+---
+
+## 4. Estrutura proposta
+
+Mesmo padrão do `/admin/` e do `/cadastro/` (HTML/CSS/JS sem framework, funções na Vercel, celular
+primeiro, PT/EN/ES pela chave `bp-lang`) — a equipe já sabe manter isso.
+
+```
+portal/                       bracerumpark.com/portal  (fora do menu do site, noindex)
+  index.html                  login + painel "hoje"
+  materiais.html              biblioteca (filtros produto/tipo/idioma)
+  divulgar.html               links rastreados, mensagens, QR, peças
+  pedidos.html                pedidos ao marketing + status
+  treinamento.html
+  portal.css · portal.js · sw.js (abre sem internet, como o /admin)
+api/
+  portal-auth.js              código por e-mail/WhatsApp → sessão (cookie assinado)
+  portal-materiais.js         lista da biblioteca (Drive ou manifesto JSON)
+  portal-pedidos.js           cria/lista pedidos (Notion/Asana ou planilha)
+  portal-cv.js                proxy de leitura do CV: corretor, reservas, comissões
+docs/portal-corretores.md     este documento
+```
+
+**Onde ficam os dados**
+
+| Dado | Fonte de verdade | Por quê |
+|---|---|---|
+| Corretores, imobiliárias, leads, reservas, comissões | **CV CRM** | Já é onde o comercial trabalha. |
+| Arquivos da biblioteca | **Google Drive** (pastas por produto, link público só de leitura) | O marketing já sobe tudo lá; o portal lê um manifesto. |
+| Pedidos ao marketing | **Notion ou Asana** (P1 pode ser planilha + Apps Script, como `/corretores`) | Quadro com status para o marketing; MCP oficial para o Claude. |
+| Sessão, aceite do termo, cliques | Vercel (KV/Blob) ou Supabase | Pouca coisa; só se precisar de histórico. |
+
+**Segurança e LGPD**: portal `noindex`; links de material com validade; sessão expira; termo com
+versão; o corretor só vê os próprios leads/reservas/comissões; nada de dado de cliente final na
+biblioteca; aviso de cookies do `tracking.js` vale também aqui.
+
+**Fases**
+1. **MVP (2–3 semanas):** login por código, mural, números ao vivo, atalhos do CV, biblioteca, links
+   rastreados + WhatsApp + QR, formulário de pedidos com status, contatos.
+2. **CV integrado:** cadastro do corretor direto no CV (aposenta a planilha), minhas reservas/comissões,
+   webhooks de aviso, MCP `bracerum-cv` para a equipe, migração do lead para a v4.
+3. **Escala:** peças personalizadas via Canva, trilha com certificado, simulador em PDF, ranking, assistente.
+
+---
+
+## 5. Decisões que precisam do cliente
+1. **Login próprio no portal** (código por e-mail/WhatsApp) **ou** só pelo login do CV? (Recomendo o próprio,
+   validando no CV: o corretor ainda não aprovado também precisa ver o material de credenciamento.)
+2. **Fila do marketing:** Notion, Asana ou planilha no começo?
+3. **Quem aprova** corretor novo e quem responde pedidos (nomes/SLA).
+4. **Regras de comissão e termo de parceria** — texto jurídico, vem do cliente.
+5. **O que é público para o corretor**: tabela completa ou só a faixa de preço? Plantas em alta?
+6. **Corretor do Paraguai**: registro equivalente ao CRECI e idioma padrão ES.
+7. Endereço: `bracerumpark.com/portal` ou subdomínio `corretor.bracerumpark.com`.
+
+## Fontes
+- CV CRM — Painel do Corretor: https://cvcrm.com.br/blog/painel-do-corretor-de-imoveis-uma-ferramenta-essencial/
+- CV CRM — documentação da API: https://desenvolvedor.cvcrm.com.br/llms.txt · changelog abr/2025: https://ajuda.cvcrm.com.br/support/solutions/articles/157000358644
+- Portal do Corretor Sienge (feito pelo CV): https://sienge.com.br/blog/portal-do-corretor-sienge-o-que-e-e-quais-sao-os-beneficios/
+- Espelho de vendas: https://sienge.com.br/blog/espelho-de-vendas-otimizar-gestao-empresarial/
+- TOTVS Construção (portal com materiais de marketing): https://www.totvs.com/construcao/totvs-construcao-gestao-de-imoveis/
+- Canva MCP oficial: https://growthmethod.com/canva-mcp-server/
+- WhatsApp MCP (oficial em beta × comunitários): https://www.dragapp.com/blog/whatsapp-mcp-server/ · https://mcpservers.org/servers/whatsapp-business-tools-mcp
+- MCPs oficiais para marketing (Google Analytics, Meta Ads, Notion, Asana, Google Workspace): https://www.digitalapplied.com/blog/official-mcp-servers-for-marketing-teams
+- ECC: https://github.com/affaan-m/ECC (pacote `ecc-universal@2.2.3`)

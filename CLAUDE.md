@@ -10,6 +10,12 @@ O site tem **7 páginas**: `index.html`, `tributacao.html`, `bracerum.html`, `ho
 maquete 3D embutida, que as seis páginas internas baixavam e interpretavam à toa. Ele roda depois do
 `script.js` porque usa `hasGsap`, `reduceMotion` e `tr()`.
 
+### Portal do Corretor — pesquisa e estrutura (2026-11-18, só documento)
+- Proposta em **`docs/portal-corretores.md`**: itens por prioridade (login, mural, biblioteca, links rastreados,
+  pedidos ao marketing, treinamento), mapa dos endpoints do CV úteis, MCPs viáveis e estrutura `portal/` + `api/portal-*`.
+- O CV já tem o painel do corretor no ar (`bracerum.cvcrm.com.br/corretor/`): o portal leva até ele, não duplica.
+- **Não existe MCP do CV** — proposto um `bracerum-cv` próprio (leitura primeiro). Nada publicado; 7 decisões do cliente no §5.
+
 ### ✅ Publicação pelo GitHub voltou (2026-11-12)
 - Em 2026-11-12 o push no `main` **voltou a publicar sozinho** na Vercel (deploy de produção `source: git`,
   `dpl_7JjxbfKeqn7pAZaTbVdBiPuxFW6D`, commit `55abe92`), e push em branch gera prévia. **Push no `main` = site no
