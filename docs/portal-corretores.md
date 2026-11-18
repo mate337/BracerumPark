@@ -283,3 +283,17 @@ e-mail/WhatsApp quando o pedido muda de etapa; fotos/vídeos novos e apresentaç
 - Primeiro admin: `matheus337.martins@gmail.com` (em `PORTAL_ADMINS` desde 2026-11-18).
 - Conta da equipe troca a senha na aba Conta; esqueceu → outro admin convida de novo não funciona (a conta já
   tem senha) — por ora, pedir ao Claude para zerar a senha no store.
+
+### Início com boas-vindas, mural só leitura e formulário de pedido (2026-11-18, pedido do Matheus)
+- **Início** (corretor e equipe): "Bem-vindo, <nome>", data e os **tópicos no centro** — corretor: Materiais,
+  Mural, Tabela, Aprender (+ atalhos Pedir ao marketing, Meu link, Seus pedidos, Painel do CV); equipe: Pedidos,
+  Corretores, Mural, Materiais, Tabela, Aprender (com contadores de pedidos novos e corretores aguardando).
+- **Mapa de reservas no Início:** legenda ao vivo do CV (disponíveis, reservados, vendidos, indisponíveis, janela e
+  preço) + a maquete embutida em `/3dmasterplan/?embed=1#lotes` (abre no modo de lotes; carrega sozinha ao chegar perto).
+- **Mural:** o corretor só lê (aba Mural); só a equipe publica. "Corretores" continua só da equipe.
+- **Pedido ao marketing = página de formulário** (`#/pedidos/novo`): 01 Material (12 opções em `MATERIAIS_PEDIDO`
+  no `conteudo.js`) · 02 Tipo (digital/impresso/ambos), quantidade, medida, produto · 03 Informações para preencher
+  (já vem com os dados do corretor e o link dele) · 04 Detalhes · 05 **Exemplos anexos** (até 6, imagem ou PDF, 3 MB
+  cada; foto grande é reduzida no navegador) + link · 06 Prazo e idioma.
+- **Anexos** no store privado em `portal/a/<pedido>/<n>-<nome>`; baixados por `GET /api/portal?anexo=<caminho>` —
+  só o dono do pedido e a equipe (outro corretor ou sem sessão = 404).

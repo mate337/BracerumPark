@@ -181,6 +181,50 @@
     'acc.dark': T('Escura', 'Oscura', 'Dark'),
     'acc.auto': T('Sistema', 'Sistema', 'System'),
 
+    'home.welcome': T('Bem-vindo', 'Bienvenido', 'Welcome'),
+    'home.sub2': T('Escolha por onde começar. O mapa de reservas logo abaixo mostra o que está livre agora.', 'Elija por dónde empezar. El mapa de reservas abajo muestra lo que está libre ahora.', 'Pick where to start. The reservation map below shows what is available right now.'),
+    'home.subTeam': T('Pedidos, corretores e mural da equipe. O mapa de reservas logo abaixo vem ao vivo do CV.', 'Pedidos, corredores y mural del equipo. El mapa de reservas abajo viene en vivo del CV.', 'Requests, brokers and the team board. The reservation map below is live from the CV.'),
+    'top.materials': T('Fotos, folders, tabelas, logos e vídeo', 'Fotos, folletos, tablas, logos y video', 'Photos, brochures, prices, logos, video'),
+    'top.board': T('Avisos da Bracerum para os corretores', 'Avisos de Bracerum para los corredores', 'Notices from Bracerum to brokers'),
+    'top.boardTeam': T('Publicar avisos para os corretores', 'Publicar avisos para los corredores', 'Post notices to brokers'),
+    'top.prices': T('Preço vigente e simulador de lote', 'Precio vigente y simulador de lote', 'Current price and lot simulator'),
+    'top.learn': T('Guias rápidos, perguntas e contatos', 'Guías rápidas, preguntas y contactos', 'Quick guides, FAQ and contacts'),
+    'top.requests': T('Fila do marketing, por etapa', 'Fila del marketing, por etapa', 'Marketing queue by stage'),
+    'top.brokers': T('Aprovar, suspender e convidar', 'Aprobar, suspender e invitar', 'Approve, suspend and invite'),
+    'map.title': T('Mapa de reservas', 'Mapa de reservas', 'Reservation map'),
+    'map.desc': T('Os 614 lotes com a situação do CV: livres, reservados e vendidos. Toque num lote para ver área, categoria e preço.', 'Los 614 lotes con la situación del CV: libres, reservados y vendidos. Toque un lote para ver área, categoría y precio.', 'All 614 lots with CV status: available, reserved and sold. Tap a lot for area, category and price.'),
+    'map.note': T('A situação vem do CV CRM e é atualizada a cada minuto. Reserva se faz no painel do CV.', 'La situación viene del CV CRM y se actualiza cada minuto. La reserva se hace en el panel del CV.', 'Status comes from the CV CRM and refreshes every minute. Reservations are made in the CV panel.'),
+    'map.res': T('Reservados', 'Reservados', 'Reserved'),
+    'map.sold': T('Vendidos', 'Vendidos', 'Sold'),
+    'map.off': T('Indisponíveis', 'No disponibles', 'Unavailable'),
+    'board.lead': T('Avisos, treinamentos e mudanças de tabela publicados pela equipe Bracerum.', 'Avisos, capacitaciones y cambios de tabla publicados por el equipo Bracerum.', 'Notices, trainings and price changes posted by the Bracerum team.'),
+    'form.title': T('Solicitação ao marketing', 'Solicitud al marketing', 'Marketing request'),
+    'form.lead': T('Diga o material, o tipo e a quantidade, o que deve aparecer na peça e anexe exemplos. O marketing responde por aqui.', 'Indique el material, el tipo y la cantidad, lo que debe aparecer en la pieza y adjunte ejemplos. El marketing responde por aquí.', 'Tell us the material, kind and quantity, what goes on the piece, and attach examples. Marketing replies here.'),
+    'form.material': T('Material', 'Material', 'Material'),
+    'form.materialHint': T('O que você precisa.', 'Qué necesita.', 'What you need.'),
+    'form.kind': T('Tipo, quantidade e medida', 'Tipo, cantidad y medida', 'Kind, quantity and size'),
+    'form.digital': T('Digital', 'Digital', 'Digital'),
+    'form.print': T('Impresso', 'Impreso', 'Printed'),
+    'form.both': T('Digital e impresso', 'Digital e impreso', 'Digital and printed'),
+    'form.qty': T('Quantidade', 'Cantidad', 'Quantity'),
+    'form.qtyHint': T('Peças diferentes no digital; cópias no impresso.', 'Piezas distintas en digital; copias en impreso.', 'Different pieces if digital; copies if printed.'),
+    'form.size': T('Medida / formato', 'Medida / formato', 'Size / format'),
+    'form.fill': T('Informações para preencher', 'Información para completar', 'Information to include'),
+    'form.fillHint': T('O que vai escrito na peça. Já trouxemos os seus dados — ajuste à vontade.', 'Lo que va escrito en la pieza. Ya trajimos sus datos — ajuste a gusto.', 'What goes on the piece. Your details are pre-filled — edit freely.'),
+    'form.details': T('Detalhes do pedido', 'Detalles del pedido', 'Request details'),
+    'form.detailsHint': T('Público, texto principal, cores, endereço de entrega do impresso…', 'Público, texto principal, colores, dirección de entrega del impreso…', 'Audience, headline, colors, delivery address for prints…'),
+    'form.examples': T('Exemplos e referências', 'Ejemplos y referencias', 'Examples and references'),
+    'form.examplesHint': T('Anexe até 6 arquivos (imagem ou PDF, até 3 MB cada — foto grande é reduzida sozinha).', 'Adjunte hasta 6 archivos (imagen o PDF, hasta 3 MB cada uno — la foto grande se reduce sola).', 'Attach up to 6 files (image or PDF, up to 3 MB each — large photos are resized).'),
+    'form.drop': T('Escolher arquivos ou arrastar aqui', 'Elegir archivos o arrastrar aquí', 'Choose files or drop them here'),
+    'form.dropHint': T('JPG, PNG, WEBP ou PDF', 'JPG, PNG, WEBP o PDF', 'JPG, PNG, WEBP or PDF'),
+    'form.when': T('Prazo e idioma', 'Plazo e idioma', 'Deadline and language'),
+    'form.tooBig': T('arquivo maior que 3 MB', 'archivo mayor que 3 MB', 'file larger than 3 MB'),
+    'form.max': T('Até 6 arquivos por pedido.', 'Hasta 6 archivos por pedido.', 'Up to 6 files per request.'),
+    'form.needMaterial': T('Escolha o material.', 'Elija el material.', 'Choose the material.'),
+    'form.needKind': T('Escolha digital ou impresso.', 'Elija digital o impreso.', 'Choose digital or printed.'),
+    'form.needInfo': T('Conte o que vai na peça ou descreva o pedido.', 'Indique lo que va en la pieza o describa el pedido.', 'Tell us what goes on the piece or describe the request.'),
+    'form.sending': T('Enviando…', 'Enviando…', 'Sending…'),
+    'form.uploading': T('Anexos', 'Adjuntos', 'Files'),
     'inv.name': T('Nome', 'Nombre', 'Name'),
     'team.noBrokers': T('Nenhum corretor nesta situação.', 'Ningún corredor en esta situación.', 'No brokers in this status.'),
     'inv.title': T('Primeiro acesso', 'Primer acceso', 'First access'),
@@ -249,6 +293,23 @@
     traducao: T('Tradução de material', 'Traducción de material', 'Translation'),
     material: T('Material que falta na biblioteca', 'Material que falta en la biblioteca', 'Missing material'),
     outro: T('Outro', 'Otro', 'Other'),
+  };
+
+  /* ------------------------------------------------------------ formulário de pedido ao marketing */
+  // chave → { nome, ex (exemplo curto), icone (do portal.js), formato sugerido, medida sugerida }
+  const MATERIAIS_PEDIDO = {
+    post: { nome: T('Post para feed', 'Post para feed', 'Feed post'), ex: T('Instagram, LinkedIn, Facebook', 'Instagram, LinkedIn, Facebook', 'Instagram, LinkedIn, Facebook'), icone: 'image', formato: 'digital', medida: '1080 × 1350' },
+    story: { nome: T('Story / Reels', 'Story / Reels', 'Story / Reels'), ex: T('Vertical, com o seu contato', 'Vertical, con su contacto', 'Vertical, with your contact'), icone: 'image', formato: 'digital', medida: '1080 × 1920' },
+    banner: { nome: T('Banner digital', 'Banner digital', 'Digital banner'), ex: T('Site, e-mail, anúncio', 'Sitio, correo, anuncio', 'Website, email, ad'), icone: 'image', formato: 'digital', medida: '1920 × 1080' },
+    folder: { nome: T('Folder / Flyer', 'Folleto / Flyer', 'Brochure / Flyer'), ex: T('Com o seu nome e QR', 'Con su nombre y QR', 'With your name and QR'), icone: 'print', formato: 'impresso', medida: 'A4' },
+    cartao: { nome: T('Cartão de visita', 'Tarjeta de presentación', 'Business card'), ex: T('Cartão Bracerum Park com seus dados', 'Tarjeta Bracerum Park con sus datos', 'Bracerum Park card with your details'), icone: 'user', formato: 'impresso', medida: '9 × 5 cm' },
+    apresentacao: { nome: T('Apresentação', 'Presentación', 'Presentation'), ex: T('PDF para cliente ou investidor', 'PDF para cliente o inversor', 'PDF for a client or investor'), icone: 'file', formato: 'digital', medida: '1920 × 1080' },
+    placa: { nome: T('Placa, faixa ou banner', 'Cartel, pancarta o banner', 'Sign or banner'), ex: T('Para plantão, stand ou evento', 'Para stand o evento', 'For a stand or event'), icone: 'print', formato: 'impresso', medida: '2 × 1 m' },
+    video: { nome: T('Vídeo', 'Video', 'Video'), ex: T('Corte curto do parque', 'Corte corto del parque', 'Short cut of the park'), icone: 'video', formato: 'digital', medida: '1080 × 1920' },
+    evento: { nome: T('Apoio em evento', 'Apoyo en evento', 'Event support'), ex: T('Feira, palestra, reunião', 'Feria, charla, reunión', 'Fair, talk, meeting'), icone: 'calendar', formato: 'ambos' },
+    visita: { nome: T('Visita ao parque', 'Visita al parque', 'Site visit'), ex: T('Com o seu cliente', 'Con su cliente', 'With your client'), icone: 'map', formato: 'ambos' },
+    traducao: { nome: T('Tradução', 'Traducción', 'Translation'), ex: T('Material em ES ou EN', 'Material en PT o EN', 'Material in PT or ES'), icone: 'globe', formato: 'digital' },
+    outro: { nome: T('Outro', 'Otro', 'Other'), ex: T('Conte nos detalhes', 'Cuéntelo en los detalles', 'Tell us in the details'), icone: 'dots' },
   };
 
   /* ------------------------------------------------------------ biblioteca */
@@ -501,5 +562,5 @@
     imobiliaria: 'https://bracerum.cvcrm.com.br/imobiliaria/',
   };
 
-  window.BP_CONTEUDO = { T, UI, PRODUTOS, TIPOS_MATERIAL, TIPOS_PEDIDO, MATERIAIS, DESTINOS, MENSAGENS, GUIAS, FAQ, CONTATOS, CV };
+  window.BP_CONTEUDO = { T, UI, MATERIAIS_PEDIDO, PRODUTOS, TIPOS_MATERIAL, TIPOS_PEDIDO, MATERIAIS, DESTINOS, MENSAGENS, GUIAS, FAQ, CONTATOS, CV };
 })();

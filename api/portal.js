@@ -329,21 +329,36 @@ const TIPOS = ['peca', 'impresso', 'evento', 'video', 'traducao', 'visita', 'mat
 const PRODUTOS = ['park', 'residence', 'resort', 'hotel', 'outlet', 'geral'];
 const STATUS = ['recebido', 'producao', 'aprovacao', 'entregue', 'cancelado'];
 
+// Material pedido (formulário de 2026-11-18): o que é, se é digital ou impresso, quantas, medida, os dados que
+// vão na peça e exemplos anexados. "tipo" continua existindo para os pedidos antigos e para o ícone.
+const MATERIAIS_PEDIDO = {
+  post: 'peca', story: 'peca', banner: 'peca', folder: 'impresso', cartao: 'impresso', apresentacao: 'material',
+  video: 'video', placa: 'impresso', evento: 'evento', visita: 'visita', traducao: 'traducao', outro: 'outro',
+};
+const FORMATOS = ['digital', 'impresso', 'ambos'];
+
 async function pedidoCriar(b, u) {
   if (u.status !== 'aprovado') throw erro(403, 'Pedidos ao marketing são liberados depois da aprovação do seu cadastro.');
-  const tipo = TIPOS.includes(b.tipo) ? b.tipo : 'outro';
+  const material = Object.prototype.hasOwnProperty.call(MATERIAIS_PEDIDO, b.material) ? b.material : null;
+  const tipo = material ? MATERIAIS_PEDIDO[material] : (TIPOS.includes(b.tipo) ? b.tipo : 'outro');
+  const formato = FORMATOS.includes(b.formato) ? b.formato : null;
   const produto = PRODUTOS.includes(b.produto) ? b.produto : 'geral';
-  const titulo = limpa(b.titulo, 100);
+  const quantidade = Math.max(1, Math.min(100000, Math.round(Number(b.quantidade) || 1)));
+  const medida = limpa(b.medida, 80) || null;
+  const dados = texto(b.dados, 1500) || null;
   const descricao = texto(b.descricao, 2000);
-  if (titulo.length < 4) throw erro(422, 'Dê um título ao pedido');
-  if (descricao.length < 10) throw erro(422, 'Descreva o que você precisa');
+  const titulo = limpa(b.titulo, 100) || limpa(b.tituloAuto, 100);
+  if (!material && titulo.length < 4) throw erro(422, 'Escolha o material');
+  if (!formato && material) throw erro(422, 'Escolha digital ou impresso');
+  if ((dados || '').length + descricao.length < 10) throw erro(422, 'Conte o que vai na peça ou descreva o que você precisa');
   const prazo = /^\d{4}-\d{2}-\d{2}$/.test(b.prazo || '') ? b.prazo : null;
   const ref = limpa(b.referencia, 400);
   if (!urlOk(ref)) throw erro(422, 'O link de referência precisa começar com https://');
   const id = `${Date.now().toString(36)}-${crypto.randomBytes(3).toString('hex')}`;
   const numero = (await listar('portal/p/')).length + 1;
   const p = {
-    id, numero, tipo, produto, titulo, descricao, prazo, referencia: ref || null,
+    id, numero, tipo, material, formato, quantidade, medida, dados, anexos: [],
+    produto, titulo: titulo || 'Pedido', descricao, prazo, referencia: ref || null,
     idioma: ['pt', 'es', 'en'].includes(b.idioma) ? b.idioma : 'pt',
     status: 'recebido', criado: agora(), atualizado: agora(),
     corretor: { id: u.id, nome: u.nome, email: u.email, imobiliaria: u.imobiliaria, ddi: u.ddi, tel: u.tel },
@@ -392,6 +407,52 @@ async function pedidoCancelarProprio(b, u) {
   p.atualizado = agora();
   await gravar(caminhoP(p.id), p);
   return { pedido: p };
+}
+
+/* ------------------------------------------------------------------ anexos dos pedidos */
+// Exemplos/referências que o corretor anexa. Vão um por chamada, em base64 (corpo da função ≤ 4,5 MB),
+// para portal/a/<pedido>/<n>-<nome>. O navegador comprime foto grande antes de mandar.
+const ANEXO_TIPOS = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'application/pdf'];
+const ANEXO_MAX = 3 * 1024 * 1024;
+const ANEXOS_POR_PEDIDO = 6;
+async function anexoEnviar(b, s, u) {
+  const p = await ler(caminhoP(limpa(b.pedido, 40)));
+  if (!p) throw erro(404, 'Pedido não encontrado');
+  if (s.p !== 'equipe' && (!u || p.corretor.id !== u.id)) throw erro(404, 'Pedido não encontrado');
+  if ((p.anexos || []).length >= ANEXOS_POR_PEDIDO) throw erro(422, `Até ${ANEXOS_POR_PEDIDO} arquivos por pedido`);
+  const tipo = String(b.tipo || '');
+  if (!ANEXO_TIPOS.includes(tipo)) throw erro(415, 'Envie imagem (JPG, PNG, WEBP) ou PDF');
+  const buf = Buffer.from(String(b.dados || ''), 'base64');
+  if (!buf.length) throw erro(422, 'Arquivo vazio');
+  if (buf.length > ANEXO_MAX) throw erro(413, 'Arquivo maior que 3 MB');
+  const nome = limpa(b.nome, 80).normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^\w.\-]+/g, '-').replace(/^-+|-+$/g, '') || 'anexo';
+  const n = (p.anexos || []).length + 1;
+  const caminho = `portal/a/${p.id}/${n}-${nome}`;
+  exigeStore();
+  await B().put(caminho, buf, { access: 'private', addRandomSuffix: false, allowOverwrite: true, contentType: tipo });
+  p.anexos = [...(p.anexos || []), { nome: limpa(b.nome, 80) || nome, caminho, tipo, kb: Math.ceil(buf.length / 1024), por: s.n || (u && u.nome) || '', em: agora() }];
+  p.atualizado = agora();
+  await gravar(caminhoP(p.id), p);
+  return { pedido: p };
+}
+async function anexoBaixar(req, res) {
+  const s = lerSessao(req);
+  const caminho = String(new URL(req.url, 'http://x').searchParams.get('anexo') || '');
+  const m = caminho.match(/^portal\/a\/([a-z0-9-]{6,40})\/[\w.\-]+$/i);
+  if (!s || !m) { res.statusCode = 404; return res.end('não encontrado'); }
+  const p = await ler(caminhoP(m[1]));
+  let dono = false;
+  if (p && s.p === 'corretor') dono = p.corretor && p.corretor.id === s.u;
+  const anexo = p && (p.anexos || []).find((a) => a.caminho === caminho);
+  if (!anexo || !(s.p === 'equipe' || dono)) { res.statusCode = 404; return res.end('não encontrado'); }
+  const r = await B().get(caminho, { access: 'private', useCache: false });
+  if (!r || !r.stream) { res.statusCode = 404; return res.end('não encontrado'); }
+  res.setHeader('Content-Type', anexo.tipo);
+  res.setHeader('Cache-Control', 'private, no-store');
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('Content-Disposition', `${anexo.tipo === 'application/pdf' || anexo.tipo.startsWith('image/') ? 'inline' : 'attachment'}; filename="${encodeURIComponent(anexo.nome)}"`);
+  const { Readable } = require('stream');
+  Readable.fromWeb(r.stream).pipe(res);
 }
 
 /* ------------------------------------------------------------------ mural */
@@ -449,6 +510,9 @@ module.exports = async (req, res) => {
   res.setHeader('Cache-Control', 'no-store');
   res.setHeader('X-Robots-Tag', 'noindex');
   const fim = (status, obj) => { res.statusCode = status; res.end(JSON.stringify(obj)); };
+  if (req.method === 'GET' && /[?&]anexo=/.test(req.url || '')) {
+    try { return await anexoBaixar(req, res); } catch (e) { console.error('[portal] anexo', e.message); res.statusCode = 500; return res.end('erro'); }
+  }
   if (req.method !== 'POST') { res.setHeader('Allow', 'POST'); return fim(405, { ok: false, erro: 'método' }); }
   if (!/application\/json/i.test(String(req.headers['content-type'] || ''))) return fim(415, { ok: false, erro: 'tipo' });
   let b = req.body;
@@ -525,6 +589,7 @@ module.exports = async (req, res) => {
         if (eq) throw erro(400, 'Abra o pedido com uma conta de corretor');
         return fim(200, { ok: true, ...(await pedidoCriar(b, u)) });
       }
+      case 'anexo': return fim(200, { ok: true, ...(await anexoEnviar(b, s, u)) });
       case 'pedidoCancelar': if (eq) throw erro(400, 'Use o status do pedido'); return fim(200, { ok: true, ...(await pedidoCancelarProprio(b, u)) });
       case 'pedidoAtualizar': soEquipe(); return fim(200, { ok: true, ...(await pedidoAtualizar(b, s)) });
       case 'corretores': soEquipe(); return fim(200, { ok: true, ...(await corretoresListar()) });

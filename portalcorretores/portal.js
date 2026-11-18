@@ -169,20 +169,23 @@
   const PAG_IDX = { '12x': 0, vista: 1, '36x': 2 };
 
   /* ============================================================ rotas */
+  // O corretor só lê o mural; "Corretores" (aprovação) existe só para a equipe.
   const ROTAS_CORRETOR = [
-    ['inicio', 'nav.home', I.home], ['materiais', 'nav.materials', I.grid], ['divulgar', 'nav.share', I.share],
-    ['tabela', 'nav.prices', I.table], ['pedidos', 'nav.requests', I.inbox], ['aprender', 'nav.learn', I.book],
+    ['inicio', 'nav.home', I.home], ['materiais', 'nav.materials', I.grid], ['mural', 'nav.board', I.megaphone],
+    ['tabela', 'nav.prices', I.table], ['aprender', 'nav.learn', I.book], ['pedidos', 'nav.requests', I.inbox],
+    ['divulgar', 'nav.share', I.share],
   ];
   const ROTAS_EQUIPE = [
-    ['pedidos', 'nav.requests', I.inbox], ['corretores', 'nav.brokers', I.users], ['mural', 'nav.board', I.megaphone],
-    ['materiais', 'nav.materials', I.grid], ['tabela', 'nav.prices', I.table], ['aprender', 'nav.learn', I.book],
+    ['inicio', 'nav.home', I.home], ['pedidos', 'nav.requests', I.inbox], ['corretores', 'nav.brokers', I.users],
+    ['mural', 'nav.board', I.megaphone], ['materiais', 'nav.materials', I.grid], ['tabela', 'nav.prices', I.table],
+    ['aprender', 'nav.learn', I.book],
   ];
   const rotas = () => (isEquipe() ? ROTAS_EQUIPE : ROTAS_CORRETOR);
   function lerRota() {
     const h = location.hash.replace(/^#\/?/, '');
     const [name, ...rest] = h.split('/');
     const validas = [...rotas().map((r) => r[0]), 'conta'];
-    const def = isEquipe() ? 'pedidos' : 'inicio';
+    const def = 'inicio';
     S.route = { name: validas.includes(name) ? name : def, arg: decodeURIComponent(rest.join('/') || '') };
   }
   window.addEventListener('hashchange', () => { if (!S.user) return; lerRota(); fecharSheet(); renderMain(true); marcarNav(); });
@@ -226,8 +229,8 @@
   function bindLang(root) { $$('[data-lang]', root).forEach((b) => b.addEventListener('click', () => setLang(b.dataset.lang))); }
   function bottomBar() {
     const it = (id, k, ico) => `<a href="#/${id}" data-nav="${id}">${ico}<span>${esc(t(k))}</span></a>`;
-    const left = isEquipe() ? [it('pedidos', 'nav.requests', I.inbox), it('corretores', 'nav.brokers', I.users)] : [it('inicio', 'nav.home', I.home), it('materiais', 'nav.materials', I.grid)];
-    const right = isEquipe() ? [it('materiais', 'nav.materials', I.grid)] : [it('divulgar', 'nav.share', I.share)];
+    const left = isEquipe() ? [it('inicio', 'nav.home', I.home), it('pedidos', 'nav.requests', I.inbox)] : [it('inicio', 'nav.home', I.home), it('materiais', 'nav.materials', I.grid)];
+    const right = isEquipe() ? [it('corretores', 'nav.brokers', I.users)] : [it('mural', 'nav.board', I.megaphone)];
     return `<nav class="bottombar" aria-label="${esc(t('brand'))}">${left.join('')}
       <button type="button" class="plus" id="bb-plus" aria-label="${esc(isEquipe() ? t('team.boardTitle') : t('nav.new'))}">${I.plus}</button>
       ${right.join('')}<button type="button" id="bb-more">${I.dots}<span>Menu</span></button></nav>`;
@@ -354,7 +357,7 @@
         S.user = d.usuario; S.pedidos = null; S.corretores = null;
         const a = await api('eu').catch(() => null);
         if (a) S.avisos = a.avisos || [];
-        location.hash = isEquipe() ? '#/pedidos' : '#/inicio';
+        location.hash = '#/inicio';
         render();
       } catch (e) {
         msg.textContent = e.message;
@@ -365,39 +368,25 @@
 
   /* ============================================================ início */
   function saudacao() { const h = new Date().getHours(); return t(h < 12 ? 'home.hello.m' : h < 18 ? 'home.hello.a' : 'home.hello.n'); }
+  // Legenda do mapa de reservas: números ao vivo do CV + janela de preço.
   function kpisHTML() {
     const L = S.lotes || {};
     const total = L.total || 614;
     const ocup = (L.r || 0) + (L.v || 0) + (L.b || 0);
-    const livres = L.carregando || L.erro ? null : total - ocup;
-    const pronto = precosOk();
-    const jan = pronto ? janelaAtual() : null;
-    const preco = pronto ? S.precos.precos[jan.id].P[0][0] : null;
-    const vir = pronto ? proximaVirada() : null;
+    const pronto = !(L.carregando || L.erro);
+    const livres = pronto ? total - ocup : null;
+    const jan = precosOk() ? janelaAtual() : null;
+    const preco = jan ? S.precos.precos[jan.id].P[0][0] : null;
+    const vir = jan ? proximaVirada() : null;
     const dias = vir ? Math.max(0, Math.ceil((new Date(vir + 'T00:00:00') - new Date()) / 864e5)) : null;
-    const skel = '<span class="skel" style="display:inline-block;width:90px;height:40px"></span>';
+    const n = (v) => (pronto ? nf(v) : '<span class="skel" style="display:inline-block;width:40px;height:22px"></span>');
+    const item = (cls, rot, v) => `<div class="legend__item"><i class="legend__dot ${cls}"></i><span>${esc(rot)}</span><b class="num">${v}</b></div>`;
     return `
-      <article class="card" data-kpi>
-        <div class="card__label">${esc(t('home.k.avail'))} ${I.cube.replace('<svg', '<svg width="18" height="18"')}</div>
-        <div class="kpi__value num">${livres == null ? skel : nf(livres)}<small>${esc(t('home.k.of'))} ${nf(total)}</small></div>
-        <div class="bar"><i style="width:${livres == null ? 0 : Math.round((livres / total) * 100)}%"></i></div>
-        <div class="kpi__foot"><i class="dot-live"></i>${esc(t('home.k.live'))}</div>
-      </article>
-      <article class="card" data-kpi>
-        <div class="card__label">${esc(t('home.k.taken'))}</div>
-        <div class="kpi__value num">${livres == null ? skel : nf((L.r || 0) + (L.v || 0))}</div>
-        <div class="kpi__foot">${livres == null ? '' : `+ ${nf(L.b || 0)} ${S.lang === 'en' ? 'held by the board' : S.lang === 'es' ? 'reservados por la dirección' : 'reservados pela diretoria'}`}</div>
-      </article>
-      <article class="card" data-kpi>
-        <div class="card__label">${esc(t('home.k.price'))}</div>
-        <div class="kpi__value num">${preco == null ? skel : nf(preco)}<small>US$</small></div>
-        <div class="kpi__foot">20% + 12x · 1–8 ${esc(t('price.qty'))}</div>
-      </article>
-      <article class="card card--dark" data-kpi>
-        <div class="card__label" style="color:var(--on-dark-muted)">${esc(t('home.k.window'))}</div>
-        <div class="kpi__value" style="font-size:clamp(28px,2.8vw,38px)">${jan ? esc(tx(jan.curto)) : skel}</div>
-        <div class="kpi__foot" style="color:var(--on-dark-muted)">${dias != null ? `<b style="color:var(--on-dark)">${nf(dias)}</b>&nbsp;${esc(t('home.k.days'))}` : jan ? esc(tx(jan.quando)) : ''}</div>
-      </article>`;
+      ${item('is-free', t('home.k.avail'), n(livres))}
+      ${item('is-res', t('map.res'), n(L.r || 0))}
+      ${item('is-sold', t('map.sold'), n(L.v || 0))}
+      ${item('is-off', t('map.off'), n(L.b || 0))}
+      <div class="legend__item legend__item--wide"><span>${esc(t('home.k.window'))}</span><b>${jan ? esc(tx(jan.curto)) : '—'}${preco != null ? ` · <span class="num">US$ ${nf(preco)}</span>/m²` : ''}</b>${dias != null ? `<small>${nf(dias)} ${esc(t('home.k.days'))}</small>` : ''}</div>`;
   }
   function atualizarKpis() {
     const box = $('#kpis');
@@ -423,73 +412,94 @@
     }
     return `<div class="notice">${inner}</div>`;
   }
-  function muralHTML() {
-    const lst = [...avisosAuto(), ...(S.avisos || []).slice().sort((a, b) => (b.fixo ? 1 : 0) - (a.fixo ? 1 : 0))].slice(0, 6);
+  function muralHTML(max = 6) {
+    const lst = [...avisosAuto(), ...(S.avisos || []).slice().sort((a, b) => (b.fixo ? 1 : 0) - (a.fixo ? 1 : 0))].slice(0, max);
     return lst.length ? `<div class="feed">${lst.map(noticeHTML).join('')}</div>` : `<p class="muted small" style="margin:0">${esc(t('home.boardEmpty'))}</p>`;
   }
+  // Página inicial: "Bem-vindo, Nome", os tópicos no meio e, abaixo, o mapa de reservas ao vivo.
+  const TOPICOS_CORRETOR = [
+    ['materiais', 'nav.materials', 'top.materials', I.grid],
+    ['mural', 'nav.board', 'top.board', I.megaphone],
+    ['tabela', 'nav.prices', 'top.prices', I.table],
+    ['aprender', 'nav.learn', 'top.learn', I.book],
+  ];
+  const TOPICOS_EQUIPE = [
+    ['pedidos', 'nav.requests', 'top.requests', I.inbox],
+    ['corretores', 'nav.brokers', 'top.brokers', I.users],
+    ['mural', 'nav.board', 'top.boardTeam', I.megaphone],
+    ['materiais', 'nav.materials', 'top.materials', I.grid],
+    ['tabela', 'nav.prices', 'top.prices', I.table],
+    ['aprender', 'nav.learn', 'top.learn', I.book],
+  ];
   VIEWS.inicio = () => {
-    const hoje = new Intl.DateTimeFormat(locale(), { day: '2-digit', month: '2-digit', year: 'numeric' }).format(new Date());
+    const hoje = new Intl.DateTimeFormat(locale(), { weekday: 'long', day: 'numeric', month: 'long' }).format(new Date());
+    const tops = isEquipe() ? TOPICOS_EQUIPE : TOPICOS_CORRETOR;
+    const extras = isEquipe()
+      ? ''
+      : `<div class="extras">
+          <button type="button" class="extra" id="q-req" ${aprovado() ? '' : 'aria-disabled="true"'}>${I.megaphone}<span>${esc(t('home.q.req'))}</span>${aprovado() ? I.arrow : I.lock}</button>
+          <a class="extra" href="#/divulgar">${I.qr}<span>${esc(t('home.q.link'))}</span>${I.arrow}</a>
+          <a class="extra" href="#/pedidos">${I.inbox}<span>${esc(t('home.myReq'))}</span><b class="num" id="cnt-req"></b>${I.arrow}</a>
+          <a class="extra" href="${C.CV.corretor}" target="_blank" rel="noopener">${I.ext}<span>${esc(t('home.q.cv'))}</span>${I.arrow}</a>
+        </div>`;
     return `
-      ${S.user.status === 'pendente' ? `<div class="banner">${I.info}<span>${esc(t('home.pending'))}</span></div>` : ''}
-      <div class="hello">
-        <div style="display:grid;gap:12px">
-          <h1 class="display">${esc(saudacao())},<br/>${esc(primeiro(S.user.nome))}<span class="hello__date num">${hoje}</span></h1>
-          <p class="lead">${esc(t('home.sub'))}</p>
-        </div>
-      </div>
-      <div class="split">
-        <div class="kpis" id="kpis">${kpisHTML()}</div>
-        <section class="stage" id="stage" aria-label="${esc(t('home.map'))}">
+      ${!isEquipe() && S.user.status === 'pendente' ? `<div class="banner">${I.info}<span>${esc(t('home.pending'))}</span></div>` : ''}
+      <section class="welcome">
+        <p class="eyebrow">${esc(hoje)}</p>
+        <h1 class="display">${esc(t('home.welcome'))}, ${esc(primeiro(S.user.nome))}</h1>
+        <p class="lead">${esc(t(isEquipe() ? 'home.subTeam' : 'home.sub2'))}</p>
+      </section>
+      <nav class="topics ${tops.length > 4 ? 'topics--6' : ''}" aria-label="${esc(t('brand'))}">
+        ${tops.map(([id, k, d, ico], i) => `<a class="topic" href="#/${id}">
+          <span class="topic__n num">0${i + 1}</span>
+          <span class="topic__ico">${ico}</span>
+          <span class="topic__t">${esc(t(k))}</span>
+          <span class="topic__d">${esc(t(d))}</span>
+          <span class="topic__go">${I.arrow}</span>
+          <b class="topic__badge num" data-cnt="${id}" hidden></b>
+        </a>`).join('')}
+      </nav>
+      ${extras}
+      <section class="section reserv">
+        <div class="section__head"><div><p class="eyebrow">${esc(t('home.k.live'))}</p><h2 class="h2" style="margin-top:6px">${esc(t('map.title'))}</h2></div>
+          <a class="btn btn--line btn--sm" href="/3dmasterplan/#lotes" target="_blank" rel="noopener">${I.expand}${esc(t('home.mapFull'))}</a></div>
+        <div class="legend" id="kpis">${kpisHTML()}</div>
+        <div class="stage stage--map" id="stage">
           <img class="stage__poster" src="/assets/web/fotos/park-aereo-rio.jpg" alt="" loading="lazy" />
-          <div class="stage__ui">
-            <div class="stage__top">
-              <span class="glass stage__chip">${I.cube.replace('<svg', '<svg width="16" height="16"')} ${esc(t('home.map'))}</span>
-              <a class="iconbtn" href="/3dmasterplan/" target="_blank" rel="noopener" title="${esc(t('home.mapFull'))}" aria-label="${esc(t('home.mapFull'))}">${I.expand}</a>
-            </div>
-            <div class="glass stage__card">
-              <b class="h3" style="color:#f5f5f3">${esc(t('home.map'))}</b>
-              <p>${esc(t('home.mapd'))}</p>
-              <button class="btn btn--light btn--sm" type="button" id="load-map">${I.play}${esc(t('home.mapOpen'))}</button>
-            </div>
+          <div class="stage__ui"><div></div>
+            <div class="glass stage__card"><b class="h3" style="color:#f5f5f3">${esc(t('map.title'))}</b><p>${esc(t('map.desc'))}</p>
+              <button class="btn btn--light btn--sm" type="button" id="load-map">${I.play}${esc(t('home.mapOpen'))}</button></div>
           </div>
-        </section>
-      </div>
-      <div class="row3">
-        <section class="card">
-          <div class="section__head" style="margin-bottom:6px"><h2 class="h3">${esc(t('home.board'))}</h2>${I.bell.replace('<svg', '<svg width="18" height="18"')}</div>
-          ${muralHTML()}
-        </section>
-        <section class="card">
-          <div class="section__head" style="margin-bottom:12px"><h2 class="h3">${esc(t('home.quick'))}</h2></div>
-          <div class="quick">
-            <a class="is-ink" href="${C.CV.corretor}" target="_blank" rel="noopener">${I.ext}<div><b>${esc(t('home.q.cv'))}</b><span>${esc(t('home.q.cvd'))}</span></div></a>
-            <a href="#/divulgar">${I.qr}<div><b>${esc(t('home.q.link'))}</b><span>${esc(t('home.q.linkd'))}</span></div></a>
-            <a href="#/tabela">${I.table}<div><b>${esc(t('home.q.price'))}</b><span>${esc(t('home.q.priced'))}</span></div></a>
-            <button type="button" id="q-req">${I.megaphone}<div><b>${esc(t('home.q.req'))}</b><span>${esc(t('home.q.reqd'))}</span></div></button>
-          </div>
-        </section>
-        <section class="card" id="home-req">
-          <div class="section__head" style="margin-bottom:6px"><h2 class="h3">${esc(t('home.myReq'))}</h2><a class="small linkbtn" href="#/pedidos">${esc(t('nav.requests'))}</a></div>
-          <div id="home-req-list"><div class="skel" style="height:56px;margin-top:10px"></div></div>
-        </section>
-      </div>`;
+        </div>
+        <p class="small muted" style="margin:10px 0 0">${esc(t('map.note'))}</p>
+      </section>`;
   };
   VIEWS['inicio:after'] = (main) => {
-    $('#load-map', main).addEventListener('click', () => {
-      const st = $('#stage');
+    const st = $('#stage', main);
+    const carregar = () => {
+      if (!st || st.classList.contains('is-live')) return;
       const fr = document.createElement('iframe');
-      fr.className = 'stage__frame'; fr.title = t('home.map'); fr.src = '/3dmasterplan/?embed=1'; fr.allow = 'fullscreen';
+      fr.className = 'stage__frame'; fr.title = t('map.title'); fr.src = '/3dmasterplan/?embed=1#lotes'; fr.allow = 'fullscreen';
       st.prepend(fr); st.classList.add('is-live'); S.mapLive = true;
-    });
-    $('#q-req', main).addEventListener('click', novoPedido);
+    };
+    $('#load-map', main).addEventListener('click', carregar);
+    // carrega sozinho quando o mapa chega perto da tela (não com economia de dados)
+    const economia = navigator.connection && navigator.connection.saveData;
+    if (!economia && 'IntersectionObserver' in window) {
+      const io = new IntersectionObserver((es) => { if (es.some((e) => e.isIntersecting)) { io.disconnect(); carregar(); } }, { rootMargin: '200px' });
+      io.observe(st);
+    }
+    const q = $('#q-req', main);
+    if (q) q.addEventListener('click', () => novoPedido());
+    const badge = (id, n) => { const b = $(`[data-cnt="${id}"]`, main); if (b && n) { b.textContent = n; b.hidden = false; } };
     carregarPedidos().then(() => {
-      const box = $('#home-req-list');
-      if (!box) return;
-      const abertos = (S.pedidos || []).filter((p) => !['entregue', 'cancelado'].includes(p.status)).slice(0, 3);
-      box.innerHTML = abertos.length ? `<div class="feed">${abertos.map((p) => `<button type="button" class="notice" data-req="${esc(p.id)}" style="text-align:left;width:100%"><span class="notice__ico">${TIPO_ICONE[p.tipo] || I.dots}</span><div><b>${esc(p.titulo)}</b><p>${esc(t('st.' + p.status))} · #${esc(p.numero)}</p></div></button>`).join('')}</div>`
-        : `<p class="muted small" style="margin:0">${esc(t('home.noReq'))}</p>`;
-      $$('[data-req]', box).forEach((b) => b.addEventListener('click', () => abrirPedido(b.dataset.req)));
-    }).catch(() => { const box = $('#home-req-list'); if (box) box.innerHTML = ''; });
+      const abertos = (S.pedidos || []).filter((p) => !['entregue', 'cancelado'].includes(p.status)).length;
+      const c = $('#cnt-req', main); if (c && abertos) c.textContent = abertos;
+      if (isEquipe()) badge('pedidos', (S.pedidos || []).filter((p) => p.status === 'recebido').length);
+    }).catch(() => {});
+    if (isEquipe()) api('corretores').then((d) => { S.corretores = d.corretores; badge('corretores', d.corretores.filter((u) => u.status === 'pendente').length); }).catch(() => {});
+    const novos = (S.avisos || []).filter((a) => Date.now() - new Date(a.em).getTime() < 7 * 864e5).length + avisosAuto().length;
+    if (!isEquipe()) badge('mural', novos);
   };
 
   /* ============================================================ materiais */
@@ -747,12 +757,13 @@
     const quem = isEquipe() ? `<span>${esc(p.corretor.nome)} · ${esc(p.corretor.imobiliaria)}</span>` : '';
     return `<button type="button" class="req" data-req="${esc(p.id)}">
       <div style="display:grid;gap:6px;min-width:0"><span class="req__title">${esc(p.titulo)}</span>
-        <span class="req__meta"><span>#${esc(p.numero)}</span><span>${esc(tx(C.TIPOS_PEDIDO[p.tipo]).split(' (')[0])}</span><span>${esc(tx(C.PRODUTOS[p.produto]))}</span>${p.prazo ? `<span>${I.calendar.replace('<svg', '<svg width="13" height="13" style="vertical-align:-2px"')} ${esc(data(p.prazo))}</span>` : ''}${quem}</span></div>
+        <span class="req__meta"><span>#${esc(p.numero)}</span><span>${esc(rotuloMaterial(p))}${p.formato ? ' · ' + esc(t(p.formato === 'impresso' ? 'form.print' : p.formato === 'ambos' ? 'form.both' : 'form.digital')) : ''}${p.quantidade > 1 ? ' · ' + nf(p.quantidade) + '×' : ''}</span>${(p.anexos || []).length ? `<span>${I.file.replace('<svg', '<svg width="13" height="13" style="vertical-align:-2px"')} ${p.anexos.length}</span>` : ''}<span>${esc(tx(C.PRODUTOS[p.produto]))}</span>${p.prazo ? `<span>${I.calendar.replace('<svg', '<svg width="13" height="13" style="vertical-align:-2px"')} ${esc(data(p.prazo))}</span>` : ''}${quem}</span></div>
       <span class="badge ${p.status === 'entregue' ? 'badge--ink' : ''}"><i></i>${esc(t('st.' + p.status))}</span>
       ${p.status !== 'cancelado' ? `<div class="steps" aria-hidden="true">${ETAPAS.map((e, i) => `<i class="${i <= idx ? 'on' : ''}"></i>`).join('')}</div>` : ''}
     </button>`;
   }
   VIEWS.pedidos = () => {
+    if (S.route.arg === 'novo' && !isEquipe()) return formPedidoHTML();
     const travado = !isEquipe() && !aprovado();
     const filtros = isEquipe() ? [['abertos', 'req.open'], ['cancelado', 'st.cancelado']] : [['abertos', 'req.open'], ['todos', 'req.all']];
     return `
@@ -779,6 +790,7 @@
     }
   }
   VIEWS['pedidos:after'] = (main) => {
+    if (S.route.arg === 'novo' && !isEquipe()) return formPedidoDepois(main);
     carregarPedidos(true).then(desenharPedidos).catch((e) => { const b = $('#req-list'); if (b) b.innerHTML = `<div class="empty">${esc(e.message)}</div>`; });
     main.addEventListener('click', (ev) => {
       const b = ev.target.closest('button'); if (!b) return;
@@ -788,48 +800,150 @@
       else if (b.id === 'req-reload') carregarPedidos(true).then(desenharPedidos);
     });
   };
-  function novoPedido(tipoInicial) {
+  function rotuloMaterial(p) {
+    if (p.material && C.MATERIAIS_PEDIDO[p.material]) return tx(C.MATERIAIS_PEDIDO[p.material].nome);
+    return tx(C.TIPOS_PEDIDO[p.tipo] || C.TIPOS_PEDIDO.outro).split(' (')[0];
+  }
+  const urlAnexo = (a) => `/api/portal?anexo=${encodeURIComponent(a.caminho)}`;
+  function novoPedido(material) {
     if (isEquipe()) return;
     if (!aprovado()) { location.hash = '#/pedidos'; toast(t('req.locked')); return; }
-    let tipo = typeof tipoInicial === 'string' ? tipoInicial : 'peca';
+    S.req.material = typeof material === 'string' ? material : null;
+    location.hash = '#/pedidos/novo';
+  }
+
+  /* ---------- formulário de solicitação (página) */
+  function formPedidoHTML() {
+    if (!aprovado()) return `<div class="empty">${I.lock}${esc(t('req.locked'))}</div>`;
+    const u = S.user;
+    const mat = S.req.material || '';
+    const dadosPadrao = [
+      `${t('auth.name')}: ${u.nome}`,
+      `WhatsApp: +${u.ddi} ${u.tel}`,
+      `${t('auth.email')}: ${u.email}`,
+      `${t('auth.agency')}: ${u.imobiliaria}`,
+      u.creci ? `CRECI: ${u.creci}` : null,
+      `${t('share.link')}: ${linkRastreado('/folderpark/', 'qr')}`,
+    ].filter(Boolean).join('\n');
     const amanha = new Date(Date.now() + 864e5).toISOString().slice(0, 10);
-    abrirSheet({
-      titulo: t('req.new'),
-      corpo: `<form id="f-req" novalidate style="display:grid;gap:18px">
-        <fieldset style="border:0;padding:0;margin:0;display:grid;gap:10px"><legend class="field" style="padding:0;margin-bottom:10px"><span>${esc(t('req.type'))}</span></legend>
-          <div class="types">${Object.keys(C.TIPOS_PEDIDO).map((k) => `<button type="button" class="type" data-tipo="${k}" aria-pressed="${k === tipo}">${TIPO_ICONE[k]}<span>${esc(tx(C.TIPOS_PEDIDO[k]))}</span></button>`).join('')}</div></fieldset>
-        <div class="grid2">
-          <label class="field"><span>${esc(t('req.product'))}</span><select class="select" name="produto">${Object.keys(C.PRODUTOS).map((k) => `<option value="${k}">${esc(tx(C.PRODUTOS[k]))}</option>`).join('')}</select></label>
-          <label class="field"><span>${esc(t('req.lang'))}</span><select class="select" name="idioma">${['pt', 'es', 'en'].map((l) => `<option value="${l}" ${l === S.lang ? 'selected' : ''}>${{ pt: 'Português', es: 'Español', en: 'English' }[l]}</option>`).join('')}</select></label>
+    const passo = (n, titulo, dica, corpo) => `<section class="fstep"><div class="fstep__head"><span class="fstep__n num">${n}</span><div><h2 class="h3">${esc(titulo)}</h2>${dica ? `<p class="small muted" style="margin:4px 0 0">${esc(dica)}</p>` : ''}</div></div><div class="fstep__body">${corpo}</div></section>`;
+    return `
+      <header class="pagehead">
+        <div class="pagehead__meta"><a href="#/pedidos" class="linkbtn" style="text-decoration:none">← ${esc(t('req.title'))}</a></div>
+        <div class="pagehead__body"><h1 class="h1">${esc(t('form.title'))}</h1><p class="lead">${esc(t('form.lead'))}</p></div>
+      </header>
+      <form id="f-req" class="reqform" novalidate>
+        ${passo('01', t('form.material'), t('form.materialHint'), `<div class="mats" role="radiogroup" aria-label="${esc(t('form.material'))}">${Object.entries(C.MATERIAIS_PEDIDO).map(([k, m]) => `<button type="button" class="mat" role="radio" data-mat="${k}" aria-checked="${k === mat}">${I[m.icone] || I.dots}<b>${esc(tx(m.nome))}</b><span>${esc(tx(m.ex))}</span></button>`).join('')}</div>`)}
+        ${passo('02', t('form.kind'), '', `<div class="seg" role="radiogroup" aria-label="${esc(t('form.kind'))}" id="f-formato">${[['digital', 'form.digital'], ['impresso', 'form.print'], ['ambos', 'form.both']].map(([v, k]) => `<button type="button" role="radio" data-formato="${v}" aria-checked="false" aria-pressed="false">${esc(t(k))}</button>`).join('')}</div>
+          <div class="grid3">
+            <label class="field"><span>${esc(t('form.qty'))}</span><input class="input num" type="number" name="quantidade" min="1" max="100000" value="1" inputmode="numeric" /><small id="qty-hint">${esc(t('form.qtyHint'))}</small></label>
+            <label class="field"><span>${esc(t('form.size'))} <span class="muted">(${esc(t('c.optional'))})</span></span><input class="input" name="medida" list="medidas" maxlength="80" placeholder="1080 × 1350" /><datalist id="medidas">${['1080 × 1080', '1080 × 1350', '1080 × 1920', 'A4', 'A5', '10 × 15 cm', '9 × 5 cm', '1920 × 1080', '2 × 1 m'].map((m) => `<option value="${m}">`).join('')}</datalist></label>
+            <label class="field"><span>${esc(t('req.product'))}</span><select class="select" name="produto">${Object.keys(C.PRODUTOS).map((k) => `<option value="${k}">${esc(tx(C.PRODUTOS[k]))}</option>`).join('')}</select></label>
+          </div>`)}
+        ${passo('03', t('form.fill'), t('form.fillHint'), `<textarea class="textarea" name="dados" maxlength="1500" style="min-height:150px">${esc(dadosPadrao)}</textarea>`)}
+        ${passo('04', t('form.details'), t('form.detailsHint'), `<textarea class="textarea" name="descricao" maxlength="2000" placeholder="${esc(t('req.descPh'))}"></textarea>`)}
+        ${passo('05', t('form.examples'), t('form.examplesHint'), `
+          <label class="drop" id="drop"><input type="file" id="f-files" multiple accept="image/jpeg,image/png,image/webp,image/gif,application/pdf" />
+            ${I.download.replace('<svg', '<svg style="transform:rotate(180deg)"')}<b>${esc(t('form.drop'))}</b><span>${esc(t('form.dropHint'))}</span></label>
+          <ul class="files" id="f-list"></ul>
+          <label class="field"><span>${esc(t('req.ref'))}</span><input class="input" type="url" name="referencia" placeholder="https://" inputmode="url" /></label>`)}
+        ${passo('06', t('form.when'), '', `<div class="grid2">
+            <label class="field"><span>${esc(t('req.due'))} <span class="muted">(${esc(t('c.optional'))})</span></span><input class="input" type="date" name="prazo" min="${amanha}" /></label>
+            <label class="field"><span>${esc(t('req.lang'))}</span><select class="select" name="idioma">${['pt', 'es', 'en'].map((l) => `<option value="${l}" ${l === S.lang ? 'selected' : ''}>${{ pt: 'Português', es: 'Español', en: 'English' }[l]}</option>`).join('')}</select></label></div>`)}
+        <div class="reqform__foot">
+          <p class="formmsg" role="alert"></p>
+          <div class="reqform__actions"><a class="btn btn--line" href="#/pedidos">${esc(t('req.close'))}</a><button type="submit" class="btn btn--ink">${esc(t('req.send'))}${I.arrow}</button></div>
         </div>
-        <label class="field"><span>${esc(t('req.titleF'))}</span><input class="input" name="titulo" maxlength="100" required placeholder="${esc(t('req.titlePh'))}" /></label>
-        <label class="field"><span>${esc(t('req.desc'))}</span><textarea class="textarea" name="descricao" maxlength="2000" required placeholder="${esc(t('req.descPh'))}"></textarea></label>
-        <div class="grid2">
-          <label class="field"><span>${esc(t('req.due'))} <span class="muted">(${esc(t('c.optional'))})</span></span><input class="input" type="date" name="prazo" min="${amanha}" /></label>
-          <label class="field"><span>${esc(t('req.ref'))}</span><input class="input" type="url" name="referencia" placeholder="https://" inputmode="url" /></label>
-        </div>
-        <p class="formmsg" role="alert"></p>
-      </form>`,
-      pe: `<button type="button" class="btn btn--line" data-x="close">${esc(t('req.close'))}</button><button type="submit" form="f-req" class="btn btn--ink">${esc(t('req.send'))}${I.arrow}</button>`,
-      depois: (p) => {
-        $$('[data-tipo]', p).forEach((b) => b.addEventListener('click', () => { tipo = b.dataset.tipo; $$('[data-tipo]', p).forEach((x) => x.setAttribute('aria-pressed', x === b)); }));
-        const f = $('#f-req', p);
-        f.addEventListener('submit', async (ev) => {
-          ev.preventDefault();
-          const fd = Object.fromEntries(new FormData(f).entries());
-          const msg = $('.formmsg', f); msg.textContent = '';
-          const falta = $$('[required]', f).filter((i) => !i.value.trim());
-          $$('.input,.textarea', f).forEach((i) => i.removeAttribute('aria-invalid'));
-          if (falta.length) { falta.forEach((i) => i.setAttribute('aria-invalid', 'true')); falta[0].focus(); return; }
-          const btn = $('button[form=f-req]', p); btn.disabled = true;
-          try {
-            const d = await api('pedido', { ...fd, tipo });
-            S.pedidos = [d.pedido, ...(S.pedidos || [])];
-            fecharSheet(); toast(t('req.sent'));
-            if (S.route.name === 'pedidos') desenharPedidos(); else location.hash = '#/pedidos';
-          } catch (e) { msg.textContent = e.message; btn.disabled = false; }
-        });
-      },
+      </form>`;
+  }
+
+  // Foto grande é reduzida no navegador (máx. 2400 px, JPEG 85%) para caber no limite de 3 MB por arquivo.
+  function prepararArquivo(f) {
+    const LIM = 3 * 1024 * 1024;
+    return new Promise((ok, falha) => {
+      const ler = (blob, tipo, nome) => {
+        const r = new FileReader();
+        r.onload = () => ok({ nome, tipo, dados: String(r.result).split(',')[1], kb: Math.ceil(blob.size / 1024) });
+        r.onerror = () => falha(new Error(t('c.error')));
+        r.readAsDataURL(blob);
+      };
+      const ehImagem = /^image\/(jpeg|png|webp)$/.test(f.type);
+      if (!ehImagem || f.size <= 1.5 * 1024 * 1024) {
+        if (f.size > LIM) return falha(new Error(`${f.name}: ${t('form.tooBig')}`));
+        return ler(f, f.type, f.name);
+      }
+      const img = new Image();
+      img.onload = () => {
+        const esc2 = Math.min(1, 2400 / Math.max(img.width, img.height));
+        const cv = document.createElement('canvas');
+        cv.width = Math.round(img.width * esc2); cv.height = Math.round(img.height * esc2);
+        cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height);
+        URL.revokeObjectURL(img.src);
+        cv.toBlob((b) => {
+          if (!b || b.size > LIM) return falha(new Error(`${f.name}: ${t('form.tooBig')}`));
+          ler(b, 'image/jpeg', f.name.replace(/\.\w+$/, '') + '.jpg');
+        }, 'image/jpeg', 0.85);
+      };
+      img.onerror = () => falha(new Error(`${f.name}: ${t('c.error')}`));
+      img.src = URL.createObjectURL(f);
+    });
+  }
+  function formPedidoDepois(main) {
+    const f = $('#f-req', main);
+    if (!f) return;
+    let material = C.MATERIAIS_PEDIDO[S.req.material] ? S.req.material : null;
+    let formato = null;
+    const arquivos = [];
+    const marcar = (sel, attr, v) => $$(sel, f).forEach((b) => { const on = b.dataset[attr] === v; b.setAttribute('aria-checked', on); b.setAttribute('aria-pressed', on); });
+    $$('[data-mat]', f).forEach((b) => b.addEventListener('click', () => {
+      material = b.dataset.mat; marcar('[data-mat]', 'mat', material);
+      const m = C.MATERIAIS_PEDIDO[material];
+      if (m.formato && !formato) { formato = m.formato; marcar('[data-formato]', 'formato', formato); }
+      const med = $('[name=medida]', f); if (m.medida && !med.value) med.placeholder = m.medida;
+    }));
+    $$('[data-formato]', f).forEach((b) => b.addEventListener('click', () => { formato = b.dataset.formato; marcar('[data-formato]', 'formato', formato); }));
+    const lista = $('#f-list', f);
+    const desenhar = () => {
+      lista.innerHTML = arquivos.map((a, i) => `<li class="file">${a.tipo === 'application/pdf' ? `<span class="file__ico">${I.file}</span>` : `<img src="data:${a.tipo};base64,${a.dados}" alt="" />`}<span class="file__n">${esc(a.nome)}<small>${kb(a.kb)}</small></span><button type="button" class="iconbtn" data-rmf="${i}" aria-label="${esc(t('team.remove'))}">${I.x}</button></li>`).join('');
+    };
+    const adicionar = async (files) => {
+      const msg = $('.formmsg', f); msg.textContent = '';
+      for (const file of Array.from(files)) {
+        if (arquivos.length >= 6) { msg.textContent = t('form.max'); break; }
+        try { arquivos.push(await prepararArquivo(file)); } catch (e) { msg.textContent = e.message; }
+      }
+      desenhar();
+    };
+    $('#f-files', f).addEventListener('change', (e) => { adicionar(e.target.files); e.target.value = ''; });
+    const drop = $('#drop', f);
+    ['dragenter', 'dragover'].forEach((ev) => drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.add('is-over'); }));
+    ['dragleave', 'drop'].forEach((ev) => drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.remove('is-over'); }));
+    drop.addEventListener('drop', (e) => adicionar(e.dataTransfer.files));
+    lista.addEventListener('click', (e) => { const b = e.target.closest('[data-rmf]'); if (b) { arquivos.splice(+b.dataset.rmf, 1); desenhar(); } });
+
+    f.addEventListener('submit', async (ev) => {
+      ev.preventDefault();
+      const fd = Object.fromEntries(new FormData(f).entries());
+      const msg = $('.formmsg', f); msg.textContent = '';
+      if (!material) { msg.textContent = t('form.needMaterial'); $('[data-mat]', f).focus(); return; }
+      if (!formato) { msg.textContent = t('form.needKind'); $('[data-formato]', f).focus(); return; }
+      if ((fd.dados || '').trim().length + (fd.descricao || '').trim().length < 10) { msg.textContent = t('form.needInfo'); return; }
+      const btn = $('button[type=submit]', f); btn.disabled = true;
+      const tituloAuto = `${tx(C.MATERIAIS_PEDIDO[material].nome)} · ${tx(C.PRODUTOS[fd.produto])}`;
+      try {
+        btn.innerHTML = `<span class="spin"></span>${esc(t('form.sending'))}`;
+        let d = await api('pedido', { ...fd, material, formato, tituloAuto });
+        for (let i = 0; i < arquivos.length; i++) {
+          btn.innerHTML = `<span class="spin"></span>${esc(t('form.uploading'))} ${i + 1}/${arquivos.length}`;
+          try { d = await api('anexo', { pedido: d.pedido.id, ...arquivos[i] }); }
+          catch (e) { toast(`${arquivos[i].nome}: ${e.message}`); }
+        }
+        S.pedidos = [d.pedido, ...(S.pedidos || []).filter((p) => p.id !== d.pedido.id)];
+        S.req.material = null;
+        toast(t('req.sent'));
+        location.hash = '#/pedidos';
+        setTimeout(() => abrirPedido(d.pedido.id), 250);
+      } catch (e) { msg.textContent = e.message; btn.disabled = false; btn.innerHTML = `${esc(t('req.send'))}${I.arrow}`; }
     });
   }
   function abrirPedido(id) {
@@ -855,14 +969,19 @@
         ${p.entrega ? `<a class="btn btn--ink" href="${esc(p.entrega)}" target="_blank" rel="noopener">${I.download}${esc(t('req.delivery'))}</a>` : ''}
         ${p.resposta && !isEquipe() ? `<div class="card card--flat"><span class="eyebrow">${esc(t('req.answer'))}</span><p style="margin:8px 0 0;white-space:pre-line">${esc(p.resposta)}</p></div>` : ''}
         <dl class="kv">
-          <dt>${esc(t('req.type'))}</dt><dd>${esc(tx(C.TIPOS_PEDIDO[p.tipo]))}</dd>
+          <dt>${esc(t('form.material'))}</dt><dd>${esc(rotuloMaterial(p))}</dd>
+          ${p.formato ? `<dt>${esc(t('form.kind'))}</dt><dd>${esc(t(p.formato === 'impresso' ? 'form.print' : p.formato === 'ambos' ? 'form.both' : 'form.digital'))}</dd>` : ''}
+          ${p.quantidade ? `<dt>${esc(t('form.qty'))}</dt><dd class="num">${nf(p.quantidade)}</dd>` : ''}
+          ${p.medida ? `<dt>${esc(t('form.size'))}</dt><dd>${esc(p.medida)}</dd>` : ''}
           <dt>${esc(t('req.product'))}</dt><dd>${esc(tx(C.PRODUTOS[p.produto]))}</dd>
           <dt>${esc(t('req.lang'))}</dt><dd>${esc(p.idioma.toUpperCase())}</dd>
           ${p.prazo ? `<dt>${esc(t('req.due'))}</dt><dd>${esc(data(p.prazo))}</dd>` : ''}
           ${p.referencia ? `<dt>${esc(t('req.ref').split(' (')[0])}</dt><dd><a class="linkbtn" href="${esc(p.referencia)}" target="_blank" rel="noopener">${esc(p.referencia)}</a></dd>` : ''}
           ${isEquipe() ? `<dt>${esc(t('req.from'))}</dt><dd>${esc(p.corretor.nome)} · ${esc(p.corretor.imobiliaria)}<br/><a class="linkbtn" href="${wa}" target="_blank" rel="noopener">WhatsApp</a> · <a class="linkbtn" href="mailto:${esc(p.corretor.email)}">${esc(p.corretor.email)}</a></dd>` : ''}
         </dl>
-        <div><span class="eyebrow">${esc(t('req.desc'))}</span><p style="margin:8px 0 0;white-space:pre-line">${esc(p.descricao)}</p></div>
+        ${p.dados ? `<div><span class="eyebrow">${esc(t('form.fill'))}</span><p style="margin:8px 0 0;white-space:pre-line">${esc(p.dados)}</p></div>` : ''}
+        ${p.descricao ? `<div><span class="eyebrow">${esc(t('form.details'))}</span><p style="margin:8px 0 0;white-space:pre-line">${esc(p.descricao)}</p></div>` : ''}
+        ${(p.anexos || []).length ? `<div><span class="eyebrow">${esc(t('form.examples'))}</span><ul class="files" style="margin-top:10px">${p.anexos.map((x) => `<li class="file">${x.tipo.startsWith('image/') ? `<img src="${esc(urlAnexo(x))}" alt="" loading="lazy" />` : `<span class="file__ico">${I.file}</span>`}<span class="file__n">${esc(x.nome)}<small>${kb(x.kb)}</small></span><a class="iconbtn" href="${esc(urlAnexo(x))}" target="_blank" rel="noopener" aria-label="${esc(t('mat.open'))}">${I.ext}</a></li>`).join('')}</ul></div>` : ''}
         ${edicao}
         <div><span class="eyebrow">${esc(t('req.history'))}</span><ul class="timeline" style="margin-top:12px">${(p.historico || []).map((h) => `<li><span>${esc(t('st.' + h.status))} · <span class="muted">${esc(h.por || '')} · ${esc(data(h.em, true))}</span></span></li>`).join('')}</ul></div>`,
       pe: isEquipe()
@@ -1100,8 +1219,12 @@
     });
   };
 
-  /* ============================================================ equipe: mural */
-  VIEWS.mural = () => `
+  /* ============================================================ mural (corretor lê; equipe publica) */
+  VIEWS.mural = () => (isEquipe() ? muralEquipe() : `
+    <header class="pagehead"><div class="pagehead__meta"><span>${esc(t('top.board'))}</span></div>
+      <div class="pagehead__body"><h1 class="h1">${esc(t('home.board'))}</h1><p class="lead">${esc(t('board.lead'))}</p></div></header>
+    <section class="card board-read"><div id="av-list"><div class="skel" style="height:80px"></div></div></section>`);
+  const muralEquipe = () => `
     <header class="pagehead"><div class="pagehead__meta"><span>${esc(t('home.board'))}</span></div>
       <div class="pagehead__body"><h1 class="h1">${esc(t('team.boardTitle'))}</h1></div></header>
     <div class="split">
@@ -1117,12 +1240,14 @@
     </div>`;
   function desenharAvisos() {
     const box = $('#av-list'); if (!box) return;
+    if (!isEquipe()) { box.innerHTML = muralHTML(40); return; }
     const lst = S.avisos || [];
     box.innerHTML = lst.length ? `<div class="feed">${lst.map((a) => `<div style="display:grid;grid-template-columns:1fr auto;gap:12px;align-items:start">${noticeHTML(a)}<button type="button" class="btn btn--ghost btn--sm" data-rm="${esc(a.id)}">${esc(t('team.remove'))}</button></div>`).join('')}</div>` : `<p class="muted small">${esc(t('home.boardEmpty'))}</p>`;
   }
   VIEWS['mural:after'] = (main) => {
     api('eu').then((d) => { S.avisos = d.avisos || []; desenharAvisos(); }).catch(() => desenharAvisos());
     const f = $('#f-aviso', main);
+    if (!f) return;
     f.addEventListener('submit', async (ev) => {
       ev.preventDefault();
       const fd = Object.fromEntries(new FormData(f).entries());
@@ -1230,7 +1355,7 @@
       try {
         const d = await api('convite', { token, nome: fd.nome, senha: fd.senha });
         S.user = d.usuario;
-        history.replaceState(null, '', location.pathname + '#/pedidos');
+        history.replaceState(null, '', location.pathname + '#/inicio');
         render(); toast(t('inv.done'));
       } catch (e) { msg.textContent = e.message; btn.disabled = false; }
     });
