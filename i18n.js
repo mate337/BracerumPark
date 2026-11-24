@@ -343,7 +343,6 @@ const I18N = {
     "ft.cta": "Let's build the industrial gateway to <em>Mercosur</em>?",
     "ft.rights": "© 2026 Bracerum Park. All rights reserved.",
     "ft.cookies": "Cookie preferences",
-    "ft.br": "Brazil", "ft.py": "Paraguay",
 
     /* tributação (página) */
     "tp.eyebrow": "Tax thesis",
@@ -469,7 +468,7 @@ const I18N = {
     "br.g2.title": "Less cost", "br.g2.desc": "No middleman margins; intercompany contracts at market price, audited by an independent third party.",
     "br.g3.title": "Less risk", "br.g3.desc": "No currency exposure on inputs and no third-party dependency in the schedule.",
     "br.contact.eyebrow": "Contact",
-    "br.contact.title": "Talk to Bracerum in Paraguay"
+    "br.contact.title": "Talk to Bracerum Park"
   },
 
   es: {
@@ -791,7 +790,6 @@ const I18N = {
     "ft.cta": "¿Construimos juntos la puerta de entrada industrial del <em>Mercosur</em>?",
     "ft.rights": "© 2026 Bracerum Park. Todos los derechos reservados.",
     "ft.cookies": "Preferencias de cookies",
-    "ft.br": "Brasil", "ft.py": "Paraguay",
     "tp.eyebrow": "Tesis fiscal",
     "tp.title": "La tributación más <em>competitiva</em> de América del Sur",
     "tp.lead": "Tres instrumentos legales que, combinados, forman uno de los regímenes fiscales más competitivos del hemisferio — de la inversión a la venta final. Todos renovados y modernizados en 2025.",
@@ -914,7 +912,7 @@ const I18N = {
     "br.g2.title": "Menos costo", "br.g2.desc": "Sin márgenes de intermediarios; contratos intercompany a precio de mercado, auditados por tercero independiente.",
     "br.g3.title": "Menos riesgo", "br.g3.desc": "Sin exposición cambiaria en insumos y sin dependencia de terceros en el cronograma.",
     "br.contact.eyebrow": "Contacto",
-    "br.contact.title": "Hable con Bracerum en Paraguay"
+    "br.contact.title": "Hable con Bracerum Park"
   }
 };
 

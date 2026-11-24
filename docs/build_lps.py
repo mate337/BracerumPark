@@ -22,10 +22,12 @@ from PIL import Image
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SITE = "https://bracerumpark.com"
-VERSAO = "2"
+VERSAO = "3"
 
-WA_BR = "5547988030200"  # Sydney Savi (Brasil)
-WA_PY = "595985516065"   # Cleber Pavão (Paraguai)
+# Contato público do Bracerum Park em todas as LPs, inclusive a de corretores
+# (pedido do cliente em 2026-11-24: saem os contatos do Cleber e do Sydney).
+WA_PARK = "5547991368987"
+EMAIL_PARK = "bracerumpark@bracerum.com"
 
 
 # --------------------------------------------------------------------------- textos
@@ -95,6 +97,8 @@ _I = {
     "chave": '<circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M16 7l3 3M14 9l2 2"/>',
     "folha": '<path d="M5 19c0-9 5-14 15-15-1 10-6 15-15 15zM5 19l8-8"/>',
 }
+MAIL_SVG = ('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">'
+            '<rect x="3" y="5" width="18" height="14"/><path d="M3 6l9 7 9-7"/></svg>')
 WA_SVG = ('<svg viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><path d="M16.04 3C9.06 3 3.4 8.66 3.4 15.64c0 2.23.58 4.4 '
           '1.69 6.32L3.3 28.7l6.9-1.81a12.6 12.6 0 0 0 5.84 1.49h.01c6.98 0 12.64-5.66 12.64-12.64C28.69 8.66 23.02 3 16.04 3zm0 '
           '22.99h-.01a10.5 10.5 0 0 1-5.35-1.47l-.38-.23-3.98 1.05 1.06-3.88-.25-.4a10.47 10.47 0 0 1-1.61-5.61c0-5.8 4.72-10.52 '
@@ -138,7 +142,7 @@ def hero(p, foto, eyebrow, titulo, sub, fatos, ctas, form_html):
     bs = []
     for kind, tri, href, extra in ctas:
         if kind == "wa":
-            bs.append(f'<a class="btn btn--line js-wa" href="https://wa.me/{WA_BR}" target="_blank" rel="noopener">{WA_SVG}{p.tx("span", tri)}</a>')
+            bs.append(f'<a class="btn btn--line js-wa" href="https://wa.me/{WA_PARK}" target="_blank" rel="noopener">{WA_SVG}{p.tx("span", tri)}</a>')
         else:
             bs.append(f'<a class="btn btn--sand" href="{href}"{extra}>{p.tx("span", tri)}<span class="arrow" aria-hidden="true">→</span></a>')
     return f'''<section class="hero" id="topo">
@@ -261,13 +265,12 @@ def produtos(p, itens):
     return f'<div class="cards rv" style="--cols:{3 if len(itens) % 3 == 0 else 2 if len(itens) == 4 else 3}">{"".join(out)}</div>'
 
 
-def final(p, titulo, texto, cta=None, so_br=False):
-    """cta = texto do botão que leva ao #form; so_br = só o Sydney (Brasil) nos contatos."""
+def final(p, titulo, texto, cta=None):
+    """cta = texto do botão que leva ao #form. Contato: WhatsApp e e-mail do Bracerum Park."""
     cta = cta or T("Receber a tabela", "Get the price list", "Recibir la tabla")
-    py = "" if so_br else f'''
-  <a class="person js-wa" data-phone="{WA_PY}" href="https://wa.me/{WA_PY}" target="_blank" rel="noopener">{WA_SVG}<div><b>Cleber Pavão</b>{p.tx("span", T("Paraguai · +595 985 516 065", "Paraguay · +595 985 516 065", "Paraguay · +595 985 516 065"))}</div></a>'''
-    pessoas = f'''<div class="people">{py}
-  <a class="person js-wa" data-phone="{WA_BR}" href="https://wa.me/{WA_BR}" target="_blank" rel="noopener">{WA_SVG}<div><b>Sydney Savi</b>{p.tx("span", T("Brasil · +55 47 98803-0200", "Brazil · +55 47 98803-0200", "Brasil · +55 47 98803-0200"))}</div></a>
+    pessoas = f'''<div class="people">
+  <a class="person js-wa" data-phone="{WA_PARK}" href="https://wa.me/{WA_PARK}" target="_blank" rel="noopener">{WA_SVG}<div><b>Bracerum Park</b>{p.tx("span", T("WhatsApp · +55 47 99136-8987", "WhatsApp · +55 47 99136-8987", "WhatsApp · +55 47 99136-8987"))}</div></a>
+  <a class="person" href="mailto:{EMAIL_PARK}" data-track="email_click">{MAIL_SVG}<div><b>E-mail</b><span>{EMAIL_PARK}</span></div></a>
 </div>'''
     return f'''<section class="sec ink" id="contato">
   <div class="final">
@@ -289,8 +292,8 @@ def rodape(p, nota=None):
   {n}{p.tx("p", base)}
   <p>© 2026 Bracerum Park · Villeta, Paraguay</p>
 </footer>
-<div class="sticky"><a href="#form" data-track="sticky_cta">{p.tx("span", p.cta)}</a><a class="js-wa" href="https://wa.me/{WA_BR}" target="_blank" rel="noopener"{p.attr("ta", T("WhatsApp", "WhatsApp", "WhatsApp"))}>{WA_SVG}</a></div>
-<a class="wa js-wa" href="https://wa.me/{WA_BR}" target="_blank" rel="noopener"{p.attr("ta", T("Falar no WhatsApp", "Chat on WhatsApp", "Hablar por WhatsApp"))}>{WA_SVG}</a>'''
+<div class="sticky"><a href="#form" data-track="sticky_cta">{p.tx("span", p.cta)}</a><a class="js-wa" href="https://wa.me/{WA_PARK}" target="_blank" rel="noopener"{p.attr("ta", T("WhatsApp", "WhatsApp", "WhatsApp"))}>{WA_SVG}</a></div>
+<a class="wa js-wa" href="https://wa.me/{WA_PARK}" target="_blank" rel="noopener"{p.attr("ta", T("Falar no WhatsApp", "Chat on WhatsApp", "Hablar por WhatsApp"))}>{WA_SVG}</a>'''
 
 
 def lotes_map():
@@ -535,7 +538,7 @@ def pg_park():
        "Al contado con 8% de descuento; 20% de seña y 12 cuotas mensuales al precio de lista; o 20% y 36 cuotas, con 8% de recargo.")),
     FAQ_VISITA])}
 {final(p, T("Vamos escolher <em>o seu lote?</em>", "Shall we pick <em>your lot?</em>", "¿Elegimos <em>su lote?</em>"),
-       T("Fale direto com quem vende: Cleber, no Paraguai, e Sydney, no Brasil.", "Talk directly to the people who sell: Cleber in Paraguay and Sydney in Brazil.", "Hable directo con quien vende: Cleber, en Paraguay, y Sydney, en Brasil."))}'''
+       T("Fale direto com a equipe comercial do Bracerum Park, pelo WhatsApp ou por e-mail.", "Talk directly to the Bracerum Park sales team, on WhatsApp or by e-mail.", "Hable directo con el equipo comercial de Bracerum Park, por WhatsApp o por e-mail."))}'''
     return montar(p, T("Parque Industrial — lotes à venda · Bracerum Park", "Industrial Park — lots for sale · Bracerum Park", "Parque Industrial — lotes en venta · Bracerum Park"),
                   "Lotes industriais a partir de 1.250 m² em Villeta, Paraguai: preços, disponibilidade ao vivo e tributo único de 1% no regime de Maquila.",
                   "park", corpo,
@@ -1046,7 +1049,7 @@ def pg_geral():
        "Sí. La sociedad paraguaya puede tener 100% de capital extranjero, sin socio local, y los equipos jurídico y contable del parque acompañan la constitución y el programa de Maquila.")),
     FAQ_ONDE, FAQ_VISITA])}
 {final(p, T("Vamos construir <em>a porta de entrada industrial do Mercosul?</em>", "Shall we build <em>Mercosur’s industrial gateway?</em>", "¿Construimos <em>la puerta de entrada industrial del Mercosur?</em>"),
-       T("Fale direto com Cleber, no Paraguai, ou Sydney, no Brasil.", "Talk directly to Cleber in Paraguay or Sydney in Brazil.", "Hable directo con Cleber, en Paraguay, o Sydney, en Brasil."))}'''
+       T("Fale direto com a equipe comercial do Bracerum Park, pelo WhatsApp ou por e-mail.", "Talk directly to the Bracerum Park sales team, on WhatsApp or by e-mail.", "Hable directo con el equipo comercial de Bracerum Park, por WhatsApp o por e-mail."))}'''
     return montar(p, T("Bracerum Park — cidade industrial em Villeta, Paraguai", "Bracerum Park — industrial city in Villeta, Paraguay", "Bracerum Park — ciudad industrial en Villeta, Paraguay"),
                   "Lotes industriais, apartamentos, casas, lojas e salas numa cidade industrial completa em Villeta, Paraguai, com tributo único de 1% no regime de Maquila.",
                   "geral", corpo,
@@ -1058,14 +1061,14 @@ def pg_geral():
 # ===================================================================== 7. Cadastro de corretores
 # Não cadastra no CV: o formulário manda para /api/corretor, que grava uma linha na planilha
 # "Leads Corretores" do Drive (Apps Script, docs/corretores-planilha.gs), e a conversa com o
-# Sydney Savi abre no WhatsApp com a mensagem pronta. Fluxo e instalação: docs/corretores.md.
+# WhatsApp do Bracerum Park abre com a mensagem pronta. Fluxo e instalação: docs/corretores.md.
 def formulario_corretor(p):
     ddi = "".join(f'<option value="{v}">{t}</option>' for v, t in DDI)
     return f'''<div class="form rv" id="form" data-kind="corretor">
   <div class="form__head">{p.tx("p", T("Cadastro de <em>corretor</em>", "Broker <em>sign-up</em>", "Registro de <em>corredor</em>"), "form__title")}</div>
-  {p.tx("p", T("Três campos. Ao enviar, a conversa com Sydney Savi, da equipe comercial, abre no seu WhatsApp com a mensagem pronta.",
-               "Three fields. When you send, a chat with Sydney Savi from the sales team opens on your WhatsApp, message ready.",
-               "Tres campos. Al enviar, la conversación con Sydney Savi, del equipo comercial, se abre en su WhatsApp con el mensaje listo."), "form__sub")}
+  {p.tx("p", T("Três campos. Ao enviar, a conversa com a equipe comercial do Bracerum Park abre no seu WhatsApp com a mensagem pronta.",
+               "Three fields. When you send, a chat with the Bracerum Park sales team opens on your WhatsApp, message ready.",
+               "Tres campos. Al enviar, la conversación con el equipo comercial de Bracerum Park se abre en su WhatsApp con el mensaje listo."), "form__sub")}
   <div class="form__bar"></div>
   <form novalidate>
     <label class="field">{p.tx("span", T("Nome", "Name", "Nombre"))}<input name="nome" autocomplete="name" required maxlength="100" /></label>
@@ -1141,9 +1144,9 @@ def pg_corretores():
   {head_sec(p, T("Como funciona", "How it works", "Cómo funciona"), T("Três passos <em>até a primeira venda.</em>", "Three steps <em>to your first sale.</em>", "Tres pasos <em>hasta la primera venta.</em>"))}
   {steps(p, [
       (T("Cadastre-se", "Sign up", "Regístrese"),
-       T("Nome, WhatsApp e imobiliária. Ao enviar, a conversa com Sydney Savi abre no seu WhatsApp, com a mensagem pronta.",
-         "Name, WhatsApp and agency. When you send, a chat with Sydney Savi opens on your WhatsApp, message ready.",
-         "Nombre, WhatsApp e inmobiliaria. Al enviar, la conversación con Sydney Savi se abre en su WhatsApp, con el mensaje listo.")),
+       T("Nome, WhatsApp e imobiliária. Ao enviar, a conversa com a equipe comercial do Bracerum Park abre no seu WhatsApp, com a mensagem pronta.",
+         "Name, WhatsApp and agency. When you send, a chat with the Bracerum Park sales team opens on your WhatsApp, message ready.",
+         "Nombre, WhatsApp e inmobiliaria. Al enviar, la conversación con el equipo comercial de Bracerum Park se abre en su WhatsApp, con el mensaje listo.")),
       (T("Receba o material", "Get the materials", "Reciba el material"),
        T("Tabela vigente, mapa de disponibilidade ao vivo, maquete 3D do masterplan e as condições da parceria, direto com a equipe comercial.",
          "Current price list, live availability map, the 3D masterplan model and the partnership terms, straight from the sales team.",
@@ -1177,17 +1180,17 @@ def pg_corretores():
        "Sí. Agende con el equipo por WhatsApp. Para clientes lejanos, la presentación puede ser en línea, con la maqueta 3D — lote por lote.")),
     FAQ_ONDE])}
 {final(p, T("Vamos vender <em>juntos?</em>", "Shall we sell <em>together?</em>", "¿Vendemos <em>juntos?</em>"),
-       T("Cadastre-se e fale direto com Sydney Savi, da equipe comercial do Bracerum Park.",
-         "Sign up and talk directly to Sydney Savi from the Bracerum Park sales team.",
-         "Regístrese y hable directo con Sydney Savi, del equipo comercial de Bracerum Park."),
-       cta=T("Fazer meu cadastro", "Sign me up", "Hacer mi registro"), so_br=True)}'''
+       T("Cadastre-se e fale direto com a equipe comercial do Bracerum Park.",
+         "Sign up and talk directly to the Bracerum Park sales team.",
+         "Regístrese y hable directo con el equipo comercial de Bracerum Park."),
+       cta=T("Fazer meu cadastro", "Sign me up", "Hacer mi registro"))}'''
     return montar(p, T("Corretores parceiros · Bracerum Park", "Partner brokers · Bracerum Park", "Corredores asociados · Bracerum Park"),
                   "Cadastro de corretores e imobiliárias para ofertar o Bracerum Park: lotes industriais, apartamentos, casas e lojas em Villeta, Paraguai.",
                   "corretores", corpo,
                   T("Olá! Sou corretor(a) e tenho interesse em ofertar o Bracerum Park para os meus clientes.",
                     "Hello! I am a real estate broker and I am interested in offering Bracerum Park to my clients.",
                     "¡Hola! Soy corredor(a) inmobiliario(a) y tengo interés en ofrecer Bracerum Park a mis clientes."),
-                  cfg_extra={"wa": WA_BR, "envio": "/api/corretor"})
+                  cfg_extra={"envio": "/api/corretor"})
 
 
 PAGINAS = {

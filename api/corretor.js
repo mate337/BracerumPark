@@ -6,7 +6,7 @@
   como "App da Web" (código em docs/corretores-planilha.gs, instalação em docs/corretores.md):
     CORRETORES_PLANILHA_URL   URL /exec do Apps Script                              [segredo]
   Sem a variável, ou se a planilha não responder, a função devolve ok:false e grava o cadastro
-  no log (Vercel → Logs, "[corretor]") — e a pessoa chega ao Sydney pelo WhatsApp do mesmo jeito,
+  no log (Vercel → Logs, "[corretor]") — e a pessoa chega ao WhatsApp do Bracerum Park do mesmo jeito,
   porque a página abre a conversa com nome e imobiliária já escritos.
 
   Entrada (JSON): { lp, idioma, pagina, nome, telefone, ddi, imobiliaria, attrib:{first,last}, hp, t }

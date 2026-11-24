@@ -10,6 +10,17 @@ O site tem **7 páginas**: `index.html`, `tributacao.html`, `bracerum.html`, `ho
 maquete 3D embutida, que as seis páginas internas baixavam e interpretavam à toa. Ele roda depois do
 `script.js` porque usa `hasGsap`, `reduceMotion` e `tr()`.
 
+### Contato único do Bracerum Park (2026-11-24)
+- **Saíram os contatos do Cleber e do Sydney do site** (pedido do cliente). Em todo lugar o contato agora é
+  **Bracerum Park — WhatsApp +55 47 99136-8987 (`5547991368987`) · `bracerumpark@bracerum.com`**.
+- Onde mudou: rodapé das 7 páginas (um cartão só, `.footer__contacts--one`; na home com WhatsApp e
+  @bracerumpark), bloco "Contato" do `bracerum.html` (`.contact-py--one`, título "Fale com o Bracerum Park"),
+  botão flutuante `.wa-float` das 7 páginas, linktree (grupo WhatsApp e e-mail do rodapé) e **as sete LPs,
+  inclusive `/corretores`** (`WA_PARK`/`EMAIL_PARK` no `docs/build_lps.py`, `WA_PARK` no `lp/lp.js`; `lp/` em `?v=3`).
+  Saíram as chaves `ft.py`/`ft.br` do `i18n.js` e `py`/`br` do linktree; `style.css`/`i18n.js` em `?v=21`.
+- **Ficaram de propósito:** os cartões de visita pessoais (`/cleberpavao`, `/sydneysavi` etc.) e os
+  contatos internos do `/admin/` e do portal.
+
 ### Portal do Corretor — pesquisa e estrutura (2026-11-18, só documento)
 - Proposta em **`docs/portal-corretores.md`**: itens por prioridade (login, mural, biblioteca, links rastreados,
   pedidos ao marketing, treinamento), mapa dos endpoints do CV úteis, MCPs viáveis e estrutura `portal/` + `api/portal-*`.
