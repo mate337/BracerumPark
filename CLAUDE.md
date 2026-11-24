@@ -35,7 +35,8 @@ maquete 3D embutida, que as seis páginas internas baixavam e interpretavam à t
   ofertas com card de WhatsApp validado na listagem e no download (fuso `PORTAL_FUSO`, padrão Assunção), materiais com
   versões, solicitações Enviada→Em análise→Em produção→Concluída com conversa, tutoriais, auditoria. Mural e
   autoexclusão saíram. `npm test` (18 testes). Biblioteca só com os 4 folders digitais, sem contatos do
-  Cleber/Sydney no portal, abre sempre no modo claro (§7.5). Tudo em `docs/portal-corretores.md` §7.
+  Cleber/Sydney no portal, abre sempre no modo claro (§7.5). **Desde 2026-11-24 as solicitações ao marketing são só do
+  gestor** (corretor não vê; servidor recusa com 403; `PORTAL_PEDIDOS_CORRETOR=1` devolve — §7.6). Tudo em `docs/portal-corretores.md` §7.
 - **Desde 2026-11-18 (fim do dia): só "Entrar"; contas criadas pelo gerenciador na aba Gestão** (link de primeiro
   acesso; "novo link" = esqueci a senha). Gerenciador = papel `equipe` (Gestão + envio de materiais); corretor = tabela,
   solicitações, materiais, masterplan 3D e aprender. `ADMIN_SENHA` não abre mais o portal. Modo claro com fundo branco.
