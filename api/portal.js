@@ -9,6 +9,12 @@
   Variáveis (nomes em .env.example):
     BLOB_READ_WRITE_TOKEN   store privado do portal                                         [segredo]
     PORTAL_CONVITE          chave que assina os links de primeiro acesso                    [segredo]
+    PORTAL_CV_AUTO          "1" = corretor novo no CV vira conta + recebe e-mail sozinho  (padrão: desligado)
+    PORTAL_CV_IGNORAR       ids de corretor do CV que nunca viram conta                    (padrão: 2, a demonstração)
+    RESEND_API_KEY          chave do Resend para o e-mail de boas-vindas                    [segredo]
+    PORTAL_EMAIL_DE         remetente  (padrão: Bracerum Park <portal@bracerumpark.com>)
+    PORTAL_EMAIL_RESPONDER  responder-para (padrão: bracerumpark@bracerum.com)
+    CRON_SECRET             a Vercel manda no cabeçalho da rotina diária (?cron=cv-corretores) [segredo]
     PORTAL_ADMINS           e-mails que podem virar o primeiro gestor (só sem conta ainda)
     PORTAL_FUSO             fuso comercial das vigências (padrão America/Asuncion)
     PORTAL_SYNC_MIN         intervalo mínimo entre consultas ao CV (padrão 5)
@@ -159,7 +165,7 @@ const nao = (res) => { res.statusCode = 404; res.setHeader('Content-Type', 'text
 
 const caminhoU = (id) => `portal/u/${id}.json`;
 const caminhoP = (id) => `portal/p/${id}.json`;
-const CAM = { imob: 'portal/i/index.json', mat: 'portal/m/index.json', tut: 'portal/t/index.json', of: 'portal/o/index.json', sync: 'portal/sync/comercial.json' };
+const CAM = { imob: 'portal/i/index.json', mat: 'portal/m/index.json', tut: 'portal/t/index.json', of: 'portal/o/index.json', sync: 'portal/sync/comercial.json', cvSync: 'portal/sync/cv-corretores.json' };
 
 /* ------------------------------------------------------------------ auditoria */
 // Quem fez o quê, em qual registro. Nunca grava senha, token ou conteúdo de arquivo.
@@ -323,6 +329,8 @@ function contaResumo(u) {
     ddi: u.ddi || '', tel: u.tel || '', imobiliaria: u.imobiliaria || '', imobiliariaId: u.imobiliariaId || null,
     creci: u.creci || '', pais: u.pais || '', slug: u.slug || '', criado: u.criado, criadoPor: u.criadoPor || null,
     ultimoAcesso: (u.acessos || [])[0] || null, excluido: u.excluido || null,
+    origem: u.origem || null, cvId: u.cvId || null,
+    convite: u.convite ? { em: u.convite.em, ok: !!u.convite.ok, erro: u.convite.erro || null, tentativas: u.convite.tentativas || 0 } : null,
   };
 }
 async function todasContas() { return lerVarios(await listar('portal/u/'), 5000); }
@@ -852,12 +860,103 @@ async function baixar(req, res) {
   return nao(res);
 }
 
+/* ------------------------------------------------------------------ corretores do CV → contas + e-mail (2026-11-24) */
+// Cada corretor ativo no CV vira uma conta de corretor no portal com o MESMO e-mail, e recebe um e-mail de
+// boas-vindas com o link de primeiro acesso (ele só cria a senha). Automático só com PORTAL_CV_AUTO=1
+// (rotina diária da Vercel + gestor abrindo a Gestão); sem isso, o gestor importa e envia pela aba "Corretores do CV".
+// Conta que já existe com o mesmo e-mail não é recriada nem rebaixada (um gestor continua gestor).
+const CVP = require('./_portal-cv.js');
+const cvAuto = () => process.env.PORTAL_CV_AUTO === '1';
+const CV_TENTATIVAS = 3;
+async function cvEstado() { return (await ler(CAM.cvSync)) || {}; }
+async function cvConvidar(u, origem, s, teste) {
+  const link = linkConvite(origem, u.email);
+  const m = CVP.emailBoasVindas({ nome: u.nome, link, origem, teste });
+  const reg = { em: agora(), por: s ? s.n : 'automação', para: u.email, teste: !!teste };
+  try { Object.assign(reg, { ok: true, id: (await CVP.enviarEmail({ para: u.email, ...m })).id }); }
+  catch (e) { Object.assign(reg, { ok: false, erro: String(e.message).slice(0, 200) }); }
+  if (!teste) {
+    u.convite = { ...reg, tentativas: ((u.convite && u.convite.tentativas) || 0) + 1 };
+    await gravar(caminhoU(u.id), u);
+  }
+  await auditar(s, teste ? 'email.teste' : 'conta.convite', 'conta', u.id, { para: u.email, ok: reg.ok, erro: reg.erro || null });
+  return reg;
+}
+function contaDoCV(c, s) {
+  const id = idEmail(c.email);
+  const nome = c.nome.length >= 2 ? c.nome : c.email.split('@')[0];
+  return { id, email: c.email, nome, ddi: c.ddi || '', tel: c.tel || '', imobiliaria: c.imobiliaria || '', papel: 'corretor', status: 'aprovado',
+    slug: slugDe(nome, id), criado: agora(), criadoPor: s ? s.n : 'CV CRM', origem: 'cv', cvId: c.cvId, pais: c.ddi === '595' ? 'PY' : c.ddi === '55' ? 'BR' : 'OUTRO', idioma: 'pt' };
+}
+async function cvCorretores() {
+  const [lista, contas, estado] = await Promise.all([CVP.lerCorretoresCV(), todasContas(), cvEstado()]);
+  const porEmail = new Map(contas.map((x) => [String(x.email).toLowerCase(), x]));
+  return {
+    auto: cvAuto(), email: CVP.emailConfigurado(), remetente: CVP.remetente(), estado,
+    corretores: lista.map((c) => {
+      const u = porEmail.get(c.email);
+      return { ...c, fora: CVP.motivoFora(c),
+        conta: u ? { id: u.id, papel: PAPEL(u), status: u.status || 'aprovado', ativo: !!u.senha, convite: u.convite || null } : null };
+    }),
+  };
+}
+async function cvSincronizar(s, origem, { enviar, cvIds } = {}) {
+  const estado = await cvEstado();
+  const res0 = { em: agora(), por: s ? s.n : 'automação', criadas: 0, convites: 0, falhas: 0, ignorados: 0 };
+  try {
+    const lista = await CVP.lerCorretoresCV();
+    for (const c of lista) {
+      if (cvIds && !cvIds.includes(c.cvId)) continue;
+      if (CVP.motivoFora(c)) { res0.ignorados++; continue; }
+      let u = await ler(caminhoU(idEmail(c.email)));
+      if (u) {
+        if (!u.cvId) { u.cvId = c.cvId; await gravar(caminhoU(u.id), u); }
+        const pendente = PAPEL(u) === 'corretor' && ativo(u) && !u.senha && !(u.convite && u.convite.ok) && ((u.convite && u.convite.tentativas) || 0) < CV_TENTATIVAS;
+        if (!(enviar && pendente)) continue;
+      } else {
+        u = contaDoCV(c, s);
+        await gravar(caminhoU(u.id), u);
+        await auditar(s, 'conta.criada', 'conta', u.id, { papel: 'corretor', email: u.email, origem: 'cv', cvId: c.cvId });
+        res0.criadas++;
+        if (!enviar) continue;
+      }
+      const r1 = await cvConvidar(u, origem, s, false);
+      if (r1.ok) res0.convites++; else res0.falhas++;
+    }
+    Object.assign(estado, { ultimaTentativa: res0.em, ultimoSucesso: res0.em, resultado: 'ok', erro: null, ultimo: res0 });
+  } catch (e) {
+    Object.assign(estado, { ultimaTentativa: res0.em, resultado: 'erro', erro: String(e.message).slice(0, 200) });
+    await gravar(CAM.cvSync, estado);
+    throw erro(502, `Não deu para ler os corretores do CV: ${e.message}`);
+  }
+  await gravar(CAM.cvSync, estado);
+  if (res0.criadas || res0.convites || res0.falhas) await auditar(s, 'cv.sincronizado', 'cv', null, res0);
+  return { resultado: res0 };
+}
+// Gestão abrindo a aba dispara a importação automática, no máximo a cada 10 min (além da rotina diária).
+async function cvTalvezAuto(s, origem) {
+  if (!cvAuto()) return;
+  const e = await cvEstado();
+  if (e.ultimaTentativa && Date.now() - Date.parse(e.ultimaTentativa) < 10 * 60e3) return;
+  try { await cvSincronizar(null, origem, { enviar: true }); } catch (err) { console.error('[portal] cv auto', err.message); }
+}
+async function cronCV(req, res) {
+  const segredo = process.env.CRON_SECRET;
+  if (!segredo || String(req.headers.authorization || '') !== `Bearer ${segredo}`) { res.statusCode = 401; return res.end(JSON.stringify({ ok: false })); }
+  if (!cvAuto()) return res.end(JSON.stringify({ ok: true, auto: false }));
+  try {
+    const d = await cvSincronizar(null, 'https://bracerumpark.com', { enviar: true });
+    return res.end(JSON.stringify({ ok: true, ...d }));
+  } catch (e) { res.statusCode = 502; return res.end(JSON.stringify({ ok: false, erro: e.message })); }
+}
+
 /* ------------------------------------------------------------------ handler */
 module.exports = async (req, res) => {
   res.setHeader('Content-Type', 'application/json; charset=utf-8');
   res.setHeader('Cache-Control', 'no-store');
   res.setHeader('X-Robots-Tag', 'noindex');
   const fim = (status, obj) => { res.statusCode = status; res.end(JSON.stringify(obj)); };
+  if (req.method === 'GET' && /[?&]cron=cv-corretores\b/.test(req.url || '')) return cronCV(req, res);
   if (req.method === 'GET' && /[?&](anexo|material|tutorial|card)=/.test(req.url || '')) {
     try { return await baixar(req, res); } catch (e) { console.error('[portal] download', e.message); res.statusCode = 500; return res.end('erro'); }
   }
@@ -941,6 +1040,25 @@ module.exports = async (req, res) => {
       case 'ofertaSalvar': soGestor(); return ok(await ofertaSalvar(b, s));
       case 'ofertaStatus': soGestor(); return ok(await ofertaStatus(b, s));
       // solicitações
+      // corretores do CV
+      case 'cvCorretores': soGestor(); await cvTalvezAuto(s, origemDe(req)); return ok(await cvCorretores());
+      case 'cvSincronizar': soGestor(); return ok(await cvSincronizar(s, origemDe(req), { enviar: !!b.enviar, cvIds: Array.isArray(b.cvIds) ? b.cvIds.map(Number) : undefined }));
+      case 'cvConvite': {
+        soGestor();
+        const alvo = await ler(caminhoU(limpa(b.id, 40)));
+        if (!alvo) throw erro(404, 'Conta não encontrada');
+        if (!ativo(alvo)) throw erro(409, 'Conta suspensa ou excluída');
+        if (alvo.senha) throw erro(409, 'Essa pessoa já criou a senha');
+        const reg = await cvConvidar(alvo, origemDe(req), s, false);
+        if (!reg.ok) throw erro(502, `O e-mail não saiu: ${reg.erro}`);
+        return ok({ envio: reg });
+      }
+      case 'cvTeste': {
+        soGestor();
+        const reg = await cvConvidar(u, origemDe(req), s, true);
+        if (!reg.ok) throw erro(502, `O e-mail de teste não saiu: ${reg.erro}`);
+        return ok({ envio: reg });
+      }
       case 'pedidos': pedidosLiberados(); return ok(await pedidosListar(s, u));
       case 'pedido': pedidosLiberados(); if (eq) throw erro(400, 'Abra a solicitação com uma conta de corretor'); return ok(await pedidoCriar(b, u));
       case 'pedidoMensagem': pedidosLiberados(); return ok(await pedidoMensagem(b, s, u));

@@ -1521,12 +1521,13 @@
     return ['gest.active', 'badge--ink'];
   }
   VIEWS.gestao = () => {
-    const aba = ['contas', 'imobiliarias', 'atividade'].includes(S.route.arg) ? S.route.arg : 'contas';
-    const abas = `<div class="seg" role="tablist" style="margin-bottom:18px">${[['contas', 'gest.tabAccounts'], ['imobiliarias', 'gest.tabAgencies'], ['atividade', 'gest.tabActivity']].map(([id, k]) => `<a role="tab" href="#/gestao/${id}" aria-current="${aba === id ? 'page' : 'false'}" aria-selected="${aba === id}">${esc(t(k))}</a>`).join('')}</div>`;
+    const aba = ['contas', 'cv', 'imobiliarias', 'atividade'].includes(S.route.arg) ? S.route.arg : 'contas';
+    const abas = `<div class="seg" role="tablist" style="margin-bottom:18px">${[['contas', 'gest.tabAccounts'], ['cv', 'gest.tabCV'], ['imobiliarias', 'gest.tabAgencies'], ['atividade', 'gest.tabActivity']].map(([id, k]) => `<a role="tab" href="#/gestao/${id}" aria-current="${aba === id ? 'page' : 'false'}" aria-selected="${aba === id}">${esc(t(k))}</a>`).join('')}</div>`;
     const head = (botao) => `<header class="pagehead"><div class="pagehead__meta"><span id="ct-count" class="num"></span></div>
       <div class="pagehead__body"><h1 class="h1">${esc(t('nav.gestao'))}</h1><p class="lead">${esc(t('gest.lead'))}</p>${botao}</div></header>${abas}`;
     if (aba === 'imobiliarias') return `${head(`<div><button type="button" class="btn btn--ink" id="im-new">${I.plus}${esc(t('imob.new'))}</button></div>`)}
       <p class="small muted" style="margin:0 0 14px">${esc(t('imob.lead'))}</p><div id="im-list"><div class="skel" style="height:200px;border-radius:18px"></div></div>`;
+    if (aba === 'cv') return `${head('')}<div id="cv-box"><div class="skel" style="height:240px;border-radius:18px"></div></div>`;
     if (aba === 'atividade') return `${head('')}<p class="small muted" style="margin:0 0 14px">${esc(t('aud.lead'))}</p><div id="au-list"><div class="skel" style="height:240px;border-radius:18px"></div></div>`;
     return `${head(`<div><button type="button" class="btn btn--ink" id="ct-new">${I.plus}${esc(t('gest.new'))}</button></div>`)}
     <div class="toolbar"><div class="seg" role="group">${[['todos', 'req.all'], ['corretor', 'gest.brokers'], ['equipe', 'gest.managers'], ['aguardando', 'gest.waiting'], ['bloqueado', 'acc.bloqueado'], ['excluido', 'gest.deletedPl']].map(([id, k]) => `<button type="button" data-cf="${id}" aria-pressed="${S.team.filtro === id}">${esc(t(k))}</button>`).join('')}</div>
@@ -1715,8 +1716,60 @@
     box.innerHTML = ev.length ? `<ul class="timeline audit">${ev.map((e) => `<li><span><b>${esc(e.acao)}</b>${e.id ? ` <span class="muted">· ${esc(e.entidade)} ${esc(String(e.id).slice(0, 14))}</span>` : ''}${e.det ? ` <span class="muted">· ${esc(JSON.stringify(e.det).slice(0, 140))}</span>` : ''}<br/><span class="muted small">${esc(e.por ? e.por.nome || '' : '')} · ${esc(data(e.em, true))}</span></span></li>`).join('')}</ul>`
       : `<div class="empty">${I.clock}${esc(t('aud.empty'))}</div>`;
   }
+  /* corretores do CV → conta no portal + e-mail de boas-vindas */
+  function cvSitu(c) {
+    if (c.fora) return ['muted', c.fora];
+    if (!c.conta) return ['', t('cv.noAccount')];
+    if (c.conta.papel === 'equipe') return ['', t('cv.isManager')];
+    if (c.conta.ativo) return ['ok', t('cv.active')];
+    const cv = c.conta.convite;
+    if (cv && cv.ok) return ['', `${t('cv.sent')} ${data(cv.em, true)}`];
+    if (cv && !cv.ok) return ['erro', `${t('cv.failed')}: ${cv.erro || ''}`];
+    return ['', t('cv.notSent')];
+  }
+  function desenharCV() {
+    const box = $('#cv-box'); const d = S.cv; if (!box || !d) return;
+    const e = d.estado || {};
+    const pend = d.corretores.filter((c) => !c.fora && (!c.conta || (c.conta.papel === 'corretor' && !c.conta.ativo && !(c.conta.convite && c.conta.convite.ok))));
+    box.innerHTML = `
+      <p class="small muted" style="margin:0 0 14px">${esc(t('cv.lead'))}</p>
+      <div class="syncbar ${d.auto && d.email ? '' : 'syncbar--alerta'}">${I.info}<span>${esc(d.auto ? t('cv.autoOn') : t('cv.autoOff'))}${d.email ? '' : ` ${esc(t('cv.noEmail'))}`}${e.ultimaTentativa ? ` <span class="muted">· ${esc(t('cv.last'))} ${esc(data(e.ultimaTentativa, true))}${e.resultado === 'erro' ? ` — ${esc(e.erro || '')}` : ''}</span>` : ''}</span></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 16px">
+        <button type="button" class="btn btn--ink btn--sm" id="cv-sync" ${pend.length ? '' : 'disabled'}>${I.send}${esc(t('cv.syncSend'))} (${pend.length})</button>
+        <button type="button" class="btn btn--line btn--sm" id="cv-test">${I.send}${esc(t('cv.test'))}</button>
+        <button type="button" class="btn btn--line btn--sm" id="cv-reload">${I.refresh}${esc(t('cv.reload'))}</button>
+      </div>
+      <div class="tablewrap"><table class="table"><thead><tr><th>${esc(t('auth.name'))}</th><th>${esc(t('auth.email'))}</th><th>${esc(t('auth.agency'))}</th><th>${esc(t('acc.status'))}</th><th></th></tr></thead><tbody>
+      ${d.corretores.map((c) => { const [cls, txt] = cvSitu(c); const pode = !c.fora && (!c.conta || (c.conta.papel === 'corretor' && !c.conta.ativo));
+        return `<tr><td><b>${esc(c.nome)}</b><br><span class="small muted">CV #${esc(c.cvId)}${c.cadastro ? ` · ${esc(c.cadastro)}` : ''}</span></td><td>${esc(c.email || '—')}</td><td>${esc(c.imobiliaria || '—')}</td>
+          <td><span class="small ${cls === 'erro' ? '' : cls === 'muted' ? 'muted' : ''}" style="${cls === 'erro' ? 'font-weight:600' : ''}">${esc(txt)}</span></td>
+          <td>${pode ? `<button type="button" class="btn btn--line btn--sm" data-cvsend="${esc(c.cvId)}">${I.send}${esc(c.conta && c.conta.convite ? t('cv.resend') : t('cv.send'))}</button>` : ''}</td></tr>`; }).join('')}
+      </tbody></table></div>
+      <p class="small muted" style="margin-top:12px">${esc(t('cv.from'))} ${esc(d.remetente)}</p>`;
+  }
+  function carregarCV() {
+    return api('cvCorretores').then((d) => { S.cv = d; desenharCV(); }).catch((e) => { const b = $('#cv-box'); if (b) b.innerHTML = `<div class="empty">${esc(e.message)}</div>`; });
+  }
   VIEWS['gestao:after'] = (main) => {
-    const aba = ['contas', 'imobiliarias', 'atividade'].includes(S.route.arg) ? S.route.arg : 'contas';
+    const aba = ['contas', 'cv', 'imobiliarias', 'atividade'].includes(S.route.arg) ? S.route.arg : 'contas';
+    if (aba === 'cv') {
+      carregarCV();
+      main.addEventListener('click', async (ev) => {
+        const b = ev.target.closest('button'); if (!b || b.disabled) return;
+        const rodar = async (fn, msg) => { b.disabled = true; try { await fn(); toast(msg); } catch (e) { toast(e.message); } await carregarCV(); };
+        if (b.id === 'cv-reload') rodar(async () => {}, t('acc.saved'));
+        else if (b.id === 'cv-test') rodar(() => api('cvTeste'), t('cv.testSent'));
+        else if (b.id === 'cv-sync') { if (!confirm(t('cv.confirmAll'))) return; rodar(async () => { const d = await api('cvSincronizar', { enviar: true }); if (d.resultado.falhas) throw new Error(`${t('cv.failed')}: ${d.resultado.falhas}`); }, t('cv.done')); }
+        else if (b.dataset.cvsend) {
+          const c = S.cv.corretores.find((x) => String(x.cvId) === b.dataset.cvsend);
+          rodar(async () => {
+            if (!c.conta) { const d = await api('cvSincronizar', { enviar: true, cvIds: [c.cvId] }); if (d.resultado.falhas) throw new Error(t('cv.failed')); }
+            else await api('cvConvite', { id: c.conta.id });
+          }, t('cv.oneSent'));
+        }
+      });
+      return;
+    }
     if (aba === 'imobiliarias') {
       api('imobiliarias').then((d) => { S.imobs = d.itens; desenharImobs(); }).catch((e) => { $('#im-list').innerHTML = `<div class="empty">${esc(e.message)}</div>`; });
       main.addEventListener('click', async (ev) => {

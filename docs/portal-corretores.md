@@ -401,3 +401,25 @@ Novas e **opcionais** (têm padrão): `PORTAL_FUSO` (America/Asuncion), `PORTAL_
   anexo → 403 para corretor). O gestor continua com a aba Solicitações completa (ver, responder, mudar etapa).
 - Para devolver ao corretor: `PORTAL_PEDIDOS_CORRETOR=1` na Vercel **e** reverter este commit no frontend.
 - Testes: 19 (novo: "padrão: corretor não vê nem cria solicitação; o gestor continua vendo tudo").
+
+### 7.7 Corretor do CV → acesso ao portal + e-mail de boas-vindas (2026-11-24)
+- **Fonte:** `GET https://bracerum.cvcrm.com.br/api/v1/cadastros/corretores` (cabeçalhos `email` + `token`, os mesmos
+  `CVCRM_EMAIL`/`CVCRM_TOKEN`; até 500 por página, `limit`/`offset`). Conferido no CV real: 4 corretores em 24/11
+  (#2 demonstração "Feira EXPO PY BR", #3 Omar, #4 e #5 contas de teste do Matheus), todos `ativo_login: "S"`.
+- **Regra:** corretor com login ativo e e-mail válido vira **conta de corretor com o mesmo e-mail** (`origem: "cv"`,
+  `cvId`), e recebe o **e-mail de boas-vindas** com o link de primeiro acesso (ele só cria a senha). Fica de fora:
+  login desativado, sem e-mail, ids em `PORTAL_CV_IGNORAR` (padrão `2`) e domínios de demonstração. Conta que já existe
+  com o mesmo e-mail não é recriada nem rebaixada (gestor continua gestor) — só ganha o `cvId`.
+  Um convite por conta; se o envio falhar, fica registrado e é tentado de novo até 3 vezes; nunca marca sucesso falso.
+- **Quando roda:** com `PORTAL_CV_AUTO=1`, (a) rotina diária da Vercel `0 13 * * *` (10h de Brasília) em
+  `/api/portal?cron=cv-corretores`, protegida por `CRON_SECRET`; (b) a cada abertura da aba Gestão → **Corretores do
+  CV** (no máximo a cada 10 min). Sem `PORTAL_CV_AUTO`, só pelos botões da aba ("Criar contas e enviar convites",
+  "Enviar acesso" por corretor, "Enviar e-mail de teste para mim"). O plano Hobby só permite rotina diária; para chegar
+  na hora, o caminho é o webhook do CV ("Adicionar webhook") — não ligado.
+- **E-mail:** Resend (`RESEND_API_KEY`), remetente `PORTAL_EMAIL_DE` (padrão `Bracerum Park <portal@bracerumpark.com>`),
+  responder para `bracerumpark@bracerum.com`. Texto do Matheus; HTML preto e branco com logo PNG e foto do galpão em
+  `portalcorretores/email/` (cliente de e-mail não mostra SVG). Módulo: `api/_portal-cv.js`.
+  **O domínio `bracerumpark.com` precisa ser verificado no Resend** (registros na GoDaddy, DNS em `domaincontrol.com`);
+  até lá o Resend só entrega de `onboarding@resend.dev` para o e-mail dono da conta Resend.
+- Testes: 22 (3 novos: conta com o mesmo e-mail e convite único; falha registrada e repetida até 3×; teste só para o
+  gestor e rotina protegida por `CRON_SECRET`).

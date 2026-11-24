@@ -359,3 +359,101 @@ test('CV fora do ar: tentativa registrada como erro, último sucesso intacto', a
   assert.equal(depois.ultimoSucesso, antes.ultimoSucesso);
   assert.match(depois.erro, /simulado/);
 });
+
+/* ================================================================ corretores do CV → conta + e-mail */
+function simularCVeEmail(corretores, falharEmail = () => false) {
+  const enviados = [];
+  const orig = global.fetch;
+  global.fetch = async (url, op = {}) => {
+    const u = String(url);
+    if (u.includes('/api/v1/cadastros/corretores')) {
+      assert.equal(op.headers.email, 'integracao@teste.dev'); assert.equal(op.headers.token, 'token-teste');
+      return new Response(JSON.stringify({ codigo: 200, limit: 500, offset: 0, corretores }), { status: 200 });
+    }
+    if (u === 'https://api.resend.com/emails') {
+      const corpo = JSON.parse(op.body);
+      if (falharEmail(corpo.to[0])) return new Response(JSON.stringify({ message: 'domínio não verificado' }), { status: 403 });
+      enviados.push(corpo);
+      return new Response(JSON.stringify({ id: 'msg_' + enviados.length }), { status: 200 });
+    }
+    return orig(url, op);
+  };
+  return { enviados, restaurar: () => { global.fetch = orig; } };
+}
+const cvC = (id, nome, email, extra = {}) => ({ idcorretor: id, nome, email, ativo_login: 'S', telefone: '+595981000111', celular: '',
+  imobiliaria: { idimobiliaria: 1, nome_fantasia: 'Feira EXPO PY BR' }, data_cad: '24/11/2026', ...extra });
+
+test('corretores do CV viram conta com o mesmo e-mail e recebem um convite só', async () => {
+  Object.assign(process.env, { CVCRM_EMAIL: 'integracao@teste.dev', CVCRM_TOKEN: 'token-teste', RESEND_API_KEY: 're_teste' });
+  const sim = simularCVeEmail([
+    cvC(2, 'Feira EXPO PY BR', 'corretor@demonstracao.com'),
+    cvC(10, 'Omar Teste Apetz', 'Omar@Teste.dev'),
+    cvC(11, 'Inativo Silva', 'inativo@teste.dev', { ativo_login: 'N' }),
+    cvC(12, 'Gestora Um', 'gestor@teste.dev'),          // já é gestor no portal: não vira corretor
+    cvC(13, 'Ana Corretora', 'ana@teste.dev'),          // já tem conta e senha: não recebe convite
+  ]);
+  try {
+    assert.equal((await post('cvCorretores', {}, C.ana)).status, 403, 'corretor não vê');
+    const lst = await post('cvCorretores', {}, C.gestor);
+    assert.equal(lst.status, 200);
+    const por = Object.fromEntries(lst.json.corretores.map((c) => [c.cvId, c]));
+    assert.match(por[2].fora, /ignorado|demonstra/);
+    assert.match(por[11].fora, /desativado/);
+    assert.equal(por[12].conta.papel, 'equipe');
+    assert.equal(por[10].conta, null);
+
+    const r1 = await post('cvSincronizar', { enviar: true }, C.gestor);
+    assert.equal(r1.status, 200, JSON.stringify(r1.json));
+    assert.deepEqual([r1.json.resultado.criadas, r1.json.resultado.convites, r1.json.resultado.falhas], [1, 1, 0]);
+    assert.equal(sim.enviados.length, 1);
+    const m = sim.enviados[0];
+    assert.deepEqual(m.to, ['omar@teste.dev']);
+    assert.match(m.subject, /Portal do Corretor/);
+    assert.match(m.html, /Seja bem-vindo ao <b>Bracerum Park<\/b>/);
+    assert.match(m.text, /materiais de divulgação, vídeos, cards para WhatsApp, novidades/);
+    const link = m.text.match(/https:\/\/\S+#\/convite\/\S+/)[0];
+    assert.equal((await post('conviteVer', { token: tokenDoLink(link) })).json.papel, 'corretor', 'link do e-mail abre como corretor');
+    const contas = (await post('contas', {}, C.gestor)).json.contas;
+    const omar = contas.find((c) => c.email === 'omar@teste.dev');
+    assert.equal(omar.papel, 'corretor'); assert.equal(omar.origem, 'cv'); assert.equal(omar.cvId, 10); assert.ok(omar.convite.ok);
+    assert.equal(contas.find((c) => c.email === 'gestor@teste.dev').papel, 'equipe', 'gestor continua gestor');
+    assert.ok(!contas.some((c) => /demonstracao|inativo/.test(c.email)));
+
+    const r2 = await post('cvSincronizar', { enviar: true }, C.gestor);
+    assert.deepEqual([r2.json.resultado.criadas, r2.json.resultado.convites], [0, 0], 'segunda rodada não duplica nem reenvia');
+    assert.equal(sim.enviados.length, 1);
+    // corretor cria a senha pelo link do e-mail e entra
+    const sess = await ativar(link, 'Omar Teste Apetz');
+    assert.equal((await post('eu', {}, sess)).json.usuario.papel, 'corretor');
+  } finally { sim.restaurar(); }
+});
+
+test('e-mail que falha fica registrado e é tentado de novo, no máximo 3 vezes', async () => {
+  const sim = simularCVeEmail([cvC(20, 'Rita Falha Souza', 'rita@teste.dev')], () => true);
+  try {
+    for (let i = 0; i < 4; i++) await post('cvSincronizar', { enviar: true }, C.gestor);
+    const rita = (await post('contas', {}, C.gestor)).json.contas.find((c) => c.email === 'rita@teste.dev');
+    assert.equal(rita.convite.ok, false); assert.equal(rita.convite.tentativas, 3); assert.match(rita.convite.erro, /domínio não verificado/);
+    const r = await post('cvConvite', { id: rita.id }, C.gestor);
+    assert.equal(r.status, 502, 'reenvio manual mostra o erro em vez de fingir sucesso');
+  } finally { sim.restaurar(); }
+});
+
+test('e-mail de teste vai só para o próprio gestor; rotina diária exige CRON_SECRET', async () => {
+  const sim = simularCVeEmail([]);
+  try {
+    assert.equal((await post('cvTeste', {}, C.ana)).status, 403);
+    const r = await post('cvTeste', {}, C.gestor);
+    assert.equal(r.status, 200);
+    assert.deepEqual(sim.enviados.at(-1).to, ['gestor@teste.dev']);
+    assert.match(sim.enviados.at(-1).subject, /^\[TESTE\]/);
+    delete process.env.CRON_SECRET;
+    assert.equal((await get('cron=cv-corretores')).status, 401, 'sem segredo configurado, ninguém dispara');
+    process.env.CRON_SECRET = 'cron-teste';
+    const sem = await (async () => { const req = { method: 'GET', url: '/api/portal?cron=cv-corretores', headers: { authorization: 'Bearer errado' } }; const res = resFalso(); await handler(req, res); await res.pronto; return res.statusCode; })();
+    assert.equal(sem, 401);
+    const comReq = { method: 'GET', url: '/api/portal?cron=cv-corretores', headers: { authorization: 'Bearer cron-teste' } };
+    const res = resFalso(); await handler(comReq, res); await res.pronto;
+    assert.deepEqual(JSON.parse(res.corpo()), { ok: true, auto: false }, 'com o automático desligado a rotina não faz nada');
+  } finally { sim.restaurar(); }
+});
