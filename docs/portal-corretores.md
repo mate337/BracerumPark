@@ -392,3 +392,12 @@ Novas e **opcionais** (têm padrão): `PORTAL_FUSO` (America/Asuncion), `PORTAL_
 - **Abre sempre no modo claro** (fundo branco), mesmo em aparelho com modo escuro; escuro só se a pessoa escolher
   no botão do topo ou em Minha conta (opção "Sistema" saiu). Chave nova `bp-portal-tema2`, para todo mundo
   recomeçar no claro.
+
+### 7.6 Solicitações ao marketing só para o gestor (2026-11-24, pedido do Matheus)
+- O corretor **não vê nem cria** solicitações: saíram a aba, o tópico do início (5 tópicos agora), os atalhos
+  "Pedir ao marketing"/"Minhas solicitações", o "+" da barra do celular (virou Tabela) e o "Falta algum material?
+  Peça ao marketing". Textos que diziam "abra um pedido" (login, guia do CV, FAQ) passaram a citar a equipe Bracerum.
+- **O servidor também recusa** (`pedidos`, `pedido`, `pedidoMensagem`, `anexo`, `pedidoCancelar` e o download de
+  anexo → 403 para corretor). O gestor continua com a aba Solicitações completa (ver, responder, mudar etapa).
+- Para devolver ao corretor: `PORTAL_PEDIDOS_CORRETOR=1` na Vercel **e** reverter este commit no frontend.
+- Testes: 19 (novo: "padrão: corretor não vê nem cria solicitação; o gestor continua vendo tudo").

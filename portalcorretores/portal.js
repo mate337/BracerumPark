@@ -189,12 +189,11 @@
   const PAG_IDX = { '12x': 0, vista: 1, '36x': 2 };
 
   /* ============================================================ rotas */
-  // Dois perfis: corretor (consulta + solicitações) e gestor (tudo + Gestão). As seis áreas do briefing:
-  // mapa de disponibilidade, tabela de vendas, materiais, ofertas/cards, solicitações e aprender.
+  // Dois perfis: corretor (só consulta) e gestor (tudo + Gestão). Desde 2026-11-24 as solicitações ao
+  // marketing são só do gestor (pedido do Matheus): o corretor não vê nem cria — o servidor também recusa.
   const ROTAS_CORRETOR = [
     ['inicio', 'nav.home', I.home], ['masterplan', 'nav.masterplan', I.cube], ['tabela', 'nav.prices', I.table],
-    ['ofertas', 'nav.offers', I.tag], ['materiais', 'nav.materials', I.grid], ['pedidos', 'nav.requests', I.megaphone],
-    ['aprender', 'nav.learn', I.book],
+    ['ofertas', 'nav.offers', I.tag], ['materiais', 'nav.materials', I.grid], ['aprender', 'nav.learn', I.book],
   ];
   const ROTAS_EQUIPE = [
     ['inicio', 'nav.home', I.home], ['gestao', 'nav.gestao', I.users], ['pedidos', 'nav.requests', I.inbox],
@@ -240,7 +239,7 @@
       </div>`;
     bindLang(app); bindTema(app);
     $('#bb-more') && $('#bb-more').addEventListener('click', abrirMais);
-    $('#bb-plus') && $('#bb-plus').addEventListener('click', () => (isEquipe() ? (location.hash = '#/gestao', setTimeout(novaConta, 60)) : novoPedido()));
+    $('#bb-plus') && $('#bb-plus').addEventListener('click', () => { location.hash = '#/gestao'; setTimeout(novaConta, 60); });
     renderMain();
     marcarNav();
     onScrollTop();
@@ -253,8 +252,9 @@
     const it = (id, k, ico) => `<a href="#/${id}" data-nav="${id}">${ico}<span>${esc(t(k))}</span></a>`;
     const left = isEquipe() ? [it('inicio', 'nav.home', I.home), it('gestao', 'nav.gestao', I.users)] : [it('inicio', 'nav.home', I.home), it('masterplan', 'nav.map', I.cube)];
     const right = isEquipe() ? [it('pedidos', 'nav.requests', I.inbox)] : [it('ofertas', 'nav.offers', I.tag)];
+    const meio = isEquipe() ? `<button type="button" class="plus" id="bb-plus" aria-label="${esc(t('gest.new'))}">${I.plus}</button>` : it('tabela', 'nav.prices', I.table);
     return `<nav class="bottombar" aria-label="${esc(t('brand'))}">${left.join('')}
-      <button type="button" class="plus" id="bb-plus" aria-label="${esc(isEquipe() ? t('gest.new') : t('nav.new'))}">${I.plus}</button>
+      ${meio}
       ${right.join('')}<button type="button" id="bb-more">${I.dots}<span>Menu</span></button></nav>`;
   }
   function marcarNav() {
@@ -429,7 +429,6 @@
     ['tabela', 'nav.prices', 'top.prices', I.table],
     ['ofertas', 'nav.offers', 'top.offers', I.tag],
     ['materiais', 'nav.materials', 'top.materials', I.grid],
-    ['pedidos', 'nav.requests', 'top.requestsBroker', I.megaphone],
     ['aprender', 'nav.learn', 'top.learn', I.book],
   ];
   const TOPICOS_EQUIPE = [
@@ -447,8 +446,6 @@
     const extras = isEquipe()
       ? ''
       : `<div class="extras">
-          <button type="button" class="extra" id="q-req" ${aprovado() ? '' : 'aria-disabled="true"'}>${I.megaphone}<span>${esc(t('home.q.req'))}</span>${aprovado() ? I.arrow : I.lock}</button>
-          <a class="extra" href="#/pedidos">${I.inbox}<span>${esc(t('home.myReq'))}</span><b class="num" id="cnt-req"></b>${I.arrow}</a>
           <a class="extra" href="${C.CV.corretor}" target="_blank" rel="noopener">${I.ext}<span>${esc(t('home.q.cv'))}</span>${I.arrow}</a>
         </div>`;
     return `
@@ -503,7 +500,7 @@
     const q = $('#q-req', main);
     if (q) q.addEventListener('click', () => novoPedido());
     const badge = (id, n) => { const b = $(`[data-cnt="${id}"]`, main); if (b && n) { b.textContent = n; b.hidden = false; } };
-    carregarPedidos(true).then(() => {
+    if (isEquipe()) carregarPedidos(true).then(() => {
       const abertos = (S.pedidos || []).filter((p) => !['concluida', 'cancelada'].includes(p.status)).length;
       const c = $('#cnt-req', main); if (c && abertos) c.textContent = abertos;
       if (isEquipe()) badge('pedidos', (S.pedidos || []).filter((p) => p.status === 'enviada').length);
@@ -606,7 +603,7 @@
         <label class="search"><span class="vh">${esc(t('mat.search'))}</span>${I.search}<input class="input" type="search" id="mat-q" placeholder="${esc(t('mat.search'))}" value="${esc(S.mat.q)}" /></label>
       </div>
       <div class="grid" id="mat-grid"><div class="skel" style="height:280px;grid-column:1/-1;border-radius:18px"></div></div>
-      ${isEquipe() ? '' : `<p class="small muted" style="margin-top:28px">${esc(t('mat.missing'))} <button type="button" class="linkbtn" id="mat-ask">${esc(t('req.new'))} →</button></p>`}`;
+`;
   };
   function desenharGrade() {
     const lst = filtrarMateriais();
@@ -630,7 +627,6 @@
       else if (b.dataset.ver) verMaterial(MATS[+b.dataset.ver]);
       else if (b.dataset.mmenu) menuMaterial(MATS[+b.dataset.mmenu]);
       else if (b.id === 'mat-add') editarMaterial(null);
-      else if (b.id === 'mat-ask') novoPedido('outro');
       else if (b.id === 'mat-retry') carregarBib();
     });
     let tmr;
