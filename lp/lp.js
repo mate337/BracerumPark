@@ -5,15 +5,15 @@
      1. idioma (PT no HTML; EN/ES no <script id="lp-i18n">; chave "bp-lang",
         a mesma do site, do linktree e da maquete)
      2. barra do topo, barra fixa do celular, revelar ao rolar
-     3. WhatsApp: PT → Sydney (Brasil), ES/EN → Cleber (Paraguai), com a
-        mensagem no idioma ativo
+     3. WhatsApp do Bracerum Park (+55 47 99136-8987; o lp-config pode trocar
+        o número em "wa"), com a mensagem no idioma ativo
      4. formulário em duas etapas → POST /api/lead → lead no CV CRM
         (com a origem guardada pelo tracking.js: utm, gclid, fbclid…)
      5. tabela de preço dos lotes pela janela vigente (precos.json da
         maquete — um lugar só para editar quando sair tabela nova)
      6. disponibilidade ao vivo dos lotes (/api/lotes-status)
      4b. cadastro de corretor (form data-kind="corretor"): um passo só →
-        POST /api/corretor → planilha do Drive, e o WhatsApp do Sydney abre
+        POST /api/corretor → planilha do Drive, e o WhatsApp do Park abre
         com a mensagem pronta. Não passa pelo CV.
    Sem JS a página continua inteira em PT; o formulário cai no WhatsApp.
    ===================================================================== */
@@ -25,7 +25,7 @@
   try { CFG = JSON.parse((D.getElementById('lp-config') || {}).textContent || '{}'); } catch (e) {}
   var DICT = {};
   try { DICT = JSON.parse((D.getElementById('lp-i18n') || {}).textContent || '{}'); } catch (e) {}
-  var WA = { br: '5547988030200', py: '595985516065' };
+  var WA_PARK = '5547991368987';
 
   /* ---------- textos das partes geradas pelo JS ---------------------- */
   var UI = {
@@ -55,7 +55,7 @@
       cMsg: 'Olá, me chamo {nome}, {imob}, e tenho interesse em ofertar o Bracerum Park para os meus clientes.',
       cDa: 'da Imobiliária {x}', cDe: 'da {x}', cAuto: 'corretor(a) autônomo(a)',
       cOkT: 'Pronto, {nome}. <em>Cadastro recebido.</em>',
-      cOkP: 'A conversa com Sydney Savi abriu no WhatsApp, com a sua mensagem já escrita — é só enviar. Se não abriu, toque abaixo:',
+      cOkP: 'A conversa com a equipe comercial do Bracerum Park abriu no WhatsApp, com a sua mensagem já escrita — é só enviar. Se não abriu, toque abaixo:',
       cOkWa: 'Abrir o WhatsApp', cOk2: 'Conhecer os produtos'
     },
     en: {
@@ -84,7 +84,7 @@
       cMsg: 'Hello, my name is {nome}, {imob}, and I am interested in offering Bracerum Park to my clients.',
       cDa: 'from {x}', cDe: 'from {x}', cAuto: 'an independent broker',
       cOkT: 'Done, {nome}. <em>You are signed up.</em>',
-      cOkP: 'A chat with Sydney Savi opened on WhatsApp with your message already written — just hit send. If it did not open, tap below:',
+      cOkP: 'A chat with the Bracerum Park sales team opened on WhatsApp with your message already written — just hit send. If it did not open, tap below:',
       cOkWa: 'Open WhatsApp', cOk2: 'See the products'
     },
     es: {
@@ -113,7 +113,7 @@
       cMsg: 'Hola, me llamo {nome}, {imob}, y tengo interés en ofrecer Bracerum Park a mis clientes.',
       cDa: 'de la Inmobiliaria {x}', cDe: 'de {x}', cAuto: 'corredor(a) independiente',
       cOkT: 'Listo, {nome}. <em>Registro recibido.</em>',
-      cOkP: 'La conversación con Sydney Savi se abrió en WhatsApp, con su mensaje ya escrito — solo tiene que enviarlo. Si no se abrió, toque abajo:',
+      cOkP: 'La conversación con el equipo comercial de Bracerum Park se abrió en WhatsApp, con su mensaje ya escrito — solo tiene que enviarlo. Si no se abrió, toque abajo:',
       cOkWa: 'Abrir WhatsApp', cOk2: 'Conocer los productos'
     }
   };
@@ -173,7 +173,7 @@
   } else D.querySelectorAll('.rv').forEach(function (n) { n.classList.add('is-in'); });
 
   /* ---------- 3. WhatsApp --------------------------------------------- */
-  function waNumber() { return CFG.wa || (lang === 'pt' ? WA.br : WA.py); }
+  function waNumber() { return CFG.wa || WA_PARK; }
   function waLink(msg, n) { return 'https://wa.me/' + (n || waNumber()) + '?text=' + encodeURIComponent(msg); }
   function paintWa() {
     var msg = (DICT[lang] && DICT[lang]['wa.msg']) || (D.querySelector('[data-t="wa.msg"]') || {})._pt || '';
@@ -287,7 +287,7 @@
   // navegador bloquearia a janela); o cadastro segue em segundo plano com keepalive,
   // que termina mesmo se a página sair. Se a janela for bloqueada (navegador de app),
   // a página vai para o WhatsApp no mesmo separador. Se a planilha falhar, a mensagem
-  // chega ao Sydney do mesmo jeito, com nome e imobiliária, e a função grava no log.
+  // chega ao WhatsApp do Park do mesmo jeito, com nome e imobiliária, e a função grava no log.
   function imobFrase(x) {
     if (/^(aut[oô]nom|independ|freelanc|por conta|cuenta propia)/i.test(x)) return u('cAuto');
     var ja = /^(imob|inmob|im[oó]veis|real estate|realty)/i.test(x);   // já começa com "Imobiliária…"
@@ -304,7 +304,7 @@
       if (nome.length < 2) return bad('nome', u('name'));
       if (tel.length < (o.ddi === '55' ? 10 : 7)) return bad('telefone', u('phone'));
       if (imob.length < 2) return bad('imobiliaria', u('imob'));
-      var url = waLink(fill(u('cMsg'), { nome: nome, imob: imobFrase(imob) }), CFG.wa || WA.br);
+      var url = waLink(fill(u('cMsg'), { nome: nome, imob: imobFrase(imob) }), waNumber());
       var win = null;
       try { win = W.open(url, '_blank'); if (win) win.opener = null; } catch (x) { win = null; }
       track('whatsapp_click', { lp: CFG.lp, destino: 'cadastro_corretor' });

@@ -3,12 +3,13 @@
 Página de cadastro de corretores e imobiliárias que querem ofertar o Bracerum Park. Mesmo padrão
 das LPs dos folders (gerada por `docs/build_lps.py`, CSS/JS em `lp/`, PT/EN/ES pela chave
 `bp-lang`), mas com **outra dinâmica de envio: não cadastra no CV CRM** — grava numa planilha do
-Google Drive e abre o WhatsApp do Sydney Savi com a mensagem pronta.
+Google Drive e abre o WhatsApp do Bracerum Park com a mensagem pronta.
 
 - Endereço: **bracerumpark.com/corretores** (também `/Corretores`; `/corretor` e `/Corretor` redirecionam).
 - Planilha: **"Leads Corretores"** no Drive do Matheus
   (`1LavGFK7SC9TeXokO8Zkaj9-vXuzX9lYOWOF71WC2WgY`), primeira aba.
-- WhatsApp de destino: Sydney Savi, **+55 47 98803-0200** (`5547988030200`, o mesmo `WA_BR` das outras LPs).
+- WhatsApp de destino: **Bracerum Park, +55 47 99136-8987** (`5547991368987`, o mesmo `WA_PARK` das outras LPs).
+  Até 2026-11-24 era o do Sydney Savi (+55 47 98803-0200); o cliente pediu o número do Park em todo o site.
 - **Publicada e ligada à planilha em 2026-11-11.** Apps Script publicado (GET na URL `/exec` responde
   `{"ok":true,"planilha":"Leads Corretores "}`), `CORRETORES_PLANILHA_URL` na Vercel (Production, sensível).
   Cadastro de teste pelo site no ar → linha 2 "TESTE Claude - apagar", conferida pelo Drive — apagar à mão.
@@ -18,7 +19,7 @@ Google Drive e abre o WhatsApp do Sydney Savi com a mensagem pronta.
 1. O corretor preenche **Nome, WhatsApp (com DDI) e Imobiliária** — três campos, um passo só.
    Autônomo escreve "Autônomo" no campo da imobiliária.
 2. No toque em "Cadastrar e chamar no WhatsApp":
-   - a conversa com o Sydney **abre na hora** (nova aba / app do WhatsApp) com:
+   - a conversa com o WhatsApp do Park **abre na hora** (nova aba / app do WhatsApp) com:
      > Olá, me chamo **Maria Souza**, da Imobiliária **Central**, e tenho interesse em ofertar o Bracerum Park para os meus clientes.
 
      (Se o nome já começa com "Imobiliária…"/"Imóveis…", sai "da Imobiliária Horizonte", sem repetir;
@@ -29,7 +30,7 @@ Google Drive e abre o WhatsApp do Sydney Savi com a mensagem pronta.
 3. A página mostra "Pronto, Maria. Cadastro recebido." com o botão "Abrir o WhatsApp" de reserva.
 
 O WhatsApp abre **antes** da resposta da planilha de propósito: depois de esperar uma resposta, o
-navegador já não deixa abrir janela. Se a planilha falhar, o Sydney recebe a mensagem do mesmo jeito
+navegador já não deixa abrir janela. Se a planilha falhar, o Park recebe a mensagem do mesmo jeito
 (com nome e imobiliária) e a função grava o cadastro no log da Vercel (`[corretor] falhou …`).
 
 ## Planilha
