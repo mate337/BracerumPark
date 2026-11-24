@@ -277,6 +277,7 @@ const I18N = {
     "nav.masterplan": "Masterplan", "nav.location": "Location", "nav.how": "How it works",
     "nav.park": "The Park", "nav.tax": "Taxation",
     "nav.bracerum": "Bracerum", "nav.cta": "Get in touch",
+    "nav.portal": "Broker Portal", "nav.portalShort": "Brokers",
     "loader.label": "Villeta Industrial City",
     "hero.scroll": "Explore",
 
@@ -742,6 +743,7 @@ const I18N = {
     "nav.masterplan": "Masterplan", "nav.location": "Ubicación", "nav.how": "Cómo funciona",
     "nav.park": "El Parque", "nav.tax": "Tributación",
     "nav.bracerum": "Bracerum", "nav.cta": "Contáctenos",
+    "nav.portal": "Portal del Corredor", "nav.portalShort": "Corredores",
     "loader.label": "Villeta Industrial City",
     "hero.scroll": "Explorar",
     "tax.title": "La tributación más <em>competitiva</em> de América del Sur.",

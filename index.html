@@ -12,7 +12,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
 <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" />
-<link rel="stylesheet" href="style.css?v=21" />
+<link rel="stylesheet" href="style.css?v=22" />
 <noscript><style>.reveal{opacity:1!important;transform:none!important}.mask__in{transform:none!important}.step{opacity:1!important;filter:none!important;transform:none!important}#loader{display:none!important}</style></noscript>
 <script src="tracking.js?v=1" defer></script>
 </head>
@@ -41,6 +41,7 @@
     <a href="tributacao.html" data-i18n="nav.tax">Tributação</a>
   </nav>
   <div class="nav__right">
+    <a class="portal-link" href="/PortalCorretores" data-track="portal_corretor_click"><span class="portal-link__full" data-i18n="nav.portal">Portal do Corretor</span><span class="portal-link__short" data-i18n="nav.portalShort">Corretores</span></a>
     <div class="lang" role="group" aria-label="Idioma / Language / Idioma">
       <button class="lang__btn" data-lang="en" title="English (US)">EN</button>
       <button class="lang__btn" data-lang="pt" title="Português (BR)">PT</button>
@@ -121,10 +122,13 @@
 </svg>
     </div>
   </div>
-  <div class="hero__lang lang" role="group" aria-label="Idioma / Language / Idioma">
-    <button class="lang__btn" data-lang="en" title="English (US)">EN</button>
-    <button class="lang__btn" data-lang="pt" title="Português (BR)">PT</button>
-    <button class="lang__btn" data-lang="es" title="Español (PY)">ES</button>
+  <div class="hero__lang">
+    <a class="portal-link" href="/PortalCorretores" data-track="portal_corretor_click"><span class="portal-link__full" data-i18n="nav.portal">Portal do Corretor</span><span class="portal-link__short" data-i18n="nav.portalShort">Corretores</span></a>
+    <div class="lang" role="group" aria-label="Idioma / Language / Idioma">
+      <button class="lang__btn" data-lang="en" title="English (US)">EN</button>
+      <button class="lang__btn" data-lang="pt" title="Português (BR)">PT</button>
+      <button class="lang__btn" data-lang="es" title="Español (PY)">ES</button>
+    </div>
   </div>
   <a class="hero__scroll" href="#tributacao-teaser" aria-label="Explorar">
     <span class="hero__scroll-line"></span>
@@ -569,7 +573,7 @@
 <script src="https://unpkg.com/@maplibre/maplibre-gl-leaflet@0.0.22/leaflet-maplibre-gl.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-<script src="i18n.js?v=21"></script>
+<script src="i18n.js?v=22"></script>
 <script src="script.js?v=20"></script>
 <script src="home.js?v=20"></script>
 </body>

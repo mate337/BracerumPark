@@ -21,6 +21,16 @@ maquete 3D embutida, que as seis páginas internas baixavam e interpretavam à t
 - **Ficaram de propósito:** os cartões de visita pessoais (`/cleberpavao`, `/sydneysavi` etc.) e os
   contatos internos do `/admin/` e do portal.
 
+### Botão "Portal do Corretor" no topo do site (2026-11-24)
+- **`.portal-link`** → `/PortalCorretores`, ao lado do seletor de idioma: no **hero da home** (o `.hero__lang` virou
+  um invólucro com o botão + o `.lang`; o `is-off` do `script.js` some com os dois) e na **nav das 7 páginas**.
+  Rótulo `nav.portal` ("Portal do Corretor" / "Broker Portal" / "Portal del Corredor") e o curto `nav.portalShort`
+  ("Corretores" / "Brokers" / "Corredores"), evento `portal_corretor_click` (`data-track`).
+- **Nav reorganizada para caber:** os links do meio somem **≤1360 px** (eram ≤900, mas entre 900 e ~1300 já se
+  espremiam e quebravam linha); entre 1361 e 1699 px o espaço entre eles aperta e o portal usa o rótulo curto;
+  **≤720 px o "Fale conosco" da nav sai** (o WhatsApp flutuante e o rodapé ficam) e o portal fica "Corretores".
+  Conferido de 320 a 1920 px nos três idiomas. `style.css`/`i18n.js` em `?v=22`.
+
 ### Portal do Corretor — pesquisa e estrutura (2026-11-18, só documento)
 - Proposta em **`docs/portal-corretores.md`**: itens por prioridade (login, mural, biblioteca, links rastreados,
   pedidos ao marketing, treinamento), mapa dos endpoints do CV úteis, MCPs viáveis e estrutura `portal/` + `api/portal-*`.
