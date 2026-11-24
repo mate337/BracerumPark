@@ -23,7 +23,7 @@
     'nav.new': T('Novo pedido', 'Nuevo pedido', 'New request'),
 
     'auth.title': T('Tudo para vender o Bracerum Park, num lugar só.', 'Todo para vender Bracerum Park, en un solo lugar.', 'Everything to sell Bracerum Park, in one place.'),
-    'auth.lead': T('Tabela vigente, materiais aprovados, o masterplan 3D com a disponibilidade dos lotes e o marketing a uma solicitação de distância.', 'Tabla vigente, materiales aprobados, el masterplan 3D con la disponibilidad de los lotes y el marketing a una solicitud de distancia.', 'Current prices, approved materials, the 3D masterplan with lot availability and marketing one request away.'),
+    'auth.lead': T('Tabela vigente, materiais aprovados, o masterplan 3D com a disponibilidade dos lotes e os folders digitais prontos para enviar.', 'Tabla vigente, materiales aprobados, el masterplan 3D con la disponibilidad de los lotes y los folletos digitales listos para enviar.', 'Current prices, approved materials, the 3D masterplan with lot availability and digital brochures ready to send.'),
     'auth.in': T('Entrar', 'Ingresar', 'Sign in'),
     'auth.up': T('Criar conta', 'Crear cuenta', 'Create account'),
     'auth.team': T('Equipe Bracerum', 'Equipo Bracerum', 'Bracerum team'),
@@ -50,7 +50,7 @@
     'home.hello.a': T('Boa tarde', 'Buenas tardes', 'Good afternoon'),
     'home.hello.n': T('Boa noite', 'Buenas noches', 'Good evening'),
     'home.sub': T('Aqui está o que mudou e o que você precisa para vender hoje.', 'Esto es lo que cambió y lo que necesita para vender hoy.', 'Here is what changed and what you need to sell today.'),
-    'home.pending': T('Seu cadastro está em análise. Já dá para usar materiais, tabela e links; os pedidos ao marketing liberam quando a equipe aprovar.', 'Su registro está en análisis. Ya puede usar materiales, tabla y enlaces; los pedidos al marketing se habilitan cuando el equipo apruebe.', 'Your account is under review. Materials, prices and links are already open; marketing requests unlock once the team approves.'),
+    'home.pending': T('Seu cadastro está em análise. Já dá para usar materiais, tabela e links.', 'Su registro está en análisis. Ya puede usar materiales, tabla y enlaces.', 'Your account is under review. Materials, prices and links are already open.'),
     'home.k.avail': T('Lotes disponíveis', 'Lotes disponibles', 'Lots available'),
     'home.k.taken': T('Reservados ou vendidos', 'Reservados o vendidos', 'Reserved or sold'),
     'home.k.price': T('Padrão · US$/m²', 'Estándar · US$/m²', 'Standard · US$/m²'),
@@ -340,7 +340,7 @@
     'gest.created2': T('Conta criada', 'Cuenta creada', 'Account created'),
     'gest.newInfo': T('A conta já nasce liberada. A senha é a própria pessoa que cria, pelo link.', 'La cuenta nace habilitada. La contraseña la crea la propia persona, por el enlace.', 'The account is active right away. The person sets the password via the link.'),
     'gest.kind': T('Tipo de conta', 'Tipo de cuenta', 'Account type'),
-    'gest.brokerInfo': T('Tabela, solicitações ao marketing, materiais, masterplan 3D e aprender.', 'Tabla, solicitudes al marketing, materiales, masterplan 3D y aprender.', 'Prices, marketing requests, materials, 3D masterplan and learn.'),
+    'gest.brokerInfo': T('Tabela, ofertas, materiais, masterplan 3D e aprender.', 'Tabla, ofertas, materiales, masterplan 3D y aprender.', 'Prices, offers, materials, 3D masterplan and learn.'),
     'gest.managerInfo': T('Tudo do corretor + gestão de contas, materiais e pedidos.', 'Todo lo del corredor + gestión de cuentas, materiales y pedidos.', 'Everything a broker has + accounts, materials and requests.'),
     'gest.brokers': T('Corretores', 'Corredores', 'Brokers'),
     'gest.managers': T('Gerenciadores', 'Administradores', 'Managers'),
@@ -382,7 +382,7 @@
     'home.welcome': T('Bem-vindo', 'Bienvenido', 'Welcome'),
     'home.sub2': T('Escolha por onde começar. O mapa de reservas logo abaixo mostra o que está livre agora.', 'Elija por dónde empezar. El mapa de reservas abajo muestra lo que está libre ahora.', 'Pick where to start. The reservation map below shows what is available right now.'),
     'home.subTeam': T('Contas, materiais e solicitações dos corretores. O mapa de reservas logo abaixo vem ao vivo do CV.', 'Cuentas, materiales y solicitudes de los corredores. El mapa de reservas abajo viene en vivo del CV.', 'Accounts, materials and broker requests. The reservation map below is live from the CV.'),
-    'top.materials': T('Fotos, folders, tabelas, logos e vídeo', 'Fotos, folletos, tablas, logos y video', 'Photos, brochures, prices, logos, video'),
+    'top.materials': T('Folders digitais prontos para enviar', 'Folletos digitales listos para enviar', 'Digital brochures ready to send'),
     'top.board': T('Avisos da Bracerum para os corretores', 'Avisos de Bracerum para los corredores', 'Notices from Bracerum to brokers'),
     'top.boardTeam': T('Publicar avisos para os corretores', 'Publicar avisos para los corredores', 'Post notices to brokers'),
     'top.prices': T('Preço vigente e simulador de lote', 'Precio vigente y simulador de lote', 'Current price and lot simulator'),
@@ -652,15 +652,15 @@
       corpo: {
         pt: [
           ['o', ['Mande o seu link (aba Divulgar). O cliente preenche e o lead chega ao CV com a sua origem.', 'Entre no painel do corretor do CV (bracerum.cvcrm.com.br/corretor) e acompanhe o lead.', 'Escolha o lote com o cliente na maquete 3D — ela mostra em tempo real o que está livre.', 'Faça a reserva no CV, com a condição de pagamento escolhida.', 'Contrato e assinatura seguem pelo CV; a comissão aparece no próprio painel.']],
-          ['q', 'Ainda não tem acesso ao painel do CV? Abra um pedido do tipo "Outro" pedindo o seu usuário.'],
+          ['q', 'Ainda não tem acesso ao painel do CV? Peça o seu usuário à equipe Bracerum.'],
         ],
         es: [
           ['o', ['Envíe su enlace (pestaña Difundir). El cliente completa y el lead llega al CV con su origen.', 'Ingrese al panel del corredor del CV (bracerum.cvcrm.com.br/corretor) y siga el lead.', 'Elija el lote con el cliente en la maqueta 3D — muestra en tiempo real lo que está libre.', 'Haga la reserva en el CV, con la condición de pago elegida.', 'Contrato y firma siguen por el CV; la comisión aparece en el mismo panel.']],
-          ['q', '¿Todavía no tiene acceso al panel del CV? Abra un pedido de tipo "Otro" pidiendo su usuario.'],
+          ['q', '¿Todavía no tiene acceso al panel del CV? Pida su usuario al equipo Bracerum.'],
         ],
         en: [
           ['o', ['Send your link (Share tab). The client fills it in and the lead reaches the CV tagged with you.', 'Open the CV broker panel (bracerum.cvcrm.com.br/corretor) and follow the lead.', 'Choose the lot with the client on the 3D model — it shows live what is available.', 'Make the reservation in the CV with the chosen payment terms.', 'Contract and signature continue in the CV; commission shows up in the same panel.']],
-          ['q', 'No access to the CV panel yet? Open an "Other" request asking for your user.'],
+          ['q', 'No access to the CV panel yet? Ask the Bracerum team for your user.'],
         ],
       } },
   ];
@@ -673,7 +673,7 @@
     { q: T('Estrangeiro pode comprar?', '¿Un extranjero puede comprar?', 'Can foreigners buy?'),
       a: T('Sim. O Paraguai permite 100% de capital estrangeiro, sem sócio local.', 'Sí. Paraguay permite 100% de capital extranjero, sin socio local.', 'Yes. Paraguay allows 100% foreign ownership, with no local partner.') },
     { q: T('Como o cliente chega lá?', '¿Cómo llega el cliente?', 'How do clients get there?'),
-      a: T('Pela PY-19, a cerca de 65 km de Assunção; o parque tem pista de pouso própria de 1.460 m. Visitas guiadas: abra um pedido.', 'Por la PY-19, a unos 65 km de Asunción; el parque tiene pista propia de 1.460 m. Visitas guiadas: abra un pedido.', 'Via PY-19, about 65 km from Asunción; the park has its own 1,460 m airstrip. Guided visits: open a request.') },
+      a: T('Pela PY-19, a cerca de 65 km de Assunção; o parque tem pista de pouso própria de 1.460 m. Visitas guiadas: combine com a equipe Bracerum.', 'Por la PY-19, a unos 65 km de Asunción; el parque tiene pista propia de 1.460 m. Visitas guiadas: coordine con el equipo Bracerum.', 'Via PY-19, about 65 km from Asunción; the park has its own 1,460 m airstrip. Guided visits: arrange with the Bracerum team.') },
   ];
 
   const CV = {

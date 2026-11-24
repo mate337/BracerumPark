@@ -697,6 +697,7 @@ function normalizaPedido(p) {
   return { ...p, status: R.statusPedido(p.status), mensagens: p.mensagens || [],
     historico: (p.historico || []).map((h) => (h.status ? { ...h, status: R.statusPedido(h.status) } : h)) };
 }
+const corretorPede = () => process.env.PORTAL_PEDIDOS_CORRETOR === '1';
 async function pedidoCriar(b, u) {
   if (u.status !== 'aprovado') throw erro(403, 'Conta sem permissão para abrir solicitações.');
   // Só os campos abaixo vêm do corretor; autor, situação, responsável e datas são do servidor.
@@ -828,7 +829,7 @@ async function baixar(req, res) {
     if (!m) return nao(res);
     const p = await ler(caminhoP(m[1]));
     const a = p && (p.anexos || []).find((x) => x.caminho === caminho);
-    if (!a || !(eq || (p.corretor && p.corretor.id === c.u.id))) return nao(res);
+    if (!a || !(eq || (corretorPede() && p.corretor && p.corretor.id === c.u.id))) return nao(res);
     return servirArquivo(res, caminho, a.tipo, a.nome, false);
   }
   if (q.get('material')) {
@@ -885,6 +886,8 @@ module.exports = async (req, res) => {
     const { s, u } = c;
     const eq = s.p === 'equipe';
     const soGestor = () => { if (!eq) throw erro(403, 'Só o gestor'); };
+    // Solicitações ao marketing: só o gestor desde 2026-11-24 (PORTAL_PEDIDOS_CORRETOR=1 devolve ao corretor).
+    const pedidosLiberados = () => { if (!eq && !corretorPede()) throw erro(403, 'As solicitações ao marketing são feitas pela equipe Bracerum'); };
     const ok = (obj) => fim(200, { ok: true, ...obj });
 
     switch (b.acao) {
@@ -938,11 +941,11 @@ module.exports = async (req, res) => {
       case 'ofertaSalvar': soGestor(); return ok(await ofertaSalvar(b, s));
       case 'ofertaStatus': soGestor(); return ok(await ofertaStatus(b, s));
       // solicitações
-      case 'pedidos': return ok(await pedidosListar(s, u));
-      case 'pedido': if (eq) throw erro(400, 'Abra a solicitação com uma conta de corretor'); return ok(await pedidoCriar(b, u));
-      case 'pedidoMensagem': return ok(await pedidoMensagem(b, s, u));
-      case 'anexo': return ok(await anexoEnviar(b, s, u));
-      case 'pedidoCancelar': if (eq) throw erro(400, 'Use a situação da solicitação'); return ok(await pedidoCancelarProprio(b, s, u));
+      case 'pedidos': pedidosLiberados(); return ok(await pedidosListar(s, u));
+      case 'pedido': pedidosLiberados(); if (eq) throw erro(400, 'Abra a solicitação com uma conta de corretor'); return ok(await pedidoCriar(b, u));
+      case 'pedidoMensagem': pedidosLiberados(); return ok(await pedidoMensagem(b, s, u));
+      case 'anexo': pedidosLiberados(); return ok(await anexoEnviar(b, s, u));
+      case 'pedidoCancelar': pedidosLiberados(); if (eq) throw erro(400, 'Use a situação da solicitação'); return ok(await pedidoCancelarProprio(b, s, u));
       case 'pedidoAtualizar': soGestor(); return ok(await pedidoAtualizar(b, s));
       default: return fim(400, { ok: false, erro: 'ação' });
     }

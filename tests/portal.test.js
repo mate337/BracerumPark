@@ -15,6 +15,7 @@ process.chdir(RAIZ);
 Object.assign(process.env, {
   BLOB_READ_WRITE_TOKEN: 'vercel_blob_rw_teste1234_naoreal', PORTAL_CONVITE: 'chave-de-teste', PORTAL_ADMINS: 'gestor@teste.dev',
   PORTAL_SEGREDO: 'sessao-de-teste', PORTAL_FUSO: 'America/Asuncion', PORTAL_SYNC_MIN: '5', PORTAL_DADOS_MAX_MIN: '60',
+  PORTAL_PEDIDOS_CORRETOR: '1',   // os testes antigos do fluxo usam o corretor; o bloqueio padrão tem teste próprio
 });
 
 /* ---------- Blob em memória */
@@ -196,6 +197,24 @@ test('solicitação: etapas, responsável, mensagens e histórico consistentes',
   assert.equal((await post('pedidoAtualizar', { id, status: 'producao' }, C.gestor)).status, 409, 'concluída não reabre');
   assert.equal((await post('pedidoMensagem', { id, texto: 'mais uma' }, C.ana)).status, 409);
   assert.equal((await post('pedidoCancelar', { id }, C.ana)).status, 409);
+});
+
+test('padrão: corretor não vê nem cria solicitação; o gestor continua vendo tudo', async () => {
+  const antes = await post('pedido', { material: 'post', formato: 'digital', descricao: 'Criada enquanto liberado' }, C.ana);
+  assert.equal(antes.status, 200);
+  const id = antes.json.pedido.id;
+  delete process.env.PORTAL_PEDIDOS_CORRETOR;
+  try {
+    assert.equal((await post('pedidos', {}, C.ana)).status, 403, 'listar');
+    assert.equal((await post('pedido', { material: 'post', formato: 'digital', descricao: 'Tentativa bloqueada' }, C.ana)).status, 403, 'criar');
+    assert.equal((await post('pedidoMensagem', { id, texto: 'oi' }, C.ana)).status, 403, 'mensagem');
+    assert.equal((await post('pedidoCancelar', { id }, C.ana)).status, 403, 'cancelar');
+    assert.equal((await post('anexo', { pedido: id, nome: 'a.png', tipo: 'image/png', dados: 'AAAA' }, C.ana)).status, 403, 'anexo');
+    const g = await post('pedidos', {}, C.gestor);
+    assert.equal(g.status, 200);
+    assert.ok(g.json.pedidos.some((p) => p.id === id), 'gestor vê a solicitação');
+    assert.equal((await post('pedidoMensagem', { id, texto: 'Seguimos por aqui' }, C.gestor)).status, 200, 'gestor responde');
+  } finally { process.env.PORTAL_PEDIDOS_CORRETOR = '1'; }
 });
 
 test('etapas antigas são lidas no fluxo novo', () => {
