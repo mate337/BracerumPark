@@ -1,8 +1,8 @@
 {
-  "fonte": "Tabela de preços — Lotes industriais · Política Comercial P1 v2.0 · Tabela v3.1 · rev. 14/10/2026 · versão pública",
+  "fonte": "Tabela de preços — Lotes industriais · Política Comercial P1 v2.0 · Tabela v3.1 · rev. 14/10/2026 · versão pública (lançamento até 15/01/2027)",
   "tabela": "v3.1",
   "revisao": "2026-10-14",
-  "masterplan": "V14-02 (09/10/2026)",
+  "masterplan": "V14 (28/10/2026)",
   "categorias": {
     "V": { "nome": { "pt": "Vitrine", "en": "Showcase", "es": "Vitrina" }, "fator": "1,15", "cor": "#b08a48" },
     "B": { "nome": { "pt": "Business", "en": "Business", "es": "Business" }, "fator": "1,10", "cor": "#6188b6" },
@@ -10,14 +10,14 @@
     "I": { "nome": { "pt": "Interna", "en": "Inner", "es": "Interna" }, "fator": "0,90", "cor": "#d9d0ad" }
   },
   "janelas": [
-    { "id": "expo", "ate": "2026-11-13",
-      "nome": { "pt": "Lançamento — Expo Paraguai-Brasil", "en": "Launch — Paraguay-Brazil Expo", "es": "Lanzamiento — Expo Paraguay-Brasil" },
-      "curto": { "pt": "Expo", "en": "Expo", "es": "Expo" },
-      "quando": { "pt": "reservas assinadas até 13/11/2026 · cota de 64 lotes", "en": "reservations signed by 13 Nov 2026 · quota of 64 lots", "es": "reservas firmadas hasta el 13/11/2026 · cupo de 64 lotes" } },
-    { "id": "pos", "de": "2026-11-14", "ate": "2027-03-31",
-      "nome": { "pt": "Pós-Expo", "en": "Post-Expo", "es": "Post-Expo" },
-      "curto": { "pt": "Pós-Expo", "en": "Post-Expo", "es": "Post-Expo" },
-      "quando": { "pt": "de 14/11/2026 a 31/03/2027", "en": "14 Nov 2026 to 31 Mar 2027", "es": "del 14/11/2026 al 31/03/2027" } },
+    { "id": "expo", "ate": "2027-01-15",
+      "nome": { "pt": "Lançamento", "en": "Launch", "es": "Lanzamiento" },
+      "curto": { "pt": "Lançamento", "en": "Launch", "es": "Lanzamiento" },
+      "quando": { "pt": "reservas assinadas até 15/01/2027 · cota de 64 lotes", "en": "reservations signed by 15 Jan 2027 · quota of 64 lots", "es": "reservas firmadas hasta el 15/01/2027 · cupo de 64 lotes" } },
+    { "id": "pos", "de": "2027-01-16", "ate": "2027-03-31",
+      "nome": { "pt": "Pós-lançamento", "en": "Post-launch", "es": "Post-lanzamiento" },
+      "curto": { "pt": "Pós-lançamento", "en": "Post-launch", "es": "Post-lanzamiento" },
+      "quando": { "pt": "de 16/01/2027 a 31/03/2027", "en": "16 Jan 2027 to 31 Mar 2027", "es": "del 16/01/2027 al 31/03/2027" } },
     { "id": "plena", "de": "2027-04-01",
       "nome": { "pt": "Fase 1 plena", "en": "Full Phase 1", "es": "Fase 1 plena" },
       "curto": { "pt": "Fase 1", "en": "Phase 1", "es": "Fase 1" },
@@ -55,5 +55,5 @@
       "I": [[198, 182, 214], [170, 156, 184], [154, 142, 166], [150, 138, 162]]
     }
   },
-  "contato": { "nomes": "Cleber Pavão e Sydney Savi", "emails": ["cleber@bracerum.com", "sydney@bracerum.com"] }
+  "contato": { "nomes": "Bracerum Park", "emails": ["bracerumpark@bracerum.com"] }
 }

@@ -435,3 +435,31 @@ Novas e **opcionais** (têm padrão): `PORTAL_FUSO` (America/Asuncion), `PORTAL_
   criado com `allowOverwrite: false` (atômico no Blob); quem não consegue criar, pula. Teste com duas chamadas
   simultâneas: um e-mail só.
 - E-mail de teste no formato final (remetente `portal@bracerumpark.com`, imagens do site) enviado ao Matheus em 25/11.
+
+### 7.9 Tabelas por produto + conferência com a tabela pública (2026-11-25)
+**Conferência com `Bracerum_Park_P1_Tabela_de_Precos_PT_PUBLICA_2.pdf`** (enviado pelo Matheus; cópia em
+`docs/lotes-p1/`): os 48 preços por m² (3 janelas × 4 faixas × 4 categorias; tabela, à vista e 36x) e o valor por
+lote de 1.250 m² **batem** com o `precos.json`. O que mudou no PDF novo são as **janelas**: Lançamento **até
+15/01/2027** (era "Expo" até 13/11/2026), Pós-lançamento de 16/01 a 31/03/2027 e Fase 1 plena a partir de
+01/04/2027; estoque 614 lotes / 766.689 m²; contato `bracerumpark@bracerum.com`. O `precos.json` foi alinhado (ids
+`expo`/`pos`/`plena` mantidos — portal, maquete e LPs viram juntos), o PDF do portal foi trocado e a nota de
+lançamento da maquete passou a 15/01/2027.
+
+**⚠️ O CV ainda está no Pós-Expo:** as tabelas aprovadas do empreendimento 4 se chamam "Pós-Expo – Á vista /
+20%+12x / 20%+36x" e cobram US$ 185/m² (Padrão). Com o PDF novo, até 15/01/2027 vale US$ 160 — falta criar/aprovar
+as tabelas de Lançamento no CV (o portal não grava no CV).
+
+**Aba Tabela com quatro produtos** (`#/tabela`, `#/tabela/casas`, `#/tabela/aptos`, `#/tabela/outlet`):
+- **Loteamentos industriais** — como antes (Tabela v3.1, simulador, lote a lote).
+- **Residence · Casas / Residence · Aptos / Bracerum Outlet** — as **tabelas aprovadas no CV** ("tabela de valores
+  (nov/2026)", à vista / x12 / x36), as mesmas da reserva: casas = os 31 lotes do Resort (US$ 1.560/m² no 20% + 12x);
+  aptos = 1.452 unidades agrupadas por tipologia (1q 48,16 e 49,20 m², 2q 68,27, 3q 97,40 e cobertura = mesma área com
+  preço maior); outlet = 57 lojas do Premium Outlet 1ª fase + 12 "Lojas" + Supermercado (US$ 1.150/m²). Em todos o
+  à vista é **−5%** e o 36x **+8%** (a LP do Business Center diz −8% no à vista do Outlet — conferir com o cliente).
+- Servidor: `api/_portal-tabelas.js` lê `GET /v1/cadastros/empreendimentos/{7,9}/tabelasdepreco/detalhada` e resume;
+  o CV leva 20–30 s (1,5 MB no 7, sem filtro por tabela), então `tabelasProdutos` devolve o retrato
+  `portal/sync/tabelas.json` e relê em segundo plano a cada `PORTAL_TABELAS_MIN` (30); acima de
+  `PORTAL_TABELAS_MAX_H` (24 h) a tela avisa "Tabela do CV de …". Falha não vira sucesso. Gestor tem "Atualizar do CV"
+  (`tabelasSincronizar`); a rotina diária também relê. Store vazio = retrato do repositório
+  (`api/_portal-tabelas-retrato.json`, lido do CV em 25/11/2026 14h UTC). `api/portal.js` foi a 60 s.
+- 25 testes (`npm test`).

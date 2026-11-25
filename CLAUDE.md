@@ -21,6 +21,14 @@ maquete 3D embutida, que as seis páginas internas baixavam e interpretavam à t
 - **Ficaram de propósito:** os cartões de visita pessoais (`/cleberpavao`, `/sydneysavi` etc.) e os
   contatos internos do `/admin/` e do portal.
 
+### Portal: tabelas por produto + tabela pública nova dos lotes (2026-11-25)
+- **Aba Tabela com 4 produtos**: Loteamentos industriais (Tabela v3.1, `precos.json`) · Residence Casas · Residence
+  Aptos · Bracerum Outlet — esses três vêm das **tabelas aprovadas no CV** (empreendimentos 7 e 9), resumidas por
+  `api/_portal-tabelas.js` e guardadas em `portal/sync/tabelas.json` (releitura em segundo plano; o CV leva 20–30 s).
+- **Tabela pública nova (`docs/lotes-p1/…PUBLICA_2.pdf`)**: preços iguais, **Lançamento prorrogado até 15/01/2027**,
+  Pós-lançamento 16/01–31/03/2027. `precos.json` alinhado (vale para portal, maquete e LPs). **O CV ainda cobra as
+  tabelas "Pós-Expo" (US$ 185)** — falta o cliente aprovar as de Lançamento no CV. Detalhes em `docs/portal-corretores.md` §7.9.
+
 ### Botão "Portal do Corretor" no topo do site (2026-11-24)
 - **`.portal-link`** → `/PortalCorretores`, ao lado do seletor de idioma: no **hero da home** (o `.hero__lang` virou
   um invólucro com o botão + o `.lang`; o `is-off` do `script.js` some com os dois) e na **nav das 7 páginas**.

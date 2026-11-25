@@ -19,6 +19,8 @@
     PORTAL_FUSO             fuso comercial das vigências (padrão America/Asuncion)
     PORTAL_SYNC_MIN         intervalo mínimo entre consultas ao CV (padrão 5)
     PORTAL_DADOS_MAX_MIN    idade máxima do último sucesso para o dado contar como atual (padrão 60)
+    PORTAL_TABELAS_MIN      intervalo entre releituras das tabelas de Casas/Aptos/Outlet no CV (padrão 30)
+    PORTAL_TABELAS_MAX_H    idade máxima dessas tabelas antes do aviso "desatualizada" (padrão 24)
     CVCRM_EMAIL/CVCRM_TOKEN leitura do mapa de disponibilidade do CV (mesmas do /api/lotes-status) [segredo]
     PORTAL_SEGREDO          (opcional) chave da sessão; sem ela deriva de ADMIN_SENHA/BLOB/CVCRM
 
@@ -31,6 +33,7 @@
     portal/t/index.json       tutoriais do "Aprender" · portal/t/f/… arquivos
     portal/o/index.json       ofertas / campanhas
     portal/sync/comercial.json retrato da situação dos lotes vinda do CV (com última tentativa/sucesso)
+    portal/sync/tabelas.json  retrato das tabelas aprovadas do CV para Casas, Aptos e Outlet (api/_portal-tabelas.js)
     portal/log/<ts>-<r>.json  auditoria (uma entrada por arquivo)
 
   Sessão: cookie HttpOnly "bp_portal" (HMAC, 30 dias, SameSite=Strict). POST JSON { acao, ... }.
@@ -171,7 +174,7 @@ const nao = (res) => { res.statusCode = 404; res.setHeader('Content-Type', 'text
 
 const caminhoU = (id) => `portal/u/${id}.json`;
 const caminhoP = (id) => `portal/p/${id}.json`;
-const CAM = { imob: 'portal/i/index.json', mat: 'portal/m/index.json', tut: 'portal/t/index.json', of: 'portal/o/index.json', sync: 'portal/sync/comercial.json', cvSync: 'portal/sync/cv-corretores.json' };
+const CAM = { imob: 'portal/i/index.json', mat: 'portal/m/index.json', tut: 'portal/t/index.json', of: 'portal/o/index.json', sync: 'portal/sync/comercial.json', cvSync: 'portal/sync/cv-corretores.json', tabelas: 'portal/sync/tabelas.json' };
 
 /* ------------------------------------------------------------------ auditoria */
 // Quem fez o quê, em qual registro. Nunca grava senha, token ou conteúdo de arquivo.
@@ -234,6 +237,52 @@ async function comercial() {
     fonte: { unidades: fonteLotes, precos: { fonte: precos.fonte, tabela: precos.tabela, revisao: precos.revisao, moeda: 'USD', unidade: 'US$/m²' } },
     janela: { id: j.id, de: j.de || null, ate: j.ate || null },
     unidades: [...unidades.values()].map((x) => ({ ...x, situacao: R.situacaoDe(x.id, snap) })),
+  };
+}
+
+/* ------------------------------------------------------------------ tabelas de Casas, Aptos e Outlet (CV) */
+// O CV leva 20–30 s para devolver as tabelas do Residence, então a consulta nunca segura a tela: a aba
+// Tabela recebe o último retrato e, se ele passou de PORTAL_TABELAS_MIN, a releitura roda em segundo plano.
+// Em falha o retrato anterior fica como estava (sem sucesso falso) e a tela avisa a data do dado.
+// Sem nada no store, vale o retrato inicial do repositório (api/_portal-tabelas-retrato.json, 25/11/2026).
+const TABELAS_MIN = () => Math.max(5, Number(process.env.PORTAL_TABELAS_MIN) || 30);
+const TABELAS_MAX_H = () => Math.max(1, Number(process.env.PORTAL_TABELAS_MAX_H) || 24);
+let lerTabelas = null;
+function tabelasSemente() { try { return require('./_portal-tabelas-retrato.json'); } catch (e) { return null; } }
+async function tabelasEstado() { return (await ler(CAM.tabelas)) || tabelasSemente(); }
+async function tabelasAtualizar() {
+  if (!lerTabelas) lerTabelas = require('./_portal-tabelas.js').lerTabelasCV;
+  const anterior = await tabelasEstado();
+  let snap;
+  try {
+    const produtos = await Promise.race([lerTabelas(), new Promise((_, rej) => setTimeout(() => rej(new Error('tempo esgotado ao consultar as tabelas do CV')), 50000))]);
+    snap = { origem: 'CV CRM · tabelas de preço aprovadas', ultimaTentativa: agora(), ultimoSucesso: agora(), resultado: 'ok', erro: null, produtos };
+  } catch (e) {
+    snap = { ...(anterior || {}), ultimaTentativa: agora(), resultado: 'erro', erro: String(e.message || 'falha').slice(0, 200) };
+    console.error('[portal] tabelas do CV:', snap.erro);
+  }
+  delete snap.rodando;
+  return gravar(CAM.tabelas, snap);
+}
+// Agenda a releitura se o retrato passou do intervalo. Devolve true se há releitura em andamento.
+async function tabelasTalvez() {
+  const e = await ler(CAM.tabelas);   // só o retrato do store conta: o do repositório sempre pede releitura
+  const t = Date.now();
+  if (e && e.rodando && t - Date.parse(e.rodando) < 90e3) return true;
+  if (e && e.ultimaTentativa && t - Date.parse(e.ultimaTentativa) < TABELAS_MIN() * 60e3) return false;
+  await gravar(CAM.tabelas, { ...(e || tabelasSemente() || {}), rodando: agora() });
+  const tarefa = tabelasAtualizar().catch((err) => console.error('[portal] tabelas do CV', err.message));
+  try { require('@vercel/functions').waitUntil(tarefa); } catch (err) { /* fora da Vercel: a promessa segue sozinha */ }
+  return true;
+}
+function tabelasPublico(snap, atualizando) {
+  const s = snap || {};
+  const idadeH = s.ultimoSucesso ? (Date.now() - Date.parse(s.ultimoSucesso)) / 36e5 : null;
+  return {
+    origem: s.origem || 'CV CRM · tabelas de preço aprovadas', ultimaTentativa: s.ultimaTentativa || null, ultimoSucesso: s.ultimoSucesso || null,
+    resultado: s.resultado || 'nunca', erro: s.erro || null, atualizando: !!atualizando, maxHoras: TABELAS_MAX_H(),
+    estado: !s.ultimoSucesso || !s.produtos ? 'indisponivel' : idadeH <= TABELAS_MAX_H() ? 'atual' : 'desatualizado',
+    produtos: s.produtos || null,
   };
 }
 
@@ -970,11 +1019,12 @@ function agendarCV() {
 async function cronCV(req, res) {
   const segredo = process.env.CRON_SECRET;
   if (!segredo || String(req.headers.authorization || '') !== `Bearer ${segredo}`) { res.statusCode = 401; return res.end(JSON.stringify({ ok: false })); }
-  if (!cvAuto()) return res.end(JSON.stringify({ ok: true, auto: false }));
+  const tab = tabelasAtualizar().then((x) => x.resultado).catch((e) => `erro: ${e.message}`);   // tabelas de Casas/Aptos/Outlet também
+  if (!cvAuto()) return res.end(JSON.stringify({ ok: true, auto: false, tabelas: await tab }));
   try {
-    const d = await cvSincronizar(null, ORIGEM_SITE, { enviar: true, desdeId: cvDesdeId(), unico: true });
-    return res.end(JSON.stringify({ ok: true, ...d }));
-  } catch (e) { res.statusCode = 502; return res.end(JSON.stringify({ ok: false, erro: e.message })); }
+    const [d, t] = await Promise.all([cvSincronizar(null, ORIGEM_SITE, { enviar: true, desdeId: cvDesdeId(), unico: true }), tab]);
+    return res.end(JSON.stringify({ ok: true, ...d, tabelas: t }));
+  } catch (e) { await tab; res.statusCode = 502; return res.end(JSON.stringify({ ok: false, erro: e.message })); }
 }
 
 /* ------------------------------------------------------------------ handler */
@@ -1036,6 +1086,8 @@ module.exports = async (req, res) => {
       }
       // dados comerciais
       case 'comercial': return ok(await comercial());
+      case 'tabelasProdutos': { const rodando = await tabelasTalvez(); return ok({ tabelas: tabelasPublico(await tabelasEstado(), rodando) }); }
+      case 'tabelasSincronizar': soGestor(); { const snap = await tabelasAtualizar(); await auditar(s, 'tabelas.sincronizar', 'sync', null, { resultado: snap.resultado }); return ok({ tabelas: tabelasPublico(snap, false) }); }
       case 'sincronizar': soGestor(); { const snap = await sincronizar(true); await auditar(s, 'comercial.sincronizar', 'sync', null, { resultado: snap.resultado }); return ok({ sync: resumoSync(snap) }); }
       // contas e imobiliárias
       case 'contas': soGestor(); return ok(await contasListar());

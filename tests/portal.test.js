@@ -370,6 +370,7 @@ function simularCVeEmail(corretores, falharEmail = () => false) {
       assert.equal(op.headers.email, 'integracao@teste.dev'); assert.equal(op.headers.token, 'token-teste');
       return new Response(JSON.stringify({ codigo: 200, limit: 500, offset: 0, corretores }), { status: 200 });
     }
+    if (u.includes('/tabelasdepreco/')) return new Response(JSON.stringify({ erro: 'simulado' }), { status: 503 });   // nunca o CV real
     if (u === 'https://api.resend.com/emails') {
       const corpo = JSON.parse(op.body);
       if (falharEmail(corpo.to[0])) return new Response(JSON.stringify({ message: 'domínio não verificado' }), { status: 403 });
@@ -454,7 +455,9 @@ test('e-mail de teste vai só para o próprio gestor; rotina diária exige CRON_
     assert.equal(sem, 401);
     const comReq = { method: 'GET', url: '/api/portal?cron=cv-corretores', headers: { authorization: 'Bearer cron-teste' } };
     const res = resFalso(); await handler(comReq, res); await res.pronto;
-    assert.deepEqual(JSON.parse(res.corpo()), { ok: true, auto: false }, 'com o automático desligado a rotina não faz nada');
+    const corpo = JSON.parse(res.corpo());
+    assert.deepEqual([corpo.ok, corpo.auto, corpo.criadas], [true, false, undefined], 'com o automático desligado a rotina não cria conta nem manda e-mail');
+    assert.equal(corpo.tabelas, 'erro', 'a rotina também relê as tabelas de Casas/Aptos/Outlet (aqui o CV simulado falha)');
   } finally { sim.restaurar(); }
 });
 
@@ -480,4 +483,78 @@ test('automático: corretor novo no CV recebe sozinho; antigos ficam no manual; 
     assert.equal(res.statusCode, 200);
     assert.equal(sim.enviados.length, 1, 'nem o cron manda para o antigo nem repete o novo');
   } finally { delete process.env.PORTAL_CV_AUTO; delete process.env.PORTAL_CV_AUTO_DESDE_ID; sim.restaurar(); }
+});
+
+/* ================================================================ tabelas de Casas, Aptos e Outlet (CV) */
+const T = require(path.join(RAIZ, 'api/_portal-tabelas.js'));
+// Tabelas no formato do CV: uma por condição, valores com e sem vírgula como o CV real manda.
+function tabCV(emp, nome, unidades) {
+  const conds = [['vista', ' - Á vista', 0.95, 0], ['12x', ' - x12', 1, 12], ['36x', ' - x36', 1.08, 36]];
+  return conds.map(([, suf, f, n], i) => ({ empreendimento: nome, idtabela: emp * 10 + i, tabela: 'tabela de valores (nov/2026)' + suf,
+    dados: unidades.map(([bloco, unidade, area, v12], k) => {
+      const total = Math.round(v12 * f * 100) / 100;
+      const sinal = n ? Math.round(total * 0.2) : total;
+      return { etapa: 'Fase 1', bloco, unidade, idunidade: emp * 1000 + k, area_privativa: area.toFixed(6), situacao: k === 0 && emp === 9 ? 'Reservada' : 'Disponível',
+        valor_total: i === 1 ? total.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) : total.toFixed(2),
+        series: n ? [{ nome: 'SINAL', qtd_parcelas: 1, data_vencimento: '30/11/2026', valor: sinal }, { nome: 'MENSAL', qtd_parcelas: n, data_vencimento: '15/12/2026', valor: Math.round((total - sinal) / n) }]
+          : [{ nome: 'SINAL', qtd_parcelas: 1, data_vencimento: '30/11/2026', valor: String(total) }] };
+    }) }));
+}
+const RESIDENCE = tabCV(7, 'Bracerum Residence', [
+  ['Quadra Q01 (Resort)', '01', 656, 1023360], ['Quadra Q02 (Resort)', '03', 600, 936000],
+  ['Torre T01', '101', 97.4, 112000], ['Torre T01', '401', 97.4, 163600], ['Torre T02', '101', 97.4, 112000],
+  ['Torre T13', '101', 68.27, 78500], ['Torre T52', '101', 48.16, 55400],
+]);
+const OUTLET = tabCV(9, 'Bracerum Outlet', [['Premium Outlet — 1ª fase', 'out/01', 233, 267950], ['Lojas', 'LJ1', 60, 69000], ['Supermercado', 'SM', 4606, 5296900]]);
+
+test('tabelas do CV: casas por lote, aptos por tipologia (cobertura pelo preço), outlet por bloco e condições', () => {
+  const p = T.resumir({ residence: RESIDENCE, outlet: OUTLET });
+  assert.deepEqual(p.casas.unidades.map((u) => [u.id, u.area, u.c['12x'].total, u.c['12x'].n]), [['Q01.L01', 656, 1023360, 12], ['Q02.L03', 600, 936000, 12]]);
+  assert.equal(p.casas.cond['12x'].m2, 1560); assert.equal(p.casas.cond.vista.ajuste, -5); assert.equal(p.casas.cond['36x'].ajuste, 8);
+  assert.equal(p.casas.unidades[0].c.vista.n, 0, 'à vista = pagamento único');
+  assert.deepEqual(p.aptos.tipos.map((g) => [g.tipo, g.area, g.qtd, g.torres.join(',')]),
+    [['1q', 48.16, 1, 'T52'], ['2q', 68.27, 1, 'T13'], ['3q', 97.4, 2, 'T01,T02'], ['cob', 97.4, 1, 'T01']]);
+  assert.equal(p.aptos.total, 5); assert.equal(p.casas.total, 2, 'casas e aptos saem do mesmo empreendimento sem se misturar');
+  assert.deepEqual(p.outlet.blocos.map((b) => [b.nome, b.total]), [['Premium Outlet — 1ª fase', 1], ['Lojas', 1], ['Supermercado', 1]]);
+  assert.equal(p.outlet.livres, 2, 'unidade reservada no CV não conta como à venda');
+  assert.equal(T.condDe('tabela de valores (nov/2026) - Á vista'), 'vista');
+  assert.equal(T.num('69.000,00'), 69000); assert.equal(T.num('972182.50'), 972182.5);
+});
+
+test('tabelas do CV no portal: retrato inicial sem sucesso falso; gestor atualiza; corretor só lê', async () => {
+  const orig = global.fetch;
+  let chamadas = 0, falhar = true;
+  global.fetch = async (url, op = {}) => {
+    const u = String(url);
+    if (!u.includes('/tabelasdepreco/')) return orig(url, op);
+    chamadas++;
+    if (falhar) return new Response(JSON.stringify({ erro: 'fora' }), { status: 500 });
+    const emp = Number(u.match(/empreendimentos\/(\d+)\//)[1]);
+    return new Response(JSON.stringify({ tabelas: emp === 7 ? RESIDENCE : OUTLET }), { status: 200 });
+  };
+  Object.assign(process.env, { CVCRM_EMAIL: 'integracao@teste.dev', CVCRM_TOKEN: 'token-teste' });
+  try {
+    store.delete('portal/sync/tabelas.json');
+    const semente = require(path.join(RAIZ, 'api/_portal-tabelas-retrato.json'));
+    // 1) sem nada no store: vale o retrato do repositório e a releitura vai para o segundo plano
+    const a = await post('tabelasProdutos', {}, C.ana);
+    assert.equal(a.status, 200);
+    assert.equal(a.json.tabelas.atualizando, true);
+    assert.equal(a.json.tabelas.produtos.aptos.total, semente.produtos.aptos.total);
+    await new Promise((r) => setTimeout(r, 50));   // a releitura (falha simulada) termina
+    const b = await post('tabelasProdutos', {}, C.ana);
+    assert.equal(b.json.tabelas.resultado, 'erro');
+    assert.equal(b.json.tabelas.ultimoSucesso, semente.ultimoSucesso, 'falha no CV não vira sucesso');
+    assert.ok(b.json.tabelas.produtos.casas.total > 0, 'o último dado bom continua na tela, com a data');
+    assert.equal(b.json.tabelas.atualizando, false, 'dentro do intervalo não consulta de novo');
+    // 2) corretor não força a releitura; gestor sim
+    assert.equal((await post('tabelasSincronizar', {}, C.ana)).status, 403);
+    falhar = false;
+    const g = await post('tabelasSincronizar', {}, C.gestor);
+    assert.equal(g.status, 200, JSON.stringify(g.json));
+    assert.equal(g.json.tabelas.resultado, 'ok'); assert.equal(g.json.tabelas.estado, 'atual');
+    assert.equal(g.json.tabelas.produtos.casas.total, 2);
+    assert.equal(g.json.tabelas.produtos.outlet.unidades[0].c['12x'].total, 267950);
+    assert.ok(chamadas >= 4, 'Residence e Outlet nas duas leituras');
+  } finally { global.fetch = orig; store.delete('portal/sync/tabelas.json'); }
 });

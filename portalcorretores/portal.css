@@ -687,3 +687,13 @@ button { cursor: pointer; background: none; border: 0; padding: 0; }
   .offer__card { aspect-ratio: auto; min-height: 340px; }
   .offer .tile__actions .lbl { display: inline; }
 }
+
+/* Tabela por produto (2026-11-25): abas Loteamentos · Casas · Aptos · Outlet e as tabelas que vêm do CV */
+.prodtabs { margin: 0 0 22px; }
+.table--cv { min-width: 760px; }
+.table--cv td, .table--cv tbody th { padding: 11px 16px; font-weight: 500; }
+.table--cv .num { text-align: right; white-space: nowrap; }
+.table--cv tbody th, .table--cv tbody th.num { text-transform: none; letter-spacing: 0; font-size: 14px; color: var(--ink); text-align: left; white-space: nowrap; }
+.table--cv thead th.num { text-align: right; }
+.table--cv td b { font-weight: 600; }
+.table--cv .table__group th { background: var(--surface-2); font-size: 13px; text-transform: none; letter-spacing: 0; color: var(--ink); font-weight: 600; }

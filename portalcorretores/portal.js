@@ -756,8 +756,94 @@
   }
 
   /* ============================================================ tabela */
+  /* Tabelas por produto (2026-11-25): Loteamentos industriais pela Tabela v3.1 (precos.json, a versão pública
+     em PDF); Residence Casas, Residence Aptos e Bracerum Outlet pelas tabelas aprovadas do CV, que o servidor
+     resume e guarda (api/_portal-tabelas.js). #/tabela, #/tabela/casas, #/tabela/aptos, #/tabela/outlet. */
+  const PRODUTOS_TAB = ['lotes', 'casas', 'aptos', 'outlet'];
+  const FOLDER_TAB = { lotes: 'park-loteamentos-industriais', casas: 'residence-casas', aptos: 'residence-aptos', outlet: 'outlet-premium' };
+  const prodTab = () => (PRODUTOS_TAB.includes(S.route.arg) ? S.route.arg : 'lotes');
+  const abasProduto = (atual) => `<nav class="seg prodtabs" role="tablist" aria-label="${esc(t('tp.products'))}">${PRODUTOS_TAB.map((id) => `<a role="tab" href="#/tabela${id === 'lotes' ? '' : '/' + id}" aria-current="${atual === id ? 'page' : 'false'}" aria-selected="${atual === id}">${esc(t('tp.' + id))}</a>`).join('')}</nav>`;
+  const folderTab = (id) => `/portalcorretores/materiais/bracerum-${FOLDER_TAB[id]}-folder-digital.pdf`;
+
+  let tabcvTimer = null;
+  function carregarTabelasCV(forcar) {
+    if (S.tabcv && !forcar && !S.tabcv.erro) return;
+    if (!S.tabcv || S.tabcv.erro) S.tabcv = { carregando: true };
+    api('tabelasProdutos').then((d) => {
+      S.tabcv = d.tabelas;
+      // releitura em segundo plano no servidor: busca de novo daqui a pouco para trazer o dado novo
+      clearTimeout(tabcvTimer);
+      if (d.tabelas.atualizando) { S.tabcvVoltas = (S.tabcvVoltas || 0) + 1; if (S.tabcvVoltas <= 3) tabcvTimer = setTimeout(() => carregarTabelasCV(true), 35000); }
+      else S.tabcvVoltas = 0;
+      if (S.route.name === 'tabela' && prodTab() !== 'lotes') { const y = window.scrollY; renderMain(); window.scrollTo(0, y); }
+    }).catch((e) => { S.tabcv = { erro: true, msg: e.message }; if (S.route.name === 'tabela' && prodTab() !== 'lotes') renderMain(); });
+  }
+  function faixasTorres(ts) {   // ['T01', …, 'T12', 'T52'] → 'T01–T12, T52'
+    const n = ts.map((x) => Number(String(x).replace(/\D/g, ''))).filter((x) => x > 0).sort((a, b) => a - b);
+    const f = (v) => 'T' + String(v).padStart(2, '0');
+    const out = [];
+    for (let i = 0; i < n.length; i++) { let j = i; while (j + 1 < n.length && n[j + 1] === n[j] + 1) j++; out.push(i === j ? f(n[i]) : `${f(n[i])}–${f(n[j])}`); i = j; }
+    return out.join(', ');
+  }
+  function tabcvBarra(tb) {
+    const ok = tb.estado === 'atual';
+    const msg = ok ? `${t('tp.ok')} ${idade(tb.ultimoSucesso)}`
+      : tb.estado === 'desatualizado' ? `${t('tp.stale')} ${data(tb.ultimoSucesso, true)}. ${t('tp.confirm')}` : t('tp.none');
+    return `<div class="syncbar ${ok ? '' : 'syncbar--alerta'}" role="status">${ok ? '<i class="dot-live"></i>' : I.info}<span>${esc(msg)}${tb.atualizando ? ` <span class="muted">· ${esc(t('tp.refreshing'))}</span>` : ''}${tb.resultado === 'erro' && tb.estado !== 'indisponivel' ? ` <span class="muted">· ${esc(t('sync.lastFail'))} ${esc(data(tb.ultimaTentativa, true))}</span>` : ''}</span>
+      ${isEquipe() ? `<button type="button" class="btn btn--line btn--sm" id="tcv-sync">${I.refresh}${esc(t('tp.sync'))}</button>` : ''}</div>`;
+  }
+  // célula "Sinal" e "Parcelas" de uma condição do CV: { total, sinal, n, parcela }
+  const celSinal = (v) => (v ? (v.n ? usd(v.sinal) : `<span class="muted">${esc(t('tp.single'))}</span>`) : '—');
+  const celParc = (v) => (v && v.n ? `${nf(v.n)} × ${usd(v.parcela)}` : '—');
+  function tabelaCV(prod) {
+    const tb = S.tabcv;
+    const head = (meta) => `${abasProduto(prod)}
+      <header class="pagehead">
+        <div class="pagehead__meta">${meta}</div>
+        <div class="pagehead__body">
+          <h1 class="h1">${esc(t('tp.h.' + prod))}</h1><p class="lead">${esc(t('tp.l.' + prod))}</p>
+          <div style="display:flex;gap:10px;flex-wrap:wrap"><a class="btn btn--line btn--sm" href="${folderTab(prod)}" target="_blank" rel="noopener">${I.download}${esc(t('tp.folder'))}</a></div>
+        </div>
+      </header>`;
+    if (!tb || tb.carregando) return `${head('')}<div class="syncbar" role="status">${I.info}<span>${esc(t('tp.loading'))}</span></div><div class="skel" style="height:360px;border-radius:18px"></div>`;
+    if (tb.erro || !tb.produtos || !tb.produtos[prod]) return `${head('')}${tb.erro ? `<div class="syncbar syncbar--alerta" role="status">${I.info}<span>${esc(t('tp.none'))}</span></div>` : tabcvBarra(tb)}`;
+    const P = tb.produtos[prod];
+    const cond = ['vista', '12x', '36x'].includes(S.price.pag) ? S.price.pag : '12x';
+    const rc = P.cond[cond] || P.cond['12x'] || {};
+    const fonte = ((P.tabelas || []).find((x) => x.cond === cond) || P.tabelas[0] || { nome: '' }).nome.replace(/\s*-\s*(x\d+|[ÁA] vista)\s*$/i, '');
+    const ajuste = (c) => { const a = (P.cond[c] || {}).ajuste; return c === '12x' ? t('tp.base') : a == null ? '' : `${a > 0 ? '+' : '−'}${nf(Math.abs(a), Number.isInteger(a) ? 0 : 1)}% ${t('tp.sobre')}`; };
+    const m2txt = rc.m2min != null && Math.abs(rc.m2max - rc.m2min) < 1 ? nf(rc.m2, rc.m2 % 1 ? 2 : 0) : `${nf(rc.m2min, 0)}–${nf(rc.m2max, 0)}`;
+    const meta = `<span>${esc(t('tp.src'))} · ${esc(fonte)}</span><span>${esc(P.empreendimento || '')}</span>`;
+    const resumo = `<div class="calcout" style="margin:0 0 18px">
+        ${prod === 'aptos' ? `<div class="card card--flat"><span class="card__label">${esc(t('tp.towers'))} · ${esc(t('tp.type').toLowerCase())}</span><b>${nf(new Set(P.tipos.flatMap((g) => g.torres)).size)} · ${nf(new Set(P.tipos.map((g) => g.tipo)).size)}</b></div>`
+          : `<div class="card card--flat"><span class="card__label">${esc(t('tp.m2'))} · ${esc(t('tp.' + cond))}</span><b>${esc(m2txt)}</b></div>`}
+        <div class="card card--flat"><span class="card__label">${esc(t('tp.from'))}</span><b>${rc.min != null ? usd(rc.min) : '—'}</b></div>
+        <div class="card card--dark"><span class="card__label" style="color:var(--on-dark-muted)">${esc(t('tp.free'))}</span><b>${nf(P.livres)} <small style="font-size:15px;color:var(--on-dark-muted)">${esc(t('tp.of'))} ${nf(P.total)}</small></b></div>
+      </div>`;
+    const toolbar = `<div class="toolbar"><div class="seg" role="group" aria-label="${esc(t('tp.cond'))}">${['vista', '12x', '36x'].map((c) => `<button type="button" data-pag="${c}" aria-pressed="${c === cond}">${esc(t('tp.' + c))}</button>`).join('')}</div></div>
+      <p class="small muted" style="margin:-10px 0 14px">${esc(t('tp.' + cond))} · ${esc(ajuste(cond))}</p>`;
+    let corpo = '';
+    if (prod === 'casas') {
+      corpo = `<div class="tablewrap"><table class="table table--cv"><caption class="vh">${esc(t('tp.h.casas'))}</caption>
+        <thead><tr><th scope="col">${esc(t('tp.lot'))}</th><th scope="col" class="num">${esc(t('tp.area'))}</th><th scope="col" class="num">US$/m²</th><th scope="col" class="num">${esc(t('tp.total'))}</th><th scope="col" class="num">${esc(t('tp.down'))}</th><th scope="col" class="num">${esc(t('tp.inst'))}</th><th scope="col">${esc(t('tp.status'))}</th></tr></thead>
+        <tbody>${P.unidades.map((u) => { const v = u.c[cond]; return `<tr><th scope="row" class="num">${esc(u.quadra)} · ${esc(t('tp.lot'))} ${esc(u.un)}</th><td class="num">${nf(u.area)} m²</td><td class="num">${v && u.area ? nf(v.total / u.area, 0) : '—'}</td><td class="num"><b>${v ? usd(v.total) : '—'}</b></td><td class="num">${celSinal(v)}</td><td class="num">${celParc(v)}</td><td>${esc(u.sit)}</td></tr>`; }).join('')}</tbody></table></div>`;
+    } else if (prod === 'aptos') {
+      corpo = `<div class="tablewrap"><table class="table table--cv"><caption class="vh">${esc(t('tp.h.aptos'))}</caption>
+        <thead><tr><th scope="col">${esc(t('tp.type'))}</th><th scope="col" class="num">${esc(t('tp.areaPriv'))}</th><th scope="col" class="num">${esc(t('tp.units'))}</th><th scope="col">${esc(t('tp.towers'))}</th><th scope="col" class="num">${esc(t('tp.total'))}</th><th scope="col" class="num">${esc(t('tp.down'))}</th><th scope="col" class="num">${esc(t('tp.inst'))}</th></tr></thead>
+        <tbody>${P.tipos.map((g) => { const v = g.c[cond]; return `<tr><th scope="row">${esc(t('tp.' + g.tipo))}</th><td class="num">${nf(g.area, 2)} m²${g.tipo === 'cob' ? ` <span class="muted">${esc(t('tp.terrace'))}</span>` : ''}</td><td class="num">${nf(g.livres)}${g.livres !== g.qtd ? ` <span class="muted">/ ${nf(g.qtd)}</span>` : ''}</td><td>${esc(faixasTorres(g.torres))}</td><td class="num"><b>${v ? usd(v.total) : '—'}</b></td><td class="num">${celSinal(v)}</td><td class="num">${celParc(v)}</td></tr>`; }).join('')}</tbody></table></div>`;
+    } else {
+      corpo = `<div class="tablewrap"><table class="table table--cv"><caption class="vh">${esc(t('tp.h.outlet'))}</caption>
+        <thead><tr><th scope="col">${esc(t('tp.unit'))}</th><th scope="col" class="num">${esc(t('tp.area'))}</th><th scope="col" class="num">${esc(t('tp.total'))}</th><th scope="col" class="num">${esc(t('tp.down'))}</th><th scope="col" class="num">${esc(t('tp.inst'))}</th><th scope="col">${esc(t('tp.status'))}</th></tr></thead>
+        ${P.blocos.map((b) => `<tbody><tr class="table__group"><th scope="colgroup" colspan="6">${esc(b.nome)} <span class="muted">· ${nf(b.total)} ${esc(t('tp.units').toLowerCase())} · ${nf(b.area)} m²</span></th></tr>
+          ${P.unidades.filter((u) => u.bloco === b.nome).map((u) => { const v = u.c[cond]; return `<tr><th scope="row" class="num">${esc(u.id)}</th><td class="num">${nf(u.area)} m²</td><td class="num"><b>${v ? usd(v.total) : '—'}</b></td><td class="num">${celSinal(v)}</td><td class="num">${celParc(v)}</td><td>${esc(u.sit)}</td></tr>`; }).join('')}</tbody>`).join('')}</table></div>`;
+    }
+    return `${head(meta)}${tabcvBarra(tb)}${toolbar}${resumo}${corpo}<p class="small muted" style="margin:14px 0 0">${esc(t('tp.note'))}</p>`;
+  }
+
   VIEWS.tabela = () => {
-    if (!precosOk()) return `<div class="skel" style="height:420px;border-radius:18px"></div>`;
+    const prod = prodTab();
+    if (prod !== 'lotes') { carregarTabelasCV(false); return tabelaCV(prod); }
+    if (!precosOk()) return `${abasProduto('lotes')}<div class="skel" style="height:420px;border-radius:18px"></div>`;
     const P = S.precos; const jA = janelaAtual();
     const jid = S.price.janela || jA.id;
     const pi = PAG_IDX[S.price.pag];
@@ -769,14 +855,15 @@
     const total = m2 * area;
     const pag = P.pagamentos.find((p) => p.id === S.price.pag);
     const nParc = S.price.pag === '12x' ? 12 : S.price.pag === '36x' ? 36 : 0;
-    return `
+    return `${abasProduto('lotes')}
       <header class="pagehead">
         <div class="pagehead__meta"><span>P1 · v${esc(String(P.tabela).replace(/^v/, ''))} · rev. ${esc(data(P.revisao))}</span><span>${esc(t('price.window'))}: <b style="color:var(--ink)">${esc(tx(jA.nome))}</b> (${esc(t('price.now'))})</span></div>
         <div class="pagehead__body">
-          <h1 class="h1">${esc(t('price.title'))}</h1><p class="lead">${esc(t('price.lead'))}</p>
+          <h1 class="h1">${esc(t('tp.h.lotes'))}</h1><p class="lead">${esc(t('price.lead'))}</p>
           <div style="display:flex;gap:10px;flex-wrap:wrap">
-            <a class="btn btn--ink btn--sm" href="/portalcorretores/materiais/bracerum-park-tabela-de-precos-v3.1.pdf" download>${I.download}${esc(t('price.pdf'))}</a>
+            <a class="btn btn--ink btn--sm" href="/portalcorretores/materiais/bracerum-park-tabela-de-precos-v3.1.pdf?v=2" download>${I.download}${esc(t('price.pdf'))}</a>
             <a class="btn btn--line btn--sm" href="/portalcorretores/materiais/bracerum-park-mapa-de-lotes-mp14.pdf" target="_blank" rel="noopener">${I.map}${esc(t('price.map'))}</a>
+            <a class="btn btn--line btn--sm" href="${folderTab('lotes')}" target="_blank" rel="noopener">${I.download}${esc(t('tp.folder'))}</a>
           </div>
         </div>
       </header>
@@ -851,6 +938,18 @@
     </section>`;
   }
   VIEWS['tabela:after'] = (main) => {
+    if (prodTab() !== 'lotes') {
+      main.addEventListener('click', async (ev) => {
+        const b = ev.target.closest('button'); if (!b) return;
+        if (b.dataset.pag) { S.price.pag = b.dataset.pag; const y = window.scrollY; renderMain(); window.scrollTo(0, y); }
+        if (b.id === 'tcv-sync') {
+          b.disabled = true;
+          try { const d = await api('tabelasSincronizar'); S.tabcv = d.tabelas; toast(d.tabelas.resultado === 'ok' ? t('tp.synced') : `${t('sync.fail')}: ${d.tabelas.erro || ''}`); renderMain(); }
+          catch (e) { toast(e.message); b.disabled = false; }
+        }
+      });
+      return;
+    }
     ligarSync(main);
     const re = () => { const y = window.scrollY; renderMain(); window.scrollTo(0, y); };
     const liga = (id, k, ev = 'change') => { const el = $(id, main); if (el) el.addEventListener(ev, (e) => { S.lotf[k] = e.target.value; S.lotf.n = 60; re(); const n = $(id); if (n && ev === 'input') { n.focus(); n.setSelectionRange(n.value.length, n.value.length); } }); };

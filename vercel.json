@@ -237,7 +237,7 @@
       "maxDuration": 20
     },
     "api/portal.js": {
-      "maxDuration": 30,
+      "maxDuration": 60,
       "includeFiles": "3dmasterplan/data/{lotes,precos}.json"
     }
   },
