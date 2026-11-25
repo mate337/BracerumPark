@@ -50,9 +50,11 @@ maquete 3D embutida, que as seis páginas internas baixavam e interpretavam à t
   **Corretor do CV → acesso + e-mail (no ar desde 2026-11-25, §7.7):** Gestão → "Corretores do CV" lista
   `GET /api/v1/cadastros/corretores` e, **só quando o Matheus clica**, cria a conta com o mesmo e-mail e manda o
   e-mail de boas-vindas pelo **Resend** (`portal@bracerumpark.com`, domínio verificado em 25/11 — registros no DNS do
-  bracerumpark.com na GoDaddy; o Resend tinha sido criado por engano para bracerum.com). `PORTAL_CV_AUTO` **desligado
-  por pedido dele** ("dispare só quando eu enviar"); a rotina diária existe mas não faz nada sem ele. `RESEND_API_KEY` e
-  `CRON_SECRET` sensíveis em Production. 22 testes. Tudo em `docs/portal-corretores.md` §7.
+  bracerumpark.com na GoDaddy; o Resend tinha sido criado por engano para bracerum.com). **Automático ligado em 25/11**
+  (`PORTAL_CV_AUTO=1`, `PORTAL_CV_AUTO_DESDE_ID=6`): corretor novo no CV (id ≥ 6) recebe sozinho em minutos — toda chamada
+  ao `/api/portal` e ao `/api/lotes-status` confere o CV em segundo plano (máx. a cada 5 min) + rotina diária; trava
+  atômica `portal/cv/auto-<cvId>-<n>.json` contra e-mail em dobro. Omar (#3) e testes (#4/#5) só pelo botão (§7.8). `RESEND_API_KEY` e
+  `CRON_SECRET` sensíveis em Production. 23 testes. Tudo em `docs/portal-corretores.md` §7.
 - **Desde 2026-11-18 (fim do dia): só "Entrar"; contas criadas pelo gerenciador na aba Gestão** (link de primeiro
   acesso; "novo link" = esqueci a senha). Gerenciador = papel `equipe` (Gestão + envio de materiais); corretor = tabela,
   solicitações, materiais, masterplan 3D e aprender. `ADMIN_SENHA` não abre mais o portal. Modo claro com fundo branco.
