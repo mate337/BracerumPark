@@ -467,3 +467,13 @@ muda no painel do CV — 3–5 até 15/01/2027 e 6–8 a partir de 16/01/2027.
   (`tabelasSincronizar`); a rotina diária também relê. Store vazio = retrato do repositório
   (`api/_portal-tabelas-retrato.json`, lido do CV em 25/11/2026 14h UTC). `api/portal.js` foi a 60 s.
 - 25 testes (`npm test`).
+
+**Tabelas em PDF (2026-11-25, pedido do Matheus):** `docs/build_tabelas_pdf.js` gera, no estilo da tabela P1 do
+cliente (A4, faixa escura, dourado `#b4904b`, Caladea + Carlito), `portalcorretores/materiais/bracerum-{residence-casas,
+residence-aptos,outlet-premium}-tabela-de-precos.pdf` com os valores das tabelas aprovadas no CV (lote/unidade a lote,
+à vista, 20% + 12x e 20% + 36x com sinal e parcelas; conferido valor a valor contra o CV) e as capas
+`portalcorretores/thumbs/tabela-*.jpg` (também a dos lotes). As quatro tabelas (a dos lotes é o PDF do cliente) estão
+na biblioteca, tipo "Tabelas e mapas", e cada aba de produto da Tabela tem "Baixar a tabela em PDF".
+**Quando o CV mudar preço:** `NODE_USE_ENV_PROXY=1 NODE_EXTRA_CA_CERTS=/root/.ccr/ca-bundle.crt CVCRM_EMAIL=… CVCRM_TOKEN=x
+node docs/build_tabelas_pdf.js --cv` (relê o CV, atualiza o retrato e os PDFs); sem `--cv` usa o retrato do repositório.
+Os PDFs são estáticos: a aba Tabela acompanha o CV sozinha, o PDF só muda quando o script roda de novo.

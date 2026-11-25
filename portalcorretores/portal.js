@@ -802,7 +802,7 @@
         <div class="pagehead__meta">${meta}</div>
         <div class="pagehead__body">
           <h1 class="h1">${esc(t('tp.h.' + prod))}</h1><p class="lead">${esc(t('tp.l.' + prod))}</p>
-          <div style="display:flex;gap:10px;flex-wrap:wrap"><a class="btn btn--line btn--sm" href="${folderTab(prod)}" target="_blank" rel="noopener">${I.download}${esc(t('tp.folder'))}</a></div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap"><a class="btn btn--ink btn--sm" href="/portalcorretores/materiais/bracerum-${FOLDER_TAB[prod]}-tabela-de-precos.pdf" download>${I.download}${esc(t('tp.pdf'))}</a><a class="btn btn--line btn--sm" href="${folderTab(prod)}" target="_blank" rel="noopener">${I.download}${esc(t('tp.folder'))}</a></div>
         </div>
       </header>`;
     if (!tb || tb.carregando) return `${head('')}<div class="syncbar" role="status">${I.info}<span>${esc(t('tp.loading'))}</span></div><div class="skel" style="height:360px;border-radius:18px"></div>`;

@@ -168,6 +168,7 @@
     'tp.l.aptos': T('Apartamentos por tipologia, com o valor de cada unidade na condição escolhida.', 'Departamentos por tipología, con el valor de cada unidad en la condición elegida.', 'Apartments by type, with the price per unit in the chosen terms.'),
     'tp.l.outlet': T('Lojas do Premium Outlet (1ª fase), lojas e supermercado. Valor por unidade, na condição escolhida.', 'Locales del Premium Outlet (1ª fase), locales y supermercado. Valor por unidad, en la condición elegida.', 'Premium Outlet stores (phase 1), shops and supermarket. Price per unit, in the chosen terms.'),
     'tp.folder': T('Baixar o folder', 'Descargar el folleto', 'Download the brochure'),
+    'tp.pdf': T('Baixar a tabela em PDF', 'Descargar la tabla en PDF', 'Download the price list (PDF)'),
     'tp.cond': T('Condição', 'Condición', 'Terms'),
     'tp.vista': T('À vista', 'Al contado', 'Cash'),
     'tp.12x': T('20% + 12x', '20% + 12 cuotas', '20% + 12x'),
@@ -595,7 +596,23 @@
     arquivo: `/portalcorretores/materiais/bracerum-${slug}-folder-digital.pdf`, previa: `/portalcorretores/thumbs/folder-${slug}.jpg`,
     formato: 'PDF', kb, idioma: 'PT',
   });
+  // Tabelas de preço em PDF (2026-11-25): a dos lotes é a versão pública do cliente (P1 v3.1, lançamento até
+  // 15/01/2027); as de Casas, Aptos e Outlet são geradas das tabelas aprovadas no CV por docs/build_tabelas_pdf.js.
+  const TAB = (slug, produto, kb, pt, es, en, dpt, des, den, arquivo) => ({
+    tipo: 'tabela', produto, destaque: true, titulo: T(pt, es, en), desc: T(dpt, des, den),
+    arquivo: arquivo || `/portalcorretores/materiais/bracerum-${slug}-tabela-de-precos.pdf`, previa: `/portalcorretores/thumbs/tabela-${slug}.jpg`,
+    formato: 'PDF', kb, idioma: 'PT',
+  });
   const MATERIAIS = [
+    TAB('park-loteamentos-industriais', 'park', 191, 'Tabela de preços · Loteamentos industriais', 'Tabla de precios · Lotes industriales', 'Price list · Industrial lots',
+      'P1 v3.1 · três janelas (lançamento até 15/01/2027), categorias e condições', 'P1 v3.1 · tres ventanas (lanzamiento hasta el 15/01/2027), categorías y condiciones', 'P1 v3.1 · three windows (launch until 15 Jan 2027), categories and terms',
+      '/portalcorretores/materiais/bracerum-park-tabela-de-precos-v3.1.pdf'),
+    TAB('residence-casas', 'residence', 72, 'Tabela de preços · Residence · Casas', 'Tabla de precios · Residence · Casas', 'Price list · Residence · Houses',
+      'Os 31 lotes para casas, lote a lote: à vista, 20% + 12x e 20% + 36x', 'Los 31 lotes para casas, uno por uno: contado, 20% + 12 y 20% + 36 cuotas', 'All 31 house lots, one by one: cash, 20% + 12x and 20% + 36x'),
+    TAB('residence-aptos', 'residence', 69, 'Tabela de preços · Residence · Apartamentos', 'Tabla de precios · Residence · Departamentos', 'Price list · Residence · Apartments',
+      '1.452 apartamentos por tipologia: à vista, 20% + 12x e 20% + 36x', '1.452 departamentos por tipología: contado, 20% + 12 y 20% + 36 cuotas', '1,452 apartments by type: cash, 20% + 12x and 20% + 36x'),
+    TAB('outlet-premium', 'outlet', 85, 'Tabela de preços · Bracerum Outlet', 'Tabla de precios · Bracerum Outlet', 'Price list · Bracerum Outlet',
+      'Lojas da 1ª fase, lojas e supermercado do Market, unidade a unidade', 'Locales de la 1ª fase, locales y supermercado del Market, uno por uno', 'Phase 1 stores, Market shops and supermarket, unit by unit'),
     PDF('park-loteamentos-industriais', 'park', 8838, 'Folder · Bracerum Park · Loteamentos industriais', 'Folleto · Bracerum Park · Lotes industriales', 'Brochure · Bracerum Park · Industrial lots',
       'Cidade industrial: lotes, infraestrutura e localização', 'Ciudad industrial: lotes, infraestructura y ubicación', 'Industrial city: lots, infrastructure and location'),
     PDF('residence-aptos', 'residence', 5680, 'Folder · Bracerum Residence · Apartamentos', 'Folleto · Bracerum Residence · Departamentos', 'Brochure · Bracerum Residence · Apartments',

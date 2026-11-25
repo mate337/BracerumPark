@@ -28,6 +28,8 @@ maquete 3D embutida, que as seis páginas internas baixavam e interpretavam à t
 - **Tabela pública nova (`docs/lotes-p1/…PUBLICA_2.pdf`)**: preços iguais, **Lançamento prorrogado até 15/01/2027**,
   Pós-lançamento 16/01–31/03/2027. `precos.json` alinhado (vale para portal, maquete e LPs). **O CV ainda cobra as
   tabelas "Pós-Expo" (US$ 185)** — falta o cliente aprovar as de Lançamento no CV. Detalhes em `docs/portal-corretores.md` §7.9.
+- **PDFs das tabelas de Casas, Aptos e Outlet** no estilo da tabela P1 (gerados por `docs/build_tabelas_pdf.js` a partir do CV),
+  na biblioteca de materiais junto com a dos lotes. Não editar os PDFs à mão — rodar o script (com `--cv` para reler o CV).
 
 ### Botão "Portal do Corretor" no topo do site (2026-11-24)
 - **`.portal-link`** → `/PortalCorretores`, ao lado do seletor de idioma: no **hero da home** (o `.hero__lang` virou
