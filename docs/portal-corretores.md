@@ -477,3 +477,26 @@ na biblioteca, tipo "Tabelas e mapas", e cada aba de produto da Tabela tem "Baix
 **Quando o CV mudar preço:** `NODE_USE_ENV_PROXY=1 NODE_EXTRA_CA_CERTS=/root/.ccr/ca-bundle.crt CVCRM_EMAIL=… CVCRM_TOKEN=x
 node docs/build_tabelas_pdf.js --cv` (relê o CV, atualiza o retrato e os PDFs); sem `--cv` usa o retrato do repositório.
 Os PDFs são estáticos: a aba Tabela acompanha o CV sozinha, o PDF só muda quando o script roda de novo.
+
+### 7.10 Maquete do corretor: lojas do Outlet e "Baixar proposta" em PDF (2026-11-25)
+- **Lojas do Outlet selecionáveis** (vale também na maquete pública): as 57 lojas da 1ª fase do Premium Outlet,
+  uma a uma, no modo "Lotes à venda" (e pelo botão "Ver lojas e preços" do cartão do Outlet). Contorno de cada loja =
+  planta "Premium Outlet · 1º fase" do folder digital do Outlet (vetorial, cópia em escala do V14 — o vão "ACESSO" cai
+  no núcleo da maquete); numeração `out/01`…`out/57`, área, situação e valores = CV (empreendimento 9). A ordem do CV
+  segue a planta (fileira da frente 01–18, de trás 19–36, coluna de dentro 37–44, de fora 45–57) — conferida pela
+  área: correlação 0,999. Gerado por **`docs/3dmasterplan/build_outlet.py`** → `3dmasterplan/data/outlet.json`.
+  Situação ao vivo: `/api/lotes-status` agora devolve também `lojas` (mapa de disponibilidade do 9). Lotes e lojas são
+  simulados separados. As 12 "Lojas" e o Supermercado do Market ainda não estão no desenho — não são clicáveis.
+- **Modo corretor** (`/3dmasterplan/?corretor=1`, usado pelos iframes e links do portal): o "Pedir proposta" vira
+  **"Baixar proposta"** com o nome do cliente (opcional). A maquete manda ids, janela, pagamento, idioma e um retrato
+  da vista (JPEG) para `POST /api/portal {acao:'proposta'}`; o servidor confere a sessão (sem sessão = 401, a maquete
+  avisa), **recalcula tudo** (`api/_portal-proposta.js`: lotes pela Tabela v3.1 com a faixa de quantidade e o sinal de
+  20%; lojas pelos valores exatos da tabela do CV), recusa unidade reservada/vendida/bloqueada no último retrato do CV
+  (409) e devolve o PDF (pdfkit 0.20.2, fontes Caladea + Carlito em `api/_fontes/`, licenças OFL/Apache junto).
+- **O PDF** (PT/ES/EN pelo idioma da maquete): número `BP-AAAAMMDD-XXXX`, cliente, corretor e imobiliária, validade de
+  30 dias; retrato da maquete com a seleção; números; condição proposta (total, sinal, parcelas, faixa); tabela das
+  unidades (nome oficial do lote); o valor nas outras condições (lotes: janelas a partir da vigente × pagamentos);
+  "Como avançar" (lotes: sequência da Política P1 pública; Outlet: texto genérico, sem regra que o cliente não deu);
+  contatos do corretor (da conta) e do Bracerum Park; nota com a data da situação do CV. Cada proposta entra na
+  **auditoria** (`proposta.gerada`: número, unidades, condição, total, cliente).
+- 27 testes (`npm test`).

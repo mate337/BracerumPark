@@ -4,7 +4,8 @@
   "description": "Site estático + funções da Vercel (api/). Dependência só das funções: @vercel/blob (Portal do Corretor). Testes: npm test.",
   "dependencies": {
     "@vercel/blob": "2.8.0",
-    "@vercel/functions": "3.11.1"
+    "@vercel/functions": "3.11.1",
+    "pdfkit": "0.20.2"
   },
   "scripts": {
     "test": "node --test tests/portal.test.js"

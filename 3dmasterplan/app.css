@@ -362,3 +362,12 @@ html.is-embed .compass{right:calc(var(--edge) + 64px)}
   html.is-embed .tools{right:calc(var(--edge) + 62px)}
   html.is-embed .card__nav{padding-right:72px}
 }
+
+/* Proposta em PDF no Portal do Corretor (?corretor=1): nome do cliente + "Baixar proposta" */
+.prop{margin-top:10px}
+.prop__lab{display:block;font:600 .6rem/1.3 var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--t-light-mute);margin-bottom:6px}
+.prop__in{width:100%;box-sizing:border-box;padding:10px 11px;border:1px solid var(--line-light);background:#fff;font:400 .86rem/1.2 var(--sans);color:var(--ink);border-radius:0}
+.prop__in:focus{outline:2px solid var(--brown);outline-offset:0;border-color:var(--brown)}
+.prop .calc__cta{margin-top:8px}
+.prop .calc__cta[disabled]{opacity:.55;cursor:progress}
+.prop__msg{margin:8px 0 0;font:400 .74rem/1.4 var(--sans);color:var(--t-light-mute)}

@@ -466,7 +466,7 @@
     'top.requests': T('Fila do marketing, por etapa', 'Fila del marketing, por etapa', 'Marketing queue by stage'),
     'top.brokers': T('Aprovar, suspender e convidar', 'Aprobar, suspender e invitar', 'Approve, suspend and invite'),
     'map.title': T('Mapa de reservas', 'Mapa de reservas', 'Reservation map'),
-    'map.desc': T('Os 614 lotes com a situação do CV: livres, reservados e vendidos. Toque num lote para ver área, categoria e preço.', 'Los 614 lotes con la situación del CV: libres, reservados y vendidos. Toque un lote para ver área, categoría y precio.', 'All 614 lots with CV status: available, reserved and sold. Tap a lot for area, category and price.'),
+    'map.desc': T('Os 614 lotes e as 57 lojas do Outlet (1ª fase) com a situação do CV. Toque num lote ou numa loja para ver área e preço, some quantos quiser e baixe a proposta em PDF para o cliente.', 'Los 614 lotes y los 57 locales del Outlet (1ª fase) con la situación del CV. Toque un lote o un local para ver área y precio, sume los que quiera y descargue la propuesta en PDF para el cliente.', 'All 614 lots and the 57 Outlet stores (phase 1) with CV status. Tap a lot or a store for area and price, add as many as you like and download the PDF proposal for your client.'),
     'map.note': T('A situação vem do CV CRM e é atualizada a cada minuto. Reserva se faz no painel do CV.', 'La situación viene del CV CRM y se actualiza cada minuto. La reserva se hace en el panel del CV.', 'Status comes from the CV CRM and refreshes every minute. Reservations are made in the CV panel.'),
     'map.res': T('Reservados', 'Reservados', 'Reserved'),
     'map.sold': T('Vendidos', 'Vendidos', 'Sold'),

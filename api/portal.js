@@ -286,6 +286,39 @@ function tabelasPublico(snap, atualizando) {
   };
 }
 
+/* ------------------------------------------------------------------ proposta em PDF (maquete 3D do portal) */
+// A maquete aberta pelo portal (/3dmasterplan/?corretor=1) pede { tipo, ids, janela, pagamento, cliente, idioma,
+// imagem }. Os valores são recalculados aqui (api/_portal-proposta.js) — nada de preço vem do navegador — e a
+// proposta fica na auditoria com número, unidades, condição e total.
+let PROP = null;
+async function proposta(b, s, u, res) {
+  if (!PROP) PROP = require('./_portal-proposta.js');
+  const { unidades, precos } = base();
+  const tipo = b.tipo === 'outlet' ? 'outlet' : 'lotes';
+  let ctx;
+  if (tipo === 'lotes') {
+    const snap = await sincronizar(false);
+    ctx = { situacao: (id) => R.situacaoDe(id, snap), sincronizadoEm: snap && snap.ultimoSucesso, janelaVigente: R.janelaVigente(precos) };
+  } else {
+    await tabelasTalvez();
+    ctx = { tabelas: await tabelasEstado() };
+  }
+  const mod = PROP.montarProposta({ tipo, ids: b.ids, janela: limpa(b.janela, 20), pagamento: limpa(b.pagamento, 10), idioma: limpa(b.idioma, 2), unidades, precos, ...ctx });
+  const numero = `BP-${R.utcParaLocal(agora()).slice(0, 10).replace(/-/g, '')}-${crypto.randomBytes(2).toString('hex').toUpperCase()}`;
+  const cliente = limpa(b.cliente, 80);
+  const { pdf, nome } = await PROP.gerarPDF(mod, {
+    corretor: { nome: u.nome, email: u.email, ddi: u.ddi, tel: u.tel, imobiliaria: u.imobiliaria, creci: u.creci },
+    cliente, imagem: PROP.imagemDe(b.imagem), numero, tz: R.fuso(), nomeFuso: R.nomeFuso(),
+  });
+  await auditar(s, 'proposta.gerada', 'proposta', numero, { tipo, n: mod.n, unidades: mod.unidades.slice(0, 60).map((x) => x.id),
+    pagamento: mod.pagamento, janela: mod.janela ? mod.janela.id : null, total: mod.cond[mod.pagamento].total, cliente: cliente || null });
+  res.statusCode = 200;
+  res.setHeader('Content-Type', 'application/pdf');
+  res.setHeader('Content-Disposition', `attachment; filename*=UTF-8''${encodeURIComponent(nome)}`);
+  res.setHeader('Content-Length', String(pdf.length));
+  return res.end(pdf);
+}
+
 /* ------------------------------------------------------------------ contas: gestor × corretor */
 const PAPEL = (u) => (u && u.papel === 'equipe' ? 'equipe' : 'corretor');
 const ativo = (u) => u && u.status !== 'bloqueado' && u.status !== 'excluido';
@@ -1086,6 +1119,7 @@ module.exports = async (req, res) => {
       }
       // dados comerciais
       case 'comercial': return ok(await comercial());
+      case 'proposta': return await proposta(b, s, u, res);
       case 'tabelasProdutos': { const rodando = await tabelasTalvez(); return ok({ tabelas: tabelasPublico(await tabelasEstado(), rodando) }); }
       case 'tabelasSincronizar': soGestor(); { const snap = await tabelasAtualizar(); await auditar(s, 'tabelas.sincronizar', 'sync', null, { resultado: snap.resultado }); return ok({ tabelas: tabelasPublico(snap, false) }); }
       case 'sincronizar': soGestor(); { const snap = await sincronizar(true); await auditar(s, 'comercial.sincronizar', 'sync', null, { resultado: snap.resultado }); return ok({ sync: resumoSync(snap) }); }

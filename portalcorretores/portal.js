@@ -468,7 +468,7 @@
       ${extras}
       <section class="section reserv">
         <div class="section__head"><div><p class="eyebrow">${esc(t('home.k.live'))}</p><h2 class="h2" style="margin-top:6px">${esc(t('map.title'))}</h2></div>
-          <a class="btn btn--line btn--sm" href="/3dmasterplan/#lotes" target="_blank" rel="noopener">${I.expand}${esc(t('home.mapFull'))}</a></div>
+          <a class="btn btn--line btn--sm" href="/3dmasterplan/?corretor=1#lotes" target="_blank" rel="noopener">${I.expand}${esc(t('home.mapFull'))}</a></div>
         <div id="syncbox">${syncHTML(true)}</div>
         <div class="legend" id="kpis">${kpisHTML()}</div>
         <div class="stage stage--map" id="stage">
@@ -486,7 +486,7 @@
     const carregar = () => {
       if (!st || st.classList.contains('is-live')) return;
       const fr = document.createElement('iframe');
-      fr.className = 'stage__frame'; fr.title = t('map.title'); fr.src = '/3dmasterplan/?embed=1#lotes'; fr.allow = 'fullscreen';
+      fr.className = 'stage__frame'; fr.title = t('map.title'); fr.src = '/3dmasterplan/?embed=1&corretor=1#lotes'; fr.allow = 'fullscreen';
       st.prepend(fr); st.classList.add('is-live'); S.mapLive = true;
     };
     $('#load-map', main).addEventListener('click', carregar);
@@ -917,7 +917,7 @@
       return `<tr><th scope="row" class="num">${esc(u.id)}</th><td>${esc(u.q)}</td><td class="num">${nf(u.a)} m²</td><td>${esc(tx(P.categorias[u.cat].nome))}</td>
         <td><span class="sit"><i class="legend__dot ${SIT_DOT[u.situacao]}"></i>${esc(t(SIT_ROT[u.situacao]))}</span></td>
         <td class="num">${m2 != null ? usd(m2 * u.a) : '—'}</td>
-        <td><a class="iconbtn" href="/3dmasterplan/#lote-${esc(u.id)}" target="_blank" rel="noopener" aria-label="${esc(t('lot.see'))} ${esc(u.id)}" title="${esc(t('lot.see'))}">${I.cube}</a></td></tr>`;
+        <td><a class="iconbtn" href="/3dmasterplan/?corretor=1#lote-${esc(u.id)}" target="_blank" rel="noopener" aria-label="${esc(t('lot.see'))} ${esc(u.id)}" title="${esc(t('lot.see'))}">${I.cube}</a></td></tr>`;
     }).join('');
     return `<section class="section" id="lotes">
       <div class="section__head"><div><h2 class="h2">${esc(t('lot.title'))}</h2><p class="small muted" style="margin:6px 0 0">${esc(t('lot.lead'))}</p></div></div>
@@ -1464,11 +1464,11 @@
     <header class="pagehead">
       <div class="pagehead__meta"><a href="#/inicio" class="linkbtn" style="text-decoration:none">← ${esc(t('nav.home'))}</a></div>
       <div class="pagehead__body"><h1 class="h1">${esc(t('nav.masterplan'))}</h1><p class="lead">${esc(t('map.desc'))}</p>
-        <div><a class="btn btn--line btn--sm" href="/3dmasterplan/#lotes" target="_blank" rel="noopener">${I.expand}${esc(t('home.mapFull'))}</a></div></div>
+        <div><a class="btn btn--line btn--sm" href="/3dmasterplan/?corretor=1#lotes" target="_blank" rel="noopener">${I.expand}${esc(t('home.mapFull'))}</a></div></div>
     </header>
     <div id="syncbox">${syncHTML(true)}</div>
     <div class="legend" id="kpis">${kpisHTML()}</div>
-    <div class="stage stage--map stage--tall is-live"><iframe class="stage__frame" title="${esc(t('nav.masterplan'))}" src="/3dmasterplan/?embed=1#lotes" allow="fullscreen"></iframe></div>
+    <div class="stage stage--map stage--tall is-live"><iframe class="stage__frame" title="${esc(t('nav.masterplan'))}" src="/3dmasterplan/?embed=1&corretor=1#lotes" allow="fullscreen"></iframe></div>
     <p class="small muted" style="margin:10px 0 0">${esc(t('map.note2'))}</p>`;
   VIEWS['masterplan:after'] = (main) => { ligarSync(main); carregarComercial(true); };
 

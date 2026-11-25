@@ -26,6 +26,9 @@ const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
    Ctrl + roda), o dedo na vertical rola a página e na horizontal gira, e os links abrem na janela de
    cima. Sem isso a maquete prenderia quem só está passando pela home. Em tela cheia volta a ser inteira. */
 const EMBED = document.documentElement.classList.contains('is-embed');
+// Portal do Corretor (?corretor=1): o "Pedir proposta" vira "Baixar proposta" — PDF gerado pelo /api/portal com a
+// sessão do corretor (sem sessão, o servidor recusa e a maquete avisa). Fora disso a maquete é a mesma.
+const CORRETOR = QUERY.get('corretor') === '1';
 const MOD = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent) ? '⌘' : 'Ctrl';
 
 /* ------------------------------------------------------------------ textos */
@@ -67,6 +70,14 @@ const T = {
     'lot.cash': 'Pagamento único na assinatura', 'lot.tier': 'Faixa de {de} a {ate} lotes na operação.', 'lot.tierUp': 'Faixa de {de} lotes ou mais na operação.',
     'lot.next': 'A partir de {n} lotes, {c} cai para {p}/m².', 'lot.add': 'Somar lotes', 'lot.adding': 'Somando: clique nos lotes para incluir ou tirar',
     'lot.block': 'Quadra {q} inteira ({n} lotes)', 'lot.clear': 'Limpar', 'lot.remove': 'Tirar {id} da simulação', 'lot.propose': 'Pedir proposta',
+    'lot.download': 'Baixar proposta', 'prop.client': 'Cliente ou empresa (opcional)', 'prop.go': 'Baixar PDF', 'prop.wait': 'Gerando a proposta…',
+    'prop.done': 'Proposta baixada.', 'prop.login': 'Entre no Portal do Corretor para baixar a proposta.', 'prop.err': 'Não deu para gerar a proposta: {e}',
+    'prop.hint': 'PDF com as unidades, os valores nas condições de pagamento e os seus contatos, pronto para enviar ao cliente.',
+    'loja.eyebrow': 'Bracerum Outlet · {b}', 'loja.title': 'Loja {id}', 'loja.multiEyebrow': 'Simulação · Bracerum Outlet', 'loja.multiTitle': '{n} lojas · {a} m²',
+    'loja.area': 'área privativa da loja no CV', 'loja.bloco': 'conjunto', 'loja.m2': '{p}/m² × {a} m²', 'loja.sum': '{n} lojas · {a} m²',
+    'loja.notes': 'Valores da tabela aprovada do Bracerum Outlet no CV CRM ({t}): à vista −5% e 20% + 36x +8% sobre o 20% + 12x. A disponibilidade de cada loja é confirmada pela Bracerum na proposta.',
+    'loja.mix': 'Lotes e lojas do Outlet são simulados separados — a seleção recomeçou.', 'lots.outlet': 'Bracerum Outlet · 1ª fase', 'lots.lojas': 'lojas',
+    'lots.seeLojas': 'Ver lojas e preços', 'loja.tip': 'Loja {id}',
     'st.r': 'Reservado', 'st.v': 'Vendido', 'st.b': 'Indisponível', 'st.d': 'disponíveis',
     'st.live': 'Disponibilidade ao vivo · CV CRM · {h}', 'st.txt': 'Este lote está {s} e não entra na simulação. Fale com a equipe comercial sobre os lotes disponíveis ao redor.',
     'st.skip': '{n} lote(s) reservado(s), vendido(s) ou indisponível(is) ficaram fora da simulação.', 'st.ask': 'Falar com a equipe comercial',
@@ -116,6 +127,14 @@ const T = {
     'lot.cash': 'Single payment on signing', 'lot.tier': 'Bracket of {de} to {ate} lots in the deal.', 'lot.tierUp': 'Bracket of {de} lots or more in the deal.',
     'lot.next': 'From {n} lots, {c} drops to {p}/m².', 'lot.add': 'Add lots', 'lot.adding': 'Adding: click lots to include or remove them',
     'lot.block': 'Whole block {q} ({n} lots)', 'lot.clear': 'Clear', 'lot.remove': 'Remove {id} from the quote', 'lot.propose': 'Request a proposal',
+    'lot.download': 'Download proposal', 'prop.client': 'Client or company (optional)', 'prop.go': 'Download PDF', 'prop.wait': 'Building the proposal…',
+    'prop.done': 'Proposal downloaded.', 'prop.login': 'Sign in to the Broker Portal to download the proposal.', 'prop.err': 'Could not build the proposal: {e}',
+    'prop.hint': 'PDF with the units, the prices for each payment option and your contact details, ready to send to the client.',
+    'loja.eyebrow': 'Bracerum Outlet · {b}', 'loja.title': 'Store {id}', 'loja.multiEyebrow': 'Quote · Bracerum Outlet', 'loja.multiTitle': '{n} stores · {a} m²',
+    'loja.area': 'private area of the store in the CV', 'loja.bloco': 'complex', 'loja.m2': '{p}/m² × {a} m²', 'loja.sum': '{n} stores · {a} m²',
+    'loja.notes': 'Prices from the approved Bracerum Outlet table in the CV CRM ({t}): cash −5% and 20% + 36x +8% on 20% + 12x. Availability of each store is confirmed by Bracerum in the proposal.',
+    'loja.mix': 'Lots and Outlet stores are quoted separately — the selection started over.', 'lots.outlet': 'Bracerum Outlet · phase 1', 'lots.lojas': 'stores',
+    'lots.seeLojas': 'See stores and prices', 'loja.tip': 'Store {id}',
     'st.r': 'Reserved', 'st.v': 'Sold', 'st.b': 'Unavailable', 'st.d': 'available',
     'st.live': 'Live availability · CV CRM · {h}', 'st.txt': 'This lot is {s} and is left out of the quote. Talk to the sales team about the available lots around it.',
     'st.skip': '{n} reserved, sold or unavailable lot(s) were left out of the quote.', 'st.ask': 'Talk to the sales team',
@@ -165,6 +184,14 @@ const T = {
     'lot.cash': 'Pago único a la firma', 'lot.tier': 'Franja de {de} a {ate} lotes en la operación.', 'lot.tierUp': 'Franja de {de} lotes o más en la operación.',
     'lot.next': 'Desde {n} lotes, {c} baja a {p}/m².', 'lot.add': 'Sumar lotes', 'lot.adding': 'Sumando: haga clic en los lotes para incluir o quitar',
     'lot.block': 'Manzana {q} entera ({n} lotes)', 'lot.clear': 'Limpiar', 'lot.remove': 'Quitar {id} de la simulación', 'lot.propose': 'Pedir propuesta',
+    'lot.download': 'Descargar propuesta', 'prop.client': 'Cliente o empresa (opcional)', 'prop.go': 'Descargar PDF', 'prop.wait': 'Generando la propuesta…',
+    'prop.done': 'Propuesta descargada.', 'prop.login': 'Ingrese al Portal del Corredor para descargar la propuesta.', 'prop.err': 'No se pudo generar la propuesta: {e}',
+    'prop.hint': 'PDF con las unidades, los valores en las condiciones de pago y sus contactos, listo para enviar al cliente.',
+    'loja.eyebrow': 'Bracerum Outlet · {b}', 'loja.title': 'Local {id}', 'loja.multiEyebrow': 'Simulación · Bracerum Outlet', 'loja.multiTitle': '{n} locales · {a} m²',
+    'loja.area': 'área privada del local en el CV', 'loja.bloco': 'conjunto', 'loja.m2': '{p}/m² × {a} m²', 'loja.sum': '{n} locales · {a} m²',
+    'loja.notes': 'Valores de la tabla aprobada del Bracerum Outlet en el CV CRM ({t}): contado −5% y 20% + 36 cuotas +8% sobre el 20% + 12. La disponibilidad de cada local la confirma Bracerum en la propuesta.',
+    'loja.mix': 'Lotes y locales del Outlet se simulan por separado — la selección empezó de nuevo.', 'lots.outlet': 'Bracerum Outlet · 1ª fase', 'lots.lojas': 'locales',
+    'lots.seeLojas': 'Ver locales y precios', 'loja.tip': 'Local {id}',
     'st.r': 'Reservado', 'st.v': 'Vendido', 'st.b': 'No disponible', 'st.d': 'disponibles',
     'st.live': 'Disponibilidad en vivo · CV CRM · {h}', 'st.txt': 'Este lote está {s} y no entra en la simulación. Hable con el equipo comercial sobre los lotes disponibles alrededor.',
     'st.skip': '{n} lote(s) reservado(s), vendido(s) o no disponible(s) quedaron fuera de la simulación.', 'st.ask': 'Hablar con el equipo comercial',
@@ -999,7 +1026,8 @@ function escolheArea(i, voo = true) {
    Lotes, categorias e áreas: data/lotes.json (mapa de lotes MP14, Masterplan V14-02, gerado por
    docs/3dmasterplan/build_lotes.py). Preços: data/precos.json (Tabela v3.1, editado à mão).
    Valor = preço por m² (janela × categoria × faixa de quantidade × pagamento) × área de cada lote. */
-let L = null, P = null;
+let L = null, P = null, O = null;      // O = lojas do Outlet (data/outlet.json, gerado por docs/3dmasterplan/build_outlet.py)
+const COR_LOJA = '#d6b37a';
 let escolhidos = [];                   // os lotes da simulação
 let modoLotes = false, somar = false;
 let janela = 'expo', pagto = '12x';
@@ -1013,6 +1041,8 @@ let ST = null, stHora = null;
 const ST_COR = { r: '#5e4219', v: '#1d1a16', b: '#bdb7aa' };
 const stDe = (l) => (ST && ST[l.id]) || null;
 const livre = (l) => !stDe(l);
+const ehLoja = (l) => !!(l && l.loja);
+const todasUnidades = () => (L.lojas ? L.lotes.concat(L.lojas) : L.lotes);
 const nomeSt = (c) => t('st.' + c);
 
 function hojeISO() {
@@ -1029,6 +1059,11 @@ const usd = (v) => `US$${lang === 'en' ? '' : ' '}${fmt(Math.round(v))}`;
 const nomeCat = (c) => tr(P.categorias[c].nome);
 const subst = (s, o) => s.replace(/\{(\w+)\}/g, (_, k) => (o[k] ?? ''));
 function calcula(lista, jan = janela, pag = pagto) {
+  if (ehLoja(lista[0])) {                     // Outlet: valores exatos da tabela do CV (total, sinal, parcelas por loja)
+    let total = 0, area = 0, sinal = 0, parcela = 0, np = 0;
+    for (const l of lista) { const v = l.v[pag]; total += v[0]; sinal += v[1]; np = v[2]; parcela += v[3]; area += l.a; }
+    return { n: lista.length, f: -1, total, area, cats: {}, np, sinal, parcela, loja: true };
+  }
   const n = lista.length, f = faixaDe(n);
   let total = 0, area = 0;
   const cats = {};
@@ -1051,6 +1086,13 @@ function preparaLotes() {
     l._bb = [Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys)];
     L.porId.set(l.id, l);
   }
+  L.lojas = O ? O.lojas.map((o) => ({ id: o.id, loja: true, q: 'Outlet', b: o.b, a: o.a, h: o.h, p: o.p, v: o.v, ex: 1 })) : [];
+  for (const l of L.lojas) {
+    l._pts = pairs(l.p);
+    const xs = l._pts.map((p) => p[0]), ys = l._pts.map((p) => p[1]);
+    l._bb = [Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys)];
+    L.porId.set(l.id, l);
+  }
   for (const q of L.quadras) {
     q._pts = pairs(q.p);
     q._lotes = L.lotes.filter((l) => l.q === q.q);
@@ -1061,14 +1103,15 @@ function preparaLotes() {
 function montaCamadaLotes() {
   const pos = [], col = [];
   const c = new THREE.Color();
-  const poe = (pts, cor) => {
+  const poe = (pts, cor, y = 0.16) => {
     c.set(cor);
     const w = pts.map((p) => toWorld(p[0], p[1]));
     for (const tri of THREE.ShapeUtils.triangulateShape(w.map((p) => new THREE.Vector2(p[0], p[1])), [])) {
-      for (const k of tri) { pos.push(w[k][0], 0.16, w[k][1]); col.push(c.r, c.g, c.b); }
+      for (const k of tri) { pos.push(w[k][0], y, w[k][1]); col.push(c.r, c.g, c.b); }
     }
   };
   for (const l of L.lotes) { l._v0 = col.length; poe(l._pts, P.categorias[l.cat].cor); l._v1 = col.length; }
+  for (const l of L.lojas) { l._v0 = col.length; poe(l._pts, COR_LOJA, l.h + 0.2); l._v1 = col.length; }   // no telhado da loja
   for (const q of L.quadras) if (q.fora) poe(q._pts, '#c9c4b8');
   const g = new THREE.BufferGeometry();
   g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
@@ -1093,8 +1136,8 @@ function pintaLotes() {                       // recolore pela situação do CV 
   const m = camadaLotes.userData.malha;
   if (!m) return;
   const a = m.geometry.attributes.color, c = new THREE.Color();
-  for (const l of L.lotes) {
-    c.set(ST_COR[stDe(l)] || P.categorias[l.cat].cor);
+  for (const l of todasUnidades()) {
+    c.set(ST_COR[stDe(l)] || (ehLoja(l) ? COR_LOJA : P.categorias[l.cat].cor));
     for (let k = l._v0; k < l._v1; k += 3) { a.array[k] = c.r; a.array[k + 1] = c.g; a.array[k + 2] = c.b; }
   }
   a.needsUpdate = true;
@@ -1174,6 +1217,7 @@ function aplicaStatus(d) {
   if (!d || !d.ok || typeof d.lotes !== 'object') return;
   const novo = {};
   for (const [id, c] of Object.entries(d.lotes)) if (L.porId.has(id) && ST_COR[c]) novo[id] = c;
+  for (const [id, c] of Object.entries(d.lojas || {})) if (L.porId.has(id) && ST_COR[c]) novo[id] = c;
   ST = novo; stHora = d.atualizado ? new Date(d.atualizado) : new Date();
   pintaLotes();
   if (P) painelLotes();
@@ -1236,7 +1280,7 @@ function escolheLotes(lista, voo = true) {
   }
   escolhidos = lista;
   if (!lista.length) { limpaSelecao(); return; }
-  selected = { kind: 'lot', i: areaIdx.industrial };
+  selected = { kind: 'lot', i: ehLoja(lista[0]) ? areaIdx.outlet : areaIdx.industrial };
   marcaSelecao(-1);
   limpaLote();
   lista.forEach((l) => desenhaLote(l));
@@ -1259,7 +1303,7 @@ function escolheLotes(lista, voo = true) {
 function porQuadra(lista) {                    // [[quadra, lotes, inteira?], ...]
   const g = new Map();
   lista.forEach((l) => { if (!g.has(l.q)) g.set(l.q, []); g.get(l.q).push(l); });
-  return [...g].map(([q, ls]) => [q, ls, ls.length > 1 && L.quadras.find((x) => x.q === q)._lotes.length === ls.length]);
+  return [...g].map(([q, ls]) => { const qq = L.quadras.find((x) => x.q === q); return [q, ls, ls.length > 1 && !!qq && qq._lotes.length === ls.length]; });
 }
 function hashLotes(lista) {
   if (lista.length === 1) return '#lote-' + lista[0].id;
@@ -1270,6 +1314,7 @@ function lotesDoHash(h) {
   return h.replace(/^lotes?-/, '').split('-').flatMap((id) => (/^Q\d\d$/.test(id) ? L.quadras.find((q) => q.q === id)?._lotes || [] : [L.porId.get(id)])).filter(Boolean);
 }
 function cliqueLote(l, juntar) {
+  if (juntar && escolhidos.length && ehLoja(escolhidos[0]) !== ehLoja(l)) { dica('loja.mix', 5000); juntar = false; }
   if (juntar && escolhidos.length && (escolhidos.includes(l) || livre(l))) {
     escolheLotes(escolhidos.includes(l) ? escolhidos.filter((x) => x !== l) : [...escolhidos, l], false);
   } else escolheLotes([l]);
@@ -1289,13 +1334,13 @@ function limpaLote() {
   lotLayer.clear();
 }
 function desenhaLote(l, hover = false) {
-  const pts = pairs(l.p).map((p) => toWorld(p[0], p[1]));
+  const pts = pairs(l.p).map((p) => toWorld(p[0], p[1])), y0 = l.h || 0;   // loja do Outlet: no telhado
   const shape = new THREE.Shape(pts.map((p) => new THREE.Vector2(p[0], -p[1])));
   // por cima de tudo: o lote continua visível mesmo com o galpão ilustrativo em cima dele
   const fill = new THREE.Mesh(new THREE.ShapeGeometry(shape), new THREE.MeshBasicMaterial({ color: '#efdcae', transparent: true,
     opacity: hover ? 0.3 : 0.62, depthWrite: false, depthTest: false, toneMapped: false, side: THREE.DoubleSide }));
-  fill.rotation.x = -Math.PI / 2; fill.position.y = 0.22; fill.renderOrder = 5;
-  const line = new THREE.Mesh(fita(pts, hover ? 1.2 : 2.0, 0.32), new THREE.MeshBasicMaterial({ color: '#473315', depthWrite: false, depthTest: false,
+  fill.rotation.x = -Math.PI / 2; fill.position.y = y0 + 0.22; fill.renderOrder = 5;
+  const line = new THREE.Mesh(fita(pts, hover ? 1.2 : 2.0, y0 + 0.32), new THREE.MeshBasicMaterial({ color: '#473315', depthWrite: false, depthTest: false,
     toneMapped: false, transparent: true, opacity: hover ? 0.6 : 1, side: THREE.DoubleSide }));
   line.renderOrder = 6;
   fill.userData.hover = line.userData.hover = hover;
@@ -1364,6 +1409,7 @@ function mostraCartaoArea(i) {
   $('#cardNote').textContent = a.photos.length ? '' : t('card.nophoto');
   $('#cardCalc').innerHTML = '';
   $('#cardActions').innerHTML = (a.id === 'industrial' && P ? `<button type="button" class="btn" data-acao="modo-lotes">${esc(t('lots.see'))} <span aria-hidden="true">→</span></button>` : '') +
+    (a.id === 'outlet' && L?.lojas?.length ? `<button type="button" class="btn" data-acao="modo-lojas">${esc(t('lots.seeLojas'))} <span aria-hidden="true">→</span></button>` : '') +
     (a.link ? `<a class="${a.id === 'industrial' ? 'linkbtn' : 'btn'}" href="${SITE}${a.link}">${esc(t('card.site'))} <span aria-hidden="true">→</span></a>` : '');
   $('#cardNav').hidden = false;
   $('#cardCount').textContent = `${i + 1} / ${AREAS.length}`;
@@ -1404,15 +1450,15 @@ function feicao(nome) {
   return [t(esq === 'ESQSIM' ? 'lot.esquina' : 'lot.meio'), t(forma === 'PO' ? 'lot.poligonal' : 'lot.retangular'), frente].filter(Boolean).join(' · ');
 }
 function mostraCartaoIndisponivel(l) {
-  const st = stDe(l);
+  const st = stDe(l), loja = ehLoja(l), rot = loja ? subst(t('loja.title'), { id: l.id }) : 'LTIND.' + l.id;
   $('#cardMedia').innerHTML = '';
-  $('#cardEyebrow').textContent = subst(t('lot.eyebrow'), { q: l.q });
-  $('#cardTitle').textContent = 'LTIND.' + l.id;
+  $('#cardEyebrow').textContent = loja ? subst(t('loja.eyebrow'), { b: l.b }) : subst(t('lot.eyebrow'), { q: l.q });
+  $('#cardTitle').textContent = rot;
   $('#cardKpis').innerHTML = [
     `<div><dt><i class="sw" style="background:${ST_COR[st]}"></i>${esc(nomeSt(st))}</dt><dd>${esc(stHora ? subst(t('st.live'), { h: horaSt() }) : '')}</dd></div>`,
-    `<div><dt>${esc(`${l.ex ? '' : '≈ '}${fmt(l.a)} m²`)}</dt><dd>${esc(nomeCat(l.cat))}</dd></div>`,
+    `<div><dt>${esc(`${l.ex ? '' : '≈ '}${fmt(l.a)} m²`)}</dt><dd>${esc(loja ? l.b : nomeCat(l.cat))}</dd></div>`,
     ...(l.nome ? [`<div class="solo"><dd>${esc(feicao(l.nome))}</dd></div>`] : [])].join('');
-  const assunto = `${t('st.ask')} — LTIND.${l.id}`;
+  const assunto = `${t('st.ask')} — ${rot}`;
   $('#cardCalc').innerHTML = `<p class="calc__st">${esc(subst(t('st.txt'), { s: nomeSt(st).toLowerCase() }))}</p>
     <a class="btn calc__cta" href="mailto:${P.contato.emails.join(',')}?subject=${encodeURIComponent(assunto)}">${esc(t('st.ask'))} <span aria-hidden="true">→</span></a>`;
   $('#cardText').textContent = '';
@@ -1422,8 +1468,111 @@ function mostraCartaoIndisponivel(l) {
   abreCartao();
 }
 const horaSt = () => stHora.toLocaleTimeString(lang === 'pt' ? 'pt-BR' : lang, { hour: '2-digit', minute: '2-digit' });
+/* botão de proposta: público = e-mail (Pedir proposta); Portal do Corretor = PDF (Baixar proposta) */
+function ctaProposta(c) {
+  if (!CORRETOR) return `<a class="btn calc__cta" href="${ehLoja(escolhidos[0]) ? linkPropostaLojas(c) : linkProposta(c)}">${esc(t('lot.propose'))} <span aria-hidden="true">→</span></a>`;
+  return `<form class="prop" data-prop>
+      <label class="prop__lab" for="propCliente">${esc(t('prop.client'))}</label>
+      <input class="prop__in" id="propCliente" name="cliente" maxlength="80" autocomplete="off" value="${esc(propCliente)}" />
+      <button type="submit" class="btn calc__cta">${esc(t('lot.download'))} <span aria-hidden="true">↓</span></button>
+      <p class="prop__msg" role="status">${esc(t('prop.hint'))}</p>
+    </form>`;
+}
+function linkPropostaLojas(c) {
+  const pg = P.pagamentos.find((p) => p.id === pagto);
+  const nomes = escolhidos.map((l) => `${subst(t('loja.title'), { id: l.id })} — ${l.b} — ${fmt(l.a)} m²`);
+  const cond = c.np ? subst(t('mail.parc'), { s: usd(c.sinal), n: c.np, p: usd(c.parcela) }) : t('lot.cash');
+  const corpo = [t('mail.hello'), '', ...nomes, '', `${t('lots.pay')}: ${tr(pg.nome)}`,
+    `${t(escolhidos.length > 1 ? 'lot.totalOp' : 'lot.total')}: ${usd(c.total)} · ${cond}`, '', location.origin + location.pathname + location.hash].join('\n');
+  const assunto = subst(t('mail.subject'), { l: escolhidos.length === 1 ? subst(t('loja.title'), { id: escolhidos[0].id }) : subst(t('loja.sum'), { n: escolhidos.length, a: fmt(c.area) }) });
+  return `mailto:${P.contato.emails.join(',')}?subject=${encodeURIComponent(assunto)}&body=${encodeURIComponent(corpo)}`;
+}
+/* Proposta em PDF (só no Portal do Corretor). A maquete manda os ids, a janela e o pagamento escolhidos, o nome
+   do cliente e um retrato da vista atual (com a seleção em destaque); o servidor confere a sessão, recalcula os
+   valores pela tabela (lotes: Tabela v3.1 · lojas: tabela aprovada do CV), confere a situação e devolve o PDF. */
+let propCliente = '';
+function captura() {
+  try {
+    renderer.render(scene, camera);             // sem preserveDrawingBuffer: lê logo depois de desenhar
+    const src = renderer.domElement, k = Math.min(1, 1600 / src.width);
+    const cv = document.createElement('canvas');
+    cv.width = Math.round(src.width * k); cv.height = Math.round(src.height * k);
+    const g = cv.getContext('2d');
+    g.fillStyle = '#e7e3d8'; g.fillRect(0, 0, cv.width, cv.height);   // o canvas é transparente: fundo da névoa
+    g.drawImage(src, 0, 0, cv.width, cv.height);
+    return cv.toDataURL('image/jpeg', 0.82);
+  } catch (e) { return null; }
+}
+async function baixarProposta(form) {
+  const msg = form.querySelector('.prop__msg'), btn = form.querySelector('button[type="submit"]');
+  if (!escolhidos.length) return;
+  const tipo = ehLoja(escolhidos[0]) ? 'outlet' : 'lotes';
+  btn.disabled = true; msg.textContent = t('prop.wait');
+  try {
+    const r = await fetch('/api/portal', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ acao: 'proposta', tipo, ids: escolhidos.map((l) => l.id), janela, pagamento: pagto, cliente: propCliente.trim(), idioma: lang, imagem: captura() }) });
+    if (!r.ok) {
+      let d = {};
+      try { d = await r.json(); } catch (e) { /* sem corpo */ }
+      throw Object.assign(new Error(r.status === 401 ? t('prop.login') : d.erro || String(r.status)), { login: r.status === 401 });
+    }
+    const blob = await r.blob();
+    const nome = /filename\*=UTF-8''([^;]+)/.exec(r.headers.get('content-disposition') || '');
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = nome ? decodeURIComponent(nome[1]) : 'proposta-bracerum-park.pdf';
+    document.body.appendChild(a); a.click();
+    setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 5000);
+    msg.textContent = t('prop.done');
+    try { window.bpTrack && window.bpTrack('proposta_download', { tipo, unidades: escolhidos.length }); } catch (e) { /* sem tracking */ }
+  } catch (e) { msg.textContent = e.login ? e.message : subst(t('prop.err'), { e: e.message }); }
+  btn.disabled = false;
+}
+function verLojas() {                          // enquadra a 1ª fase do Outlet (botão do cartão do Outlet)
+  const bb = L.lojas.reduce((b, l) => [Math.min(b[0], l._bb[0]), Math.min(b[1], l._bb[1]), Math.max(b[2], l._bb[2]), Math.max(b[3], l._bb[3])],
+    [Infinity, Infinity, -Infinity, -Infinity]);
+  const [cx, cz] = toWorld((bb[0] + bb[2]) / 2, (bb[1] + bb[3]) / 2);
+  const sph = esfera();
+  const fim = { r: THREE.MathUtils.clamp(Math.hypot(bb[2] - bb[0], bb[3] - bb[1]) * 1.9, 560, 2600), phi: THREE.MathUtils.clamp(sph.phi, 0.45, 0.95), theta: sph.theta };
+  voar(comIndice(new THREE.Vector3(cx, 0, cz), fim), fim, 1300);
+}
+function mostraCartaoLojas() {
+  const lista = escolhidos, c = calcula(lista), um = lista.length === 1 ? lista[0] : null;
+  $('#cardMedia').innerHTML = '';
+  $('#cardEyebrow').textContent = um ? subst(t('loja.eyebrow'), { b: um.b }) : t('loja.multiEyebrow');
+  $('#cardTitle').textContent = um ? subst(t('loja.title'), { id: um.id }) : subst(t('loja.multiTitle'), { n: fmt(lista.length), a: fmt(c.area) });
+  const sw = `<i class="sw" style="background:${COR_LOJA}"></i>`;
+  const blocos = [...new Set(lista.map((l) => l.b))];
+  $('#cardKpis').innerHTML = (um
+    ? [[esc(`${fmt(um.a)} m²`), esc(t('loja.area'))], [sw + esc(um.b), esc(t('loja.bloco'))]]
+    : blocos.map((b) => { const ls = lista.filter((l) => l.b === b); return [`${sw}${ls.length} × ${esc(b)}`, esc(`${fmt(ls.reduce((s, l) => s + l.a, 0))} m²`)]; }))
+    .map(([dt, dd]) => `<div><dt>${dt}</dt><dd>${dd}</dd></div>`).join('');
+  const chip = (id) => `<li><button type="button" data-tira="${esc(id)}" aria-label="${esc(subst(t('lot.remove'), { id }))}">${esc(id)}<span aria-hidden="true">×</span></button></li>`;
+  const chips = lista.length > 1 && lista.length <= 40 ? `<ul class="chips">${lista.map((l) => chip(l.id)).join('')}</ul>` : '';
+  $('#cardCalc').innerHTML = `
+    <p class="calc__lab">${esc(t('lots.pay'))}</p>${segs(t('lots.pay'), P.pagamentos.map((p) => ({ id: p.id, rot: tr(p.nome) })), pagto, 'pag')}
+    <div class="calc__res" aria-live="polite">
+      <p class="calc__lbl">${esc(t(um ? 'lot.total' : 'lot.totalOp'))}</p>
+      <p class="calc__total">${usd(c.total)}</p>
+      <p class="calc__m2">${esc(subst(t(um ? 'loja.m2' : 'lot.m2avg'), { p: usd(c.total / c.area), a: fmt(c.area) }))}</p>
+      <dl class="calc__rows">${c.np
+        ? `<div><dt>${esc(t('lot.down'))}</dt><dd>${usd(c.sinal)}</dd></div><div><dt>${esc(subst(t('lot.inst'), { n: c.np }))}</dt><dd>${usd(c.parcela)}</dd></div>`
+        : `<div><dt>${esc(t('lot.cash'))}</dt><dd>${usd(c.total)}</dd></div>`}</dl>
+    </div>
+    ${ctaProposta(c)}
+    ${chips}
+    <div class="calc__btns">
+      <button type="button" class="linkbtn" data-acao="somar" aria-pressed="${somar}">${esc(t(somar ? 'lot.adding' : 'lot.add'))}</button>
+      ${lista.length > 1 ? `<button type="button" class="linkbtn" data-acao="limpar">${esc(t('lot.clear'))}</button>` : ''}
+    </div>`;
+  $('#cardText').textContent = subst(t('loja.notes'), { t: O ? O.tabela : '' });
+  $('#cardNote').textContent = '';
+  $('#cardActions').innerHTML = `<p class="contact">${esc(P.contato.nomes)} · ${P.contato.emails.map(esc).join(' · ')}</p>`;
+  $('#cardNav').hidden = true;
+  abreCartao();
+}
 function mostraCartaoLotes() {
   if (escolhidos.length === 1 && !livre(escolhidos[0])) { mostraCartaoIndisponivel(escolhidos[0]); return; }
+  if (ehLoja(escolhidos[0])) { mostraCartaoLojas(); return; }
   const lista = escolhidos, c = calcula(lista), um = lista.length === 1 ? lista[0] : null;
   const quadras = [...new Set(lista.map((l) => l.q))];
   $('#cardMedia').innerHTML = '';
@@ -1456,7 +1605,7 @@ function mostraCartaoLotes() {
         : `<div><dt>${esc(t('lot.cash'))}</dt><dd>${usd(c.total)}</dd></div>`}</dl>
       <p class="calc__tier">${esc(faixaTxt(c))}</p>
     </div>
-    <a class="btn calc__cta" href="${linkProposta(c)}">${esc(t('lot.propose'))} <span aria-hidden="true">→</span></a>
+    ${ctaProposta(c)}
     ${chips}
     <div class="calc__btns">
       <button type="button" class="linkbtn" data-acao="somar" aria-pressed="${somar}">${esc(t(somar ? 'lot.adding' : 'lot.add'))}</button>
@@ -1506,6 +1655,8 @@ function painelLotes() {
       <em>${usd(P.precos[janela][k][0][0])}<small>/m²</small></em></li>`).join('')}
       ${ST ? ['r', 'v', 'b'].filter((k) => sts[k]).map((k) => `<li class="legend__st"><i class="sw" style="background:${ST_COR[k]}"></i>
       <span><b>${esc(nomeSt(k))}</b><small>${fmt(sts[k])} ${esc(t('lots.lots'))}</small></span></li>`).join('') : ''}
+      ${L.lojas.length ? `<li><i class="sw" style="background:${COR_LOJA}"></i><span><b>${esc(t('lots.outlet'))}</b><small>${fmt(L.lojas.filter(livre).length)} ${esc(t('lots.lojas'))}${ST ? ' ' + esc(t('st.d')) : ''}</small></span>
+      <em>${usd(O.cond['12x'].m2)}<small>/m²</small></em></li>` : ''}
       <li class="legend__fora"><i class="sw"></i><span>${esc(t('lots.recinto'))}</span></li></ul>
     ${ST ? `<p class="lotpanel__live"><i aria-hidden="true"></i>${esc(subst(t('st.live'), { h: horaSt() }))}</p>` : ''}
     <p class="lotpanel__how">${esc(t(COARSE ? 'lots.howtoTouch' : 'lots.howto'))}</p>`;
@@ -1534,6 +1685,14 @@ function areaNoChao(x, z) {
   for (const id of HIT_ORDER) if (inPoly(X, Y, AREAS[areaIdx[id]].poly)) return areaIdx[id];
   return -1;
 }
+const tetoLoja = new THREE.Plane(new THREE.Vector3(0, 1, 0), -9);
+function lojaNoRaio() {                          // a loja é escolhida no plano do telhado (9 m), não no chão
+  if (!L?.lojas?.length) return null;
+  const p = new THREE.Vector3();
+  if (!ray.ray.intersectPlane(tetoLoja, p)) return null;
+  const X = p.x + W / 2, Y = p.z + H / 2;
+  return L.lojas.find((l) => X >= l._bb[0] && X <= l._bb[2] && Y >= l._bb[1] && Y <= l._bb[3]) || null;
+}
 function loteEm(p) {
   if (!L) return null;
   const X = p.x + W / 2, Y = p.z + H / 2;
@@ -1548,6 +1707,7 @@ function alvoEm(cx, cy) {
   const h = aponta(cx, cy);
   if (!h) return null;
   const chaoOuGalpao = !h.building || h.area === areaIdx.industrial;
+  if (modoLotes) { const lj = lojaNoRaio(); if (lj) return { lot: lj, point: h.point }; }
   if (chaoOuGalpao || modoLotes) {
     const l = loteEm(h.point);
     if (l) return { lot: l, point: h.point };
@@ -1571,7 +1731,10 @@ function hoverEm(cx, cy) {
     setHover(-1); hoverLote(a.lot);
     const l = a.lot, pg = P.pagamentos.find((p) => p.id === pagto), jn = P.janelas.find((j) => j.id === janela);
     const st = stDe(l);
-    tip.innerHTML = `<small>LTIND.${esc(l.id)}</small><b>${esc(nomeCat(l.cat))} · ${l.ex ? '' : '≈ '}${fmt(l.a)} m²</b>` + (st
+    if (ehLoja(l)) tip.innerHTML = `<small>${esc(subst(t('loja.tip'), { id: l.id }))}</small><b>${esc(l.b)} · ${fmt(l.a)} m²</b>` + (st
+      ? `<span class="tip__st"><i class="sw" style="background:${ST_COR[st]}"></i>${esc(nomeSt(st))}</span>`
+      : `${usd(l.v[pagto][0])} <span class="tip__m">${esc(tr(pg.nome))}</span>`);
+    else tip.innerHTML = `<small>LTIND.${esc(l.id)}</small><b>${esc(nomeCat(l.cat))} · ${l.ex ? '' : '≈ '}${fmt(l.a)} m²</b>` + (st
       ? `<span class="tip__st"><i class="sw" style="background:${ST_COR[st]}"></i>${esc(nomeSt(st))}</span>`
       : `${usd(precoM2(l.cat, 1) * l.a)} <span class="tip__m">${esc(tr(jn.curto))} · ${esc(tr(pg.nome))}</span>`);
   } else if (a.recinto) {
@@ -1750,8 +1913,11 @@ function ligaInterface() {
     else if (acao === 'quadra') escolheLotes(L.quadras.find((q) => q.q === b.dataset.q)._lotes.filter(livre));
     else if (acao === 'limpar') limpaSelecao();
     else if (acao === 'modo-lotes') { limpaSelecao(); modoLotesOn(true); }
+    else if (acao === 'modo-lojas') { limpaSelecao(); modoLotesOn(true, false); verLojas(); }
   };
   card.addEventListener('click', controlesLotes);
+  card.addEventListener('input', (e) => { if (e.target.name === 'cliente') propCliente = e.target.value; });
+  card.addEventListener('submit', (e) => { if (!e.target.matches('[data-prop]')) return; e.preventDefault(); baixarProposta(e.target); });
   $('#lotPanel').addEventListener('click', controlesLotes);
   $('#cardPrev').addEventListener('click', () => { pararTour(); escolheArea(((selected?.i ?? 0) - 1 + AREAS.length) % AREAS.length); });
   $('#cardNext').addEventListener('click', () => { pararTour(); escolheArea(((selected?.i ?? -1) + 1) % AREAS.length); });
@@ -1892,7 +2058,8 @@ async function iniciar() {
   aplicaIdioma();
   if (!temWebGL()) { $('#loader').classList.add('is-done'); $('#fallback').hidden = false; return; }
   progresso(0.1);
-  [S, L, P] = await Promise.all(['scene', 'lotes', 'precos'].map((f) => fetch(`data/${f}.json`).then((r) => r.json())));
+  [S, L, P, O] = await Promise.all(['scene', 'lotes', 'precos', 'outlet'].map((f) => fetch(`data/${f}.json`).then((r) => r.json())
+    .catch((e) => { if (f === 'outlet') return null; throw e; })));   // sem as lojas, a maquete segue só com os lotes
   [W, H] = S.sheet;
   janela = janelaVigente();
   progresso(0.35);
@@ -1984,7 +2151,7 @@ async function iniciar() {
   carregaStatus();
   setInterval(() => { if (!document.hidden) carregaStatus(); }, 120000);
   document.addEventListener('visibilitychange', () => { if (!document.hidden) carregaStatus(); });
-  window.__bp = { scene, camera, controls, renderer, escolheArea, escolheLotes, modoLotesOn, calcula, vistaGeral, vistaCima, setHora, aplicaStatus, S, L, P, U,
+  window.__bp = { scene, camera, controls, renderer, escolheArea, escolheLotes, modoLotesOn, calcula, vistaGeral, vistaCima, setHora, aplicaStatus, S, L, P, O, U, verLojas,
     estado: () => ({ janela, pagto, escolhidos: escolhidos.map((l) => l.id), modoLotes, status: ST }) };
 }
 

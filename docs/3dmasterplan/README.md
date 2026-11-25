@@ -280,3 +280,13 @@ As posições seguem o V14. Nele, o Ambulatório (Posto de Saúde de 4.113 m²) 
 Bombeiros de 620 m² com o Posto Policial de 506 m² ao lado) ficam no vértice norte. O Resort passou para a
 borda leste, junto à pista (31 lotes), e o Residence ocupa o miolo da ponta norte. O desenho do folheto
 estava um número atrás da legenda a partir do 09 (a maquete segue a legenda).
+
+## Lojas do Outlet e modo corretor (2026-11-25)
+- `data/outlet.json` (gerado por `docs/3dmasterplan/build_outlet.py`): as 57 lojas da 1ª fase do Premium Outlet com
+  contorno (planta do folder digital do Outlet, na escala do V14), altura do telhado, área e valores do CV
+  (`v: {vista|12x|36x: [total, sinal, n, parcela]}`). Sem o arquivo a maquete segue só com os lotes.
+- No modo "Lotes à venda" as lojas aparecem em dourado (`COR_LOJA`) no telhado e entram no mesmo fluxo dos lotes
+  (`escolhidos`, cartão, soma com Shift, hash `#lotes-out/12-out/13`); a escolha é pelo plano do telhado (9 m), não pelo
+  chão. Lotes e lojas não se misturam na mesma simulação. A situação vem de `lojas` no `/api/lotes-status`.
+- `?corretor=1` (Portal do Corretor): o botão vira "Baixar proposta" com o campo do cliente; o PDF é do `/api/portal`
+  (ver `docs/portal-corretores.md` §7.10). `app.css`/`app.js` em `?v=6`.

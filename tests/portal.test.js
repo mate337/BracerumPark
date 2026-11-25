@@ -558,3 +558,60 @@ test('tabelas do CV no portal: retrato inicial sem sucesso falso; gestor atualiz
     assert.ok(chamadas >= 4, 'Residence e Outlet nas duas leituras');
   } finally { global.fetch = orig; store.delete('portal/sync/tabelas.json'); }
 });
+
+/* ================================================================ proposta em PDF (maquete do portal) */
+const PROPOSTA = require(path.join(RAIZ, 'api/_portal-proposta.js'));
+async function postBruto(dados, cookie = '') {
+  const req = { method: 'POST', url: '/api/portal', headers: { 'content-type': 'application/json', cookie, 'x-forwarded-for': '10.1.0.9', host: 'teste.local' }, body: { acao: 'proposta', ...dados } };
+  const partes = [];
+  const res = new Writable({ write(c, _e, cb) { partes.push(Buffer.from(c)); cb(); } });
+  res.headers = {}; res.statusCode = 200; res.setHeader = (k, v) => { res.headers[k.toLowerCase()] = v; };
+  const pronto = new Promise((ok) => res.on('finish', ok));
+  const fimOrig = res.end.bind(res); res.end = (c) => { if (c) partes.push(Buffer.from(c)); return fimOrig(); };
+  await handler(req, res); await pronto;
+  return { status: res.statusCode, headers: res.headers, corpo: Buffer.concat(partes) };
+}
+
+test('proposta: valores pela tabela (não do navegador), faixa de quantidade, janelas a partir da vigente', () => {
+  const precos = require(path.join(RAIZ, '3dmasterplan/data/precos.json'));
+  const lotes = require(path.join(RAIZ, '3dmasterplan/data/lotes.json'));
+  const unidades = new Map(lotes.lotes.map((l) => [l.id, l]));
+  const base = { tipo: 'lotes', unidades, precos, situacao: () => 'disponivel', janelaVigente: { id: 'expo' }, idioma: 'pt' };
+  // exemplo da tabela P1: Q07.L014, Padrão, Lançamento, 20% + 12x → US$ 200.000, sinal 40.000, 12 × 13.333
+  const um = PROPOSTA.montarProposta({ ...base, ids: ['Q07.L014'], janela: 'expo', pagamento: '12x' });
+  assert.deepEqual(um.cond['12x'], { total: 200000, sinal: 40000, n: 12, parcela: 13333 });
+  assert.deepEqual(um.matriz.map((m) => m.id), ['expo', 'pos', 'plena']);
+  assert.equal(um.matriz[2].cond['12x'].total, 275000);
+  // 16 lotes da Q06 (faixa 9–16, Padrão) → US$ 138/m², total 2.760.000 (exemplo da tabela)
+  const q06 = lotes.lotes.filter((l) => l.q === 'Q06').map((l) => l.id);
+  assert.equal(PROPOSTA.montarProposta({ ...base, ids: q06, pagamento: '12x' }).cond['12x'].total, 2760000);
+  // janela passada vira a vigente; ocupado é recusado
+  assert.equal(PROPOSTA.montarProposta({ ...base, ids: ['Q07.L014'], janela: 'expo', janelaVigente: { id: 'pos' } }).janela.id, 'pos');
+  assert.throws(() => PROPOSTA.montarProposta({ ...base, ids: ['Q07.L014'], situacao: () => 'reservado' }), /Fora de venda/);
+  // imagem: só JPEG/PNG de verdade
+  assert.equal(PROPOSTA.imagemDe('data:image/jpeg;base64,' + Buffer.from('não é jpeg').toString('base64')), null);
+  assert.ok(PROPOSTA.imagemDe('data:image/png;base64,iVBORw0KGgo='));
+});
+
+test('proposta no portal: só com sessão; PDF com número na auditoria; lote reservado no CV é recusado; outlet pela tabela do CV', async () => {
+  delete process.env.CVCRM_EMAIL; delete process.env.CVCRM_TOKEN;
+  assert.equal((await postBruto({ tipo: 'lotes', ids: ['Q01.L001'] })).status, 401, 'sem sessão');
+  CV.falhar = false; store.delete('portal/sync/comercial.json');
+  const r = await postBruto({ tipo: 'lotes', ids: ['Q01.L001', 'Q01.L002'], janela: 'expo', pagamento: '36x', cliente: 'Cliente Teste', idioma: 'es',
+    total: 1, imagem: 'data:image/png;base64,iVBORw0KGgo=' }, C.ana);
+  assert.equal(r.status, 200, r.corpo.toString().slice(0, 200));
+  assert.equal(r.headers['content-type'], 'application/pdf');
+  assert.equal(r.corpo.slice(0, 5).toString(), '%PDF-');
+  assert.match(decodeURIComponent(r.headers['content-disposition']), /propuesta-bracerum-park-BP-\d{8}-[0-9A-F]{4}\.pdf/);
+  const log = (await post('auditoria', {}, C.gestor)).json.eventos.find((e) => e.acao === 'proposta.gerada');
+  assert.ok(log, 'proposta registrada na auditoria');
+  assert.deepEqual([log.det.tipo, log.det.n, log.det.pagamento, log.det.cliente], ['lotes', 2, '36x', 'Cliente Teste']);
+  assert.notEqual(log.det.total, 1, 'o total é o do servidor, não o que o navegador mandou');
+  const res = await postBruto({ tipo: 'lotes', ids: ['Q07.L014'] }, C.ana);       // reservado no CV simulado
+  assert.equal(res.status, 409); assert.match(JSON.parse(res.corpo).erro, /Q07\.L014/);
+  const o = await postBruto({ tipo: 'outlet', ids: ['out/01', 'out/57'], pagamento: 'vista' }, C.ana);   // retrato do repositório
+  assert.equal(o.status, 200, o.corpo.toString().slice(0, 200));
+  assert.equal(o.corpo.slice(0, 5).toString(), '%PDF-');
+  assert.equal((await postBruto({ tipo: 'outlet', ids: ['out/99'] }, C.ana)).status, 422);
+  store.delete('portal/sync/tabelas.json');
+});
