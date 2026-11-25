@@ -192,8 +192,23 @@ html.no-motion .reveal{opacity:1;transform:none}
   padding:11px 20px;transition:background var(--dur-s),color var(--dur-s),border-color var(--dur-s);
 }
 .nav__cta:hover{background:var(--paper);color:var(--ink);border-color:var(--paper)}
-@media (max-width: 900px){
+/* Os links do meio só aparecem quando cabem junto com o Portal do Corretor,
+   o idioma e o "Fale conosco". Abaixo de 1300 px eles já se espremiam (e
+   quebravam em duas linhas) mesmo antes do botão do portal. Entre 1360 e
+   1700 px o espaço entre eles aperta e o botão do portal usa o rótulo curto. */
+@media (max-width: 1360px){
   .nav__links a:not(.nav__cta){display:none}
+}
+@media (min-width: 1361px) and (max-width: 1699px){
+  .nav__links{gap:clamp(14px,1.4vw,26px)}
+  .nav__links a:not(.nav__cta){letter-spacing:.1em}
+  .nav .portal-link__full{display:none}
+  .nav .portal-link__short{display:inline}
+}
+@media (max-width: 720px){
+  /* no celular a barra não comporta logo + portal + idioma + CTA; o contato
+     segue pelo WhatsApp flutuante (sempre visível) e pelo rodapé */
+  .nav__cta{display:none}
 }
 @media (max-width: 460px){
   /* o CTA quebrava em duas linhas e estourava a barra de 72 px */
@@ -801,9 +816,34 @@ html.no-motion .step{opacity:1;filter:none;transform:none}
 .hero__lang{
   position:absolute;z-index:6;top:clamp(22px,3.4vw,34px);
   right:max(var(--gap), calc((100% - var(--max)) / 2 + var(--gap)));
-  background:rgba(14,13,11,.55);backdrop-filter:blur(8px);
+  display:flex;align-items:stretch;gap:8px;
   transition:opacity var(--dur-m) var(--ease),transform var(--dur-m) var(--ease),visibility 0s;
 }
+.hero__lang > .lang,.hero__lang > .portal-link{background:rgba(14,13,11,.55);backdrop-filter:blur(8px)}
+
+/* Atalho para o Portal do Corretor (/PortalCorretores), ao lado do seletor de
+   idioma: no hero da home e na nav de todas as páginas. Mesma altura e moldura
+   do seletor; no celular o rótulo encurta para "Corretores". */
+.portal-link{
+  display:inline-flex;align-items:center;gap:8px;align-self:stretch;
+  border:1px solid var(--line-dark);padding:0 12px;color:var(--t-dark);
+  font:700 .64rem/1 var(--sans);letter-spacing:.12em;text-transform:uppercase;white-space:nowrap;
+  transition:background var(--dur-s),color var(--dur-s),border-color var(--dur-s);
+}
+.portal-link::before{content:"";width:6px;height:6px;background:var(--sand);transform:rotate(45deg);flex:none}
+.portal-link:hover{background:var(--paper);color:var(--ink);border-color:var(--paper)}
+.portal-link__short{display:none}
+@media (max-width: 640px){
+  .portal-link__full{display:none}
+  .portal-link__short{display:inline}
+  .portal-link{padding:0 9px;letter-spacing:.08em}
+}
+@media (max-width: 360px){
+  .portal-link{padding:0 7px;gap:6px;letter-spacing:.04em}
+  .nav__right{gap:8px}
+  .nav .lang__btn{padding:6px 4px}
+}
+@media (max-width: 340px){ .nav{padding:0 10px} .nav__right{gap:6px} }
 .hero__lang.is-off{opacity:0;visibility:hidden;transform:translateY(-8px);pointer-events:none}
 @media (max-width: 520px){
   .lang__btn{padding:6px 6px;font-size:.6rem}
