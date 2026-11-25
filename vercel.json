@@ -238,7 +238,7 @@
     },
     "api/portal.js": {
       "maxDuration": 60,
-      "includeFiles": "{3dmasterplan/data/{lotes,precos}.json,api/_fontes/*.ttf}"
+      "includeFiles": "{3dmasterplan/data/{lotes,precos}.json,api/_fontes/*.ttf,node_modules/pdfkit/js/{data,standard-fonts}/**}"
     }
   },
   "headers": [

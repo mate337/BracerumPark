@@ -499,4 +499,8 @@ Os PDFs são estáticos: a aba Tabela acompanha o CV sozinha, o PDF só muda qua
   "Como avançar" (lotes: sequência da Política P1 pública; Outlet: texto genérico, sem regra que o cliente não deu);
   contatos do corretor (da conta) e do Bracerum Park; nota com a data da situação do CV. Cada proposta entra na
   **auditoria** (`proposta.gerada`: número, unidades, condição, total, cliente).
+- **Pacote da função:** o rastreador da Vercel (`@vercel/nft`) não leva as fontes-padrão nem o `data/` do pdfkit (ele usa
+  `require('#standard-fonts/…')`); sem eles o PDF quebra no servidor. Por isso o `vercel.json` inclui
+  `node_modules/pdfkit/js/{data,standard-fonts}/**` e `api/_fontes/*.ttf` no `api/portal.js` — conferido gerando o PDF só
+  com os arquivos rastreados + `includeFiles` (funciona) e sem eles (falha em `Helvetica.cjs`).
 - 27 testes (`npm test`).
