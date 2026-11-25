@@ -22,7 +22,7 @@ Object.assign(process.env, {
 const store = new Map();
 const blobPath = require.resolve('@vercel/blob', { paths: [RAIZ] });
 require.cache[blobPath] = { id: blobPath, filename: blobPath, loaded: true, exports: {
-  async put(p, body) { store.set(p, Buffer.isBuffer(body) ? body : Buffer.from(String(body))); return { pathname: p }; },
+  async put(p, body, op = {}) { if (op.allowOverwrite === false && store.has(p)) throw new Error('This blob already exists'); store.set(p, Buffer.isBuffer(body) ? body : Buffer.from(String(body))); return { pathname: p }; },
   async get(p) { if (!store.has(p)) return null; return { stream: new Blob([store.get(p)]).stream(), blob: { contentType: 'application/octet-stream', size: store.get(p).length } }; },
   async list({ prefix }) { return { blobs: [...store.keys()].filter((k) => k.startsWith(prefix)).map((k) => ({ pathname: k })), hasMore: false }; },
   async del(p) { store.delete(p); },
@@ -456,4 +456,28 @@ test('e-mail de teste vai só para o próprio gestor; rotina diária exige CRON_
     const res = resFalso(); await handler(comReq, res); await res.pronto;
     assert.deepEqual(JSON.parse(res.corpo()), { ok: true, auto: false }, 'com o automático desligado a rotina não faz nada');
   } finally { sim.restaurar(); }
+});
+
+test('automático: corretor novo no CV recebe sozinho; antigos ficam no manual; sem convite em dobro', async () => {
+  const sim = simularCVeEmail([cvC(25, 'Antigo Silva', 'antigo@teste.dev'), cvC(31, 'Novo Corretor Souza', 'novo@teste.dev')]);
+  Object.assign(process.env, { PORTAL_CV_AUTO: '1', PORTAL_CV_AUTO_DESDE_ID: '30' });
+  try {
+    store.delete('portal/sync/cv-corretores.json');
+    // duas chamadas ao mesmo tempo (a trava "rodando" segura a segunda)
+    const [a, b] = await Promise.all([post('cvCorretores', {}, C.gestor), post('cvCorretores', {}, C.gestor)]);
+    assert.equal(a.status, 200); assert.equal(b.status, 200);
+    assert.deepEqual(sim.enviados.map((m) => m.to[0]), ['novo@teste.dev'], 'só o novo, uma vez');
+    const contas = (await post('contas', {}, C.gestor)).json.contas;
+    assert.ok(contas.some((c) => c.email === 'novo@teste.dev' && c.origem === 'cv'));
+    assert.ok(!contas.some((c) => c.email === 'antigo@teste.dev'), 'o antigo espera o botão manual');
+    assert.equal(a.json.desdeId, 30);
+    // dentro de 5 min não consulta de novo
+    await post('cvCorretores', {}, C.gestor);
+    assert.equal(sim.enviados.length, 1);
+    // rotina diária respeita o mesmo limite de id
+    process.env.CRON_SECRET = 'cron-teste';
+    const res = resFalso(); await handler({ method: 'GET', url: '/api/portal?cron=cv-corretores', headers: { authorization: 'Bearer cron-teste' } }, res); await res.pronto;
+    assert.equal(res.statusCode, 200);
+    assert.equal(sim.enviados.length, 1, 'nem o cron manda para o antigo nem repete o novo');
+  } finally { delete process.env.PORTAL_CV_AUTO; delete process.env.PORTAL_CV_AUTO_DESDE_ID; sim.restaurar(); }
 });

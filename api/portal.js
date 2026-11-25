@@ -129,6 +129,12 @@ async function gravar(caminho, obj) {
   await B().put(caminho, JSON.stringify(obj), { access: 'private', addRandomSuffix: false, allowOverwrite: true, contentType: 'application/json', cacheControlMaxAge: 60 });
   return obj;
 }
+// Cria o arquivo só se ainda não existe (atômico no Blob): serve de trava entre instâncias da função.
+async function reservar(caminho, obj) {
+  exigeStore();
+  try { await B().put(caminho, JSON.stringify(obj || { em: agora() }), { access: 'private', addRandomSuffix: false, allowOverwrite: false, contentType: 'application/json' }); return true; }
+  catch (e) { if (await ler(caminho).catch(() => null)) return false; throw e; }   // já existia = outra instância reservou
+}
 async function listar(prefixo) {
   exigeStore();
   const out = [];
@@ -867,6 +873,9 @@ async function baixar(req, res) {
 // Conta que já existe com o mesmo e-mail não é recriada nem rebaixada (um gestor continua gestor).
 const CVP = require('./_portal-cv.js');
 const cvAuto = () => process.env.PORTAL_CV_AUTO === '1';
+// No automático, só corretores com id do CV a partir deste número (os que já existiam ficam no botão manual).
+const cvDesdeId = () => Number(process.env.PORTAL_CV_AUTO_DESDE_ID || 0) || 0;
+const ORIGEM_SITE = 'https://bracerumpark.com';
 const CV_TENTATIVAS = 3;
 async function cvEstado() { return (await ler(CAM.cvSync)) || {}; }
 async function cvConvidar(u, origem, s, teste) {
@@ -892,7 +901,7 @@ async function cvCorretores() {
   const [lista, contas, estado] = await Promise.all([CVP.lerCorretoresCV(), todasContas(), cvEstado()]);
   const porEmail = new Map(contas.map((x) => [String(x.email).toLowerCase(), x]));
   return {
-    auto: cvAuto(), email: CVP.emailConfigurado(), remetente: CVP.remetente(), estado,
+    auto: cvAuto(), desdeId: cvDesdeId(), email: CVP.emailConfigurado(), remetente: CVP.remetente(), estado,
     corretores: lista.map((c) => {
       const u = porEmail.get(c.email);
       return { ...c, fora: CVP.motivoFora(c),
@@ -900,15 +909,20 @@ async function cvCorretores() {
     }),
   };
 }
-async function cvSincronizar(s, origem, { enviar, cvIds } = {}) {
+async function cvSincronizar(s, origem, { enviar, cvIds, desdeId, unico } = {}) {
   const estado = await cvEstado();
   const res0 = { em: agora(), por: s ? s.n : 'automação', criadas: 0, convites: 0, falhas: 0, ignorados: 0 };
   try {
     const lista = await CVP.lerCorretoresCV();
     for (const c of lista) {
       if (cvIds && !cvIds.includes(c.cvId)) continue;
+      if (desdeId && c.cvId < desdeId) continue;
       if (CVP.motivoFora(c)) { res0.ignorados++; continue; }
       let u = await ler(caminhoU(idEmail(c.email)));
+      // no automático, cada tentativa de cada corretor é reservada uma única vez (dois acessos ao mesmo tempo não duplicam)
+      const tentativa = ((u && u.convite && u.convite.tentativas) || 0) + 1;
+      const precisa = !u || (PAPEL(u) === 'corretor' && ativo(u) && !u.senha && !(u.convite && u.convite.ok) && tentativa <= CV_TENTATIVAS);
+      if (unico && precisa && !(await reservar(`portal/cv/auto-${c.cvId}-${tentativa}.json`, { em: agora(), email: c.email }))) continue;
       if (u) {
         if (!u.cvId) { u.cvId = c.cvId; await gravar(caminhoU(u.id), u); }
         const pendente = PAPEL(u) === 'corretor' && ativo(u) && !u.senha && !(u.convite && u.convite.ok) && ((u.convite && u.convite.tentativas) || 0) < CV_TENTATIVAS;
@@ -933,19 +947,32 @@ async function cvSincronizar(s, origem, { enviar, cvIds } = {}) {
   if (res0.criadas || res0.convites || res0.falhas) await auditar(s, 'cv.sincronizado', 'cv', null, res0);
   return { resultado: res0 };
 }
-// Gestão abrindo a aba dispara a importação automática, no máximo a cada 10 min (além da rotina diária).
-async function cvTalvezAuto(s, origem) {
-  if (!cvAuto()) return;
+// Automático (PORTAL_CV_AUTO=1): o CV não avisa cadastro de corretor (não há webhook para isso) e o plano da
+// Vercel só tem rotina diária — então toda chamada ao portal e ao /api/lotes-status (a maquete do site consulta
+// o tempo todo) confere o CV em segundo plano, no máximo a cada 5 min. A trava "rodando" evita convite em dobro.
+const CV_INTERVALO = 5 * 60e3;
+async function cvTalvezAuto() {
+  if (!cvAuto()) return null;
   const e = await cvEstado();
-  if (e.ultimaTentativa && Date.now() - Date.parse(e.ultimaTentativa) < 10 * 60e3) return;
-  try { await cvSincronizar(null, origem, { enviar: true }); } catch (err) { console.error('[portal] cv auto', err.message); }
+  const agoraMs = Date.now();
+  if (e.ultimaTentativa && agoraMs - Date.parse(e.ultimaTentativa) < CV_INTERVALO) return null;
+  if (e.rodando && agoraMs - Date.parse(e.rodando) < 2 * 60e3) return null;
+  await gravar(CAM.cvSync, { ...e, rodando: agora() });
+  try { return await cvSincronizar(null, ORIGEM_SITE, { enviar: true, desdeId: cvDesdeId(), unico: true }); }
+  catch (err) { console.error('[portal] cv auto', err.message); return null; }
+  finally { const f = await cvEstado(); delete f.rodando; await gravar(CAM.cvSync, f); }
+}
+function agendarCV() {
+  if (!cvAuto()) return;
+  const tarefa = cvTalvezAuto().catch((err) => console.error('[portal] cv auto', err.message));
+  try { require('@vercel/functions').waitUntil(tarefa); } catch (err) { /* fora da Vercel: a promessa segue sozinha */ }
 }
 async function cronCV(req, res) {
   const segredo = process.env.CRON_SECRET;
   if (!segredo || String(req.headers.authorization || '') !== `Bearer ${segredo}`) { res.statusCode = 401; return res.end(JSON.stringify({ ok: false })); }
   if (!cvAuto()) return res.end(JSON.stringify({ ok: true, auto: false }));
   try {
-    const d = await cvSincronizar(null, 'https://bracerumpark.com', { enviar: true });
+    const d = await cvSincronizar(null, ORIGEM_SITE, { enviar: true, desdeId: cvDesdeId(), unico: true });
     return res.end(JSON.stringify({ ok: true, ...d }));
   } catch (e) { res.statusCode = 502; return res.end(JSON.stringify({ ok: false, erro: e.message })); }
 }
@@ -957,6 +984,7 @@ module.exports = async (req, res) => {
   res.setHeader('X-Robots-Tag', 'noindex');
   const fim = (status, obj) => { res.statusCode = status; res.end(JSON.stringify(obj)); };
   if (req.method === 'GET' && /[?&]cron=cv-corretores\b/.test(req.url || '')) return cronCV(req, res);
+  agendarCV();
   if (req.method === 'GET' && /[?&](anexo|material|tutorial|card)=/.test(req.url || '')) {
     try { return await baixar(req, res); } catch (e) { console.error('[portal] download', e.message); res.statusCode = 500; return res.end('erro'); }
   }
@@ -1041,7 +1069,7 @@ module.exports = async (req, res) => {
       case 'ofertaStatus': soGestor(); return ok(await ofertaStatus(b, s));
       // solicitações
       // corretores do CV
-      case 'cvCorretores': soGestor(); await cvTalvezAuto(s, origemDe(req)); return ok(await cvCorretores());
+      case 'cvCorretores': soGestor(); await cvTalvezAuto(); return ok(await cvCorretores());
       case 'cvSincronizar': soGestor(); return ok(await cvSincronizar(s, origemDe(req), { enviar: !!b.enviar, cvIds: Array.isArray(b.cvIds) ? b.cvIds.map(Number) : undefined }));
       case 'cvConvite': {
         soGestor();
@@ -1074,3 +1102,4 @@ module.exports = async (req, res) => {
 };
 
 module.exports._interno = { hashSenha, senhaConfere, slugDe, validarConta, idEmail, normalizaMaterial, normalizaPedido, bibliotecaPara, _zerarBase: () => { BASE = null; } };
+module.exports.agendarCV = agendarCV;

@@ -1733,7 +1733,7 @@
     const pend = d.corretores.filter((c) => !c.fora && (!c.conta || (c.conta.papel === 'corretor' && !c.conta.ativo && !(c.conta.convite && c.conta.convite.ok))));
     box.innerHTML = `
       <p class="small muted" style="margin:0 0 14px">${esc(t('cv.lead'))}</p>
-      <div class="syncbar ${d.auto && d.email ? '' : 'syncbar--alerta'}">${I.info}<span>${esc(d.auto ? t('cv.autoOn') : t('cv.autoOff'))}${d.email ? '' : ` ${esc(t('cv.noEmail'))}`}${e.ultimaTentativa ? ` <span class="muted">· ${esc(t('cv.last'))} ${esc(data(e.ultimaTentativa, true))}${e.resultado === 'erro' ? ` — ${esc(e.erro || '')}` : ''}</span>` : ''}</span></div>
+      <div class="syncbar ${d.auto && d.email ? '' : 'syncbar--alerta'}">${I.info}<span>${esc(d.auto ? t('cv.autoOn') + (d.desdeId ? ` ${t('cv.autoFrom')} #${d.desdeId}.` : '') : t('cv.autoOff'))}${d.email ? '' : ` ${esc(t('cv.noEmail'))}`}${e.ultimaTentativa ? ` <span class="muted">· ${esc(t('cv.last'))} ${esc(data(e.ultimaTentativa, true))}${e.resultado === 'erro' ? ` — ${esc(e.erro || '')}` : ''}</span>` : ''}</span></div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 16px">
         <button type="button" class="btn btn--ink btn--sm" id="cv-sync" ${pend.length ? '' : 'disabled'}>${I.send}${esc(t('cv.syncSend'))} (${pend.length})</button>
         <button type="button" class="btn btn--line btn--sm" id="cv-test">${I.send}${esc(t('cv.test'))}</button>

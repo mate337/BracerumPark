@@ -49,7 +49,7 @@ const ignorados = () => String(process.env.PORTAL_CV_IGNORAR ?? '2').split(/[,;\
 function motivoFora(c) {
   if (!c.ativo) return 'login desativado no CV';
   if (!emailOk(c.email)) return 'sem e-mail válido no CV';
-  if (ignorados().includes(c.cvId)) return 'ignorado (PORTAL_CV_IGNORAR)';
+  if (ignorados().includes(c.cvId)) return 'fora do portal (corretor de demonstração)';
   if (/@(demonstracao|exemplo|example)\./.test(c.email)) return 'e-mail de demonstração';
   return null;
 }

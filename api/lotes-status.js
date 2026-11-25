@@ -98,6 +98,9 @@ async function lerCV() {
 }
 
 module.exports = async (req, res) => {
+  // Portal do Corretor: a maquete chama esta função o tempo todo — aproveita para conferir corretor novo no CV
+  // (só com PORTAL_CV_AUTO=1, no máximo a cada 5 min, em segundo plano; nunca atrasa nem derruba a resposta).
+  if (process.env.PORTAL_CV_AUTO === '1') { try { require('./portal.js').agendarCV(); } catch (e) { console.error('[lotes-status] cv', e.message); } }
   res.setHeader('Content-Type', 'application/json; charset=utf-8');
   try {
     const { total, lotes, desconhecidas } = await lerCV();

@@ -423,3 +423,15 @@ Novas e **opcionais** (têm padrão): `PORTAL_FUSO` (America/Asuncion), `PORTAL_
   até lá o Resend só entrega de `onboarding@resend.dev` para o e-mail dono da conta Resend.
 - Testes: 22 (3 novos: conta com o mesmo e-mail e convite único; falha registrada e repetida até 3×; teste só para o
   gestor e rotina protegida por `CRON_SECRET`).
+
+### 7.8 Automático ligado (2026-11-25, pedido do Matheus)
+- `PORTAL_CV_AUTO=1` e `PORTAL_CV_AUTO_DESDE_ID=6` em Production: **corretor cadastrado no CV com id ≥ 6** vira conta e
+  recebe o e-mail sozinho. Os que já existiam (Omar #3, testes #4/#5) continuam no botão manual da aba.
+- **Gatilho:** o CV não tem webhook de cadastro de corretor (os eventos documentados são de reserva, cliente, unidade e
+  empreendimento) e o plano Hobby só roda rotina diária. Então **toda chamada ao `/api/portal` e ao `/api/lotes-status`**
+  (a maquete da home chama o tempo todo) agenda, em segundo plano (`waitUntil` do `@vercel/functions` 3.11.1), uma
+  conferência do CV — **no máximo a cada 5 min**. Sem visita nenhuma ao site, a rotina diária das 10h garante.
+- **Sem convite em dobro:** cada tentativa de cada corretor é reservada com um arquivo `portal/cv/auto-<cvId>-<n>.json`
+  criado com `allowOverwrite: false` (atômico no Blob); quem não consegue criar, pula. Teste com duas chamadas
+  simultâneas: um e-mail só.
+- E-mail de teste no formato final (remetente `portal@bracerumpark.com`, imagens do site) enviado ao Matheus em 25/11.
