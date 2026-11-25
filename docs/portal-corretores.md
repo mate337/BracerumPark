@@ -448,6 +448,10 @@ lançamento da maquete passou a 15/01/2027.
 **⚠️ O CV ainda está no Pós-Expo:** as tabelas aprovadas do empreendimento 4 se chamam "Pós-Expo – Á vista /
 20%+12x / 20%+36x" e cobram US$ 185/m² (Padrão). Com o PDF novo, até 15/01/2027 vale US$ 160 — falta criar/aprovar
 as tabelas de Lançamento no CV (o portal não grava no CV).
+No CV as 9 tabelas do empreendimento 4 já existem com vigência: 3–5 "Lançamento Expo" 01/11→13/11/2026, 6–8
+"Pós-Expo" 14/11/2026→31/03/2027, 9–11 "Fase 1 plena" 01/04→01/07/2027. **A API do CV não altera tabela de preço**
+(v1 e v3 só aceitam GET — conferido por OPTIONS em 25/11/2026; a documentação pública só tem leitura): a vigência se
+muda no painel do CV — 3–5 até 15/01/2027 e 6–8 a partir de 16/01/2027.
 
 **Aba Tabela com quatro produtos** (`#/tabela`, `#/tabela/casas`, `#/tabela/aptos`, `#/tabela/outlet`):
 - **Loteamentos industriais** — como antes (Tabela v3.1, simulador, lote a lote).
