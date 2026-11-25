@@ -615,3 +615,35 @@ test('proposta no portal: só com sessão; PDF com número na auditoria; lote re
   assert.equal((await postBruto({ tipo: 'outlet', ids: ['out/99'] }, C.ana)).status, 422);
   store.delete('portal/sync/tabelas.json');
 });
+
+test('proposta mista: lotes pela tabela P1 (faixa só pelos lotes) + lojas pelo CV, somados', async () => {
+  const precos = require(path.join(RAIZ, '3dmasterplan/data/precos.json'));
+  const lotes = require(path.join(RAIZ, '3dmasterplan/data/lotes.json'));
+  const tabelas = require(path.join(RAIZ, 'api/_portal-tabelas-retrato.json'));
+  const unidades = new Map(lotes.lotes.map((l) => [l.id, l]));
+  const base = { unidades, precos, tabelas, situacao: () => 'disponivel', janelaVigente: { id: 'expo' }, janela: 'expo', pagamento: '12x' };
+  const out01 = tabelas.produtos.outlet.unidades.find((u) => u.id === 'out/01').c['12x'];
+  const m = PROPOSTA.montarProposta({ ...base, ids: ['Q07.L014', 'out/01'] });
+  assert.equal(m.tipo, 'misto'); assert.deepEqual([m.nLotes, m.nLojas], [1, 1]);
+  assert.deepEqual(m.cond['12x'], { total: 200000 + out01.total, sinal: 40000 + out01.sinal, n: 12, parcela: 13333 + out01.parcela });
+  assert.equal(m.faixa.de, 1, 'a loja não conta na faixa de quantidade dos lotes');
+  // na matriz por janela só a parte dos lotes muda; a das lojas é a mesma
+  assert.equal(m.matriz[2].cond['12x'].total - m.matriz[0].cond['12x'].total, 275000 - 200000);
+  // 9 lotes + 1 loja: faixa 9–16 (Padrão, US$ 138/m²) nos lotes
+  const nove = lotes.lotes.filter((l) => l.q === 'Q08').slice(0, 9).map((l) => l.id);
+  const m9 = PROPOSTA.montarProposta({ ...base, ids: [...nove, 'out/01'] });
+  assert.equal(m9.faixa.de, 9);
+  assert.equal(m9.cond['12x'].total, 138 * 1250 * 9 + out01.total);
+  // loja ocupada derruba a proposta mista inteira
+  const ocupada = JSON.parse(JSON.stringify(tabelas)); ocupada.produtos.outlet.unidades.find((u) => u.id === 'out/01').sit = 'Reservada';
+  assert.throws(() => PROPOSTA.montarProposta({ ...base, tabelas: ocupada, ids: ['Q07.L014', 'out/01'] }), /out\/01/);
+  // o PDF misto sai
+  const { pdf, nome } = await PROPOSTA.gerarPDF(m, { corretor: { nome: 'Ana Corretora' }, numero: 'BP-20261125-MIX1' });
+  assert.equal(pdf.slice(0, 5).toString(), '%PDF-'); assert.match(nome, /BP-20261125-MIX1/);
+  // e pelo portal, com sessão
+  const r = await postBruto({ ids: ['Q01.L001', 'out/02'], pagamento: 'vista' }, C.ana);
+  assert.equal(r.status, 200, r.corpo.toString().slice(0, 200));
+  const log = (await post('auditoria', {}, C.gestor)).json.eventos.filter((e) => e.acao === 'proposta.gerada').find((e) => e.det.tipo === 'misto');
+  assert.ok(log); assert.deepEqual(log.det.unidades, ['Q01.L001', 'out/02']);
+  store.delete('portal/sync/tabelas.json');
+});

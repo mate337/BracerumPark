@@ -287,6 +287,7 @@ estava um número atrás da legenda a partir do 09 (a maquete segue a legenda).
   (`v: {vista|12x|36x: [total, sinal, n, parcela]}`). Sem o arquivo a maquete segue só com os lotes.
 - No modo "Lotes à venda" as lojas aparecem em dourado (`COR_LOJA`) no telhado e entram no mesmo fluxo dos lotes
   (`escolhidos`, cartão, soma com Shift, hash `#lotes-out/12-out/13`); a escolha é pelo plano do telhado (9 m), não pelo
-  chão. Lotes e lojas não se misturam na mesma simulação. A situação vem de `lojas` no `/api/lotes-status`.
+  chão. Lotes e lojas podem ir juntos na mesma simulação (`calcula` soma as duas partes; a faixa de quantidade conta só os
+  lotes; cartão `mostraCartaoMisto`). A situação vem de `lojas` no `/api/lotes-status`. `app.js` em `?v=7`.
 - `?corretor=1` (Portal do Corretor): o botão vira "Baixar proposta" com o campo do cliente; o PDF é do `/api/portal`
   (ver `docs/portal-corretores.md` §7.10). `app.css`/`app.js` em `?v=6`.

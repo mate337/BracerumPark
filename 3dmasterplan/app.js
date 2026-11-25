@@ -76,7 +76,8 @@ const T = {
     'loja.eyebrow': 'Bracerum Outlet · {b}', 'loja.title': 'Loja {id}', 'loja.multiEyebrow': 'Simulação · Bracerum Outlet', 'loja.multiTitle': '{n} lojas · {a} m²',
     'loja.area': 'área privativa da loja no CV', 'loja.bloco': 'conjunto', 'loja.m2': '{p}/m² × {a} m²', 'loja.sum': '{n} lojas · {a} m²',
     'loja.notes': 'Valores da tabela aprovada do Bracerum Outlet no CV CRM ({t}): à vista −5% e 20% + 36x +8% sobre o 20% + 12x. A disponibilidade de cada loja é confirmada pela Bracerum na proposta.',
-    'loja.mix': 'Lotes e lojas do Outlet são simulados separados — a seleção recomeçou.', 'lots.outlet': 'Bracerum Outlet · 1ª fase', 'lots.lojas': 'lojas',
+    'mix.eyebrow': 'Simulação · lotes + Outlet', 'mix.title': '{l} + {o} · {a} m²', 'mix.l': '{n} lote', 'mix.ls': '{n} lotes', 'mix.o': '{n} loja', 'mix.os': '{n} lojas',
+    'mix.lots': 'Lotes · {p}', 'mix.stores': 'Lojas do Outlet · tabela do CV', 'mix.tier': 'Faixa de quantidade dos lotes: {n} lote(s) — as lojas não entram na contagem.', 'lots.outlet': 'Bracerum Outlet · 1ª fase', 'lots.lojas': 'lojas',
     'lots.seeLojas': 'Ver lojas e preços', 'loja.tip': 'Loja {id}',
     'st.r': 'Reservado', 'st.v': 'Vendido', 'st.b': 'Indisponível', 'st.d': 'disponíveis',
     'st.live': 'Disponibilidade ao vivo · CV CRM · {h}', 'st.txt': 'Este lote está {s} e não entra na simulação. Fale com a equipe comercial sobre os lotes disponíveis ao redor.',
@@ -133,7 +134,8 @@ const T = {
     'loja.eyebrow': 'Bracerum Outlet · {b}', 'loja.title': 'Store {id}', 'loja.multiEyebrow': 'Quote · Bracerum Outlet', 'loja.multiTitle': '{n} stores · {a} m²',
     'loja.area': 'private area of the store in the CV', 'loja.bloco': 'complex', 'loja.m2': '{p}/m² × {a} m²', 'loja.sum': '{n} stores · {a} m²',
     'loja.notes': 'Prices from the approved Bracerum Outlet table in the CV CRM ({t}): cash −5% and 20% + 36x +8% on 20% + 12x. Availability of each store is confirmed by Bracerum in the proposal.',
-    'loja.mix': 'Lots and Outlet stores are quoted separately — the selection started over.', 'lots.outlet': 'Bracerum Outlet · phase 1', 'lots.lojas': 'stores',
+    'mix.eyebrow': 'Quote · lots + Outlet', 'mix.title': '{l} + {o} · {a} m²', 'mix.l': '{n} lot', 'mix.ls': '{n} lots', 'mix.o': '{n} store', 'mix.os': '{n} stores',
+    'mix.lots': 'Lots · {p}', 'mix.stores': 'Outlet stores · CV table', 'mix.tier': 'Lot quantity band: {n} lot(s) — stores do not count.', 'lots.outlet': 'Bracerum Outlet · phase 1', 'lots.lojas': 'stores',
     'lots.seeLojas': 'See stores and prices', 'loja.tip': 'Store {id}',
     'st.r': 'Reserved', 'st.v': 'Sold', 'st.b': 'Unavailable', 'st.d': 'available',
     'st.live': 'Live availability · CV CRM · {h}', 'st.txt': 'This lot is {s} and is left out of the quote. Talk to the sales team about the available lots around it.',
@@ -190,7 +192,8 @@ const T = {
     'loja.eyebrow': 'Bracerum Outlet · {b}', 'loja.title': 'Local {id}', 'loja.multiEyebrow': 'Simulación · Bracerum Outlet', 'loja.multiTitle': '{n} locales · {a} m²',
     'loja.area': 'área privada del local en el CV', 'loja.bloco': 'conjunto', 'loja.m2': '{p}/m² × {a} m²', 'loja.sum': '{n} locales · {a} m²',
     'loja.notes': 'Valores de la tabla aprobada del Bracerum Outlet en el CV CRM ({t}): contado −5% y 20% + 36 cuotas +8% sobre el 20% + 12. La disponibilidad de cada local la confirma Bracerum en la propuesta.',
-    'loja.mix': 'Lotes y locales del Outlet se simulan por separado — la selección empezó de nuevo.', 'lots.outlet': 'Bracerum Outlet · 1ª fase', 'lots.lojas': 'locales',
+    'mix.eyebrow': 'Simulación · lotes + Outlet', 'mix.title': '{l} + {o} · {a} m²', 'mix.l': '{n} lote', 'mix.ls': '{n} lotes', 'mix.o': '{n} local', 'mix.os': '{n} locales',
+    'mix.lots': 'Lotes · {p}', 'mix.stores': 'Locales del Outlet · tabla del CV', 'mix.tier': 'Franja de cantidad de los lotes: {n} lote(s) — los locales no cuentan.', 'lots.outlet': 'Bracerum Outlet · 1ª fase', 'lots.lojas': 'locales',
     'lots.seeLojas': 'Ver locales y precios', 'loja.tip': 'Local {id}',
     'st.r': 'Reservado', 'st.v': 'Vendido', 'st.b': 'No disponible', 'st.d': 'disponibles',
     'st.live': 'Disponibilidad en vivo · CV CRM · {h}', 'st.txt': 'Este lote está {s} y no entra en la simulación. Hable con el equipo comercial sobre los lotes disponibles alrededor.',
@@ -1059,7 +1062,12 @@ const usd = (v) => `US$${lang === 'en' ? '' : ' '}${fmt(Math.round(v))}`;
 const nomeCat = (c) => tr(P.categorias[c].nome);
 const subst = (s, o) => s.replace(/\{(\w+)\}/g, (_, k) => (o[k] ?? ''));
 function calcula(lista, jan = janela, pag = pagto) {
-  if (ehLoja(lista[0])) {                     // Outlet: valores exatos da tabela do CV (total, sinal, parcelas por loja)
+  const lojas = lista.filter(ehLoja);
+  if (lojas.length && lojas.length < lista.length) {   // proposta mista: soma as duas partes
+    const a = calcula(lista.filter((l) => !ehLoja(l)), jan, pag), b = calcula(lojas, jan, pag);
+    return { ...a, n: a.n + b.n, total: a.total + b.total, area: a.area + b.area, sinal: a.sinal + b.sinal, parcela: a.parcela + b.parcela, misto: true, lotes: a, lojas: b };
+  }
+  if (lojas.length) {                     // Outlet: valores exatos da tabela do CV (total, sinal, parcelas por loja)
     let total = 0, area = 0, sinal = 0, parcela = 0, np = 0;
     for (const l of lista) { const v = l.v[pag]; total += v[0]; sinal += v[1]; np = v[2]; parcela += v[3]; area += l.a; }
     return { n: lista.length, f: -1, total, area, cats: {}, np, sinal, parcela, loja: true };
@@ -1280,7 +1288,7 @@ function escolheLotes(lista, voo = true) {
   }
   escolhidos = lista;
   if (!lista.length) { limpaSelecao(); return; }
-  selected = { kind: 'lot', i: ehLoja(lista[0]) ? areaIdx.outlet : areaIdx.industrial };
+  selected = { kind: 'lot', i: lista.every(ehLoja) ? areaIdx.outlet : areaIdx.industrial };
   marcaSelecao(-1);
   limpaLote();
   lista.forEach((l) => desenhaLote(l));
@@ -1314,7 +1322,6 @@ function lotesDoHash(h) {
   return h.replace(/^lotes?-/, '').split('-').flatMap((id) => (/^Q\d\d$/.test(id) ? L.quadras.find((q) => q.q === id)?._lotes || [] : [L.porId.get(id)])).filter(Boolean);
 }
 function cliqueLote(l, juntar) {
-  if (juntar && escolhidos.length && ehLoja(escolhidos[0]) !== ehLoja(l)) { dica('loja.mix', 5000); juntar = false; }
   if (juntar && escolhidos.length && (escolhidos.includes(l) || livre(l))) {
     escolheLotes(escolhidos.includes(l) ? escolhidos.filter((x) => x !== l) : [...escolhidos, l], false);
   } else escolheLotes([l]);
@@ -1432,13 +1439,13 @@ function faixaTxt(c) {
 }
 function linkProposta(c) {
   const jan = P.janelas.find((j) => j.id === janela), pg = P.pagamentos.find((p) => p.id === pagto);
-  const nomes = escolhidos.map((l) => `${l.nome || 'LTIND.' + l.id} — ${nomeCat(l.cat)} — ${fmt(l.a)} m²`);
+  const nomes = escolhidos.map((l) => (ehLoja(l) ? `${subst(t('loja.title'), { id: l.id })} — ${l.b} — ${fmt(l.a)} m²` : `${l.nome || 'LTIND.' + l.id} — ${nomeCat(l.cat)} — ${fmt(l.a)} m²`));
   const cond = c.np ? subst(t('mail.parc'), { s: usd(c.sinal), n: c.np, p: usd(c.parcela) }) : t('lot.cash');
   const corpo = [t('mail.hello'), '', ...nomes, '', subst(t('mail.sim'), { v: P.tabela }),
     `${t('lots.window')}: ${tr(jan.nome)} (${tr(jan.quando)})`, `${t('lots.pay')}: ${tr(pg.nome)}`,
     `${t(escolhidos.length > 1 ? 'lot.totalOp' : 'lot.total')}: ${usd(c.total)} · ${cond}`, '',
     location.origin + location.pathname + location.hash].join('\n');
-  const assunto = subst(t('mail.subject'), { l: escolhidos.length === 1 ? 'LTIND.' + escolhidos[0].id : `${escolhidos.length} ${t('lots.lots')}` });
+  const assunto = subst(t('mail.subject'), { l: c.misto ? tituloMisto(c) : escolhidos.length === 1 ? 'LTIND.' + escolhidos[0].id : `${escolhidos.length} ${t('lots.lots')}` });
   return `mailto:${P.contato.emails.join(',')}?subject=${encodeURIComponent(assunto)}&body=${encodeURIComponent(corpo)}`;
 }
 /* LTIND.Q07.L014.A01250.ESQNAO.RT.L -> "meio de quadra · retangular · frente leste" */
@@ -1470,7 +1477,7 @@ function mostraCartaoIndisponivel(l) {
 const horaSt = () => stHora.toLocaleTimeString(lang === 'pt' ? 'pt-BR' : lang, { hour: '2-digit', minute: '2-digit' });
 /* botão de proposta: público = e-mail (Pedir proposta); Portal do Corretor = PDF (Baixar proposta) */
 function ctaProposta(c) {
-  if (!CORRETOR) return `<a class="btn calc__cta" href="${ehLoja(escolhidos[0]) ? linkPropostaLojas(c) : linkProposta(c)}">${esc(t('lot.propose'))} <span aria-hidden="true">→</span></a>`;
+  if (!CORRETOR) return `<a class="btn calc__cta" href="${escolhidos.every(ehLoja) ? linkPropostaLojas(c) : linkProposta(c)}">${esc(t('lot.propose'))} <span aria-hidden="true">→</span></a>`;
   return `<form class="prop" data-prop>
       <label class="prop__lab" for="propCliente">${esc(t('prop.client'))}</label>
       <input class="prop__in" id="propCliente" name="cliente" maxlength="80" autocomplete="off" value="${esc(propCliente)}" />
@@ -1506,7 +1513,7 @@ function captura() {
 async function baixarProposta(form) {
   const msg = form.querySelector('.prop__msg'), btn = form.querySelector('button[type="submit"]');
   if (!escolhidos.length) return;
-  const tipo = ehLoja(escolhidos[0]) ? 'outlet' : 'lotes';
+  const tipo = escolhidos.every(ehLoja) ? 'outlet' : escolhidos.some(ehLoja) ? 'misto' : 'lotes';
   btn.disabled = true; msg.textContent = t('prop.wait');
   try {
     const r = await fetch('/api/portal', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' },
@@ -1570,9 +1577,52 @@ function mostraCartaoLojas() {
   $('#cardNav').hidden = true;
   abreCartao();
 }
+const tituloMisto = (c) => subst(t('mix.title'), { l: subst(t(c.lotes.n === 1 ? 'mix.l' : 'mix.ls'), { n: fmt(c.lotes.n) }),
+  o: subst(t(c.lojas.n === 1 ? 'mix.o' : 'mix.os'), { n: fmt(c.lojas.n) }), a: fmt(c.area) });
+function mostraCartaoMisto() {
+  const lista = escolhidos, c = calcula(lista), jan = P.janelas.find((j) => j.id === janela);
+  $('#cardMedia').innerHTML = '';
+  $('#cardEyebrow').textContent = t('mix.eyebrow');
+  $('#cardTitle').textContent = tituloMisto(c);
+  const sw = (cor) => `<i class="sw" style="background:${cor}"></i>`;
+  const linhas = [
+    ...Object.entries(c.lotes.cats).sort((a, b) => b[1].a - a[1].a).map(([k, v]) =>
+      [`${sw(P.categorias[k].cor)}${v.n} × ${esc(nomeCat(k))}`, esc(`${fmt(v.a)} m² × ${usd(v.pm)}/m² = ${usd(v.v)}`)]),
+    [`${sw(COR_LOJA)}${c.lojas.n} × ${esc(t('lots.outlet'))}`, esc(`${fmt(c.lojas.area)} m² = ${usd(c.lojas.total)}`)]];
+  $('#cardKpis').innerHTML = linhas.map(([dt, dd]) => `<div><dt>${dt}</dt><dd>${dd}</dd></div>`).join('');
+  const chip = (id) => `<li><button type="button" data-tira="${esc(id)}" aria-label="${esc(subst(t('lot.remove'), { id }))}">${esc(id)}<span aria-hidden="true">×</span></button></li>`;
+  const chips = lista.length <= 40 ? `<ul class="chips">${lista.map((l) => chip(l.id)).join('')}</ul>` : '';
+  $('#cardCalc').innerHTML = `
+    <p class="calc__lab">${esc(t('lots.window'))}</p>${segJanela()}
+    <p class="calc__when">${esc(tr(jan.quando))}</p>
+    <p class="calc__lab">${esc(t('lots.pay'))}</p>${segs(t('lots.pay'), P.pagamentos.map((p) => ({ id: p.id, rot: tr(p.nome) })), pagto, 'pag')}
+    <div class="calc__res" aria-live="polite">
+      <p class="calc__lbl">${esc(t('lot.totalOp'))}</p>
+      <p class="calc__total">${usd(c.total)}</p>
+      <p class="calc__m2">${esc(subst(t('lot.m2avg'), { p: usd(c.total / c.area), a: fmt(c.area) }))}</p>
+      <dl class="calc__rows">
+        <div><dt>${esc(subst(t('mix.lots'), { p: tr(jan.curto) }))}</dt><dd>${usd(c.lotes.total)}</dd></div>
+        <div><dt>${esc(t('mix.stores'))}</dt><dd>${usd(c.lojas.total)}</dd></div>
+        ${c.np ? `<div><dt>${esc(t('lot.down'))}</dt><dd>${usd(c.sinal)}</dd></div><div><dt>${esc(subst(t('lot.inst'), { n: c.np }))}</dt><dd>${usd(c.parcela)}</dd></div>`
+          : `<div><dt>${esc(t('lot.cash'))}</dt><dd>${usd(c.total)}</dd></div>`}</dl>
+      <p class="calc__tier">${esc(subst(t('mix.tier'), { n: c.lotes.n }))} ${esc(faixaTxt(c.lotes))}</p>
+    </div>
+    ${ctaProposta(c)}
+    ${chips}
+    <div class="calc__btns">
+      <button type="button" class="linkbtn" data-acao="somar" aria-pressed="${somar}">${esc(t(somar ? 'lot.adding' : 'lot.add'))}</button>
+      <button type="button" class="linkbtn" data-acao="limpar">${esc(t('lot.clear'))}</button>
+    </div>`;
+  $('#cardText').textContent = `${t('lot.notes')}${janela === 'expo' ? ' ' + t('lot.expoNote') : ''} ${subst(t('loja.notes'), { t: O ? O.tabela : '' })}`;
+  $('#cardNote').textContent = '';
+  $('#cardActions').innerHTML = `<p class="contact">${esc(P.contato.nomes)} · ${P.contato.emails.map(esc).join(' · ')}</p>`;
+  $('#cardNav').hidden = true;
+  abreCartao();
+}
 function mostraCartaoLotes() {
   if (escolhidos.length === 1 && !livre(escolhidos[0])) { mostraCartaoIndisponivel(escolhidos[0]); return; }
-  if (ehLoja(escolhidos[0])) { mostraCartaoLojas(); return; }
+  if (escolhidos.every(ehLoja)) { mostraCartaoLojas(); return; }
+  if (escolhidos.some(ehLoja)) { mostraCartaoMisto(); return; }
   const lista = escolhidos, c = calcula(lista), um = lista.length === 1 ? lista[0] : null;
   const quadras = [...new Set(lista.map((l) => l.q))];
   $('#cardMedia').innerHTML = '';

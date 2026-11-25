@@ -34,7 +34,7 @@ maquete 3D embutida, que as seis páginas internas baixavam e interpretavam à t
   (contorno do folder digital, numeração/valores/situação do CV — `docs/3dmasterplan/build_outlet.py` → `3dmasterplan/data/outlet.json`;
   `/api/lotes-status` devolve `lojas`). No portal a maquete abre com **`?corretor=1`**: "Pedir proposta" vira **"Baixar proposta"** —
   PDF gerado no servidor (`api/_portal-proposta.js`, pdfkit + `api/_fontes/`), valores recalculados, unidade ocupada recusada,
-  registrado na auditoria. Quando o CV mudar preço do Outlet: reler o CV (`build_tabelas_pdf.js --cv`) e rodar o `build_outlet.py`.
+  registrado na auditoria. **Lotes e lojas podem ir juntos na mesma proposta** (faixa de quantidade só pelos lotes; lojas pelo CV; tudo somado). Quando o CV mudar preço do Outlet: reler o CV (`build_tabelas_pdf.js --cv`) e rodar o `build_outlet.py`.
 
 ### Botão "Portal do Corretor" no topo do site (2026-11-24)
 - **`.portal-link`** → `/PortalCorretores`, ao lado do seletor de idioma: no **hero da home** (o `.hero__lang` virou

@@ -23,12 +23,15 @@ const TXT = {
   pt: {
     loc: 'pt-BR', prop: 'Proposta comercial', lotes: 'Lotes industriais', outlet: 'Bracerum Outlet · Premium Outlet 1ª fase',
     tLote: 'Lote {id} · {a}', tLotes: '{n} lotes industriais · {a}', tLoja: 'Loja {id} · {a}', tLojas: '{n} lojas no Bracerum Outlet · {a}',
+    tMisto: '{l} + {o} · {a}', misto: 'Lotes industriais + Bracerum Outlet', nL: '{n} lote', nLs: '{n} lotes', nO: '{n} loja', nOs: '{n} lojas', kMisto: 'lotes + lojas',
+    loja: 'Loja', lojaCat: 'loja · Outlet', outrasM: 'Por janela de preço (data da assinatura) e condição de pagamento. Só os lotes mudam com a janela; as lojas do Outlet seguem a tabela do CV (à vista −5%, 20% + 36x +8%). Em destaque, a condição proposta.',
+    faixaM: 'Faixa de quantidade da tabela dos lotes: {f} (as lojas não entram na contagem)',
     para: 'Para: {c}', semCliente: 'Simulação de compra para o seu cliente', num: 'Proposta Nº {n} · emitida em {d} · válida por 30 dias, até {v}',
     por: 'Preparada por {c}', img: 'As unidades da proposta em destaque no Masterplan 3D do Bracerum Park (imagem ilustrativa).',
     kUn: 'lotes', kUnL: 'lojas', kArea: 'área total', kTot: 'valor · {p}', kM2: 'preço médio por m²',
     cond: 'Condição proposta', sinal: 'Sinal de 20% na assinatura', parc: '{n} parcelas mensais de', unico: 'Pagamento único na assinatura',
     faixa: 'Faixa de {de} a {ate} lotes na operação', faixaUp: 'Faixa de {de} lotes ou mais na operação',
-    unidades: 'Unidades da proposta', cLote: 'Lote', cQuadra: 'Quadra', cCat: 'Categoria', cArea: 'Área', cM2: 'US$/m²', cValor: 'Valor',
+    unidades: 'Unidades da proposta', cLote: 'Lote', cUn: 'Unidade', cQuadra: 'Quadra', cCat: 'Categoria', cArea: 'Área', cM2: 'US$/m²', cValor: 'Valor',
     cLoja: 'Loja', cConj: 'Conjunto', total: 'Total', outras: 'O valor da operação nas outras condições',
     outrasL: 'Por janela de preço (data da assinatura) e condição de pagamento. Em destaque, a condição proposta.',
     outrasO: 'Tabela aprovada do Bracerum Outlet no CV: à vista −5% e 20% + 36x +8% sobre o 20% + 12x.',
@@ -50,12 +53,15 @@ const TXT = {
   es: {
     loc: 'es-PY', prop: 'Propuesta comercial', lotes: 'Lotes industriales', outlet: 'Bracerum Outlet · Premium Outlet 1ª fase',
     tLote: 'Lote {id} · {a}', tLotes: '{n} lotes industriales · {a}', tLoja: 'Local {id} · {a}', tLojas: '{n} locales en el Bracerum Outlet · {a}',
+    tMisto: '{l} + {o} · {a}', misto: 'Lotes industriales + Bracerum Outlet', nL: '{n} lote', nLs: '{n} lotes', nO: '{n} local', nOs: '{n} locales', kMisto: 'lotes + locales',
+    loja: 'Local', lojaCat: 'local · Outlet', outrasM: 'Por ventana de precio (fecha de la firma) y condición de pago. Solo los lotes cambian con la ventana; los locales del Outlet siguen la tabla del CV (contado −5%, 20% + 36 cuotas +8%). Destacada, la condición propuesta.',
+    faixaM: 'Franja de cantidad de la tabla de lotes: {f} (los locales no cuentan)',
     para: 'Para: {c}', semCliente: 'Simulación de compra para su cliente', num: 'Propuesta N.º {n} · emitida el {d} · válida por 30 días, hasta el {v}',
     por: 'Preparada por {c}', img: 'Las unidades de la propuesta destacadas en el Masterplan 3D de Bracerum Park (imagen ilustrativa).',
     kUn: 'lotes', kUnL: 'locales', kArea: 'área total', kTot: 'valor · {p}', kM2: 'precio medio por m²',
     cond: 'Condición propuesta', sinal: 'Seña del 20% a la firma', parc: '{n} cuotas mensuales de', unico: 'Pago único a la firma',
     faixa: 'Franja de {de} a {ate} lotes en la operación', faixaUp: 'Franja de {de} lotes o más en la operación',
-    unidades: 'Unidades de la propuesta', cLote: 'Lote', cQuadra: 'Manzana', cCat: 'Categoría', cArea: 'Área', cM2: 'US$/m²', cValor: 'Valor',
+    unidades: 'Unidades de la propuesta', cLote: 'Lote', cUn: 'Unidad', cQuadra: 'Manzana', cCat: 'Categoría', cArea: 'Área', cM2: 'US$/m²', cValor: 'Valor',
     cLoja: 'Local', cConj: 'Conjunto', total: 'Total', outras: 'El valor de la operación en las otras condiciones',
     outrasL: 'Por ventana de precio (fecha de la firma) y condición de pago. Destacada, la condición propuesta.',
     outrasO: 'Tabla aprobada del Bracerum Outlet en el CV: contado −5% y 20% + 36 cuotas +8% sobre el 20% + 12.',
@@ -77,12 +83,15 @@ const TXT = {
   en: {
     loc: 'en-US', prop: 'Commercial proposal', lotes: 'Industrial lots', outlet: 'Bracerum Outlet · Premium Outlet phase 1',
     tLote: 'Lot {id} · {a}', tLotes: '{n} industrial lots · {a}', tLoja: 'Store {id} · {a}', tLojas: '{n} stores at Bracerum Outlet · {a}',
+    tMisto: '{l} + {o} · {a}', misto: 'Industrial lots + Bracerum Outlet', nL: '{n} lot', nLs: '{n} lots', nO: '{n} store', nOs: '{n} stores', kMisto: 'lots + stores',
+    loja: 'Store', lojaCat: 'store · Outlet', outrasM: 'By price window (signing date) and payment terms. Only the lots change with the window; Outlet stores follow the CV table (cash −5%, 20% + 36x +8%). Highlighted: the proposed terms.',
+    faixaM: 'Lot price list quantity band: {f} (stores do not count)',
     para: 'For: {c}', semCliente: 'Purchase simulation for your client', num: 'Proposal No. {n} · issued {d} · valid for 30 days, until {v}',
     por: 'Prepared by {c}', img: 'The units in this proposal highlighted on the Bracerum Park 3D Masterplan (illustrative image).',
     kUn: 'lots', kUnL: 'stores', kArea: 'total area', kTot: 'price · {p}', kM2: 'average price per m²',
     cond: 'Proposed terms', sinal: '20% down payment on signing', parc: '{n} monthly instalments of', unico: 'Single payment on signing',
     faixa: '{de} to {ate} lots in the purchase', faixaUp: '{de} lots or more in the purchase',
-    unidades: 'Units in this proposal', cLote: 'Lot', cQuadra: 'Block', cCat: 'Category', cArea: 'Area', cM2: 'US$/m²', cValor: 'Price',
+    unidades: 'Units in this proposal', cLote: 'Lot', cUn: 'Unit', cQuadra: 'Block', cCat: 'Category', cArea: 'Area', cM2: 'US$/m²', cValor: 'Price',
     cLoja: 'Store', cConj: 'Complex', total: 'Total', outras: 'The purchase price under the other terms',
     outrasL: 'By price window (signing date) and payment terms. Highlighted: the proposed terms.',
     outrasO: 'Approved Bracerum Outlet table in the CV: cash −5% and 20% + 36x +8% on 20% + 12x.',
@@ -127,64 +136,77 @@ function condLotes(precos, lotes, j, faixa) {
 
 /**
  * @param {object} o
- *   tipo 'lotes' | 'outlet'; ids [...]; janela; pagamento; idioma
+ *   ids [...] — lotes ("Q07.L014") e/ou lojas do Outlet ("out/12"), juntos ou separados; janela; pagamento; idioma
  *   unidades  Map id → {id,q,a,cat,nome} (lotes.json) · precos (precos.json) · janelaVigente {id}
  *   situacao(id) → 'disponivel' | 'reservado' | 'vendido' | 'indisponivel' | 'desconhecida' (lotes)
  *   tabelas   retrato das tabelas do CV (produtos.outlet) · sincronizadoEm (ISO do último sucesso do CV)
+ * Proposta mista (2026-11-25): a faixa de quantidade da Tabela P1 conta só os lotes; as lojas entram pelos valores
+ * do CV (iguais em todas as janelas); total, sinal e parcelas são a soma das duas partes.
  */
-function montarProposta(o) {
-  const idioma = TXT[o.idioma] ? o.idioma : 'pt';
-  const ids = [...new Set((Array.isArray(o.ids) ? o.ids : []).map((x) => String(x).trim()).filter(Boolean))];
-  if (!ids.length) throw erro(422, 'Escolha ao menos uma unidade');
-  if (ids.length > 200) throw erro(422, 'Proposta com mais de 200 unidades — divida em partes');
-  const pagamento = CONDS.includes(o.pagamento) ? o.pagamento : '12x';
-
-  if (o.tipo === 'outlet') {
-    const P = o.tabelas && o.tabelas.produtos && o.tabelas.produtos.outlet;
-    if (!P) throw erro(503, 'Tabela do Outlet indisponível agora — tente em alguns minutos');
-    const por = new Map(P.unidades.map((u) => [u.id, u]));
-    const fora = ids.filter((id) => !por.has(id));
-    if (fora.length) throw erro(422, `Loja não encontrada na tabela do CV: ${fora.join(', ')}`);
-    const us = ids.map((id) => por.get(id));
-    const ocup = us.filter((u) => !/dispon/i.test(u.sit || ''));
-    if (ocup.length) throw erro(409, `Fora de venda no CV: ${ocup.map((u) => `${u.id} (${String(u.sit).toLowerCase()})`).join(', ')}`);
-    const cond = {};
-    for (const c of CONDS) {
-      const s = { total: 0, sinal: 0, n: 0, parcela: 0 };
-      for (const u of us) { const v = u.c[c]; s.total += v.total; s.sinal += v.sinal; s.n = v.n; s.parcela += v.parcela; }
-      cond[c] = s;
-    }
-    const tab = ((P.tabelas || [])[0] || { nome: 'tabela de valores' }).nome.replace(/\s*-\s*(x\d+|[ÁA] vista)\s*$/i, '');
-    return {
-      tipo: 'outlet', idioma, pagamento, n: us.length, area: us.reduce((s, u) => s + u.area, 0), cond,
-      ajuste: { vista: P.cond.vista && P.cond.vista.ajuste, '36x': P.cond['36x'] && P.cond['36x'].ajuste },
-      unidades: us.map((u) => ({ id: u.id, grupo: u.bloco, area: u.area, m2: u.c[pagamento].total / u.area, total: u.c[pagamento].total })),
-      tabela: tab, sincronizadoEm: o.tabelas.ultimoSucesso || null,
-    };
+function parteOutlet(o, ids, pagamento) {
+  const P = o.tabelas && o.tabelas.produtos && o.tabelas.produtos.outlet;
+  if (!P) throw erro(503, 'Tabela do Outlet indisponível agora — tente em alguns minutos');
+  const por = new Map(P.unidades.map((u) => [u.id, u]));
+  const fora = ids.filter((id) => !por.has(id));
+  if (fora.length) throw erro(422, `Unidade não encontrada: ${fora.slice(0, 5).join(', ')}`);
+  const us = ids.map((id) => por.get(id));
+  const ocup = us.filter((u) => !/dispon/i.test(u.sit || ''));
+  if (ocup.length) throw erro(409, `Fora de venda no CV: ${ocup.map((u) => `${u.id} (${String(u.sit).toLowerCase()})`).join(', ')}`);
+  const cond = {};
+  for (const c of CONDS) {
+    const s = { total: 0, sinal: 0, n: 0, parcela: 0 };
+    for (const u of us) { const v = u.c[c]; s.total += v.total; s.sinal += v.sinal; s.n = v.n; s.parcela += v.parcela; }
+    cond[c] = s;
   }
-
+  return {
+    n: us.length, area: us.reduce((s, u) => s + u.area, 0), cond,
+    ajuste: { vista: P.cond.vista && P.cond.vista.ajuste, '36x': P.cond['36x'] && P.cond['36x'].ajuste },
+    unidades: us.map((u) => ({ id: u.id, loja: true, grupo: u.bloco, area: u.area, m2: u.c[pagamento].total / u.area, total: u.c[pagamento].total })),
+    tabela: ((P.tabelas || [])[0] || { nome: 'tabela de valores' }).nome.replace(/\s*-\s*(x\d+|[ÁA] vista)\s*$/i, ''),
+    sincronizadoEm: o.tabelas.ultimoSucesso || null,
+  };
+}
+function parteLotes(o, ids, pagamento, idioma) {
   const { precos } = o;
-  const fora = ids.filter((id) => !o.unidades.has(id));
-  if (fora.length) throw erro(422, `Lote não encontrado: ${fora.slice(0, 5).join(', ')}`);
   const lotes = ids.map((id) => o.unidades.get(id));
   const ocup = lotes.map((l) => [l.id, o.situacao(l.id)]).filter(([, s]) => s !== 'disponivel' && s !== 'desconhecida');
   if (ocup.length) throw erro(409, `Fora de venda no CV: ${ocup.slice(0, 8).map(([id, s]) => `${id} (${s})`).join(', ')}${ocup.length > 8 ? '…' : ''}`);
-  const semSituacao = lotes.some((l) => o.situacao(l.id) === 'desconhecida');
   // janela: a escolhida, se ainda vale (vigente ou futura); senão a vigente
   const iv = precos.janelas.findIndex((j) => j.id === o.janelaVigente.id);
   const ij = precos.janelas.findIndex((j) => j.id === o.janela);
   const janela = precos.janelas[ij >= iv ? ij : iv];
   const faixa = faixaDe(precos, lotes.length);
   const matriz = precos.janelas.slice(iv).map((j) => ({ id: j.id, nome: tx(j.curto, idioma), quando: periodo(j, idioma), cond: condLotes(precos, lotes, j.id, faixa) }));
-  const cond = matriz.find((m) => m.id === janela.id).cond;
   return {
-    tipo: 'lotes', idioma, pagamento, n: lotes.length, area: lotes.reduce((s, l) => s + l.a, 0), cond, matriz, faixa: precos.faixas[faixa],
+    n: lotes.length, area: lotes.reduce((s, l) => s + l.a, 0), cond: matriz.find((m) => m.id === janela.id).cond, matriz, faixa: precos.faixas[faixa],
     janela: { id: janela.id, nome: tx(janela.nome, idioma), quando: tx(janela.quando, idioma) },
     unidades: lotes.map((l) => {
       const m2 = precos.precos[janela.id][l.cat][faixa][PAG[pagamento]];
       return { id: l.id, nome: l.nome, grupo: l.q, cat: tx(precos.categorias[l.cat].nome, idioma), area: l.a, m2, total: m2 * l.a };
     }),
-    tabela: precos.tabela, semSituacao, sincronizadoEm: o.sincronizadoEm || null,
+    tabela: precos.tabela, semSituacao: lotes.some((l) => o.situacao(l.id) === 'desconhecida'), sincronizadoEm: o.sincronizadoEm || null,
+  };
+}
+function montarProposta(o) {
+  const idioma = TXT[o.idioma] ? o.idioma : 'pt';
+  const ids = [...new Set((Array.isArray(o.ids) ? o.ids : []).map((x) => String(x).trim()).filter(Boolean))];
+  if (!ids.length) throw erro(422, 'Escolha ao menos uma unidade');
+  if (ids.length > 200) throw erro(422, 'Proposta com mais de 200 unidades — divida em partes');
+  const pagamento = CONDS.includes(o.pagamento) ? o.pagamento : '12x';
+  const idsLotes = ids.filter((id) => o.unidades && o.unidades.has(id));
+  const idsLojas = ids.filter((id) => !(o.unidades && o.unidades.has(id)));
+  if (idsLojas.length && !idsLotes.length && idsLojas.some((id) => /^Q\d\d\.L\d{3}$/i.test(id))) throw erro(422, `Lote não encontrado: ${idsLojas.slice(0, 5).join(', ')}`);
+  const L = idsLotes.length ? parteLotes(o, idsLotes, pagamento, idioma) : null;
+  const O = idsLojas.length ? parteOutlet(o, idsLojas, pagamento) : null;
+  if (!L) return { tipo: 'outlet', idioma, pagamento, nLotes: 0, nLojas: O.n, ...O, tabelaOutlet: O.tabela };
+  if (!O) return { tipo: 'lotes', idioma, pagamento, nLotes: L.n, nLojas: 0, ...L };
+  const soma = (a, b) => ({ total: a.total + b.total, sinal: a.sinal + b.sinal, n: a.n || b.n, parcela: a.parcela + b.parcela });
+  const junta = (cl) => Object.fromEntries(CONDS.map((c) => [c, soma(cl[c], O.cond[c])]));
+  return {
+    tipo: 'misto', idioma, pagamento, nLotes: L.n, nLojas: O.n, n: L.n + O.n, area: L.area + O.area,
+    cond: junta(L.cond), matriz: L.matriz.map((m) => ({ ...m, cond: junta(m.cond) })), faixa: L.faixa, janela: L.janela,
+    unidades: [...L.unidades, ...O.unidades], tabela: L.tabela, tabelaOutlet: O.tabela, ajuste: O.ajuste,
+    semSituacao: L.semSituacao, sincronizadoEm: L.sincronizadoEm,
   };
 }
 
@@ -204,11 +226,13 @@ function gerarPDF(mod, { corretor = {}, cliente = '', imagem = null, numero, emi
   const data = (d) => new Intl.DateTimeFormat(T.loc, { timeZone: tz, day: '2-digit', month: '2-digit', year: 'numeric' }).format(d);
   const dataHora = (d) => new Intl.DateTimeFormat(T.loc, { timeZone: tz, day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }).format(d);
   const validade = new Date(emitido.getTime() + 30 * 864e5);
-  const lotes = mod.tipo === 'lotes';
+  const lotes = mod.tipo !== 'outlet', misto = mod.tipo === 'misto';   // lotes = há lotes (só lotes ou misto)
+  const rotulo = misto ? T.misto : lotes ? T.lotes : T.outlet;
+  const qtd = () => [mod.nLotes && sub(mod.nLotes === 1 ? T.nL : T.nLs, { n: nf(mod.nLotes) }), mod.nLojas && sub(mod.nLojas === 1 ? T.nO : T.nOs, { n: nf(mod.nLojas) })].filter(Boolean).join(' + ');
   const nomePag = (c) => ({ vista: { pt: 'À vista', es: 'Al contado', en: 'Cash' }, '12x': { pt: '20% + 12x', es: '20% + 12 cuotas', en: '20% + 12x' }, '36x': { pt: '20% + 36x', es: '20% + 36 cuotas', en: '20% + 36x' } }[c][mod.idioma] || c);
 
   const doc = new PDFDocument({ size: 'A4', margins: { top: M.top, bottom: M.bottom, left: M.x, right: M.x }, bufferPages: true,
-    info: { Title: `${T.prop} ${numero} — Bracerum Park`, Author: corretor.nome || 'Bracerum Park', Subject: lotes ? T.lotes : T.outlet, Creator: 'Portal do Corretor · Bracerum Park' } });
+    info: { Title: `${T.prop} ${numero} — Bracerum Park`, Author: corretor.nome || 'Bracerum Park', Subject: rotulo, Creator: 'Portal do Corretor · Bracerum Park' } });
   doc.registerFont('titulo', path.join(FONTES, 'Caladea-Bold.ttf'));
   doc.registerFont('txt', path.join(FONTES, 'Carlito-Regular.ttf'));
   doc.registerFont('neg', path.join(FONTES, 'Carlito-Bold.ttf'));
@@ -226,8 +250,8 @@ function gerarPDF(mod, { corretor = {}, cliente = '', imagem = null, numero, emi
   const h2 = (s) => { cabe(60); doc.font('titulo').fontSize(13.5).fillColor(C.texto).text(s, M.x, y, { width: LARG }); y = doc.y + 6; };
 
   /* ---------- abertura */
-  const titulo = lotes
-    ? (mod.n === 1 ? sub(T.tLote, { id: 'LTIND.' + mod.unidades[0].id, a: m2(mod.area) }) : sub(T.tLotes, { n: nf(mod.n), a: m2(mod.area) }))
+  const titulo = misto ? sub(T.tMisto, { l: sub(mod.nLotes === 1 ? T.nL : T.nLs, { n: nf(mod.nLotes) }), o: sub(mod.nLojas === 1 ? T.nO : T.nOs, { n: nf(mod.nLojas) }), a: m2(mod.area) })
+    : lotes ? (mod.n === 1 ? sub(T.tLote, { id: 'LTIND.' + mod.unidades[0].id, a: m2(mod.area) }) : sub(T.tLotes, { n: nf(mod.n), a: m2(mod.area) }))
     : (mod.n === 1 ? sub(T.tLoja, { id: mod.unidades[0].id, a: m2(mod.area) }) : sub(T.tLojas, { n: nf(mod.n), a: m2(mod.area) }));
   const linhaPara = cliente ? sub(T.para, { c: cliente }) : T.semCliente;
   const quem = [corretor.nome, corretor.imobiliaria].filter(Boolean).join(' · ');
@@ -239,7 +263,7 @@ function gerarPDF(mod, { corretor = {}, cliente = '', imagem = null, numero, emi
   const hBox = pad + 12 + hT + 6 + hP + 10 + hM + pad - 4;
   doc.rect(M.x, y, LARG, hBox).fill(C.escuro);
   let yy = y + pad;
-  caps(`${T.prop} · ${lotes ? T.lotes : T.outlet}`, M.x + pad, yy, { size: 6.8, sp: 2.2 });
+  caps(`${T.prop} · ${rotulo}`, M.x + pad, yy, { size: 6.8, sp: 2.2 });
   yy += 14;
   doc.font('titulo').fontSize(20).fillColor('#ffffff').text(titulo, M.x + pad, yy, { width: wIn }); yy += hT + 6;
   doc.font('txt').fontSize(11).fillColor('#d8d3cb').text(linhaPara, M.x + pad, yy, { width: wIn }); yy += hP + 10;
@@ -261,7 +285,7 @@ function gerarPDF(mod, { corretor = {}, cliente = '', imagem = null, numero, emi
 
   /* ---------- números */
   const cc = mod.cond[mod.pagamento];
-  const kpis = [[nf(mod.n), lotes ? T.kUn : T.kUnL], [m2(mod.area), T.kArea], [usd(cc.total), sub(T.kTot, { p: nomePag(mod.pagamento) })], [`US$ ${nf(cc.total / mod.area, 2)}`, T.kM2]];
+  const kpis = [[misto ? `${nf(mod.nLotes)} + ${nf(mod.nLojas)}` : nf(mod.n), misto ? T.kMisto : lotes ? T.kUn : T.kUnL], [m2(mod.area), T.kArea], [usd(cc.total), sub(T.kTot, { p: nomePag(mod.pagamento) })], [`US$ ${nf(cc.total / mod.area, 2)}`, T.kM2]];
   cabe(64);
   const wk = (LARG - 3 * 8) / 4;
   kpis.forEach(([v, r], i) => {
@@ -275,7 +299,8 @@ function gerarPDF(mod, { corretor = {}, cliente = '', imagem = null, numero, emi
   /* ---------- condição proposta */
   const linhasCond = [[cc.n ? T.sinal : T.unico, usd(cc.n ? cc.sinal : cc.total)], ...(cc.n ? [[sub(T.parc, { n: cc.n }), usd(cc.parcela)]] : [])];
   const subCond = lotes ? `${mod.janela.nome} (${mod.janela.quando}) · ${nomePag(mod.pagamento)}` : nomePag(mod.pagamento);
-  const extraCond = lotes ? (mod.faixa.ate == null ? sub(T.faixaUp, { de: mod.faixa.de }) : sub(T.faixa, { de: mod.faixa.de, ate: mod.faixa.ate })) : '';
+  const fx = lotes ? (mod.faixa.ate == null ? sub(T.faixaUp, { de: mod.faixa.de }) : sub(T.faixa, { de: mod.faixa.de, ate: mod.faixa.ate })) : '';
+  const extraCond = misto ? sub(T.faixaM, { f: fx.toLowerCase() }) : fx;
   const hCond = 118 + (extraCond ? 12 : 0);
   cabe(hCond);
   doc.rect(M.x, y, LARG, hCond).fill(C.escuro);
@@ -293,7 +318,7 @@ function gerarPDF(mod, { corretor = {}, cliente = '', imagem = null, numero, emi
 
   /* ---------- tabela das unidades */
   const cols = lotes
-    ? [[T.cLote, 0.30, 'l'], [T.cQuadra, 0.10, 'l'], [T.cCat, 0.14, 'l'], [T.cArea, 0.14, 'r'], [T.cM2, 0.12, 'r'], [T.cValor, 0.20, 'r']]
+    ? [[misto ? T.cUn : T.cLote, 0.30, 'l'], [T.cQuadra, 0.10, 'l'], [T.cCat, 0.14, 'l'], [T.cArea, 0.14, 'r'], [T.cM2, 0.12, 'r'], [T.cValor, 0.20, 'r']]
     : [[T.cLoja, 0.16, 'l'], [T.cConj, 0.34, 'l'], [T.cArea, 0.14, 'r'], [T.cM2, 0.14, 'r'], [T.cValor, 0.22, 'r']];
   const xs = []; let acc = M.x; for (const c of cols) { xs.push(acc); acc += c[1] * LARG; }
   const cab = () => {
@@ -305,7 +330,9 @@ function gerarPDF(mod, { corretor = {}, cliente = '', imagem = null, numero, emi
   h2(T.unidades);
   cab();
   mod.unidades.forEach((u, iu) => {
-    const celulas = lotes
+    const celulas = lotes && u.loja
+      ? [[`${T.loja} ${u.id}`, 'neg', u.grupo], ['Outlet'], [T.lojaCat], [m2(u.area)], [nf(u.m2, 2)], [usd(u.total), 'neg']]
+      : lotes
       ? [['LTIND.' + u.id, 'neg', u.nome], [u.grupo], [u.cat], [m2(u.area)], [nf(u.m2, u.m2 % 1 ? 2 : 0)], [usd(u.total), 'neg']]
       : [[u.id, 'neg'], [u.grupo], [m2(u.area)], [nf(u.m2, 2)], [usd(u.total), 'neg']];
     const h = lotes ? 28 : 20, ultima = iu === mod.unidades.length - 1;
@@ -319,14 +346,14 @@ function gerarPDF(mod, { corretor = {}, cliente = '', imagem = null, numero, emi
     doc.moveTo(M.x, y).lineTo(M.x + LARG, y).lineWidth(0.6).strokeColor(C.linha).stroke();
   });
   doc.rect(M.x, y, LARG, 22).fill(C.claro);
-  doc.font('neg').fontSize(9.5).fillColor(C.texto).text(`${T.total} · ${nf(mod.n)} ${lotes ? T.kUn : T.kUnL}`, M.x + 8, y + 6, { width: 260 });
+  doc.font('neg').fontSize(9.5).fillColor(C.texto).text(`${T.total} · ${qtd()}`, M.x + 8, y + 6, { width: 260 });
   doc.text(m2(mod.area), xs[lotes ? 3 : 2] + 8, y + 6, { width: cols[lotes ? 3 : 2][1] * LARG - 16, align: 'right' });
   doc.text(usd(cc.total), xs[cols.length - 1] + 8, y + 6, { width: cols[cols.length - 1][1] * LARG - 16, align: 'right' });
   y += 22 + 20;
 
   /* ---------- outras condições */
   h2(T.outras);
-  doc.font('txt').fontSize(8.4).fillColor(C.cinza).text(lotes ? T.outrasL : T.outrasO, M.x, y, { width: LARG }); y = doc.y + 8;
+  doc.font('txt').fontSize(8.4).fillColor(C.cinza).text(misto ? T.outrasM : lotes ? T.outrasL : T.outrasO, M.x, y, { width: LARG }); y = doc.y + 8;
   const celCond = (v, x, w, destaque) => {
     doc.font(destaque ? 'neg' : 'txt').fontSize(destaque ? 10.5 : 10).fillColor(destaque ? C.ouro : C.texto).text(usd(v.total), x, y + 7, { width: w, align: 'right', lineBreak: false });
     doc.font('txt').fontSize(6.6).fillColor(C.cinza).text(v.n ? `${T.pSinal.toLowerCase()} ${usd(v.sinal)} · ${v.n} × ${usd(v.parcela)}` : '—', x, y + 21, { width: w, align: 'right', lineBreak: false });
@@ -367,7 +394,7 @@ function gerarPDF(mod, { corretor = {}, cliente = '', imagem = null, numero, emi
 
   /* ---------- como avançar */
   h2(T.passos);
-  for (const p of lotes ? T.passosL : T.passosO) {
+  for (const p of misto ? [...T.passosL.slice(0, -1), T.passosO[1], T.passosL[T.passosL.length - 1]] : lotes ? T.passosL : T.passosO) {
     doc.font('txt').fontSize(9.2); const h = doc.heightOfString(p, { width: LARG - 16 });
     cabe(h + 4);
     doc.circle(M.x + 3, y + 5.5, 2.4).fill(C.ouro);
@@ -392,7 +419,7 @@ function gerarPDF(mod, { corretor = {}, cliente = '', imagem = null, numero, emi
     .text('bracerumpark.com · Villeta, Paraguay', M.x + LARG / 2 + 10, y + 58, { width: LARG / 2 - 30 });
   y += hC + 12;
 
-  const fonte = lotes ? T.fonteL : sub(T.fonteO, { t: mod.tabela });
+  const fonte = misto ? `${T.fonteL} ${sub(T.fonteO, { t: mod.tabelaOutlet })}` : lotes ? T.fonteL : sub(T.fonteO, { t: mod.tabela });
   const nota = sub(T.nota, { d: dataHora(emitido), fuso: nomeFuso || tz, fonte, s: mod.sincronizadoEm && !mod.semSituacao ? dataHora(new Date(mod.sincronizadoEm)) : T.semSit });
   doc.font('ita').fontSize(7.4).fillColor(C.cinza).text(nota, M.x, y, { width: LARG, lineGap: 1 });
 
@@ -404,7 +431,7 @@ function gerarPDF(mod, { corretor = {}, cliente = '', imagem = null, numero, emi
     caps('Bracerum Park', M.x, 26, { size: 6.6, sp: 2.4 });
     doc.font('txt').fontSize(6.6).fillColor(C.cinza).text(`${T.prop} ${numero}${cliente ? ' · ' + cliente : ''}`, M.x + 110, 26, { width: LARG - 110, lineBreak: false });
     caps('Bracerum Park', M.x, PAGES.h - 34, { size: 6, cor: C.cinza, sp: 2.4 });
-    doc.font('txt').fontSize(6.6).fillColor(C.cinza).text(lotes ? T.lotes : T.outlet, M.x, PAGES.h - 34, { width: LARG, align: 'center', lineBreak: false })
+    doc.font('txt').fontSize(6.6).fillColor(C.cinza).text(rotulo, M.x, PAGES.h - 34, { width: LARG, align: 'center', lineBreak: false })
       .text(sub(T.pag, { i: i + 1, n: total }), M.x, PAGES.h - 34, { width: LARG, align: 'right', lineBreak: false });
     doc.page.margins.bottom = mb;
   }

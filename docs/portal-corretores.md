@@ -486,7 +486,12 @@ Os PDFs são estáticos: a aba Tabela acompanha o CV sozinha, o PDF só muda qua
   segue a planta (fileira da frente 01–18, de trás 19–36, coluna de dentro 37–44, de fora 45–57) — conferida pela
   área: correlação 0,999. Gerado por **`docs/3dmasterplan/build_outlet.py`** → `3dmasterplan/data/outlet.json`.
   Situação ao vivo: `/api/lotes-status` agora devolve também `lojas` (mapa de disponibilidade do 9). Lotes e lojas são
-  simulados separados. As 12 "Lojas" e o Supermercado do Market ainda não estão no desenho — não são clicáveis.
+  somados na mesma simulação e na mesma proposta (desde 25/11, pedido do Matheus — ver abaixo). As 12 "Lojas" e o
+  Supermercado do Market ainda não estão no desenho — não são clicáveis.
+- **Proposta mista (lotes + lojas):** a faixa de quantidade da Tabela P1 conta **só os lotes**; as lojas entram pelos
+  valores do CV (iguais em todas as janelas); total, sinal e parcelas = soma das duas partes. O cartão mostra as duas
+  parcelas ("Lotes · Lançamento" e "Lojas do Outlet"), e o PDF traz as duas na mesma tabela e na matriz janela ×
+  pagamento (só a parte dos lotes muda com a janela). O servidor separa pelo id (lote do `lotes.json` × loja do CV).
 - **Modo corretor** (`/3dmasterplan/?corretor=1`, usado pelos iframes e links do portal): o "Pedir proposta" vira
   **"Baixar proposta"** com o nome do cliente (opcional). A maquete manda ids, janela, pagamento, idioma e um retrato
   da vista (JPEG) para `POST /api/portal {acao:'proposta'}`; o servidor confere a sessão (sem sessão = 401, a maquete
